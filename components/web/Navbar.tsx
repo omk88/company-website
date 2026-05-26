@@ -8,6 +8,8 @@ import { RxLinkedinLogo } from "react-icons/rx";
 import { AiOutlineInstagram } from "react-icons/ai";
 import { cn } from "@/lib/utils";
 import Image from 'next/image';
+import { FaXTwitter } from "react-icons/fa6";
+
 
 
 export function Navbar() {
@@ -18,15 +20,15 @@ export function Navbar() {
     return (
         <nav className="w-full py-5 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-                <Image
+                {/* <Image
                     src={"https://i.ibb.co/JRXCHVWB/logo3.png"}
                     alt="image"
                     width="50"
                     height="50"
-                />
+                /> */}
                 <Link href="/">
                     <h1 className="text-3xl font-bold">
-                        taQtiQ
+                        <span className="text-2.2xl">t</span>a<span className="text-3.5xl">Q</span>ti<span className="text-4xl">Q</span>
                     </h1>
                 </Link>
 
@@ -39,6 +41,7 @@ export function Navbar() {
                 </div>
             </div>
             <div className="flex items-center gap-5 ml-4">
+                <FaXTwitter className="h-8 w-8" />
                 <AiOutlineInstagram className="h-8 w-8" />
                 <RxLinkedinLogo className="h-8 w-8" />
                 <ThemeToggle />
