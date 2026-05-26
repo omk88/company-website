@@ -1,5 +1,9 @@
+import TypewriterEffect from "@/components/web/TypeWriter";
+
 export default function Home() {
   return (
-    <div>Hello world</div>
+    <div>
+      <TypewriterEffect />
+    </div>
   );
 }

@@ -17,16 +17,16 @@ export function Navbar() {
             <div className="flex items-center gap-8">
                 <Link href="/">
                     <h1 className="text-3xl font-bold">
-                        tektract
+                        taQtiQ
                     </h1>
                 </Link>
 
                 <div className="flex items-center gap-10 ml-4">
                     <Link className={buttonVariants({ variant: "link" })} href="/">Home</Link>
-                    <Link className={buttonVariants({ variant: "ghost" })} href="/about">About</Link>
-                    <Link className={buttonVariants({ variant: "ghost" })} href="/insights">Insights</Link>
-                    <Link className={buttonVariants({ variant: "ghost" })} href="/contact">Contact</Link>
-                    <Link className={buttonVariants({ variant: "ghost" })} href="/products">Products</Link>
+                    <Link className={buttonVariants({ variant: "link" })} href="/about">About</Link>
+                    <Link className={buttonVariants({ variant: "link" })} href="/insights">Insights</Link>
+                    <Link className={buttonVariants({ variant: "link" })} href="/contact">Contact</Link>
+                    <Link className={buttonVariants({ variant: "link" })} href="/products">Products</Link>
                 </div>
             </div>
             <div className="flex items-center gap-5 ml-4">
