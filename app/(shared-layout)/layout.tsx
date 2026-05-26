@@ -1,3 +1,5 @@
+import { Separator } from "@/components/ui/separator";
+import Footer from "@/components/web/Footer";
 import { Navbar } from "@/components/web/Navbar";
 import { ReactNode } from "react";
 
@@ -7,6 +9,7 @@ export default function SharedLayout({ children }: { children: ReactNode }) {
             
             <Navbar />
             { children }
+            <Footer />
         </>
     );
 }

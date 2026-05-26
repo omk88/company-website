@@ -10,7 +10,7 @@ const spaceGrotesk = Space_Grotesk({
 
 export default function TypewriterEffect() {
   return (
-    <div className={`${spaceGrotesk.className} text-8xl font-bold`}>
+    <div className={`${spaceGrotesk.className} text-5xl font-bold`}>
       <span className="text-black flex flex-row items-center justify-start gap-2">
         <span>{">"}</span>
         <Typewriter

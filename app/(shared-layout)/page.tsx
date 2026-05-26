@@ -3,7 +3,14 @@ import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Card } from "@/components/ui/card";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { LuBoxes } from "react-icons/lu";
+import { IoAccessibility } from "react-icons/io5";
+import { LuComputer } from "react-icons/lu";
+import { Separator } from "@/components/ui/separator";
+
+
+
 
 // style={{ backgroundImage: "url('https://i.postimg.cc/qRmvBwP7/grid3.png')" }}
 
@@ -17,7 +24,7 @@ export default function Home() {
             <div>
               <TypewriterEffect /> 
             </div>
-            <p className="text-lg leading-relaxed text-muted-foreground">
+            <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
               Lorem Ipsum is simply dummy text of the printing and typesetting industry. 
               Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, 
               when an unknown printer took a galley of type and scrambled it to make a type 
@@ -42,15 +49,61 @@ export default function Home() {
           </div>
         </div>
       </div>
-    <div className="mt-15 mb-15 h-70 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-      <Card className="border-2 rounded-none">
-        {/* Card 1 Content */}
+    <div className="mt-15 mb-10 h-100 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <Card className="border-2 rounded-none object-cover hover:scale-107 transition duration-500">
+        <CardHeader>
+          <LuBoxes className="h-10 w-10" />
+          <CardTitle className="text-2xl">Lorem Ipsum</CardTitle>
+          <CardDescription>
+              Lorem Ipsum is simply dummy text of the printing and typesetting industry. 
+              Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, 
+              when an unknown printer took a galley of type and scrambled it to make a type 
+              specimen book. It has survived not only five centuries, but also the leap into 
+              electronic typesetting, remaining essentially unchanged. It was popularised in 
+              the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, 
+              and more recently with desktop publishing software like Aldus PageMaker 
+              including versions of Lorem Ipsum.
+          </CardDescription>
+        </CardHeader>
       </Card>
-      <Card className="border-2 rounded-none">
-        {/* Card 2 Content */}
+      <Card className="border-2 rounded-none object-cover hover:scale-107 transition duration-500">
+        <CardHeader>
+          <IoAccessibility className="h-10 w-10" />
+          <CardTitle className="text-2xl">Lorem Ipsum</CardTitle>
+          <CardDescription>
+              Lorem Ipsum is simply dummy text of the printing and typesetting industry. 
+              Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, 
+              when an unknown printer took a galley of type and scrambled it to make a type 
+              specimen book. It has survived not only five centuries, but also the leap into 
+              electronic typesetting, remaining essentially unchanged. It was popularised in 
+              the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, 
+              and more recently with desktop publishing software like Aldus PageMaker 
+              including versions of Lorem Ipsum.
+          </CardDescription>
+        </CardHeader>
       </Card>
+      <Card className="border-2 rounded-none object-cover hover:scale-107 transition duration-500">
+        <CardHeader>
+          <LuComputer className="h-10 w-10" />
+          <CardTitle className="text-2xl">Lorem Ipsum</CardTitle>
+          <CardDescription>
+              Lorem Ipsum is simply dummy text of the printing and typesetting industry. 
+              Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, 
+              when an unknown printer took a galley of type and scrambled it to make a type 
+              specimen book. It has survived not only five centuries, but also the leap into 
+              electronic typesetting, remaining essentially unchanged. It was popularised in 
+              the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, 
+              and more recently with desktop publishing software like Aldus PageMaker 
+              including versions of Lorem Ipsum.
+          </CardDescription>
+        </CardHeader>
+      </Card>
+    </div>
+    <div className="mb-15 h-100 grid gap-6 md:grid-cols-2 lg:grid-cols-1">
       <Card className="border-2 rounded-none">
-        {/* Card 3 Content */}
+        <CardHeader>
+          <CardTitle className="text-2xl">Lorem Ipsum</CardTitle>
+        </CardHeader>
       </Card>
     </div>
     </div>

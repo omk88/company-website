@@ -28,7 +28,7 @@ export function Navbar() {
                 /> */}
                 <Link href="/">
                     <h1 className="text-3xl font-bold">
-                        <span className="text-2.2xl">t</span>a<span className="text-3.5xl">Q</span>ti<span className="text-4xl">Q</span>
+                        <span className="text-2.2xl">T</span>a<span className="text-3.5xl">Q</span>ti<span className="text-4xl">Q</span>
                     </h1>
                 </Link>
 
