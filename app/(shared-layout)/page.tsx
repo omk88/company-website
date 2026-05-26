@@ -3,7 +3,7 @@ import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LuBoxes } from "react-icons/lu";
 import { IoAccessibility } from "react-icons/io5";
 import { LuComputer } from "react-icons/lu";
@@ -11,9 +11,6 @@ import { Separator } from "@/components/ui/separator";
 import { FaGlobeEurope } from "react-icons/fa";
 import { BiSolidServer } from "react-icons/bi";
 import { GiArtificialIntelligence } from "react-icons/gi";
-
-
-
 import {
   Carousel,
   CarouselContent,
@@ -21,45 +18,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
-
-const CAROUSEL_ITEMS = [
-  {
-    id: "boxes",
-    icon: LuBoxes,
-    title: "Lorem Ipsum",
-    description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.",
-  },
-  {
-    id: "accessibility",
-    icon: IoAccessibility,
-    title: "Lorem Ipsum",
-    description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.",
-  },
-  {
-    id: "computer",
-    icon: LuComputer,
-    title: "Lorem Ipsum",
-    description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. ",
-  },
-  {
-    id: "globe",
-    icon: FaGlobeEurope,
-    title: "Lorem Ipsum",
-    description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.",
-  },
-  {
-    id: "server",
-    icon: BiSolidServer,
-    title: "Lorem Ipsum",
-    description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.",
-  },
-  {
-    id: "ai",
-    icon: GiArtificialIntelligence,
-    title: "Lorem Ipsum",
-    description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. ",
-  },
-];
+import { CAROUSEL_ITEMS } from "../constants/carouselItems"
 
 
 // style={{ backgroundImage: "url('https://i.postimg.cc/qRmvBwP7/grid3.png')" }}
@@ -127,10 +86,38 @@ export default function Home() {
       </div>
 
       <div className="mb-15 h-100 grid gap-6 md:grid-cols-2 lg:grid-cols-1">
-        <Card className="border-2 rounded-none">
+        <Card className="bg-gray-200 rounded-none">
           <CardHeader>
-            <CardTitle className="text-2xl">Lorem Ipsum</CardTitle>
+            <CardTitle className="text-2xl text-center">Working with trusted tools</CardTitle>
           </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center justify-items-center w-full">
+              
+              <div className="w-full aspect-video relative overflow-hidden border-muted">
+                <img 
+                  src="https://i.postimg.cc/L8zSfkXM/nextjs.jpg" 
+                  alt="Tool 1" 
+                  className="w-full h-full object-contain"
+                />
+              </div>
+
+              <div className="w-full aspect-video relative overflow-hidden border-muted">
+                <img 
+                  src="https://i.postimg.cc/3NRrFkqW/typescript.png" 
+                  alt="Tool 2" 
+                  className="w-full h-full object-contain"
+                />
+              </div>
+
+              <div className="w-full aspect-video relative overflow-hidden border-muted">
+                <img 
+                  src="https://via.placeholder.com/400x250" 
+                  alt="Tool 3" 
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            </div>
+          </CardContent>
         </Card>
       </div>
     </div>
