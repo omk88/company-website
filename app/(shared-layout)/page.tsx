@@ -3,14 +3,14 @@ import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Card } from "@/components/ui/card";
 
 // style={{ backgroundImage: "url('https://i.postimg.cc/qRmvBwP7/grid3.png')" }}
 
 
 export default function Home() {
   return (
-    <div 
-      className="min-h-screen w-full bg-cover bg-center bg-no-repeat"    >
+    <div className="min-h-screen w-full bg-cover bg-center bg-no-repeat">
       <div className="mt-10 max-w-7xl mx-auto px-6">
         <div className="flex flex-row items-center justify-between w-full gap-12">
           <div className="w-[65%] flex flex-col gap-8 shrink-0">
@@ -42,6 +42,17 @@ export default function Home() {
           </div>
         </div>
       </div>
+    <div className="mt-15 mb-15 h-70 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <Card className="border-2 rounded-none">
+        {/* Card 1 Content */}
+      </Card>
+      <Card className="border-2 rounded-none">
+        {/* Card 2 Content */}
+      </Card>
+      <Card className="border-2 rounded-none">
+        {/* Card 3 Content */}
+      </Card>
+    </div>
     </div>
   );
 }
