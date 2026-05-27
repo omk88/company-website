@@ -27,21 +27,18 @@ import { CAROUSEL_ITEMS } from "../constants/carouselItems"
 export default function Home() {
   return (
     <div className="min-h-screen w-full bg-cover bg-center bg-no-repeat">
-      <div className="mt-10 max-w-7xl mx-auto px-6">
-        <div className="flex flex-row items-center justify-between w-full gap-12">
+      <div className="mt-25 max-w-7xl mx-auto px-6">
+        <div className="mb-25 flex flex-row items-center justify-between w-full gap-12">
           <div className="w-[65%] flex flex-col gap-8 shrink-0">
             <div>
               <TypewriterEffect /> 
             </div>
-            <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
+            <p className="mt-5 text-base leading-relaxed text-muted-foreground">
               Lorem Ipsum is simply dummy text of the printing and typesetting industry. 
               Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, 
               when an unknown printer took a galley of type and scrambled it to make a type 
               specimen book. It has survived not only five centuries, but also the leap into 
-              electronic typesetting, remaining essentially unchanged. It was popularised in 
-              the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, 
-              and more recently with desktop publishing software like Aldus PageMaker 
-              including versions of Lorem Ipsum.
+              electronic typesetting, remaining essentially unchanged.
             </p>
           </div>
 
@@ -49,11 +46,11 @@ export default function Home() {
             <Link 
               className={cn(
                 buttonVariants({ variant: "outline" }), 
-                "text-xl font-bold uppercase tracking-wider px-10 py-7 h-auto border-2 gap-4 rounded-none whitespace-nowrap"
+                "text-sm font-bold uppercase tracking-wider px-10 py-7 h-auto border-2 gap-4 rounded-none whitespace-nowrap"
               )} 
               href="/products"
             > 
-              View products <ArrowRight className="size-6"/>
+              View products <ArrowRight className="size-3"/>
             </Link>
           </div>
         </div>
