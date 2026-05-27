@@ -20,16 +20,12 @@ import {
 } from "@/components/ui/carousel"
 import { CAROUSEL_ITEMS } from "../constants/carouselItems"
 
-
-// style={{ backgroundImage: "url('https://i.postimg.cc/qRmvBwP7/grid3.png')" }}
-
-
 export default function Home() {
   return (
     <div className="min-h-screen w-full bg-cover bg-center bg-no-repeat">
-      <div className="mt-25 max-w-7xl mx-auto px-6">
-        <div className="mb-25 flex flex-row items-center justify-between w-full gap-12">
-          <div className="w-[65%] flex flex-col gap-8 shrink-0">
+      <div className="mt-30 max-w-7xl mx-auto px-6">
+        <div className="mb-60 flex flex-row items-center justify-between w-full gap-12">
+          <div className="w-[50%] flex flex-col gap-8 shrink-0">
             <div>
               <TypewriterEffect /> 
             </div>
@@ -83,14 +79,13 @@ export default function Home() {
       </div>
 
       <div className="mb-15 h-100 grid gap-6 md:grid-cols-2 lg:grid-cols-1">
-        <Card className="bg-gray-200 rounded-none">
+        <Card className="border-0">
           <CardHeader>
             <CardTitle className="text-2xl text-center">Working with trusted tools</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center justify-items-center w-full">
-              
-              <div className="w-full aspect-video relative overflow-hidden border-muted">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 items-center justify-items-center w-full">
+              <div className="w-full p-12 aspect-video relative overflow-hidden border-muted">
                 <img 
                   src="https://i.postimg.cc/L8zSfkXM/nextjs.jpg" 
                   alt="Tool 1" 
@@ -98,17 +93,17 @@ export default function Home() {
                 />
               </div>
 
-              <div className="w-full aspect-video relative overflow-hidden border-muted">
+              <div className="w-full p-12 aspect-video relative overflow-hidden border-muted">
                 <img 
-                  src="https://i.postimg.cc/3NRrFkqW/typescript.png" 
+                  src="https://i.postimg.cc/hv3p7Bcz/typescript-logo-icon-144782.png" 
                   alt="Tool 2" 
                   className="w-full h-full object-contain"
                 />
               </div>
 
-              <div className="w-full aspect-video relative overflow-hidden border-muted">
+              <div className="w-full p-12 aspect-video relative overflow-hidden border-muted">
                 <img 
-                  src="https://via.placeholder.com/400x250" 
+                  src="https://i.postimg.cc/WzjPf0kX/logo-black.png" 
                   alt="Tool 3" 
                   className="w-full h-full object-contain"
                 />
