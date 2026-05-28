@@ -40,6 +40,7 @@ export function Navbar() {
                     <Link className={cn(buttonVariants({ variant: "link" }), anim)} href="/products">Products</Link>
                 </div>
             </div>
+            <Link className={buttonVariants()} href="/sign-in">Sign in</Link>
             <div className="flex items-center gap-5 ml-4">
                 <FaXTwitter className="h-8 w-8" />
                 <AiOutlineInstagram className="h-8 w-8" />
