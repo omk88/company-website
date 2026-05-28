@@ -1,5 +1,3 @@
-"use client";
-
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import SignUpForm from "@/components/web/SignUpForm";
 import SignInForm from "@/components/web/SignInForm";
