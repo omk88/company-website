@@ -9,14 +9,27 @@ import { authClient } from "@/lib/auth-client";
 import { signUpSchema } from "@/app/schemas/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
+import { toast } from "sonner";
 
 export default function SignUpForm() {
+
+    function onError(errors: any) {
+        const firstErrorKey = Object.keys(errors)[0];
+        
+        if (firstErrorKey) {
+            const errorMessage = errors[firstErrorKey].message;
+            toast.error(errorMessage);
+        }
+    }
+
     const form = useForm({
         resolver: zodResolver(signUpSchema),
+        mode: "onTouched",
         defaultValues: {
             email: "",
             name: "",
-            password: ""
+            password: "",
+            confirmpassword: ""
         }
     });
 
@@ -31,7 +44,7 @@ export default function SignUpForm() {
     const handleGoogleSignIn = async () => {
         await authClient.signIn.social({
             provider: "google",
-            callbackURL: "/dashboard",
+            callbackURL: "/",
         });
     };
     
@@ -42,7 +55,7 @@ export default function SignUpForm() {
                 <CardDescription>Create an account to get started</CardDescription>
             </CardHeader>
             <CardContent>
-                <form onSubmit={form.handleSubmit(onSubmit)}>
+                <form onSubmit={form.handleSubmit(onSubmit, onError)}>
                     <FieldGroup className="gap-y-4">
                         <Controller
                             name="name"
@@ -70,7 +83,22 @@ export default function SignUpForm() {
                             render={({ field, fieldState }) => (
                                 <Field>
                                     <FieldLabel>Password</FieldLabel>
-                                    <Input aria-invalid={fieldState.invalid} placeholder="*****" type="password" {...field}/>
+                                    <Input aria-invalid={fieldState.invalid} placeholder="********" type="password" {...field}/>
+                                </Field>
+                            )}
+                        />
+                        <Controller
+                            name="confirmpassword"
+                            control={form.control}
+                            render={({ field, fieldState }) => (
+                                <Field>
+                                    <FieldLabel>Confirm Password</FieldLabel>
+                                    <Input 
+                                        aria-invalid={fieldState.invalid} 
+                                        placeholder="********" 
+                                        type="password" 
+                                        {...field}
+                                    />
                                 </Field>
                             )}
                         />
