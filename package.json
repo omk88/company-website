@@ -9,9 +9,11 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@convex-dev/better-auth": "^0.12.2",
     "better-auth": "^1.6.11",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "convex": "^1.39.1",
     "embla-carousel-react": "^8.6.0",
     "lucide-react": "^1.16.0",
     "next": "16.2.6",

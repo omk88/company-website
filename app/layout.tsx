@@ -3,6 +3,7 @@ import { ThemeProvider } from "@/components/ui/theme-provider"
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google"; 
 import "./globals.css";
+import { ConvexClientProvider } from "./ConvexClientProvider";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -29,7 +30,9 @@ export default function RootLayout({
             enableSystem
         >
           <main className="max-w-7xl mx-auto w-full">
-            {children}
+            <ConvexClientProvider>
+              {children}
+            </ConvexClientProvider>
           </main>
         </ThemeProvider>
       </body>
