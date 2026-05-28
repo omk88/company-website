@@ -8,14 +8,47 @@ import { Input } from "../ui/input";
 import { authClient } from "@/lib/auth-client";
 import { Checkbox } from "../ui/checkbox";
 import Link from "next/link";
+import { toast } from "sonner";
+import { useState } from "react";
 
 export default function SignInForm() {
-    const { control } = useForm();
+    const [isLoading, setIsLoading] = useState(false);
+    
+    const { control, handleSubmit } = useForm({
+        defaultValues: {
+            email: "",
+            password: "",
+            rememberMe: false
+        }
+    });
+
+    const onSubmit = async (data: any) => {
+        setIsLoading(true);
+        try {
+            await authClient.signIn.email({
+                email: data.email,
+                password: data.password,
+                callbackURL: "/", 
+            }, {
+                onRequest: () => setIsLoading(true),
+                onSuccess: () => {
+                    toast.success("Successfully signed in!");
+                },
+                onError: (ctx) => {
+                    setIsLoading(false);
+                    toast.error(ctx.error.message || "Invalid email or password.");
+                }
+            });
+        } catch (error) {
+            setIsLoading(false);
+            toast.error("An unexpected error occurred.");
+        }
+    };
 
     const handleGoogleSignIn = async () => {
         await authClient.signIn.social({
             provider: "google",
-            callbackURL: "/dashboard",
+            callbackURL: "/",
         });
     };
     
@@ -26,15 +59,21 @@ export default function SignInForm() {
                 <CardDescription>Sign in to continue</CardDescription>
             </CardHeader>
             <CardContent>
-                <form onSubmit={(e) => e.preventDefault()}>
+                <form onSubmit={handleSubmit(onSubmit)}>
                     <FieldGroup className="gap-y-4">
                         <Controller
                             name="email"
                             control={control}
+                            rules={{ required: "Email is required" }}
                             render={({ field, fieldState }) => (
                                 <Field>
                                     <FieldLabel>Email</FieldLabel>
-                                    <Input aria-invalid={fieldState.invalid} placeholder="john@doe.com" type="email" {...field}/>
+                                    <Input 
+                                        aria-invalid={fieldState.invalid} 
+                                        placeholder="john@doe.com" 
+                                        type="email" 
+                                        {...field}
+                                    />
                                 </Field>
                             )}
                         />
@@ -42,27 +81,40 @@ export default function SignInForm() {
                         <Controller
                             name="password"
                             control={control}
+                            rules={{ required: "Password is required" }}
                             render={({ field, fieldState }) => (
                                 <Field>
                                     <FieldLabel>Password</FieldLabel>
-                                    <Input aria-invalid={fieldState.invalid} placeholder="********" type="password" {...field}/>
+                                    <Input 
+                                        aria-invalid={fieldState.invalid} 
+                                        placeholder="********" 
+                                        type="password" 
+                                        {...field}
+                                    />
                                 </Field>
                             )}  
                         />
 
                         <div className="flex items-center justify-between pt-1 pb-2">
-                            <Field orientation="horizontal" className="space-x-2">
-                                <Checkbox
-                                    id="remember-me-checkbox"
-                                    name="remember-me-checkbox"
-                                />
-                                <FieldLabel
-                                    htmlFor="remember-me-checkbox"
-                                    className="font-normal cursor-pointer select-none"
-                                >
-                                    Remember me
-                                </FieldLabel>
-                            </Field>
+                            <Controller
+                                name="rememberMe"
+                                control={control}
+                                render={({ field }) => (
+                                    <Field orientation="horizontal" className="space-x-2">
+                                        <Checkbox
+                                            id="remember-me-checkbox"
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
+                                        />
+                                        <FieldLabel
+                                            htmlFor="remember-me-checkbox"
+                                            className="font-normal cursor-pointer select-none"
+                                        >
+                                            Remember me
+                                        </FieldLabel>
+                                    </Field>
+                                )}
+                            />
 
                             <Link
                                 href="/forgot-password" 
@@ -71,7 +123,10 @@ export default function SignInForm() {
                                 Forgot password?
                             </Link>
                         </div>
-                        <Button type="submit" className="w-full">Sign in</Button>
+                        
+                        <Button type="submit" className="w-full" disabled={isLoading}>
+                            {isLoading ? "Signing in..." : "Sign in"}
+                        </Button>
                     </FieldGroup>
                 </form>
 
@@ -87,6 +142,7 @@ export default function SignInForm() {
                     variant="outline" 
                     className="w-full" 
                     onClick={handleGoogleSignIn}
+                    disabled={isLoading}
                 >
                     <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
                         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>

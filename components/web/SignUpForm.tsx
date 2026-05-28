@@ -10,15 +10,18 @@ import { signUpSchema } from "@/app/schemas/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
 import { toast } from "sonner";
+import { useState } from "react"; 
+import { useRouter } from "next/navigation";
 
 export default function SignUpForm() {
+    const [isLoading, setIsLoading] = useState(false);
+    const router = useRouter();
 
     function onError(errors: any) {
         const firstErrorKey = Object.keys(errors)[0];
         
         if (firstErrorKey) {
             const errorMessage = errors[firstErrorKey].message;
-            
             toast.error(errorMessage);
         }
     }
@@ -38,14 +41,29 @@ export default function SignUpForm() {
         await authClient.signUp.email({
             email: data.email,
             name: data.name,
-            password: data.password
+            password: data.password,
+        }, {
+            onRequest: () => {
+                setIsLoading(true);
+            },
+            onSuccess: () => {
+                setIsLoading(false);
+                toast.success("Account created successfully!");
+                
+                router.push("/"); 
+                router.refresh();
+            },
+            onError: (ctx) => {
+                setIsLoading(false);
+                toast.error(ctx.error.message || "Failed to create an account.");
+            }
         });
     }
 
     const handleGoogleSignIn = async () => {
         await authClient.signIn.social({
             provider: "google",
-            callbackURL: "/",
+            callbackURL: "/", 
         });
     };
     
@@ -64,7 +82,7 @@ export default function SignUpForm() {
                             render={({ field, fieldState }) => (
                                 <Field>
                                     <FieldLabel>Username</FieldLabel>
-                                    <Input aria-invalid={fieldState.invalid} placeholder="User#123" {...field}/>
+                                    <Input aria-invalid={fieldState.invalid} placeholder="User#123" disabled={isLoading} {...field}/>
                                 </Field>
                             )}
                         />
@@ -74,7 +92,7 @@ export default function SignUpForm() {
                             render={({ field, fieldState }) => (
                                 <Field>
                                     <FieldLabel>Email</FieldLabel>
-                                    <Input aria-invalid={fieldState.invalid} placeholder="john@doe.com" type="email" {...field}/>
+                                    <Input aria-invalid={fieldState.invalid} placeholder="john@doe.com" type="email" disabled={isLoading} {...field}/>
                                 </Field>
                             )}
                         />
@@ -84,7 +102,7 @@ export default function SignUpForm() {
                             render={({ field, fieldState }) => (
                                 <Field>
                                     <FieldLabel>Password</FieldLabel>
-                                    <Input aria-invalid={fieldState.invalid} placeholder="********" type="password" {...field}/>
+                                    <Input aria-invalid={fieldState.invalid} placeholder="********" type="password" disabled={isLoading} {...field}/>
                                 </Field>
                             )}
                         />
@@ -98,12 +116,16 @@ export default function SignUpForm() {
                                         aria-invalid={fieldState.invalid} 
                                         placeholder="********" 
                                         type="password" 
+                                        disabled={isLoading}
                                         {...field}
                                     />
                                 </Field>
                             )}
                         />
-                        <Button type="submit" className="w-full">Sign up</Button>
+                        
+                        <Button type="submit" className="w-full" disabled={isLoading}>
+                            {isLoading ? "Creating account..." : "Sign up"}
+                        </Button>
                     </FieldGroup>
                 </form>
 
@@ -119,6 +141,7 @@ export default function SignUpForm() {
                     variant="outline" 
                     className="w-full" 
                     onClick={handleGoogleSignIn}
+                    disabled={isLoading} 
                 >
                     <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
                         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
