@@ -7,9 +7,9 @@ import { FieldGroup, Field, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
 import { authClient } from "@/lib/auth-client";
 import { Checkbox } from "../ui/checkbox";
+import Link from "next/link";
 
 export default function SignInForm() {
-
     const { control } = useForm();
 
     const handleGoogleSignIn = async () => {
@@ -19,7 +19,7 @@ export default function SignInForm() {
         });
     };
     
-    return(
+    return (
         <Card>
             <CardHeader>
                 <CardTitle>Sign in</CardTitle>
@@ -38,30 +38,40 @@ export default function SignInForm() {
                                 </Field>
                             )}
                         />
+
                         <Controller
                             name="password"
                             control={control}
                             render={({ field, fieldState }) => (
                                 <Field>
                                     <FieldLabel>Password</FieldLabel>
-                                    <Input aria-invalid={fieldState.invalid} placeholder="*****" type="password" {...field}/>
+                                    <Input aria-invalid={fieldState.invalid} placeholder="********" type="password" {...field}/>
                                 </Field>
                             )}  
                         />
-                        <Field orientation="horizontal">
-                            <Checkbox
-                                id="finder-pref-9k2-hard-disks-ljj-checkbox"
-                                name="finder-pref-9k2-hard-disks-ljj-checkbox"
-                            />
-                            <FieldLabel
-                                htmlFor="finder-pref-9k2-hard-disks-ljj-checkbox"
-                                className="font-normal"
+
+                        <div className="flex items-center justify-between pt-1 pb-2">
+                            <Field orientation="horizontal" className="space-x-2">
+                                <Checkbox
+                                    id="remember-me-checkbox"
+                                    name="remember-me-checkbox"
+                                />
+                                <FieldLabel
+                                    htmlFor="remember-me-checkbox"
+                                    className="font-normal cursor-pointer select-none"
+                                >
+                                    Remember me
+                                </FieldLabel>
+                            </Field>
+
+                            <Link
+                                href="/forgot-password" 
+                                className="whitespace-nowrap text-sm font-medium text-muted-foreground hover:text-primary hover:underline transition-colors"
                             >
-                                Remember me
-                            </FieldLabel>
-                        </Field>
-                            
-                        <Button>Sign up</Button>
+                                Forgot password?
+                            </Link>
+                        </div>
+                        <Button type="submit" className="w-full">Sign in</Button>
                     </FieldGroup>
                 </form>
 
@@ -84,7 +94,7 @@ export default function SignInForm() {
                         <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
                         <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                     </svg>
-                    Sign up with Google
+                    Sign in with Google
                 </Button>
             </CardContent>
         </Card>

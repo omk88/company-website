@@ -18,6 +18,7 @@ export default function SignUpForm() {
         
         if (firstErrorKey) {
             const errorMessage = errors[firstErrorKey].message;
+            
             toast.error(errorMessage);
         }
     }

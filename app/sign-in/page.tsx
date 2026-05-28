@@ -12,8 +12,10 @@ export default function SignIn() {
                     <TabsTrigger value="signup">Sign up</TabsTrigger>
                     <TabsTrigger value="signin">Sign in</TabsTrigger>
                 </TabsList>
-                <TabsContent value="signup"><SignUpForm /></TabsContent>
-                <TabsContent value="signin"><SignInForm /></TabsContent>
+                <div className="min-h-[510px] flex flex-col justify-start">
+                    <TabsContent value="signup"><SignUpForm /></TabsContent>
+                    <TabsContent value="signin"><SignInForm /></TabsContent>
+                </div>
             </Tabs>
         </div>
     );
