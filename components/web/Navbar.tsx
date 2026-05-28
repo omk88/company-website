@@ -1,31 +1,21 @@
-"use client";
-
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Button, buttonVariants } from "../ui/button";
+import { buttonVariants } from "../ui/button";
 import { ThemeToggle } from "./ThemeToggle";
 import { RxLinkedinLogo } from "react-icons/rx";
 import { AiOutlineInstagram } from "react-icons/ai";
 import { cn } from "@/lib/utils";
-import Image from 'next/image';
 import { FaXTwitter } from "react-icons/fa6";
+import { NavbarAuth } from "./NavbarAuth";
+import { isAuthenticated } from "@/lib/auth-server"; 
 
-
-
-export function Navbar() {
-
-    const router = useRouter();
+export async function Navbar() { 
     const anim = "relative no-underline hover:no-underline after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100";
+
+    const userIsAuthenticated = await isAuthenticated();
 
     return (
         <nav className="w-full py-5 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-                {/* <Image
-                    src={"https://i.ibb.co/JRXCHVWB/logo3.png"}
-                    alt="image"
-                    width="50"
-                    height="50"
-                /> */}
                 <Link href="/">
                     <h1 className="text-3xl font-bold">
                         <span className="text-2.2xl">T</span>a<span className="text-3.5xl">Q</span>ti<span className="text-4xl">Q</span>
@@ -40,12 +30,15 @@ export function Navbar() {
                     <Link className={cn(buttonVariants({ variant: "link" }), anim)} href="/products">Products</Link>
                 </div>
             </div>
-            <Link className={buttonVariants()} href="/sign-in">Sign in</Link>
+
             <div className="flex items-center gap-5 ml-4">
                 <FaXTwitter className="h-8 w-8" />
                 <AiOutlineInstagram className="h-8 w-8" />
                 <RxLinkedinLogo className="h-8 w-8" />
-                <ThemeToggle />
+                <div className="flex items-center gap-1 ml-4">
+                    <ThemeToggle />
+                    <NavbarAuth initialIsAuth={userIsAuthenticated} />
+                </div>
             </div>
         </nav>
     );
