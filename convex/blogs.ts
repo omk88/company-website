@@ -7,17 +7,26 @@ export const createPost = mutation({
     subtitle: v.string(),
     imageUrl: v.string(),
     content: v.string(),
+    tags: v.array(v.string()),
   },
   handler: async (ctx, args) => {
-
-    const newBlogId = await ctx.db.insert("blogs", {
+    return await ctx.db.insert("blogs", {
       title: args.title,
       subtitle: args.subtitle,
       imageUrl: args.imageUrl,
       content: args.content,
+      tags: args.tags, 
       createdAt: Date.now(),
     });
+  },
+});
 
-    return newBlogId;
+export const getPosts = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db
+      .query("blogs")
+      .order("desc")
+      .collect();
   },
 });

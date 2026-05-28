@@ -1,15 +1,15 @@
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
+import Link from "next/link";
 
 export interface BlogPost {
-    id: string;
-    author: string;
-    date: string;
-    imageSrc: string;
+    _id: string;
     title: string;
-    description: string;
-    tags: string[];
+    subtitle: string;
+    imageUrl: string;
+    content: string;
+    tags: string[]; 
+    createdAt: number;
 }
 
 interface BlogCardProps {
@@ -17,42 +17,57 @@ interface BlogCardProps {
 }
 
 export function BlogCard({ post }: BlogCardProps) {
+    const formattedDate = new Date(post.createdAt).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric"
+    });
+
     return (
-        <div className="flex flex-col gap-4">
-            <div className="relative aspect-video w-full overflow-hidden border-black bg-gray-100">
+        <Link 
+            href={`/insights/${post._id}`} 
+            className="group flex flex-col gap-4 cursor-pointer block text-inherit no-underline"
+        >
+            <div className="relative aspect-video w-full overflow-hidden bg-muted">
                 <Image
-                    src={post.imageSrc} 
+                    src={post.imageUrl}
                     alt={post.title}
                     fill
-                    className="object-cover"
+                    className="object-cover transition-transform duration-300 group-hover:scale-105"
                     sizes="(max-w-768px) 100vw, (max-w-1200px) 50vw, 33vw"
                 />
             </div>
 
-            <div className="text-sm text-gray-500 font-medium">
-                {post.author} • {post.date}
+            <div className="text-sm text-muted-foreground font-medium">
+                Taqtiq Team • {formattedDate}
             </div>
 
             <div className="space-y-2">
-                <h3 className="text-2xl font-bold tracking-tight hover:underline cursor-pointer">
+                <h3 className="text-2xl font-bold tracking-tight line-clamp-2 text-foreground group-hover:underline underline-offset-4">
                     {post.title}
                 </h3>
-                <p className="text-gray-600 line-clamp-3 leading-relaxed">
-                    {post.description}
+                <p className="text-muted-foreground line-clamp-3 leading-relaxed text-sm">
+                    {post.subtitle}
                 </p>
             </div>
 
             <div className="flex flex-wrap gap-2 pt-2">
-                {post.tags.map((tag) => (
-                    <Badge 
-                        key={tag} 
-                        variant="secondary" 
-                        className="border-2 px-3 py-1 font-semibold text-xs"
-                    >
-                        {tag}
+                {post.tags && post.tags.length > 0 ? (
+                    post.tags.map((tag) => (
+                        <Badge 
+                            key={tag} 
+                            variant="secondary" 
+                            className="border px-3 py-0.5 font-semibold text-xs whitespace-nowrap"
+                        >
+                            {tag}
+                        </Badge>
+                    ))
+                ) : (
+                    <Badge variant="outline" className="px-3 py-0.5 text-xs text-muted-foreground">
+                        General
                     </Badge>
-                ))}
+                )}
             </div>
-        </div>
+        </Link>
     );
 }
