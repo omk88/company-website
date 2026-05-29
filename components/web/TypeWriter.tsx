@@ -8,7 +8,7 @@ export default function TypewriterEffect() {
       <span>{">"}</span>
       <Typewriter
         options={{
-          strings: ['Agility.', 'Velocity.', 'Disruption.', 'Innovation.'],
+          strings: ['Agility.', 'Velocity.', 'Ingenuity.', 'Disruption.', 'Innovation.', 'Transformation.'],
           autoStart: true,
           loop: true,
           delay: 40,     

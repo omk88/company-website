@@ -1,100 +1,104 @@
 import Link from "next/link";
-import { FaLinkedin, FaInstagram, FaXTwitter } from "react-icons/fa6"; // Optional icons
+import { FaLinkedin, FaInstagram, FaXTwitter } from "react-icons/fa6";
 
 export default function Footer() {
   return (
-    <footer className="w-full border-t border-gray-200 bg-white py-12 text-sm text-gray-600">
-      <div className="mx-auto max-w-7xl px-6">
+    <div className="w-full pb-8 px-4 flex justify-center relative z-10">
+      
+      <footer className="w-full max-w-6xl bg-white/30 backdrop-blur-xl rounded-[2.5rem] py-12 px-10 text-sm text-neutral-800 
+        border border-white/60
+        shadow-[0_10px_30px_rgba(0,0,0,0.03),inset_1px_1px_2px_rgba(255,255,255,0.7)]"
+      >
         <div className="grid grid-cols-1 gap-10 md:grid-cols-4 lg:grid-cols-5">
           
           <div className="flex flex-col gap-6 lg:col-span-1">
-            <div className="flex items-center gap-2 text-xl font-bold text-gray-900">
+            <div className="flex items-center gap-2 text-2xl font-black text-neutral-950 tracking-tight">
               <span>TaQtiQ</span>
             </div>
             
-            <div className="flex items-center gap-5 text-gray-700">
-              <Link href="#" className="hover:text-gray-900 transition"><FaLinkedin size={20} /></Link>
-              <Link href="#" className="hover:text-gray-900 transition"><FaInstagram size={20} /></Link>
-              <Link href="#" className="hover:text-gray-900 transition"><FaXTwitter size={18} /></Link>
+            <div className="flex items-center gap-5 text-neutral-800">
+              <Link href="#" className="hover:text-neutral-500 transition-colors duration-200"><FaLinkedin size={20} /></Link>
+              <Link href="#" className="hover:text-neutral-500 transition-colors duration-200"><FaInstagram size={20} /></Link>
+              <Link href="#" className="hover:text-neutral-500 transition-colors duration-200"><FaXTwitter size={18} /></Link>
             </div>
           </div>
 
           <div className="flex flex-col gap-8">
             <div className="flex flex-col gap-3">
-              <h3 className="font-bold text-gray-900">TaQtiQ Store</h3>
-              <ul className="flex flex-col gap-2.5">
-                <li><Link href="#" className="hover:underline">Ray-Ban glasses</Link></li>
-                <li><Link href="#" className="hover:underline">Oakley glasses</Link></li>
-                <li><Link href="#" className="hover:underline">Accessories</Link></li>
-                <li><Link href="#" className="hover:underline">Apps and games</Link></li>
-                <li><Link href="#" className="hover:underline">Refurbished</Link></li>
+              <h3 className="font-extrabold text-neutral-950 tracking-tight">TaQtiQ Store</h3>
+              <ul className="flex flex-col gap-2.5 opacity-85 font-medium">
+                <li><Link href="#" className="hover:text-neutral-500 transition-colors">Ray-Ban glasses</Link></li>
+                <li><Link href="#" className="hover:text-neutral-500 transition-colors">Oakley glasses</Link></li>
+                <li><Link href="#" className="hover:text-neutral-500 transition-colors">Accessories</Link></li>
+                <li><Link href="#" className="hover:text-neutral-500 transition-colors">Apps and games</Link></li>
+                <li><Link href="#" className="hover:text-neutral-500 transition-colors">Refurbished</Link></li>
               </ul>
             </div>
             
             <div className="flex flex-col gap-3">
-              <h3 className="font-bold text-gray-900">Store support and legal</h3>
-              <ul className="flex flex-col gap-2.5">
-                <li><Link href="#" className="hover:underline">Help Centre</Link></li>
-                <li><Link href="#" className="hover:underline">Order status</Link></li>
-                <li><Link href="#" className="hover:underline">Returns</Link></li>
+              <h3 className="font-extrabold text-neutral-950 tracking-tight">Store support and legal</h3>
+              <ul className="flex flex-col gap-2.5 opacity-85 font-medium">
+                <li><Link href="#" className="hover:text-neutral-500 transition-colors">Help Centre</Link></li>
+                <li><Link href="#" className="hover:text-neutral-500 transition-colors">Order status</Link></li>
+                <li><Link href="#" className="hover:text-neutral-500 transition-colors">Returns</Link></li>
               </ul>
             </div>
           </div>
 
           <div className="flex flex-col gap-8">
             <div className="flex flex-col gap-3">
-              <h3 className="font-bold text-gray-900">Community</h3>
-              <ul className="flex flex-col gap-2.5">
-                <li><Link href="#" className="hover:underline">Creators</Link></li>
-                <li><Link href="#" className="hover:underline">Developers</Link></li>
-                <li><Link href="#" className="hover:underline">Businesses</Link></li>
-                <li><Link href="#" className="hover:underline">Non-profits</Link></li>
+              <h3 className="font-extrabold text-neutral-950 tracking-tight">Community</h3>
+              <ul className="flex flex-col gap-2.5 opacity-85 font-medium">
+                <li><Link href="#" className="hover:text-neutral-500 transition-colors">Creators</Link></li>
+                <li><Link href="#" className="hover:text-neutral-500 transition-colors">Developers</Link></li>
+                <li><Link href="#" className="hover:text-neutral-500 transition-colors">Businesses</Link></li>
+                <li><Link href="#" className="hover:text-neutral-500 transition-colors">Non-profits</Link></li>
               </ul>
             </div>
 
             <div className="flex flex-col gap-3">
-              <h3 className="font-bold text-gray-900">Our actions</h3>
-              <ul className="flex flex-col gap-2.5">
-                <li><Link href="#" className="hover:underline">Data and privacy</Link></li>
-                <li><Link href="#" className="hover:underline">Responsible business practices</Link></li>
-                <li><Link href="#" className="hover:underline">Accessibility</Link></li>
+              <h3 className="font-extrabold text-neutral-950 tracking-tight">Our actions</h3>
+              <ul className="flex flex-col gap-2.5 opacity-85 font-medium">
+                <li><Link href="#" className="hover:text-neutral-500 transition-colors">Data and privacy</Link></li>
+                <li><Link href="#" className="hover:text-neutral-500 transition-colors">Responsible business practices</Link></li>
+                <li><Link href="#" className="hover:text-neutral-500 transition-colors">Accessibility</Link></li>
               </ul>
             </div>
           </div>
 
           <div className="flex flex-col gap-3">
-            <h3 className="font-bold text-gray-900">About us</h3>
-            <ul className="flex flex-col gap-2.5">
-              <li><Link href="#" className="hover:underline">About Meta</Link></li>
-              <li><Link href="#" className="hover:underline">Company info</Link></li>
-              <li><Link href="#" className="hover:underline">Careers</Link></li>
-              <li><Link href="#" className="hover:underline">Media gallery</Link></li>
-              <li><Link href="#" className="hover:underline">For investors</Link></li>
+            <h3 className="font-extrabold text-neutral-950 tracking-tight">About us</h3>
+            <ul className="flex flex-col gap-2.5 opacity-85 font-medium">
+              <li><Link href="#" className="hover:text-neutral-500 transition-colors">About Meta</Link></li>
+              <li><Link href="#" className="hover:text-neutral-500 transition-colors">Company info</Link></li>
+              <li><Link href="#" className="hover:text-neutral-500 transition-colors">Careers</Link></li>
+              <li><Link href="#" className="hover:text-neutral-500 transition-colors">Media gallery</Link></li>
+              <li><Link href="#" className="hover:text-neutral-500 transition-colors">For investors</Link></li>
             </ul>
           </div>
 
           <div className="flex flex-col gap-8">
             <div className="flex flex-col gap-3">
-              <h3 className="font-bold text-gray-900">Site terms and policies</h3>
-              <ul className="flex flex-col gap-2.5">
-                <li><Link href="#" className="hover:underline">Community Standards</Link></li>
-                <li><Link href="#" className="hover:underline">Privacy Policy</Link></li>
-                <li><Link href="#" className="hover:underline">Terms</Link></li>
-                <li><Link href="#" className="hover:underline">Cookie settings</Link></li>
+              <h3 className="font-extrabold text-neutral-950 tracking-tight">Site terms and policies</h3>
+              <ul className="flex flex-col gap-2.5 opacity-85 font-medium">
+                <li><Link href="#" className="hover:text-neutral-500 transition-colors">Community Standards</Link></li>
+                <li><Link href="#" className="hover:text-neutral-500 transition-colors">Privacy Policy</Link></li>
+                <li><Link href="#" className="hover:text-neutral-500 transition-colors">Terms</Link></li>
+                <li><Link href="#" className="hover:text-neutral-500 transition-colors">Cookie settings</Link></li>
               </ul>
             </div>
 
             <div className="flex flex-col gap-3">
-              <h3 className="font-bold text-gray-900">App support</h3>
-              <ul className="flex flex-col gap-2.5">
-                <li><Link href="#" className="hover:underline">Help Centre</Link></li>
-                <li><Link href="#" className="hover:underline">Help Centre</Link></li>
+              <h3 className="font-extrabold text-neutral-950 tracking-tight">App support</h3>
+              <ul className="flex flex-col gap-2.5 opacity-85 font-medium">
+                <li><Link href="#" className="hover:text-neutral-500 transition-colors">Help Centre</Link></li>
+                <li><Link href="#" className="hover:text-neutral-500 transition-colors">Help Centre</Link></li>
               </ul>
             </div>
           </div>
 
         </div>
-      </div>
-    </footer>
+      </footer>
+    </div>
   );
 }

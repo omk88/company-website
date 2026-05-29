@@ -1,17 +1,20 @@
 import { ThemeProvider } from "@/components/ui/theme-provider"
-
 import type { Metadata } from "next";
 import "./globals.css";
 import { ConvexClientProvider } from "./ConvexClientProvider";
-import { Poppins } from "next/font/google"; 
-
-
+import { JetBrains_Mono, Poppins } from "next/font/google"; 
 import { Toaster } from "@/components/ui/sonner"
 
 const poppins = Poppins({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"], 
-  variable: "--font-poppins",
+  subsets: ['latin'],
+  weight: ['700'],
+  variable: "--font-poppins"
+});
+
+const jetBrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: "--font-jetbrains-mono"
 });
 
 export const metadata: Metadata = {
@@ -25,14 +28,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${poppins.variable} min-h-full flex flex-col transition-colors duration-300 font-sans`}>
+    <html lang="en" suppressHydrationWarning className="h-full">
+      <body className={`${jetBrainsMono.variable} ${poppins.variable} min-h-full flex flex-col bg-[#f8f9fa] transition-colors duration-300 font-sans antialiased text-neutral-950`}>
         <ThemeProvider
             attribute="class"
-            defaultTheme="system"
+            defaultTheme="light" 
             enableSystem
         >
-          <main className="max-w-7xl mx-auto w-full">
+          <main className="max-w-7xl mx-auto w-full flex-1">
             <ConvexClientProvider>
               {children}
             </ConvexClientProvider>

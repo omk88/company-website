@@ -42,7 +42,7 @@ export function NewsletterCard() {
                 <div>
                     <p className="text-lg text-gray-500 uppercase tracking-wider mb-2">insights</p>
                     <h1 className="text-3xl font-bold leading-tight">
-                        Taqtiq Newsletter: Stay up to date with the team.
+                        Newsletter. Stay up to date.
                     </h1>
                 </div>
                 
