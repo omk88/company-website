@@ -4,13 +4,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { LuBoxes } from "react-icons/lu";
-import { IoAccessibility } from "react-icons/io5";
-import { LuComputer } from "react-icons/lu";
-import { Separator } from "@/components/ui/separator";
-import { FaGlobeEurope } from "react-icons/fa";
-import { BiSolidServer } from "react-icons/bi";
-import { GiArtificialIntelligence } from "react-icons/gi";
+
 import {
   Carousel,
   CarouselContent,
@@ -18,6 +12,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
+
 import { CAROUSEL_ITEMS } from "../constants/carouselItems"
 
 export default function Home() {

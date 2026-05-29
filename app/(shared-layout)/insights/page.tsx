@@ -1,43 +1,25 @@
+// app/insights/page.tsx
 import { NewsletterCard } from "@/components/web/NewsletterCard";
 import { TagFilters } from "@/components/web/TagFilters";
 import { BlogPagination } from "@/components/web/BlogPagination";
 import { BlogGrid } from "@/components/web/BlogGrid";
 
-import { headers } from "next/headers";
-import { getToken } from "@/lib/auth-server";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 
-
+// 1. Import your Convex server-side auth utilities
+import { fetchAuthQuery } from "@/lib/auth-server";
+import { api } from "@/convex/_generated/api";
 
 export default async function InsightsPage() {
-
-    const reqHeaders = await headers();
-    const token = await getToken();
-
-    let isCompanyUser = false;
+    const user = await fetchAuthQuery(api.auth.getCurrentUser);
+    
+    const userEmail = user?.email || "";
     const companyDomain = "@taqtiq.tech";
+    const isCompanyUser = userEmail.endsWith(companyDomain);
 
-    if (token) {
-        try {
-            const baseUrl = process.env.NEXT_PUBLIC_CONVEX_SITE_URL || "http://localhost:3000";
-            const response = await fetch(`${baseUrl}/api/auth/get-session`, {
-                headers: reqHeaders,
-            });
-            
-            if (response.ok) {
-                const session = await response.json();
-                const userEmail = session?.user?.email || "";
-                
-                isCompanyUser = userEmail.endsWith(companyDomain);
-            }
-        } catch (error) {
-            console.error("Failed to fetch session on Insights page:", error);
-        }
-    }
-
-return (
+    return (
         <main className="max-w-7xl mx-auto px-4 py-8 relative">
             {isCompanyUser && (
                 <div className="flex justify-end mb-6">
