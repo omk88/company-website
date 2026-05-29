@@ -1,4 +1,3 @@
-// app/insights/page.tsx
 import { NewsletterCard } from "@/components/web/NewsletterCard";
 import { TagFilters } from "@/components/web/TagFilters";
 import { BlogPagination } from "@/components/web/BlogPagination";
@@ -8,12 +7,15 @@ import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 
-// 1. Import your Convex server-side auth utilities
 import { fetchAuthQuery } from "@/lib/auth-server";
+import { preloadQuery } from "convex/nextjs"; 
 import { api } from "@/convex/_generated/api";
 
 export default async function InsightsPage() {
-    const user = await fetchAuthQuery(api.auth.getCurrentUser);
+    const [user, preloadedBlogs] = await Promise.all([
+        fetchAuthQuery(api.auth.getCurrentUser),
+        preloadQuery(api.blogs.getPosts)
+    ]);
     
     const userEmail = user?.email || "";
     const companyDomain = "@taqtiq.tech";
@@ -34,7 +36,7 @@ export default async function InsightsPage() {
 
             <NewsletterCard />
             <TagFilters />
-            <BlogGrid />
+            <BlogGrid preloadedBlogs={preloadedBlogs} />
             <BlogPagination />
         </main>
     );

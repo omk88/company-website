@@ -1,4 +1,3 @@
-import { Separator } from "@/components/ui/separator";
 import Footer from "@/components/web/Footer";
 import { Navbar } from "@/components/web/Navbar";
 import { PerformanceTracker } from "@/components/web/PerformanceTracker";

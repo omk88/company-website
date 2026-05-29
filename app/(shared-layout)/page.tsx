@@ -4,7 +4,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-
+import { Space_Grotesk } from 'next/font/google';
 import {
   Carousel,
   CarouselContent,
@@ -12,6 +12,11 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  weight: ['700'],
+});
 
 import { CAROUSEL_ITEMS } from "../constants/carouselItems"
 
@@ -21,7 +26,7 @@ export default function Home() {
       <div className="mt-30 max-w-7xl mx-auto px-6">
         <div className="mb-60 flex flex-row items-center justify-between w-full gap-12">
           <div className="w-[50%] flex flex-col gap-8 shrink-0">
-            <div>
+            <div className={`${spaceGrotesk.className} text-4xl font-bold`}>
               <TypewriterEffect /> 
             </div>
             <p className="mt-5 text-base leading-relaxed text-muted-foreground">
