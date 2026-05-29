@@ -11,6 +11,7 @@
 import type * as auth from "../auth.js";
 import type * as blogs from "../blogs.js";
 import type * as http from "../http.js";
+import type * as subscribers from "../subscribers.js";
 
 import type {
   ApiFromModules,
@@ -22,6 +23,7 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   blogs: typeof blogs;
   http: typeof http;
+  subscribers: typeof subscribers;
 }>;
 
 /**

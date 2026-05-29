@@ -11,6 +11,11 @@ const schema = defineSchema({
     tags: v.array(v.string()), 
     createdAt: v.number(),
     }),
+
+    subscribers: defineTable({
+        email: v.string(),
+        subscribedAt: v.number(),
+    }).index("by_email", ["email"])
 });
 
 export default schema;
