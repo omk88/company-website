@@ -4,6 +4,7 @@ import "./globals.css";
 import { ConvexClientProvider } from "./ConvexClientProvider";
 import { JetBrains_Mono, Poppins } from "next/font/google"; 
 import { Toaster } from "@/components/ui/sonner"
+import Background from "@/components/web/Background"; 
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -35,6 +36,7 @@ export default function RootLayout({
             defaultTheme="light" 
             enableSystem
         >
+          <Background />
           <main className="max-w-7xl mx-auto w-full flex-1">
             <ConvexClientProvider>
               {children}
