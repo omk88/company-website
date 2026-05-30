@@ -39,6 +39,10 @@ export default function BlogPostForm() {
                 content: data.content,
                 tags: data.tags,
             });
+
+            fetch("/api/revalidate", { method: "POST" }).catch((err) => 
+                console.error("Background revalidation failed:", err)
+            );
             
             toast.success("Blog article published successfully!");
             reset(); 
