@@ -15,7 +15,6 @@ export default async function InsightsPage() {
     return (
         <main className="max-w-7xl mx-auto px-4 py-8 relative">
             <AdminActions />
-
             <NewsletterCard />
             <TagFilters />
             <BlogGrid preloadedBlogs={preloadedBlogs} />
