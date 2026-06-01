@@ -22,7 +22,7 @@ export function Navbar() {
 
                     <div className="flex items-center gap-6">
                         <Link className={cn(buttonVariants({ variant: "link" }), anim, "text-neutral-950 hover:opacity-70 font-semibold text-sm")} href="/">Home</Link>
-                        <Link className={cn(buttonVariants({ variant: "link" }), anim, "text-neutral-950 hover:opacity-70 font-semibold text-sm")} href="/vision">The Vision</Link>
+                        <Link className={cn(buttonVariants({ variant: "link" }), anim, "text-neutral-950 hover:opacity-70 font-semibold text-sm")} href="/vision">Vision</Link>
                         <Link className={cn(buttonVariants({ variant: "link" }), anim, "text-neutral-950 hover:opacity-70 font-semibold text-sm")} href="/insights">Insights</Link>
                         <Link className={cn(buttonVariants({ variant: "link" }), anim, "text-neutral-950 hover:opacity-70 font-semibold text-sm")} href="/contact">Contact</Link>
                         <Link className={cn(buttonVariants({ variant: "link" }), anim, "text-neutral-950 hover:opacity-70 font-semibold text-sm")} href="/products">Products</Link>

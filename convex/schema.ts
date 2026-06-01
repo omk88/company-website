@@ -16,7 +16,15 @@ const schema = defineSchema({
     subscribers: defineTable({
         email: v.string(),
         subscribedAt: v.number(),
-    }).index("by_email", ["email"])
+    }).index("by_email", ["email"]),
+
+    contactMessages: defineTable({
+        name: v.string(),
+        email: v.string(),
+        subject: v.string(),
+        message: v.string(),
+        createdAt: v.number(),
+  }),
 });
 
 export default schema;
