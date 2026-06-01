@@ -37,9 +37,7 @@ export default function RootLayout({
             disableTransitionOnChange
         >
           <main className="max-w-7xl mx-auto w-full flex-1">
-            <ConvexClientProvider>
-              {children}
-            </ConvexClientProvider>
+            {children}
           </main>
           <Toaster />
         </ThemeProvider>
