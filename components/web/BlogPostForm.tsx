@@ -6,7 +6,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../ui
 import { FieldGroup, Field, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { api } from "@/convex/_generated/api";
 import { useMutation } from "convex/react";
@@ -18,10 +18,14 @@ const AVAILABLE_TAGS = ["Product", "Research", "Technology", "Opinion", "Tutoria
 
 export default function BlogPostForm() {
     const [isLoading, setIsLoading] = useState(false);
+    const [selectedImage, setSelectedImage] = useState<File | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
     const createBlog = useMutation(api.blogs.createPost);
+    const generateUploadUrl = useMutation(api.blogs.generateUploadUrl);
     
     const { control, handleSubmit, reset } = useForm({
-        defaultValues: { title: "", subtitle: "", imageUrl: "", content: "", tags: [] as string[] }
+        defaultValues: { title: "", subtitle: "", content: "", tags: [] as string[] }
     });
 
     const onSubmit = async (data: any) => {
@@ -30,14 +34,31 @@ export default function BlogPostForm() {
             return;
         }
 
+        if (!selectedImage) {
+            toast.error("Please upload a cover image from your computer.");
+            return;
+        }
+
         setIsLoading(true);
         try {
+            const uploadUrl = await generateUploadUrl();
+
+            const result = await fetch(uploadUrl, {
+                method: "POST",
+                headers: { "Content-Type": selectedImage.type },
+                body: selectedImage,
+            });
+
+            if (!result.ok) throw new Error("Failed to upload image bundle.");
+            
+            const { storageId } = await result.json();
+
             await createBlog({
                 title: data.title,
                 subtitle: data.subtitle,
-                imageUrl: data.imageUrl,
                 content: data.content,
                 tags: data.tags,
+                storageId: storageId,
             });
 
             fetch("/api/revalidate", { method: "POST" }).catch((err) => 
@@ -45,9 +66,12 @@ export default function BlogPostForm() {
             );
             
             toast.success("Blog article published successfully!");
+            setSelectedImage(null);
+            if (fileInputRef.current) fileInputRef.current.value = "";
             reset(); 
         } catch (error) {
-            toast.error("Database rejected the request.");
+            console.error(error);
+            toast.error("Process interrupted. Image storage or database rejected entry.");
         } finally {
             setIsLoading(false);
         }
@@ -146,18 +170,25 @@ export default function BlogPostForm() {
                             }}
                         />
 
-                        <Controller
-                            name="imageUrl"
-                            control={control}
-                            rules={{ required: "A cover image link is required" }}
-                            render={({ field, fieldState }) => (
-                                <Field>
-                                    <FieldLabel>Cover Image URL</FieldLabel>
-                                    <Input aria-invalid={fieldState.invalid} placeholder="https://images.unsplash.com/..." type="url" disabled={isLoading} {...field} />
-                                    {fieldState.error && <p className="text-xs text-destructive mt-1">{fieldState.error.message}</p>}
-                                </Field>
+                        <Field>
+                            <FieldLabel>Cover Image Asset</FieldLabel>
+                            <Input 
+                                ref={fileInputRef}
+                                type="file" 
+                                accept="image/*" 
+                                disabled={isLoading}
+                                onChange={(e) => {
+                                    if (e.target.files && e.target.files[0]) {
+                                        setSelectedImage(e.target.files[0]);
+                                    }
+                                }}
+                            />
+                            {selectedImage && (
+                                <p className="text-xs text-muted-foreground mt-1">
+                                    Selected: {selectedImage.name} ({(selectedImage.size / 1024 / 1024).toFixed(2)} MB)
+                                </p>
                             )}
-                        />
+                        </Field>
 
                         <Controller
                             name="content"
@@ -184,7 +215,7 @@ export default function BlogPostForm() {
                         />
                         
                         <Button type="submit" className="w-full mt-2" disabled={isLoading}>
-                            {isLoading ? "Publishing Post..." : "Publish Blog Post"}
+                            {isLoading ? "Uploading & Publishing..." : "Publish Blog Post"}
                         </Button>
                     </FieldGroup>
                 </form>

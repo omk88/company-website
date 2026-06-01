@@ -3,21 +3,31 @@ import { v } from "convex/values";
 import { api } from "./_generated/api";
 import { Resend } from "resend";
 
+export const generateUploadUrl = mutation({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.storage.generateUploadUrl();
+  },
+});
+
 export const createPost = mutation({
   args: {
     title: v.string(),
     subtitle: v.string(),
-    imageUrl: v.string(),
     content: v.string(),
     tags: v.array(v.string()),
+    storageId: v.string(), 
   },
   handler: async (ctx, args) => {
+    const generatedImageUrl = await ctx.storage.getUrl(args.storageId);
+
     const newBlogId = await ctx.db.insert("blogs", {
       title: args.title,
       subtitle: args.subtitle,
-      imageUrl: args.imageUrl,
       content: args.content,
       tags: args.tags,
+      storageId: args.storageId,
+      imageUrl: generatedImageUrl || "",
       createdAt: Date.now(),
     });
 
@@ -33,10 +43,12 @@ export const createPost = mutation({
 export const getPosts = query({
   args: {},
   handler: async (ctx) => {
-    return await ctx.db
+    const posts = await ctx.db
       .query("blogs")
       .order("desc")
       .collect();
+
+    return posts.map(({ content, ...previewFields }) => previewFields);
   },
 });
 
@@ -56,7 +68,7 @@ export const sendNewPostEmail = action({
         to: emailList,
         subject: `New Article: ${args.title}`,
         html: `
-          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; rounded: 8px;">
+          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
             <h2 style="color: #111;">${args.title}</h2>
             <p style="color: #666; font-size: 16px; line-height: 1.6;">${args.subtitle}</p>
             <hr style="border: 0; border-top: 1px solid #eee; margin: 24px 0;" />

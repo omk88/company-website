@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { revalidatePath } from 'next/cache';
+import { revalidateTag } from 'next/cache';
 import { fetchAuthQuery } from "@/lib/auth-server";
 import { api } from "@/convex/_generated/api";
 
@@ -12,7 +12,8 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    revalidatePath('/insights');
+    revalidateTag('blog', 'max'); 
+    
     return NextResponse.json({ revalidated: true });
   } catch (err) {
     return NextResponse.json({ message: 'Error revalidating' }, { status: 500 });

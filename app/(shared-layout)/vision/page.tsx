@@ -4,10 +4,7 @@ import {
   CardHeader, 
   CardTitle 
 } from "@/components/ui/card";
-import { Marquee } from "@/components/ui/marquee";
 import Image from "next/image";
-
-export const dynamic = 'force-static'
 
 const sampleImages = [
   { src: "https://i.ibb.co/F4yP9FDf/next-js-512h.png", alt: "nextjs" },
@@ -85,28 +82,6 @@ export default function About() {
           </Card>
 
         </div>
-      </div>
-      <div>
-        <Marquee duration="20s" className="[--gap:2.5rem]">
-          {sampleImages.map((image, idx) => (
-            
-            <div 
-              key={idx} 
-              className="w-[160px] h-[80px] shrink-0 flex items-center justify-center relative overflow-hidden bg-transparent"
-            >
-              <div className="relative w-full h-full p-2">
-                <Image
-                  src={image.src}
-                  alt={image.alt}
-                  fill
-                  sizes="160px"
-                  className="object-contain transition-transform duration-300 hover:scale-105"
-                />
-              </div>
-            </div>
-
-          ))}
-        </Marquee>
       </div>
     </div>
   );

@@ -2,21 +2,23 @@ import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import Link from "next/link";
 
-export interface BlogPost {
+export interface BlogPostPreview {
     _id: string;
     title: string;
     subtitle: string;
     imageUrl: string;
-    content: string;
     tags: string[]; 
     createdAt: number;
 }
 
 interface BlogCardProps {
-    post: BlogPost;
+    post: BlogPostPreview; 
+    index: number; 
 }
 
-export function BlogCard({ post }: BlogCardProps) {
+export function BlogCard({ post, index }: BlogCardProps) {
+    const isPriority = index < 3;
+
     const formattedDate = new Date(post.createdAt).toLocaleDateString("en-US", {
         month: "short",
         day: "numeric",
@@ -33,6 +35,7 @@ export function BlogCard({ post }: BlogCardProps) {
                     src={post.imageUrl}
                     alt={post.title}
                     fill
+                    priority={isPriority}
                     className="object-cover transition-transform duration-300 group-hover:scale-105"
                     sizes="(max-w-768px) 100vw, (max-w-1200px) 50vw, 33vw"
                 />

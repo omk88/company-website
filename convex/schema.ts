@@ -4,12 +4,13 @@ import { v } from "convex/values";
 const schema = defineSchema({
 
     blogs: defineTable({
-    title: v.string(),
-    subtitle: v.string(),
-    imageUrl: v.string(),
-    content: v.string(),
-    tags: v.array(v.string()), 
-    createdAt: v.number(),
+        title: v.string(),
+        subtitle: v.string(),
+        imageUrl: v.string(),
+        content: v.string(),
+        tags: v.array(v.string()), 
+        storageId: v.string(),
+        createdAt: v.number(),
     }),
 
     subscribers: defineTable({

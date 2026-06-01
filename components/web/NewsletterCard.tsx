@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useState } from "react"; 
 import { useMutation } from "convex/react";
@@ -37,11 +36,11 @@ export function NewsletterCard() {
     };
 
     return (
-        <Card className="bg-gray-100 rounded-none border-none shadow-none flex flex-col md:flex-row justify-between p-8 gap-8">
+        <div className="w-full bg-muted flex flex-col md:flex-row justify-between p-8 gap-8">
             <div className="flex-1 max-w-xl flex flex-col gap-4">
                 <div>
-                    <p className="text-lg text-gray-500 uppercase tracking-wider mb-2">insights</p>
-                    <h1 className="text-3xl font-bold leading-tight">
+                    <p className="text-lg text-muted-foreground uppercase tracking-wider mb-2">insights</p>
+                    <h1 className="text-3xl font-bold leading-tight text-foreground">
                         Newsletter. Stay up to date.
                     </h1>
                 </div>
@@ -51,7 +50,7 @@ export function NewsletterCard() {
                         type="email"
                         required
                         disabled={isSubmitting}
-                        className="bg-white h-12 text-lg" 
+                        className="bg-background h-12 text-lg" 
                         placeholder="Enter your email" 
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
@@ -67,10 +66,10 @@ export function NewsletterCard() {
             </div>
 
             <div className="flex-1 max-w-sm md:pt-10"> 
-                <p className="text-xl text-gray-700 leading-relaxed">
+                <p className="text-xl text-muted-foreground leading-relaxed">
                     Subscribe to learn more about our latest insights, news and product launches
                 </p>
             </div>
-        </Card>
+        </div>
     );
 }

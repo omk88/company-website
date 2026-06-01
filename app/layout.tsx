@@ -1,10 +1,10 @@
 import { ThemeProvider } from "@/components/ui/theme-provider"
 import type { Metadata } from "next";
-import "./globals.css";
 import { ConvexClientProvider } from "./ConvexClientProvider";
 import { JetBrains_Mono, Poppins } from "next/font/google"; 
 import { Toaster } from "@/components/ui/sonner"
-import Background from "@/components/web/Background"; 
+import "./globals.css";
+
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -30,13 +30,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className="h-full">
-      <body className={`${jetBrainsMono.variable} ${poppins.variable} min-h-full flex flex-col bg-[#f8f9fa] transition-colors duration-300 font-sans antialiased text-neutral-950`}>
+      <body className={`${jetBrainsMono.variable} ${poppins.variable} min-h-full flex flex-col bg-white transition-colors duration-300 font-sans antialiased text-neutral-950`}>
         <ThemeProvider
             attribute="class"
             defaultTheme="light" 
             enableSystem
+            disableTransitionOnChange
         >
-          <Background />
           <main className="max-w-7xl mx-auto w-full flex-1">
             <ConvexClientProvider>
               {children}
