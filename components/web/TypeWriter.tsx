@@ -1,12 +1,17 @@
 "use client";
 
-import Typewriter from 'typewriter-effect';
+import dynamic from 'next/dynamic';
+
+const DynamicTypewriter = dynamic(() => import('typewriter-effect'), {
+  ssr: false,
+  loading: () => <span>Innovation.</span> 
+});
 
 export default function TypewriterEffect() {
   return (
     <span className="text-black flex flex-row items-center justify-start gap-2">
       <span>{">"}</span>
-      <Typewriter
+      <DynamicTypewriter
         options={{
           strings: ['Agility.', 'Velocity.', 'Ingenuity.', 'Disruption.', 'Innovation.', 'Transformation.'],
           autoStart: true,
