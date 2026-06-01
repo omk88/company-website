@@ -16,8 +16,7 @@ interface BlogCardProps {
     index: number; 
 }
 
-export function BlogCard({ post, index }: BlogCardProps) {
-    const isPriority = index < 3;
+export function BlogCard({ post }: BlogCardProps) {
 
     const formattedDate = new Date(post.createdAt).toLocaleDateString("en-US", {
         month: "short",
@@ -35,7 +34,6 @@ export function BlogCard({ post, index }: BlogCardProps) {
                     src={post.imageUrl}
                     alt={post.title}
                     fill
-                    priority={isPriority}
                     className="object-cover transition-transform duration-300 group-hover:scale-105"
                     sizes="(max-w-768px) 100vw, (max-w-1200px) 50vw, 33vw"
                 />

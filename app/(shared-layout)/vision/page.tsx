@@ -6,15 +6,6 @@ import {
 } from "@/components/ui/card";
 import Image from "next/image";
 
-const sampleImages = [
-  { src: "https://i.ibb.co/F4yP9FDf/next-js-512h.png", alt: "nextjs" },
-  { src: "https://i.ibb.co/SXzY1cVP/typescript.png", alt: "typescript" },
-  { src: "https://i.ibb.co/4whWk3XB/convex.png", alt: "convex" },
-  { src: "https://i.ibb.co/7xYvqk1M/vercel.png", alt: "vercel" },
-  { src: "https://i.ibb.co/R4yWNGcQ/stripe.png", alt: "stripe" },
-  { src: "https://i.ibb.co/k6J57kYS/plaid.png", alt: "plaid" },
-];
-
 export default function About() {
   return (
     <div className="min-h-screen w-full relative">
@@ -24,7 +15,7 @@ export default function About() {
           <Card className="flex flex-col justify-between overflow-hidden bg-white/70 backdrop-blur-md border-neutral-200/50">
             <div className="w-full aspect-[16/10] bg-muted/20 flex items-center justify-center relative overflow-hidden group">
               <Image
-                src="https://i.ibb.co/zVXDm46p/Firefly-Gemini-Flash-monochrome-gray-simple-software-dashboard-without-text-or-specific-icons-sleek.png"
+                src="/tools.png"
                 alt="dashboard"
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -44,7 +35,7 @@ export default function About() {
           <Card className="flex flex-col justify-between overflow-hidden bg-white/70 backdrop-blur-md border-neutral-200/50">
             <div className="w-full aspect-[16/10] bg-muted/20 flex items-center justify-center relative overflow-hidden group">
               <Image
-                src="https://i.ibb.co/1fqKZ9xf/Firefly-Gemini-Flash-monochrome-gray-simple-software-development-process-staying-lean-doing-what-ot.png"
+                src="/lean.png"
                 alt="process"
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -64,7 +55,7 @@ export default function About() {
           <Card className="flex flex-col justify-between overflow-hidden bg-white/70 backdrop-blur-md border-neutral-200/50">
             <div className="w-full aspect-[16/10] bg-muted/20 flex items-center justify-center relative overflow-hidden group">
               <Image
-                src="https://i.ibb.co/PsDWwyXZ/Firefly-Gemini-Flash-monochrome-gray-brain-white-background-235534.png"
+                src="/brain.png"
                 alt="brain"
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
