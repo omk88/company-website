@@ -1,6 +1,5 @@
-import { mutation, query, action } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
-import { api } from "./_generated/api";
 
 export const generateUploadUrl = mutation({
   args: {},
@@ -14,6 +13,7 @@ export const createPost = mutation({
     title: v.string(),
     subtitle: v.string(),
     content: v.string(),
+    author: v.string(),
     tags: v.array(v.string()),
     storageId: v.string(), 
   },
@@ -24,6 +24,7 @@ export const createPost = mutation({
       title: args.title,
       subtitle: args.subtitle,
       content: args.content,
+      author: args.author,
       tags: args.tags,
       storageId: args.storageId,
       imageUrl: generatedImageUrl || "",
@@ -31,6 +32,48 @@ export const createPost = mutation({
     });
 
     return newBlogId;
+  },
+});
+
+export const updatePost = mutation({
+  args: {
+    postId: v.id("blogs"),
+    title: v.string(),
+    subtitle: v.string(),
+    content: v.string(),
+    author: v.string(),
+    tags: v.array(v.string()),
+    storageId: v.string(), 
+  },
+  handler: async (ctx, args) => {
+    const { postId, ...fieldsToUpdate } = args;
+
+    const currentPost = await ctx.db.get(postId);
+    if (!currentPost) {
+      throw new Error("Update targeted a blog post that no longer exists.");
+    }
+
+    let finalImageUrl = currentPost.imageUrl;
+
+    if (fieldsToUpdate.storageId !== currentPost.storageId) {
+      const generatedImageUrl = await ctx.storage.getUrl(fieldsToUpdate.storageId);
+      finalImageUrl = generatedImageUrl || "";
+
+      if (currentPost.storageId) {
+        try {
+          await ctx.storage.delete(currentPost.storageId);
+        } catch (e) {
+          console.warn("Could not remove orphaned storage asset:", e);
+        }
+      }
+    }
+
+    await ctx.db.patch(postId, {
+      ...fieldsToUpdate,
+      imageUrl: finalImageUrl,
+    });
+
+    return postId;
   },
 });
 
@@ -44,4 +87,24 @@ export const getPosts = query({
 
     return posts.map(({ content, ...previewFields }) => previewFields);
   },
+});
+
+export const getPostById = query({
+    args: {
+        postId: v.id("blogs")
+    },
+    handler: async (ctx, args) => {
+        const post = await ctx.db.get(args.postId);
+
+        if(!post) {
+            return null;
+        }
+
+        const resolvedImageUrl = post?.storageId !== undefined ? await ctx.storage.getUrl(post.storageId) : null;
+
+        return {
+            ...post,
+            imageUrl: resolvedImageUrl
+        };
+    }
 });

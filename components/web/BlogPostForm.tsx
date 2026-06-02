@@ -6,27 +6,52 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../ui
 import { FieldGroup, Field, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
 import { toast } from "sonner";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { api } from "@/convex/_generated/api";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { Badge } from "../ui/badge";
 import { Checkbox } from "../ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Id } from "@/convex/_generated/dataModel";
+import { useRouter } from "next/navigation";
 
 const AVAILABLE_TAGS = ["Product", "Research", "Technology", "Opinion", "Tutorials"];
 
-export default function BlogPostForm() {
+interface BlogPostFormProps {
+    editingBlogId?: string; 
+}
+
+export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
+    const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
+    const existingPost = useQuery(
+        api.blogs.getPostById,
+        editingBlogId ? { postId: editingBlogId as Id<"blogs"> } : "skip"
+    );
+
     const createBlog = useMutation(api.blogs.createPost);
+    const updateBlog = useMutation(api.blogs.updatePost);
     const generateUploadUrl = useMutation(api.blogs.generateUploadUrl);
     
     const { control, handleSubmit, reset } = useForm({
-        defaultValues: { title: "", subtitle: "", content: "", tags: [] as string[] }
+        defaultValues: { title: "", subtitle: "", content: "", author: "", tags: [] as string[] }
     });
+
+    useEffect(() => {
+        if (existingPost) {
+            reset({
+                title: existingPost.title,
+                subtitle: existingPost.subtitle,
+                content: existingPost.content,
+                author: existingPost.author,
+                tags: existingPost.tags || []
+            });
+        }
+    }, [existingPost, reset]);
 
     const onSubmit = async (data: any) => {
         if (data.tags.length === 0) {
@@ -34,41 +59,61 @@ export default function BlogPostForm() {
             return;
         }
 
-        if (!selectedImage) {
+        if (!editingBlogId && !selectedImage) {
             toast.error("Please upload a cover image from your computer.");
             return;
         }
 
         setIsLoading(true);
         try {
-            const uploadUrl = await generateUploadUrl();
+            let storageId = existingPost?.storageId || "";
 
-            const result = await fetch(uploadUrl, {
-                method: "POST",
-                headers: { "Content-Type": selectedImage.type },
-                body: selectedImage,
-            });
+            if (selectedImage) {
+                const uploadUrl = await generateUploadUrl();
+                const result = await fetch(uploadUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": selectedImage.type },
+                    body: selectedImage,
+                });
 
-            if (!result.ok) throw new Error("Failed to upload image bundle.");
-            
-            const { storageId } = await result.json();
+                if (!result.ok) throw new Error("Failed to upload image bundle.");
+                const resJson = await result.json();
+                storageId = resJson.storageId;
+            }
 
-            await createBlog({
-                title: data.title,
-                subtitle: data.subtitle,
-                content: data.content,
-                tags: data.tags,
-                storageId: storageId,
-            });
+            if (editingBlogId) {
+                await updateBlog({
+                    postId: editingBlogId as Id<"blogs">,
+                    title: data.title,
+                    subtitle: data.subtitle,
+                    content: data.content,
+                    author: data.author,
+                    tags: data.tags,
+                    storageId: storageId,
+                });
+                toast.success("Blog article updated successfully!");
+            } else {
+                await createBlog({
+                    title: data.title,
+                    subtitle: data.subtitle,
+                    content: data.content,
+                    author: data.author,
+                    tags: data.tags,
+                    storageId: storageId,
+                });
+                toast.success("Blog article published successfully!");
+            }
 
             fetch("/api/revalidate", { method: "POST" }).catch((err) => 
                 console.error("Background revalidation failed:", err)
             );
             
-            toast.success("Blog article published successfully!");
             setSelectedImage(null);
             if (fileInputRef.current) fileInputRef.current.value = "";
             reset(); 
+
+            router.push("/insights");
+            router.refresh();
         } catch (error) {
             console.error(error);
             toast.error("Process interrupted. Image storage or database rejected entry.");
@@ -80,8 +125,10 @@ export default function BlogPostForm() {
     return (
         <Card className="w-full max-w-3xl mx-auto">
             <CardHeader>
-                <CardTitle>Create New Blog Post</CardTitle>
-                <CardDescription>Draft and publish a new article directly to the Insights page.</CardDescription>
+                <CardTitle>{editingBlogId ? "✏️ Edit Blog Post" : "Create New Blog Post"}</CardTitle>
+                <CardDescription>
+                    {editingBlogId ? "Modify fields below and save changes." : "Draft and publish a new article directly to the Insights page."}
+                </CardDescription>
             </CardHeader>
             <CardContent>
                 <form onSubmit={handleSubmit(onSubmit)}>
@@ -171,7 +218,7 @@ export default function BlogPostForm() {
                         />
 
                         <Field>
-                            <FieldLabel>Cover Image Asset</FieldLabel>
+                            <FieldLabel>Cover Image Asset {editingBlogId && <span className="text-muted-foreground text-xs font-normal">(Leave blank to keep existing)</span>}</FieldLabel>
                             <Input 
                                 ref={fileInputRef}
                                 type="file" 
@@ -199,7 +246,7 @@ export default function BlogPostForm() {
                                     <FieldLabel>Article Content</FieldLabel>
                                     <textarea
                                         aria-invalid={fieldState.invalid}
-                                        placeholder="Write your post here..."
+                                        placeholder="Write your post markdown here..."
                                         disabled={isLoading}
                                         rows={12}
                                         className={cn(
@@ -213,9 +260,27 @@ export default function BlogPostForm() {
                                 </Field>
                             )}
                         />
+
+                        <Controller
+                            name="author"
+                            control={control}
+                            rules={{ required: "Author is required" }}
+                            render={({ field, fieldState }) => (
+                                <Field>
+                                    <FieldLabel>Author</FieldLabel>
+                                    <Input aria-invalid={fieldState.invalid} placeholder="John Doe" type="text" disabled={isLoading} {...field} />
+                                    {fieldState.error && <p className="text-xs text-destructive mt-1">{fieldState.error.message}</p>}
+                                </Field>
+                            )}
+                        />
                         
                         <Button type="submit" className="w-full mt-2" disabled={isLoading}>
-                            {isLoading ? "Uploading & Publishing..." : "Publish Blog Post"}
+                            {isLoading 
+                                ? "Saving..." 
+                                : editingBlogId 
+                                ? "Save Changes" 
+                                : "Publish Blog Post"
+                            }
                         </Button>
                     </FieldGroup>
                 </form>

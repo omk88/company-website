@@ -6,7 +6,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 
-export function AdminActions() {
+export function AddBlogButton() {
     const user = useQuery(api.auth.getCurrentUser);
     
     const userEmail = user?.email || "";

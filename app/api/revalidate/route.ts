@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    revalidateTag('blog', 'max'); 
+    revalidateTag('blog', { expire: 0 }); 
     
     return NextResponse.json({ revalidated: true });
   } catch (err) {

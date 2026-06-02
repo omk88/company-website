@@ -6,6 +6,7 @@ export interface BlogPostPreview {
     _id: string;
     title: string;
     subtitle: string;
+    author: string;
     imageUrl: string;
     tags: string[]; 
     createdAt: number;
@@ -40,7 +41,7 @@ export function BlogCard({ post }: BlogCardProps) {
             </div>
 
             <div className="text-sm text-muted-foreground font-medium">
-                Taqtiq Team • {formattedDate}
+                {post.author} • {formattedDate}
             </div>
 
             <div className="space-y-2">
