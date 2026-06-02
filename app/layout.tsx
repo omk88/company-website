@@ -1,9 +1,7 @@
-import { ThemeProvider } from "@/components/ui/theme-provider"
 import type { Metadata } from "next";
-import { ConvexClientProvider } from "./ConvexClientProvider";
 import { JetBrains_Mono, Poppins } from "next/font/google"; 
-import { Toaster } from "@/components/ui/sonner"
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner";
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -30,17 +28,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className="h-full">
       <body className={`${jetBrainsMono.variable} ${poppins.variable} min-h-full flex flex-col bg-white transition-colors duration-300 font-sans antialiased text-neutral-950`}>
-        <ThemeProvider
-            attribute="class"
-            defaultTheme="light" 
-            enableSystem
-            disableTransitionOnChange
-        >
-          <main className="max-w-7xl mx-auto w-full flex-1">
-            {children}
-          </main>
-          <Toaster />
-        </ThemeProvider>
+        <main className="max-w-7xl mx-auto w-full flex-1">
+          {children}
+        </main>
+        <Toaster />
       </body>
     </html>
   );

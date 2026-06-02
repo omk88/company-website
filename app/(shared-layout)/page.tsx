@@ -1,5 +1,10 @@
-import TypewriterEffect from "@/components/web/TypeWriter";
+import dynamic from 'next/dynamic';
 import { Space_Grotesk } from 'next/font/google';
+
+const TypewriterEffect = dynamic(() => import("@/components/web/TypeWriter"), {
+  ssr: true
+});
+
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
