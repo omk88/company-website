@@ -23,7 +23,7 @@ export default function ToolsGrid({ tools }: ToolsGridProps) {
   const displayTools = tools || defaultTools
 
   return (
-    <div className="w-full max-w-[1200px] mx-auto px-4 my-12">
+    <div className="w-full max-w-7xl mx-auto p-6 md:p-12 relative z-10 box-border">
       <div className="border border-border bg-card text-card-foreground p-8 sm:p-12">
         
         <div className="mb-14 space-y-2 border-b border-border pb-6">
@@ -53,7 +53,6 @@ export default function ToolsGrid({ tools }: ToolsGridProps) {
             </div>
           ))}
         </div>
-
       </div>
     </div>
   )

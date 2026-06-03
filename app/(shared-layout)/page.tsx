@@ -2,10 +2,14 @@ import dynamic from 'next/dynamic';
 import { Space_Grotesk } from 'next/font/google';
 import Link from 'next/link';
 
+const ModelScene = dynamic(() => import("@/components/3d/GridCube"), {
+  ssr: true,
+  loading: () => <div className="w-full aspect-square bg-muted/10 animate-pulse rounded-full" />
+});
+
 const TypewriterEffect = dynamic(() => import("@/components/web/TypeWriter"), {
   ssr: true
 });
-
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
@@ -14,12 +18,12 @@ const spaceGrotesk = Space_Grotesk({
 
 export default function Home() {
   return (
-    <div className="min-h-screen w-full relative">
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <div className="min-h-[calc(100vh-120px)] flex flex-col items-center justify-center text-center w-full">
-          <div className="max-w-2xl flex flex-col items-center gap-8">
-            <div className="flex flex-col items-center gap-6">
-              <div className={`${spaceGrotesk.className} text-5xl font-extrabold text-neutral-950 tracking-tight`}>
+    <div className="min-h-screen w-full relative overflow-hidden flex items-center justify-center py-12 lg:py-0">
+      <div className="w-full max-w-6xl mx-auto px-6 relative z-10 box-border">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-center w-full justify-items-center">
+          <div className="flex flex-col items-center lg:items-start text-center lg:text-left w-full max-w-lg gap-8 lg:justify-self-center">
+            <div className="flex flex-col items-center lg:items-start gap-6 w-full">
+              <div className={`${spaceGrotesk.className} text-4xl sm:text-5xl font-extrabold text-neutral-950 tracking-tight leading-none`}>
                 <TypewriterEffect /> 
               </div>
               <p className="text-lg leading-relaxed text-neutral-950 font-semibold max-w-md opacity-85">
@@ -47,6 +51,11 @@ export default function Home() {
               </Link>
             </div>
           </div>
+
+          <div className="w-full aspect-square max-w-md lg:max-w-[460px] mx-auto">
+            <ModelScene />
+          </div>
+
         </div>
       </div>
     </div>
