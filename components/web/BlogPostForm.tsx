@@ -104,9 +104,14 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                 toast.success("Blog article published successfully!");
             }
 
-            fetch("/api/revalidate", { method: "POST" }).catch((err) => 
-                console.error("Background revalidation failed:", err)
-            );
+            try {
+                const revalidateRes = await fetch("/api/revalidate", { method: "POST" });
+                if (!revalidateRes.ok) {
+                    console.error("Server-side tag revalidation returned an error status.");
+                }
+            } catch (err) {
+                console.error("Background revalidation network failure:", err);
+            }
             
             setSelectedImage(null);
             if (fileInputRef.current) fileInputRef.current.value = "";
@@ -125,7 +130,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
     return (
         <Card className="w-full max-w-3xl mx-auto">
             <CardHeader>
-                <CardTitle>{editingBlogId ? "✏️ Edit Blog Post" : "Create New Blog Post"}</CardTitle>
+                <CardTitle>{editingBlogId ? "Edit Blog Post" : "Create New Blog Post"}</CardTitle>
                 <CardDescription>
                     {editingBlogId ? "Modify fields below and save changes." : "Draft and publish a new article directly to the Insights page."}
                 </CardDescription>

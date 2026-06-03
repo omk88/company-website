@@ -28,6 +28,7 @@ export default function SignInForm() {
             await authClient.signIn.email({
                 email: data.email,
                 password: data.password,
+                rememberMe: data.rememberMe,
                 callbackURL: "/", 
             }, {
                 onRequest: () => setIsLoading(true),

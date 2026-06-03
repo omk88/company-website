@@ -49,7 +49,7 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
     },
     plugins: [
       convex({ authConfig }),
-    ],
+    ]
   });
 };
 
