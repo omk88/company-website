@@ -1,5 +1,6 @@
 import dynamic from 'next/dynamic';
 import { Space_Grotesk } from 'next/font/google';
+import Link from 'next/link';
 
 const TypewriterEffect = dynamic(() => import("@/components/web/TypeWriter"), {
   ssr: true
@@ -28,16 +29,22 @@ export default function Home() {
             </div>
             
             <div className="flex flex-row items-center gap-4 mt-2">
-              <button className="px-7 py-3.5 bg-white hover:bg-neutral-100 text-neutral-950 font-semibold text-sm rounded-full border border-neutral-200 transition-all duration-200 active:scale-98 shadow-sm">
+              <Link 
+                href="/sign-in" 
+                className="inline-block px-7 py-3.5 bg-white hover:bg-neutral-100 text-neutral-950 font-semibold text-sm rounded-full border border-neutral-200 transition-all duration-200 active:scale-98 shadow-sm text-center"
+              >
                 Sign in
-              </button>
+              </Link>
               
-              <button className="group px-6 py-3.5 bg-neutral-950 hover:bg-neutral-800 text-white font-semibold text-sm rounded-full transition-all duration-200 active:scale-98 flex items-center gap-2 shadow-sm">
+              <Link 
+                href="/products" 
+                className="group px-6 py-3.5 bg-neutral-950 hover:bg-neutral-800 text-white font-semibold text-sm rounded-full transition-all duration-200 active:scale-98 inline-flex items-center gap-2 shadow-sm"
+              >
                 <span>See our products</span>
                 <svg className="w-3 h-3 text-white transform group-hover:translate-x-0.5 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={4}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
-              </button>
+              </Link>
             </div>
           </div>
         </div>

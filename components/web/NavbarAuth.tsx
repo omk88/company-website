@@ -7,6 +7,7 @@ async function NavbarAuthServerContent() {
   const userIsAuthenticated = await isAuthenticated();
   return <NavbarAuthClient initialIsAuth={userIsAuthenticated} />;
 }
+
 export function NavbarAuth() {
   return (
     <Suspense fallback={<LogIn className="h-4 w-4" />}>

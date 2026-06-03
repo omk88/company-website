@@ -39,7 +39,7 @@ export function NavbarAuthClient({ initialIsAuth }: NavbarAuthClientProps) {
                     <LogOut className="h-4 w-4" />
                 </Button>
             ) : (
-                <Link className={buttonVariants({ variant: "ghost" })} href="/sign-in" title="Sign In">
+                <Link className={buttonVariants({ variant: "ghost" })} href="/sign-in" title="Sign Up">
                     <LogIn className="h-4 w-4" />
                 </Link>
             )}

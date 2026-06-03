@@ -11,7 +11,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6">
           
           <div className="flex flex-col gap-4 lg:col-span-1">
-            <span className="text-xl font-bold text-foreground tracking-tight">
+            <span className="font-poppins-text text-xl font-bold text-foreground tracking-tight">
               TaQtiQ
             </span>
             <div className="flex items-center gap-4 text-muted-foreground">
