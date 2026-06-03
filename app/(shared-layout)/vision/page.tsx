@@ -4,6 +4,7 @@ import {
   CardHeader, 
   CardTitle 
 } from "@/components/ui/card";
+import Technologies from "@/components/web/Technologies";
 import Image from "next/image";
 
 export default function About() {
@@ -74,6 +75,7 @@ export default function About() {
 
         </div>
       </div>
+      <Technologies />
     </div>
   );
 }
