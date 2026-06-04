@@ -26,6 +26,13 @@ const schema = defineSchema({
         message: v.string(),
         createdAt: v.number(),
   }),
+
+    comments: defineTable({
+        postId: v.id("blogs"),
+        authorId: v.string(),
+        authorName: v.string(),
+        body: v.string()
+    })
 });
 
 export default schema;

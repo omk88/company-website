@@ -1,7 +1,7 @@
 import { buttonVariants } from "@/components/ui/button";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
-import { fetchQuery } from "convex/nextjs";
+import { fetchQuery, preloadQuery } from "convex/nextjs";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -10,6 +10,7 @@ import { Metadata } from "next";
 import ReactMarkdown from 'react-markdown';
 import { EditBlogButton } from "@/components/web/EditBlogButton";
 import { BlogCTA } from "@/components/web/BlogCTA";
+import { CommentSection } from "@/components/web/CommentSection";
 
 interface postIdRouteProps {
     params: Promise<{
@@ -37,7 +38,11 @@ export async function generateMetadata({ params }: postIdRouteProps): Promise<Me
 export default async function postIdRoute({ params }: postIdRouteProps) {
     const { postId } = await params;
 
-    const post = await fetchQuery(api.blogs.getPostById, { postId: postId });
+
+    const [post, preloadedComments] = await Promise.all([
+        fetchQuery(api.blogs.getPostById, { postId: postId }),
+        preloadQuery(api.comments.getCommentsByPost, { postId: postId }),
+    ]);
 
     if (!post) {   
         return (
@@ -84,6 +89,9 @@ export default async function postIdRoute({ params }: postIdRouteProps) {
 
             <Separator className="my-8" />
             <BlogCTA />
+            <Separator className="my-8" />
+
+            <CommentSection preloadedComments={preloadedComments} />
         </div>
     )
 }

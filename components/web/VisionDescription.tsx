@@ -4,7 +4,7 @@ export default function VisionDescription() {
         <div className="border border-border bg-card text-card-foreground p-8 sm:p-12">
           <div className="mb-14 space-y-2 border-b border-border pb-6">
             <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-              Why TaQtiQ
+              Why TaQtiQ?
             </h2>
             <p className="text-lg font-mono text-muted-foreground">
               Because real problems need addressing.
