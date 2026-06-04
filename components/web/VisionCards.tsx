@@ -54,7 +54,7 @@ export default function VisionCards() {
       imageSrc: "/comp3.png",
       imageAlt: "brain",
       title: "Innovating where it's desperately desired.",
-      description: "Architecturing effective platforms. Responding to novel challenges.",
+      description: "Architecturing effective platforms. Addressing novel challenges with dexterity.",
     },
   ];
 
