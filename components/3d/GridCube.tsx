@@ -9,6 +9,8 @@ const AVAILABLE_MODELS = [
   '/cube6.glb', '/cube7.glb', '/cube8.glb', '/cube9.glb', '/cube10.glb'
 ]
 
+let globalSessionModelPath: string | null = null
+
 function UniversalModel({ path }: { path: string }) {
   const { scene } = useGLTF(path)
   const clonedScene = useMemo(() => scene.clone(), [scene])
@@ -20,47 +22,45 @@ function UniversalModel({ path }: { path: string }) {
   )
 }
 
-function Dynamic3DScene() {
-  const [selectedModel, setSelectedModel] = useState<string | null>(null)
-  const [canRenderCanvas, setCanRenderCanvas] = useState(false)
+export default function Dynamic3DScene() {
+  const [isReady, setIsReady] = useState(false)
+
+  if (typeof window !== 'undefined' && !globalSessionModelPath) {
+    const randomIndex = Math.floor(Math.random() * AVAILABLE_MODELS.length)
+    globalSessionModelPath = AVAILABLE_MODELS[randomIndex]
+  }
+
+  const finalPath = globalSessionModelPath || AVAILABLE_MODELS[0]
 
   useEffect(() => {
-    const randomIndex = Math.floor(Math.random() * AVAILABLE_MODELS.length)
-    setSelectedModel(AVAILABLE_MODELS[randomIndex])
-
-    const idleTimeout = setTimeout(() => {
-      setCanRenderCanvas(true)
-    }, 100) 
-
-    return () => clearTimeout(idleTimeout)
+    setIsReady(true)
+    
+    if (globalSessionModelPath) {
+      useGLTF.preload(globalSessionModelPath)
+    }
   }, [])
 
-  if (!selectedModel || !canRenderCanvas) {
+  if (!isReady) {
     return <div className="w-full aspect-square bg-neutral-100/10 animate-pulse rounded-full" />
   }
 
   return (
     <div className="w-full h-full min-h-[400px]">
       <Canvas 
+        key={`home-canvas}`}
         camera={{ position: [1, 1, 15], fov: 45 }}
         gl={{ 
-          antialias: false, 
+          antialias: true, 
           powerPreference: "high-performance",
-          precision: "mediump" 
+          precision: "highp" 
         }}
-        dpr={1}
+        dpr={typeof window !== 'undefined' ? window.devicePixelRatio : 1} 
       >
         <Stage intensity={0.5} environment="city" adjustCamera={false} shadows={false}>
-          <UniversalModel path={selectedModel} />
+          <UniversalModel path={finalPath} />
         </Stage>
         <OrbitControls enableZoom={false} autoRotate autoRotateSpeed={0.6} />
       </Canvas>
     </div>
   )
 }
-
-import dynamic from 'next/dynamic'
-export default dynamic(() => Promise.resolve(Dynamic3DScene), {
-  ssr: false,
-  loading: () => <div className="w-full aspect-square bg-neutral-100/10 animate-pulse rounded-full" />
-})
