@@ -1,15 +1,8 @@
-import dynamic from 'next/dynamic';
 import { Space_Grotesk } from 'next/font/google';
 import Link from 'next/link';
 
-const ModelScene = dynamic(() => import("@/components/3d/GridCube"), {
-  ssr: true,
-  loading: () => <div className="w-full aspect-square bg-muted/10 animate-pulse rounded-full" />
-});
-
-const TypewriterEffect = dynamic(() => import("@/components/web/TypeWriter"), {
-  ssr: true
-});
+import ModelScene from "@/components/3d/GridCube";
+import TypewriterEffect from "@/components/web/TypeWriter";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
@@ -21,6 +14,7 @@ export default function Home() {
     <div className="min-h-screen w-full relative overflow-hidden flex items-center justify-center py-12 lg:py-0">
       <div className="w-full max-w-6xl mx-auto px-6 relative z-10 box-border">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-center w-full justify-items-center">
+          
           <div className="flex flex-col items-center lg:items-start text-center lg:text-left w-full max-w-lg gap-8 lg:justify-self-center">
             <div className="flex flex-col items-center lg:items-start gap-6 w-full">
               <div className={`${spaceGrotesk.className} text-4xl sm:text-5xl font-extrabold text-neutral-950 tracking-tight leading-none`}>

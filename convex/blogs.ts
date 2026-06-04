@@ -35,6 +35,26 @@ export const createPost = mutation({
   },
 });
 
+export const deletePost = mutation({
+  args: {
+    id: v.id("blogs"), 
+    storageId: v.optional(v.string())
+  },
+  handler: async (ctx, args) => {
+    if (args.storageId) {
+      try {
+        await ctx.storage.delete(args.storageId);
+      } catch (error) {
+        console.error("Failed to delete associated image from storage:", error);
+      }
+    }
+
+    await ctx.db.delete(args.id);
+
+    return { success: true };
+  },
+});
+
 export const updatePost = mutation({
   args: {
     postId: v.id("blogs"),

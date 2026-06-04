@@ -34,7 +34,7 @@ export function ContactForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 max-w-xl mx-auto bg-white p-6 rounded-lg border border-neutral-200 shadow-sm">
+    <form onSubmit={handleSubmit} className="space-y-4 max-w-xl mx-auto bg-white p-6 border border-neutral-200">
       <div>
         <label className="block text-sm font-semibold text-neutral-700 mb-1">Name</label>
         <input required name="name" type="text" className="w-full px-3 py-2 border border-neutral-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-neutral-950" />

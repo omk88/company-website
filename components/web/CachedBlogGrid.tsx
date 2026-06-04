@@ -1,11 +1,12 @@
 import { fetchQuery } from "convex/nextjs";
 import { api } from "@/convex/_generated/api";
-import { cacheTag } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import { BlogGridManager } from "./BlogGridManager";
 
 export async function CachedBlogGrid() {
     "use cache";
-    cacheTag("blog");   
+    cacheTag("blog");  
+    cacheLife("days"); 
 
     const posts = await fetchQuery(api.blogs.getPosts);
 
