@@ -26,26 +26,15 @@ export default function Footer() {
               </Link>
             </div>
           </div>
-
-          <div className="flex flex-col gap-6">
-            <div className="flex flex-col gap-3">
-              <h3 className="font-semibold text-foreground">TaQtiQ Store</h3>
-              <ul className="flex flex-col gap-2">
-                <li><Link href="#" className="hover:text-foreground transition-colors">Ray-Ban glasses</Link></li>
-                <li><Link href="#" className="hover:text-foreground transition-colors">Oakley glasses</Link></li>
-                <li><Link href="#" className="hover:text-foreground transition-colors">Accessories</Link></li>
-                <li><Link href="#" className="hover:text-foreground transition-colors">Apps and games</Link></li>
-                <li><Link href="#" className="hover:text-foreground transition-colors">Refurbished</Link></li>
-              </ul>
-            </div>
-            <div className="flex flex-col gap-3">
-              <h3 className="font-semibold text-foreground">Store support and legal</h3>
-              <ul className="flex flex-col gap-2">
-                <li><Link href="#" className="hover:text-foreground transition-colors">Help Centre</Link></li>
-                <li><Link href="#" className="hover:text-foreground transition-colors">Order status</Link></li>
-                <li><Link href="#" className="hover:text-foreground transition-colors">Returns</Link></li>
-              </ul>
-            </div>
+          <div className="flex flex-col gap-3">
+            <h3 className="font-semibold text-foreground">About us</h3>
+            <ul className="flex flex-col gap-2">
+              <li><Link href="#" className="hover:text-foreground transition-colors">About TaQtiQ</Link></li>
+              <li><Link href="#" className="hover:text-foreground transition-colors">Company info</Link></li>
+              <li><Link href="#" className="hover:text-foreground transition-colors">Careers</Link></li>
+              <li><Link href="#" className="hover:text-foreground transition-colors">Media gallery</Link></li>
+              <li><Link href="#" className="hover:text-foreground transition-colors">For investors</Link></li>
+            </ul>
           </div>
 
           <div className="flex flex-col gap-6">
@@ -55,7 +44,6 @@ export default function Footer() {
                 <li><Link href="#" className="hover:text-foreground transition-colors">Creators</Link></li>
                 <li><Link href="#" className="hover:text-foreground transition-colors">Developers</Link></li>
                 <li><Link href="#" className="hover:text-foreground transition-colors">Businesses</Link></li>
-                <li><Link href="#" className="hover:text-foreground transition-colors">Non-profits</Link></li>
               </ul>
             </div>
             <div className="flex flex-col gap-3">
@@ -67,18 +55,6 @@ export default function Footer() {
               </ul>
             </div>
           </div>
-
-          <div className="flex flex-col gap-3">
-            <h3 className="font-semibold text-foreground">About us</h3>
-            <ul className="flex flex-col gap-2">
-              <li><Link href="#" className="hover:text-foreground transition-colors">About Meta</Link></li>
-              <li><Link href="#" className="hover:text-foreground transition-colors">Company info</Link></li>
-              <li><Link href="#" className="hover:text-foreground transition-colors">Careers</Link></li>
-              <li><Link href="#" className="hover:text-foreground transition-colors">Media gallery</Link></li>
-              <li><Link href="#" className="hover:text-foreground transition-colors">For investors</Link></li>
-            </ul>
-          </div>
-
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-3">
               <h3 className="font-semibold text-foreground">Site terms</h3>
