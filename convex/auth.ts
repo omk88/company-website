@@ -16,6 +16,9 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
     baseURL: process.env.SITE_URL || "http://localhost:3000",
     database: authComponent.adapter(ctx),
     secret: process.env.BETTER_AUTH_SECRET,
+    advanced: {
+      cookiePrefix: "__Secure-",
+    },
     emailAndPassword: {
       enabled: true,
       requireEmailVerification: false,
