@@ -5,11 +5,11 @@ import { components } from "./_generated/api";
 import { DataModel } from "./_generated/dataModel";
 import authConfig from "./auth.config";
 import { query } from "./_generated/server";
-import { Resend } from "resend";
+// import { Resend } from "resend";
 
 export const authComponent = createClient<DataModel>(components.betterAuth);
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const createAuth = (ctx: GenericCtx<DataModel>) => {
   return betterAuth({
@@ -20,7 +20,7 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
       enabled: true,
       requireEmailVerification: false,
 
-      sendResetPassword: async ({ user, url }) => {
+      /*sendResetPassword: async ({ user, url }) => {
         try {
           await resend.emails.send({
             from: process.env.EMAIL_FROM || "info@taqtiq.tech",
@@ -39,7 +39,7 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
           console.error("Resend failed to send reset email:", error);
           throw new Error("Failed to send password reset email.");
         }
-      },
+      },*/
     },
     socialProviders: {
       google: {
