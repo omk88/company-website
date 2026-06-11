@@ -16,9 +16,6 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
     baseURL: process.env.SITE_URL || "http://localhost:3000",
     database: authComponent.adapter(ctx),
     secret: process.env.BETTER_AUTH_SECRET,
-    advanced: {
-      cookiePrefix: "__Secure-",
-    },
     emailAndPassword: {
       enabled: true,
       requireEmailVerification: false,
@@ -59,12 +56,8 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
 export const getCurrentUser = query({
   args: {},
   handler: async (ctx) => {
-    const userMetadata = await authComponent.safeGetAuthUser(ctx);
-    
-    if (!userMetadata) {
-      return null;
-    }
-    
-    return userMetadata;
+    const identity = await ctx.auth.getUserIdentity();
+    return identity; 
   },
 });
+
