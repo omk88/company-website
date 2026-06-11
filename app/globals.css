@@ -147,3 +147,31 @@
 .Typewriter__cursor {
   animation: Typewriter-cursor 0.5s infinite !important;
 }
+
+canvas, 
+canvas * {
+  transition: none !important;
+}
+
+img:not([src]), img[src=""] {
+  opacity: 0 !important;
+  display: none !important;
+}
+
+.canvas-container-block::before,
+.canvas-container-block::after,
+.canvas-container-block *:before,
+.canvas-container-block *:after {
+  content: none !important;
+  display: none !important;
+  opacity: 0 !important;
+}
+
+canvas:-moz-broken,
+canvas:-moz-loading,
+canvas::before,
+canvas::after {
+  content: "" !important;
+  display: none !important;
+  opacity: 0 !important;
+}
