@@ -10,9 +10,13 @@ import { Checkbox } from "../ui/checkbox";
 import Link from "next/link";
 import { toast } from "sonner";
 import { useState } from "react";
+// 1. Import the eye icons
+import { Eye, EyeOff } from "lucide-react"; 
 
 export default function SignInForm() {
     const [isLoading, setIsLoading] = useState(false);
+    // 2. Initialize the visibility state
+    const [showPassword, setShowPassword] = useState(false); 
     
     const { control, handleSubmit } = useForm({
         defaultValues: {
@@ -86,12 +90,27 @@ export default function SignInForm() {
                             render={({ field, fieldState }) => (
                                 <Field>
                                     <FieldLabel>Password</FieldLabel>
-                                    <Input 
-                                        aria-invalid={fieldState.invalid} 
-                                        placeholder="********" 
-                                        type="password" 
-                                        {...field}
-                                    />
+                                    <div className="relative flex items-center">
+                                        <Input 
+                                            aria-invalid={fieldState.invalid} 
+                                            placeholder="********" 
+                                            type={showPassword ? "text" : "password"} 
+                                            className="pr-10"
+                                            {...field}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute right-3 text-muted-foreground hover:text-foreground focus:outline-none select-none"
+                                            aria-label={showPassword ? "Hide password" : "Show password"}
+                                        >
+                                            {showPassword ? (
+                                                <EyeOff className="h-4 w-4" />
+                                            ) : (
+                                                <Eye className="h-4 w-4" />
+                                            )}
+                                        </button>
+                                    </div>
                                 </Field>
                             )}  
                         />

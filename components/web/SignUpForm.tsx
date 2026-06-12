@@ -12,9 +12,12 @@ import z from "zod";
 import { toast } from "sonner";
 import { useState } from "react"; 
 import { useRouter } from "next/navigation";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function SignUpForm() {
     const [isLoading, setIsLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const router = useRouter();
 
     function onError(errors: any) {
@@ -96,29 +99,67 @@ export default function SignUpForm() {
                                 </Field>
                             )}
                         />
+                        
                         <Controller
                             name="password"
                             control={form.control}
                             render={({ field, fieldState }) => (
                                 <Field>
                                     <FieldLabel>Password</FieldLabel>
-                                    <Input aria-invalid={fieldState.invalid} placeholder="********" type="password" disabled={isLoading} {...field}/>
+                                    <div className="relative flex items-center">
+                                        <Input 
+                                            aria-invalid={fieldState.invalid} 
+                                            placeholder="********" 
+                                            type={showPassword ? "text" : "password"} 
+                                            className="pr-10"
+                                            disabled={isLoading} 
+                                            {...field}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute right-3 text-muted-foreground hover:text-foreground focus:outline-none select-none"
+                                            aria-label={showPassword ? "Hide password" : "Show password"}
+                                        >
+                                            {showPassword ? (
+                                                <EyeOff className="h-4 w-4" />
+                                            ) : (
+                                                <Eye className="h-4 w-4" />
+                                            )}
+                                        </button>
+                                    </div>
                                 </Field>
                             )}
                         />
+
                         <Controller
                             name="confirmpassword"
                             control={form.control}
                             render={({ field, fieldState }) => (
                                 <Field>
                                     <FieldLabel>Confirm Password</FieldLabel>
-                                    <Input 
-                                        aria-invalid={fieldState.invalid} 
-                                        placeholder="********" 
-                                        type="password" 
-                                        disabled={isLoading}
-                                        {...field}
-                                    />
+                                    <div className="relative flex items-center">
+                                        <Input 
+                                            aria-invalid={fieldState.invalid} 
+                                            placeholder="********" 
+                                            type={showConfirmPassword ? "text" : "password"} 
+                                            className="pr-10"
+                                            disabled={isLoading}
+                                            {...field}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                            className="absolute right-3 text-muted-foreground hover:text-foreground focus:outline-none select-none"
+                                            aria-label={showConfirmPassword ? "Hide confirmation password" : "Show confirmation password"}
+                                        >
+                                            {showConfirmPassword ? (
+                                                <EyeOff className="h-4 w-4" />
+                                            ) : (
+                                                <Eye className="h-4 w-4" />
+                                            )}
+                                        </button>
+                                    </div>
                                 </Field>
                             )}
                         />

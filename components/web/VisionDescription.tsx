@@ -13,7 +13,7 @@ export default function VisionDescription() {
                 Why TaQtiQ?
               </h2>
               <p className="text-lg font-mono text-muted-foreground">
-                Because real problems need addressing.
+                Relentless innovation.
               </p>
             </div>
             <p className="p-0 text-sm md:text-base leading-relaxed text-accent-foreground">
@@ -27,9 +27,8 @@ export default function VisionDescription() {
             </p>
           </div>
 
-          <div className="w-full aspect-[16/10] bg-muted/20 flex items-center justify-center relative overflow-hidden order-2 lg:order-2">
-            <Image
-              src="/columns.png"
+            <div className="w-full max-w-sm mx-auto aspect-[16/10] bg-muted/20 flex items-center justify-center relative overflow-hidden order-2 lg:order-2">            <Image
+              src="/grid.png"
               alt="Layered tabs representation"
               fill
               className="object-contain"
