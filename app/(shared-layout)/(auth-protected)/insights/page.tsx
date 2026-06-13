@@ -3,10 +3,12 @@ import { AddBlogButton } from "@/components/web/AddBlogButton";
 import { CachedBlogGrid } from "@/components/web/CachedBlogGrid";
 import { SkeletonLoadingUi } from "@/components/web/SkeletonLoadingUI";
 import { Suspense } from "react";
+import { headers } from "next/headers";
 
-export const dynamic = "force-dynamic";
+export default async function InsightsPage() {
 
-export default function InsightsPage() {
+    await headers();
+
     return (
         <main className="max-w-7xl mx-auto px-4 py-8 relative">
             <AddBlogButton />
