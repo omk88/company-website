@@ -11,7 +11,7 @@ interface CardData {
 
 function VisionCardItem({ card }: { card: CardData }) {
   return (
-    <Card className="flex flex-col justify-between overflow-hidden bg-white/70 backdrop-blur-md border-neutral-200/50 rounded-none">
+    <Card className="flex flex-col justify-between overflow-hidden bg-card/70 backdrop-blur-md border-border/50 rounded-none transition-colors duration-300">
       <div className="w-full aspect-[16/10] bg-muted/20 flex items-center justify-center relative overflow-hidden group">
         <Image
           src={card.imageSrc}
@@ -22,7 +22,7 @@ function VisionCardItem({ card }: { card: CardData }) {
         />
       </div>
       <CardHeader className="pt-2 flex flex-col gap-2">
-        <CardTitle className="text-xl font-semibold tracking-tight">
+        <CardTitle className="text-xl font-semibold tracking-tight text-foreground">
           {card.title}
         </CardTitle>
         <CardContent className="p-0 text-sm md:text-base leading-relaxed text-muted-foreground">

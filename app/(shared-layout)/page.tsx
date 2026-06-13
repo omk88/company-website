@@ -26,10 +26,10 @@ export default function Home() {
           
           <div className="flex flex-col items-center lg:items-start text-center lg:text-left w-full max-w-lg gap-8 lg:justify-self-center">
             <div className="flex flex-col items-center lg:items-start gap-6 w-full">
-              <div className={`${spaceGrotesk.className} text-4xl sm:text-5xl font-extrabold text-neutral-950 tracking-tight leading-none`}>
+              <div className={`${spaceGrotesk.className} text-4xl sm:text-5xl font-extrabold text-foreground tracking-tight leading-none`}>
                 <TypewriterEffect /> 
               </div>
-              <p className="text-lg leading-relaxed text-neutral-950 font-semibold max-w-md opacity-85">
+              <p className="text-lg leading-relaxed text-foreground font-semibold max-w-md opacity-85">
                 Building software that pushes boundaries. <br />
                 We are where the future happens.
               </p>
@@ -38,17 +38,17 @@ export default function Home() {
             <div className="flex flex-row items-center gap-4 mt-2">
               <Link 
                 href="/sign-in" 
-                className="inline-block px-7 py-3.5 bg-white hover:bg-neutral-100 text-neutral-950 font-semibold text-sm rounded-full border border-neutral-200 transition-all duration-200 active:scale-98 shadow-sm text-center"
+                className="inline-block px-7 py-3.5 bg-background dark:bg-neutral-900 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-foreground font-semibold text-sm rounded-full border border-neutral-200 dark:border-neutral-800 transition-all duration-200 active:scale-98 shadow-sm text-center"
               >
                 Sign in
               </Link>
               
               <Link 
                 href="/products" 
-                className="group px-6 py-3.5 bg-neutral-950 hover:bg-neutral-800 text-white font-semibold text-sm rounded-full transition-all duration-200 active:scale-98 inline-flex items-center gap-2 shadow-sm"
+                className="group px-6 py-3.5 bg-foreground hover:bg-foreground/90 text-background font-semibold text-sm rounded-full transition-all duration-200 active:scale-98 inline-flex items-center gap-2 shadow-sm"
               >
                 <span>See our products</span>
-                <svg className="w-3 h-3 text-white transform group-hover:translate-x-0.5 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={4}>
+                <svg className="w-3 h-3 text-background transform group-hover:translate-x-0.5 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={4}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
               </Link>

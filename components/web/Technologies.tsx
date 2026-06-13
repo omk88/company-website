@@ -47,7 +47,7 @@ export default function ToolsGrid({ tools }: ToolsGridProps) {
                   alt={tool.name}
                   fill
                   sizes="(max-width: 640px) 50vw, 16vw"
-                  className="object-contain grayscale contrast-125 mix-blend-multiply dark:invert"
+                  className="object-contain grayscale contrast-125 mix-blend-multiply dark:mix-blend-normal dark:invert"
                 />
               </div>
             </div>

@@ -16,7 +16,7 @@ export default function TypewriterEffect() {
   }, []);
 
   return (
-    <span className="text-black flex flex-row items-center justify-start gap-2">
+    <span className="text-foreground flex flex-row items-center justify-start gap-2">
       <span>{">"}</span>
       {shouldRender ? (
         <DynamicTypewriter
@@ -28,7 +28,7 @@ export default function TypewriterEffect() {
             deleteSpeed: 30, 
           }}
         />
-      ) : (<></>)}
+      ) : null}
     </span>
   );
 }

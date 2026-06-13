@@ -5,10 +5,10 @@ export default function ContactPage() {
     <section className="w-full h-[calc(100vh-4rem)] grid grid-cols-1 lg:grid-cols-12 gap-8 items-center py-6">
       
       <div className="lg:col-span-5 flex flex-col justify-center text-left max-w-md">
-        <h1 className="text-4xl font-extrabold tracking-tight text-neutral-950 sm:text-5xl mb-4">
+        <h1 className="text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl mb-4">
           Get in Touch
         </h1>
-        <p className="text-base text-neutral-600 mb-2">
+        <p className="text-base text-muted-foreground mb-2">
           Have a question or want to work together? Drop us a message and our team will get back to you shortly.
         </p>
       </div>

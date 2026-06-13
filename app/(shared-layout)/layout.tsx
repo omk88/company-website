@@ -10,11 +10,11 @@ const Navbar = dynamic(() => import("@/components/web/Navbar").then((mod) => mod
 });
 
 export default function SharedLayout({ children }: { children: ReactNode }) {
-    return (
-        <>
-            <Navbar />
-            { children }
-            <Footer />
-        </>
-    );
+  return (
+    <div className="min-h-screen flex flex-col bg-background text-foreground transition-colors duration-300 ease-in-out">
+      <Navbar />
+      {children}
+      <Footer />
+    </div>
+  );
 }

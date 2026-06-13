@@ -3,8 +3,7 @@ import Image from 'next/image';
 export default function VisionDescription() {
   return (
     <div className="w-full max-w-7xl mx-auto p-6 md:p-12 relative z-10 box-border">
-      <div className="border border-border bg-card text-card-foreground p-8 sm:p-12">
-        
+      <div className="border border-border bg-card text-card-foreground p-8 sm:p-12 transition-colors duration-300">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           
           <div className="flex flex-col h-full order-1 lg:order-1">
@@ -16,7 +15,7 @@ export default function VisionDescription() {
                 Relentless innovation.
               </p>
             </div>
-            <p className="p-0 text-sm md:text-base leading-relaxed text-accent-foreground">
+            <p className="p-0 text-sm md:text-base leading-relaxed text-muted-foreground">
               Modern enterprises struggle to innovate, and technology fails to deliver on its promises.  
               Painful problems go unaddressed. At TaQtiQ, we are asking the question, why is real 
               innovation so rare? Moving with speed. Executing with rapid precision. We are the 
@@ -27,7 +26,8 @@ export default function VisionDescription() {
             </p>
           </div>
 
-            <div className="w-full max-w-sm mx-auto aspect-[16/10] bg-muted/20 flex items-center justify-center relative overflow-hidden order-2 lg:order-2">            <Image
+          <div className="w-full max-w-sm mx-auto aspect-[16/10] bg-muted/20 flex items-center justify-center relative overflow-hidden order-2 lg:order-2">
+            <Image
               src="/grid.png"
               alt="Layered tabs representation"
               fill
@@ -35,9 +35,7 @@ export default function VisionDescription() {
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           </div>
-
         </div>
-
       </div>
     </div>
   );
