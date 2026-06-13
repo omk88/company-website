@@ -1,6 +1,11 @@
 import Technologies from "@/components/web/Technologies";
 import VisionCards from "@/components/web/VisionCards";
 import VisionDescription from "@/components/web/VisionDescription";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Vision",
+};
 
 export default function About() {
   return (

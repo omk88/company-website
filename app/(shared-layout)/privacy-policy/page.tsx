@@ -1,4 +1,9 @@
+import { Metadata } from "next";
 import React from "react";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+};
 
 interface DefinitionItem {
   term: string;
@@ -344,7 +349,6 @@ export default function PrivacyPolicy() {
   return (
     <div className="min-h-screen bg-background text-foreground py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
-        {/* Header Section */}
         <header className="border-b border-border pb-8 mb-12">
           <h1 className="text-4xl font-bold tracking-tight mb-3 sm:text-5xl">
             Privacy Policy
@@ -354,7 +358,6 @@ export default function PrivacyPolicy() {
           </p>
         </header>
 
-        {/* Intro Section */}
         <div className="space-y-6 text-base leading-relaxed text-muted-foreground mb-16">
           <p>
             TaQtiQ (“we,” “our,” or “us”) is committed to protecting your privacy. This Privacy Policy explains how your personal information is collected, used, and disclosed by TaQtiQ.
@@ -373,7 +376,6 @@ export default function PrivacyPolicy() {
           </p>
         </div>
 
-        {/* Dynamic Sections Divider */}
         <div className="space-y-14">
           {sections.map((section) => (
             <section key={section.id} id={section.id} className="scroll-mt-20 border-t border-border/40 pt-8">

@@ -17,8 +17,11 @@ const jetBrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TaQtiQ",
-  description: "TaQtiQ",
+  title: {
+    default: "TaQtiQ | Digital Solutions",
+    template: "%s | TaQtiQ",               
+  },
+  description: "Your company description goes here.",
 };
 
 export default function RootLayout({

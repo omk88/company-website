@@ -8,10 +8,10 @@ export default function Footer() {
       <Separator />
 
       <footer className="w-full max-w-7xl mx-auto py-12 px-6 text-sm text-muted-foreground">
-        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6">
+        <div className="grid grid-cols-2 gap-x-8 gap-y-8 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6">
           
-          <div className="flex flex-col gap-4 lg:col-span-1">
-            <span className="font-poppins-text text-xl font-bold text-foreground tracking-tight">
+          <div className="flex flex-col gap-4 col-span-2 md:col-span-4 lg:col-span-1">
+            <span className="font-poppins-text text-2xl font-extrabold text-foreground tracking-tight">
               TaQtiQ
             </span>
             <div className="flex items-center gap-4 text-muted-foreground">
@@ -26,6 +26,7 @@ export default function Footer() {
               </Link>
             </div>
           </div>
+
           <div className="flex flex-col gap-3">
             <h3 className="font-semibold text-foreground">About us</h3>
             <ul className="flex flex-col gap-2">
@@ -37,40 +38,40 @@ export default function Footer() {
             </ul>
           </div>
 
-          <div className="flex flex-col gap-6">
-            <div className="flex flex-col gap-3">
-              <h3 className="font-semibold text-foreground">Community</h3>
-              <ul className="flex flex-col gap-2">
-                <li><Link href="/vision" className="hover:text-foreground transition-colors">Creators</Link></li>
-                <li><Link href="/vision" className="hover:text-foreground transition-colors">Developers</Link></li>
-                <li><Link href="/vision" className="hover:text-foreground transition-colors">Businesses</Link></li>
-              </ul>
-            </div>
-            <div className="flex flex-col gap-3">
-              <h3 className="font-semibold text-foreground">Our actions</h3>
-              <ul className="flex flex-col gap-2">
-                <li><Link href="/privacy-policy" className="hover:text-foreground transition-colors">Data and privacy</Link></li>
-                <li><Link href="/privacy-policy" className="hover:text-foreground transition-colors">Responsible business</Link></li>
-                <li><Link href="/terms-and-conditions" className="hover:text-foreground transition-colors">Accessibility</Link></li>
-              </ul>
-            </div>
+          <div className="flex flex-col gap-3">
+            <h3 className="font-semibold text-foreground">Community</h3>
+            <ul className="flex flex-col gap-2">
+              <li><Link href="/vision" className="hover:text-foreground transition-colors">Creators</Link></li>
+              <li><Link href="/vision" className="hover:text-foreground transition-colors">Developers</Link></li>
+              <li><Link href="/vision" className="hover:text-foreground transition-colors">Businesses</Link></li>
+            </ul>
           </div>
-          <div className="flex flex-col gap-6">
-            <div className="flex flex-col gap-3">
-              <h3 className="font-semibold text-foreground">Site terms</h3>
-              <ul className="flex flex-col gap-2">
-                <li><Link href="/privacy-policy" className="hover:text-foreground transition-colors">Privacy Policy</Link></li>
-                <li><Link href="/terms-and-conditions" className="hover:text-foreground transition-colors">Terms and Conditions</Link></li>
-                <li><Link href="/cookie-policy" className="hover:text-foreground transition-colors">Cookie Policy</Link></li>
-              </ul>
-            </div>
-            <div className="flex flex-col gap-3">
-              <h3 className="font-semibold text-foreground">App support</h3>
-              <ul className="flex flex-col gap-2">
-                <li><Link href="/contact" className="hover:text-foreground transition-colors">Help Centre</Link></li>
-              </ul>
-            </div>
+
+          <div className="flex flex-col gap-3">
+            <h3 className="font-semibold text-foreground">Site terms</h3>
+            <ul className="flex flex-col gap-2">
+              <li><Link href="/privacy-policy" className="hover:text-foreground transition-colors">Privacy Policy</Link></li>
+              <li><Link href="/terms-and-conditions" className="hover:text-foreground transition-colors">Terms and Conditions</Link></li>
+              <li><Link href="/cookie-policy" className="hover:text-foreground transition-colors">Cookie Policy</Link></li>
+            </ul>
           </div>
+
+          <div className="flex flex-col gap-3">
+            <h3 className="font-semibold text-foreground">Our actions</h3>
+            <ul className="flex flex-col gap-2">
+              <li><Link href="/privacy-policy" className="hover:text-foreground transition-colors">Data and privacy</Link></li>
+              <li><Link href="/privacy-policy" className="hover:text-foreground transition-colors">Responsible business</Link></li>
+              <li><Link href="/terms-and-conditions" className="hover:text-foreground transition-colors">Accessibility</Link></li>
+            </ul>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <h3 className="font-semibold text-foreground">App support</h3>
+            <ul className="flex flex-col gap-2">
+              <li><Link href="/contact" className="hover:text-foreground transition-colors">Help Centre</Link></li>
+            </ul>
+          </div>
+
         </div>
       </footer>
     </div>
