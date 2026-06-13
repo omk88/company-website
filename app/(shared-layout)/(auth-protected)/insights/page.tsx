@@ -11,9 +11,7 @@ export default async function InsightsPage() {
 
     return (
         <main className="max-w-7xl mx-auto px-4 py-8 relative">
-            <Suspense fallback={<div className="h-10 mb-6" />}>
-                <AddBlogButton />
-            </Suspense>
+            <AddBlogButton />
             <NewsletterCard />
             
             <Suspense fallback={<SkeletonLoadingUi />}>
