@@ -9,6 +9,8 @@ import { api } from "@/convex/_generated/api";
 export function AddBlogButton() {
     const user = useQuery(api.auth.getCurrentUser);
     
+    console.log("USER:", user);
+    
     const userEmail = user?.email || "";
     const companyDomain = "@taqtiq.tech";
     const isCompanyUser = userEmail.endsWith(companyDomain);

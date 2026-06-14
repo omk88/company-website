@@ -3,5 +3,4 @@ import type { AuthConfig } from "convex/server";
 
 export default {
   providers: [getAuthConfigProvider()],
-  
 } satisfies AuthConfig;

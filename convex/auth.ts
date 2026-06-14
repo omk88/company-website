@@ -13,11 +13,7 @@ export const authComponent = createClient<DataModel>(components.betterAuth);
 
 export const createAuth = (ctx: GenericCtx<DataModel>) => {
   return betterAuth({
-    baseURL: process.env.SITE_URL || "https://www.taqtiq.tech",
-    trustedOrigins: [
-      "https://www.taqtiq.tech",
-      "https://taqtiq.tech"
-    ],
+    baseURL: process.env.SITE_URL || "http://localhost:3000",
     database: authComponent.adapter(ctx),
     secret: process.env.BETTER_AUTH_SECRET,
     emailAndPassword: {
