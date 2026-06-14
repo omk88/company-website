@@ -7,6 +7,8 @@ export async function POST(request: NextRequest) {
   const user = await fetchAuthQuery(api.auth.getCurrentUser);
   const isCompanyUser = user?.email?.endsWith("@taqtiq.tech");
 
+  console.log("USER:::::",user);
+
   if (!isCompanyUser) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
