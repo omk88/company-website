@@ -15,13 +15,13 @@ export default function Footer() {
               TaQtiQ
             </span>
             <div className="flex items-center gap-4 text-muted-foreground">
-              <Link href="#" className="hover:text-foreground transition-colors">
+              <Link href="https://www.linkedin.com/company/taqtiq-tech" className="hover:text-foreground transition-colors">
                 <FaLinkedin size={18} />
               </Link>
-              <Link href="#" className="hover:text-foreground transition-colors">
+              <Link href="https://www.instagram.com/taqtiq_tech" className="hover:text-foreground transition-colors">
                 <FaInstagram size={18} />
               </Link>
-              <Link href="#" className="hover:text-foreground transition-colors">
+              <Link href="https://x.com/TaQtiQ_tech" className="hover:text-foreground transition-colors">
                 <FaXTwitter size={16} />
               </Link>
             </div>
