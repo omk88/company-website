@@ -12,3 +12,6 @@ export const {
   convexUrl: process.env.NEXT_PUBLIC_CONVEX_URL!,
   convexSiteUrl: process.env.NEXT_PUBLIC_CONVEX_SITE_URL!,
 });
+
+console.log("NEXT PUBLIC CONVEX URL:", process.env.NEXT_PUBLIC_CONVEX_URL);
+console.log("NEXT PUBLIC CONVEX SITE URL:", process.env.NEXT_PUBLIC_CONVEX_SITE_URL);
