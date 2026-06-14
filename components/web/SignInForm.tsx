@@ -10,12 +10,10 @@ import { Checkbox } from "../ui/checkbox";
 import Link from "next/link";
 import { toast } from "sonner";
 import { useState } from "react";
-// 1. Import the eye icons
-import { Eye, EyeOff } from "lucide-react"; 
+import { Eye, EyeOff, Loader2 } from "lucide-react"; 
 
 export default function SignInForm() {
     const [isLoading, setIsLoading] = useState(false);
-    // 2. Initialize the visibility state
     const [showPassword, setShowPassword] = useState(false); 
     
     const { control, handleSubmit } = useForm({
@@ -145,7 +143,14 @@ export default function SignInForm() {
                         </div>
                         
                         <Button type="submit" className="w-full" disabled={isLoading}>
-                            {isLoading ? "Signing in..." : "Sign in"}
+                            {isLoading ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Signing in
+                                </>
+                            ) : (
+                                "Sign in"
+                            )}
                         </Button>
                     </FieldGroup>
                 </form>

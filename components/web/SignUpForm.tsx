@@ -12,7 +12,7 @@ import z from "zod";
 import { toast } from "sonner";
 import { useState } from "react"; 
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 
 export default function SignUpForm() {
     const [isLoading, setIsLoading] = useState(false);
@@ -165,7 +165,14 @@ export default function SignUpForm() {
                         />
                         
                         <Button type="submit" className="w-full" disabled={isLoading}>
-                            {isLoading ? "Creating account..." : "Sign up"}
+                            {isLoading ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Creating account
+                                </>
+                            ) : (
+                                "Sign up"
+                            )}
                         </Button>
                     </FieldGroup>
                 </form>
