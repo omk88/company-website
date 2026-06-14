@@ -13,6 +13,8 @@ export function AddBlogButton() {
     const companyDomain = "@taqtiq.tech";
     const isCompanyUser = userEmail.endsWith(companyDomain);
 
+    console.log("CURRENT USER:", user);
+
     if (!isCompanyUser) return null;
 
     return (
