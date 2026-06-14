@@ -3,15 +3,15 @@ import { Separator } from "@/components/ui/separator";
 
 export default function Loading() {
   return (
-    <div className="max-w-6xl mx-auto py-8 px-4 relative">
+    <div className="w-full max-w-6xl mx-auto py-8 px-4 relative">
       <Skeleton className="h-10 w-32 mb-4 bg-neutral-200/80" />
       
       <Skeleton className="w-full h-[400px] mb-8 rounded-none bg-neutral-200/80" />
       
-      <div className="space-y-4 flex flex-col">
+      <div className="space-y-4 flex flex-col w-full">
         <Skeleton className="h-10 w-3/4 bg-neutral-200/80" />
         
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 w-full">
           <Skeleton className="h-6 w-1/2 bg-neutral-200/60" />
           <Skeleton className="h-4 w-1/4 bg-neutral-200/40" />
         </div>
@@ -19,7 +19,7 @@ export default function Loading() {
 
       <Separator className="my-8" />
 
-      <div className="space-y-6">
+      <div className="space-y-6 w-full">
         <div className="space-y-2">
           <Skeleton className="h-5 w-full bg-neutral-200/60" />
           <Skeleton className="h-5 w-full bg-neutral-200/60" />
