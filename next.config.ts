@@ -6,28 +6,16 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'groovy-peacock-979.eu-west-1.convex.cloud',
+        hostname: '*.eu-west-1.convex.site',
         port: '',
         pathname: '/**',
       },
       {
         protocol: 'https',
-        hostname: 'i.ibb.co',
+        hostname: '*.eu-west-1.convex.cloud',
         port: '',
         pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'i.postimg.cc', 
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'images.unsplash.com', 
-        port: '',
-        pathname: '/**',
-      },
+      }
     ],
   },
 };
