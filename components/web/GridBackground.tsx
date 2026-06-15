@@ -11,7 +11,7 @@ export default function GridBackground({ children }: { children: React.ReactNode
     setMounted(true)
   }, [])
 
-  let lineColor = "rgba(148, 163, 184, 0.15)"
+  let lineColor = "rgba(148, 163, 184, 0.3)"
   let backgroundColor = "rgb(255, 255, 255)" 
 
   if (mounted && resolvedTheme === "dark") {
