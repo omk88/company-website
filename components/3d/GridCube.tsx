@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect, useMemo, Suspense } from 'react'
+import { useState, useEffect, useMemo, useRef, Suspense } from 'react'
 import { useGLTF, OrbitControls, Center } from '@react-three/drei'
-import { Canvas } from '@react-three/fiber'
+import { Canvas, useFrame } from '@react-three/fiber'
+import * as THREE from 'three'
 
 const AVAILABLE_MODELS = [
   '/cube1.glb', '/cube2.glb', '/cube3.glb', '/cube4.glb', '/cube5.glb',
@@ -14,9 +15,48 @@ let persistentSessionPath: string | null = null
 function UniversalModel({ path }: { path: string }) {
   const { scene } = useGLTF(path)
   const clonedScene = useMemo(() => scene.clone(), [scene])
+  
+  const groupRef = useRef<THREE.Group>(null)
+  const [isIntroFinished, setIsIntroFinished] = useState(false)
+
+  const targetRotationY = -Math.PI / 10
+  const targetScale = 1
+
+  useEffect(() => {
+    if (groupRef.current) {
+      groupRef.current.scale.set(0.9, 0.9, 0.9)
+      groupRef.current.position.y = 0
+      
+      groupRef.current.rotation.y = targetRotationY - (Math.PI / 6)
+    }
+    setIsIntroFinished(false)
+  }, [path])
+
+  useFrame((state, delta) => {
+    if (!groupRef.current) return
+
+    const smoothDelta = Math.min(delta, 0.1)
+
+    if (!isIntroFinished) {
+      groupRef.current.scale.x = THREE.MathUtils.lerp(groupRef.current.scale.x, targetScale, smoothDelta * 2)
+      groupRef.current.scale.y = THREE.MathUtils.lerp(groupRef.current.scale.y, targetScale, smoothDelta * 2)
+      groupRef.current.scale.z = THREE.MathUtils.lerp(groupRef.current.scale.z, targetScale, smoothDelta * 2)
+
+      groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, targetRotationY, smoothDelta * 3)
+
+      if (
+        Math.abs(groupRef.current.scale.x - targetScale) < 0.005 && 
+        Math.abs(groupRef.current.rotation.y - targetRotationY) < 0.005
+      ) {
+        setIsIntroFinished(true)
+      }
+    } else {
+      groupRef.current.rotation.y += smoothDelta * 0.08
+    }
+  })
 
   return (
-    <group rotation={[Math.PI, -Math.PI / 10, 0]} dispose={null}>
+    <group ref={groupRef} rotation={[Math.PI, targetRotationY, 0]} dispose={null}>
       <Center>
         <primitive object={clonedScene} />
       </Center>
@@ -24,7 +64,7 @@ function UniversalModel({ path }: { path: string }) {
   )
 }
 
-export default function Dynamic3DScene() {
+export default function GridCube() {
   const [modelPath, setModelPath] = useState<string | null>(null)
   const [isUnmounting, setIsUnmounting] = useState(false)
 
@@ -55,8 +95,6 @@ export default function Dynamic3DScene() {
     }
 
     const finalPath = persistentSessionPath || AVAILABLE_MODELS[0]
-
-    //useGLTF.preload(finalPath)
     setModelPath(finalPath)
 
     return () => {
@@ -94,8 +132,6 @@ export default function Dynamic3DScene() {
             target={[0, 0, 0]}
             enablePan={false}
             enableZoom={false} 
-            autoRotate 
-            autoRotateSpeed={0.6} 
           />
         </Canvas>
       </Suspense>
