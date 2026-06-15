@@ -56,6 +56,7 @@ export default function Dynamic3DScene() {
 
     const finalPath = persistentSessionPath || AVAILABLE_MODELS[0]
 
+    //useGLTF.preload(finalPath)
     setModelPath(finalPath)
 
     return () => {
