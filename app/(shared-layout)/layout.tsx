@@ -1,3 +1,4 @@
+import GridBackground from "@/components/web/GridBackground";
 import dynamic from "next/dynamic";
 import { ReactNode } from "react";
 
@@ -13,7 +14,9 @@ export default function SharedLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground transition-colors duration-300 ease-in-out">
       <Navbar />
-      {children}
+        <GridBackground>
+          {children}
+        </GridBackground>
       <Footer />
     </div>
   );
