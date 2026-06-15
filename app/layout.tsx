@@ -3,6 +3,7 @@ import { JetBrains_Mono, Poppins } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "next-themes";
+import GridBackground from "@/components/web/GridBackground"; 
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -38,9 +39,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <main className="w-full flex-1 flex flex-col">
-            {children}
-          </main>
+          <GridBackground>
+            <main className="w-full flex-1 flex flex-col">
+              {children}
+            </main>
+          </GridBackground>
           <Toaster />
         </ThemeProvider>
       </body>

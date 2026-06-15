@@ -15,7 +15,7 @@ export default function SharedLayout({ children }: { children: ReactNode }) {
     <div className="min-h-screen flex flex-col bg-background text-foreground transition-colors duration-300 ease-in-out">
       <Navbar />
         <GridBackground>
-          {children}
+          {children} 
         </GridBackground>
       <Footer />
     </div>
