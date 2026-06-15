@@ -65,7 +65,7 @@ export default function Dynamic3DScene() {
   }, [])
 
   const loadingPlaceholder = (
-    <div className="w-full aspect-square bg-neutral-100/10 animate-pulse rounded-xl" />
+    <></>
   )
 
   if (!modelPath || isUnmounting) return loadingPlaceholder
