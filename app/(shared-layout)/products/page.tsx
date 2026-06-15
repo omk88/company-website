@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 
 export default function Products() {
   return (
-    <div className="w-full h-[calc(100vh-4rem)] flex flex-col items-center justify-center bg-background text-center transition-colors duration-300 ease-in-out">
+    <div className="w-full h-[calc(100vh-4rem)] flex flex-col items-center justify-center text-center transition-colors duration-300 ease-in-out">
       <div className="space-y-2">
         <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
           Products
@@ -22,9 +22,7 @@ export default function Products() {
           </span>
         </h1>
 
-
         <RiAliensFill className="text-7xl text-emerald-600 dark:text-green-400 max-w-sm mx-auto pt-2 transition-colors duration-300" />
-
       </div>
     </div>
   );
