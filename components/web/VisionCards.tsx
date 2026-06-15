@@ -17,11 +17,12 @@ function VisionCardItem({ card }: { card: CardData }) {
           src={card.imageSrc}
           alt={card.imageAlt}
           fill
+          priority
           className="object-contain transition-transform duration-300 group-hover:scale-105"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
       </div>
-      <CardHeader className="pt-2 flex flex-col gap-2">
+      <CardHeader className="pt-4 flex flex-col gap-2">
         <CardTitle className="text-xl font-semibold tracking-tight text-foreground">
           {card.title}
         </CardTitle>
@@ -59,13 +60,11 @@ export default function VisionCards() {
   ];
 
   return (
-    <div className="w-full">
-      <div className="max-w-7xl mx-auto p-6 md:p-12 relative z-10 box-border">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {cardsData.map((card) => (
-            <VisionCardItem key={card.id} card={card} />
-          ))}
-        </div>
+    <div className="w-full py-8 md:py-12">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {cardsData.map((card) => (
+          <VisionCardItem key={card.id} card={card} />
+        ))}
       </div>
     </div>
   );

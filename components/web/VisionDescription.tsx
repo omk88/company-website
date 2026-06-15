@@ -2,7 +2,7 @@ import Image from 'next/image';
 
 export default function VisionDescription() {
   return (
-    <div className="w-full max-w-7xl mx-auto p-6 md:p-12 relative z-10 box-border">
+    <div className="w-full py-6 md:py-12 relative z-10 box-border">
       <div className="border border-border bg-card text-card-foreground p-8 sm:p-12 transition-colors duration-300">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           
