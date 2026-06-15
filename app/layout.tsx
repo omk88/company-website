@@ -21,7 +21,8 @@ export const metadata: Metadata = {
     default: "TaQtiQ | Digital Solutions",
     template: "%s | TaQtiQ",               
   },
-  description: "Your company description goes here.",
+  description: "Description",
+  colorScheme: "light dark", 
 };
 
 export default function RootLayout({
@@ -38,7 +39,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <main className="max-w-7xl mx-auto w-full flex-1">
+          <main className="w-full flex-1 flex flex-col">
             {children}
           </main>
           <Toaster />
