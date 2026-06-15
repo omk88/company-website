@@ -36,7 +36,7 @@ export function ContactForm() {
   return (
     <form 
       onSubmit={handleSubmit} 
-      className="space-y-4 max-w-xl mx-auto bg-card p-6 border border-border transition-colors duration-300 ease-in-out"
+      className="space-y-4 w-full max-w-xl mx-auto bg-card p-6 border border-border transition-colors duration-300 ease-in-out"
     >
       <div>
         <label className="block text-sm font-semibold text-foreground mb-1">Name</label>

@@ -35,13 +35,13 @@ export default function NewsletterSubscriptionForm() {
         }
     };
 
-    return(
-        <form onSubmit={handleSubscribe} className="flex gap-2 w-full mt-4">
+    return (
+        <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-2 w-full mt-4">
             <Input 
                 type="email"
                 required
                 disabled={isSubmitting}
-                className="bg-background h-12 text-lg" 
+                className="bg-background h-12 text-lg w-full" 
                 placeholder="Enter your email..." 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -49,7 +49,7 @@ export default function NewsletterSubscriptionForm() {
             <Button 
                 type="submit" 
                 disabled={isSubmitting}
-                className="h-12 text-lg px-6"
+                className="h-12 text-lg px-6 w-full sm:w-auto shrink-0"
             >
                 {isSubmitting ? "Joining..." : "Subscribe"}
             </Button> 

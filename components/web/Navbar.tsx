@@ -13,7 +13,7 @@ export function Navbar() {
 
     return (
         <header className="w-full bg-background border-b border-border sticky top-0 z-50 transition-colors duration-300 ease-in-out"> 
-            <nav className="w-full max-w-7xl mx-auto px-6 h-16 flex items-center justify-between relative">
+            <nav className="w-full px-6 md:px-12 h-16 flex items-center justify-between relative">
                 
                 <div className="flex items-center gap-8">
                     <Link href="/">
