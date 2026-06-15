@@ -56,7 +56,6 @@ export default function Dynamic3DScene() {
 
     const finalPath = persistentSessionPath || AVAILABLE_MODELS[0]
 
-    useGLTF.preload(finalPath)
     setModelPath(finalPath)
 
     return () => {
@@ -64,9 +63,7 @@ export default function Dynamic3DScene() {
     }
   }, [])
 
-  const loadingPlaceholder = (
-    <></>
-  )
+  const loadingPlaceholder = <></>
 
   if (!modelPath || isUnmounting) return loadingPlaceholder
 
@@ -77,7 +74,6 @@ export default function Dynamic3DScene() {
     >
       <Suspense fallback={loadingPlaceholder}>
         <Canvas 
-          key={`canvas-${modelPath}`}
           camera={{ position: [40, 45, 80], fov: 5 }}
           gl={{ 
             antialias: true, 

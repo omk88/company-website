@@ -21,8 +21,7 @@ export const metadata: Metadata = {
     default: "TaQtiQ | Digital Solutions",
     template: "%s | TaQtiQ",               
   },
-  description: "Description",
-  colorScheme: "light dark", 
+  description: "Description"
 };
 
 export default function RootLayout({
