@@ -26,9 +26,8 @@ export default function Home() {
           
           <div className="flex flex-col items-center lg:items-start text-center lg:text-left w-full max-w-lg gap-8 lg:justify-self-center">
             <div className="flex flex-col items-center lg:items-start gap-6 w-full">
-              <div className={`${spaceGrotesk.className} text-4xl sm:text-5xl font-extrabold text-foreground tracking-tight leading-none`}>
-                <TypewriterEffect /> 
-              </div>
+              <TypewriterEffect className={`${spaceGrotesk.className} text-4xl sm:text-5xl font-extrabold text-foreground tracking-tight leading-none`} /> 
+              
               <p className="text-lg leading-relaxed text-foreground font-semibold max-w-md opacity-85">
                 Building software that pushes boundaries. <br />
                 We are where the future happens.

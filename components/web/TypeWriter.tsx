@@ -7,7 +7,11 @@ const DynamicTypewriter = dynamic(() => import('typewriter-effect'), {
   ssr: false
 });
 
-export default function TypewriterEffect() {
+interface TypewriterEffectProps {
+  className?: string;
+}
+
+export default function TypewriterEffect({ className }: TypewriterEffectProps) {
   const [shouldRender, setShouldRender] = useState(false);
 
   useEffect(() => {
@@ -16,7 +20,7 @@ export default function TypewriterEffect() {
   }, []);
 
   return (
-    <span className="text-foreground flex flex-row items-center justify-start gap-2">
+    <span className={`text-foreground flex flex-row items-center justify-start gap-2 ${className || ''}`}>
       <span>{">"}</span>
       {shouldRender ? (
         <DynamicTypewriter
