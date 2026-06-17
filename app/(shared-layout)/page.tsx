@@ -2,16 +2,7 @@ import { Space_Grotesk } from 'next/font/google';
 import Link from 'next/link';
 
 import TypewriterEffect from "@/components/web/TypeWriter";
-import dynamic from 'next/dynamic';
-
-const GridCube = dynamic(() => import('@/components/3d/GridCube'), {
-  ssr: true,
-  loading: () => (
-    <div className="w-full min-h-[400px] flex items-center justify-center bg-neutral-100/5">
-      <div className="w-48 h-48 bg-neutral-200/50 animate-pulse rounded-xl" />
-    </div>
-  ),
-});
+import GridCube from '@/components/3d/GridCube';
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
