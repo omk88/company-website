@@ -1,18 +1,21 @@
 "use client";
 
 import { Controller, useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
+import { Eye, EyeOff, Loader2 } from "lucide-react"; 
+import Link from "next/link";
+
 import { Button } from "../ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../ui/card";
 import { FieldGroup, Field, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
-import { authClient } from "@/lib/auth-client";
 import { Checkbox } from "../ui/checkbox";
-import Link from "next/link";
-import { toast } from "sonner";
-import { useState } from "react";
-import { Eye, EyeOff, Loader2 } from "lucide-react"; 
+import { authClient } from "@/lib/auth-client";
 
 export default function SignInForm() {
+    const router = useRouter(); 
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false); 
     
@@ -31,11 +34,14 @@ export default function SignInForm() {
                 email: data.email,
                 password: data.password,
                 rememberMe: data.rememberMe,
-                callbackURL: "/", 
             }, {
                 onRequest: () => setIsLoading(true),
                 onSuccess: () => {
                     toast.success("Successfully signed in!");
+                    
+                    router.refresh(); 
+                    
+                    router.push("/");
                 },
                 onError: (ctx) => {
                     setIsLoading(false);
@@ -51,7 +57,7 @@ export default function SignInForm() {
     const handleGoogleSignIn = async () => {
         await authClient.signIn.social({
             provider: "google",
-            callbackURL: "/",
+            callbackURL: "/", 
         });
     };
     
