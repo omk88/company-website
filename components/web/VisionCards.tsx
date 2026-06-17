@@ -12,7 +12,7 @@ interface CardData {
 function VisionCardItem({ card }: { card: CardData }) {
   return (
     <Card className="flex flex-col justify-between overflow-hidden bg-card/70 backdrop-blur-md border-border/50 rounded-none transition-colors duration-300">
-      <div className="w-full aspect-[16/10] bg-muted/20 flex items-center justify-center relative overflow-hidden group">
+      <div className="w-full aspect-video bg-muted/20 flex items-center justify-center relative overflow-hidden group">
         <Image
           src={card.imageSrc}
           alt={card.imageAlt}
