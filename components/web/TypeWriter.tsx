@@ -12,27 +12,29 @@ interface TypewriterEffectProps {
 }
 
 export default function TypewriterEffect({ className }: TypewriterEffectProps) {
-  const [shouldRender, setShouldRender] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setShouldRender(true), 500);
-    return () => clearTimeout(timer);
+    setMounted(true);
   }, []);
 
   return (
     <span className={`text-foreground flex flex-row items-center justify-start gap-2 ${className || ''}`}>
       <span>{">"}</span>
-      {shouldRender ? (
+      
+      {mounted ? (
         <DynamicTypewriter
           options={{
-            strings: ['Agility.', 'Velocity.', 'Ingenuity.', 'Disruption.', 'Innovation.', 'Transformation.'],
+            strings: ['Transformation.', 'Agility.', 'Velocity.', 'Ingenuity.', 'Disruption.', 'Innovation.'],
             autoStart: true,
             loop: true,
             delay: 40,     
             deleteSpeed: 30, 
           }}
         />
-      ) : null}
+      ) : (
+        <span className="opacity-0">Transformation.</span>
+      )}
     </span>
   );
 }
