@@ -6,6 +6,7 @@ import { Button, buttonVariants } from "../ui/button";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { LogIn, LogOut } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface NavbarAuthClientProps {
     initialIsAuth: boolean;
@@ -35,11 +36,11 @@ export function NavbarAuthClient({ initialIsAuth }: NavbarAuthClientProps) {
     return (
         <div className="flex items-center gap-3">
             {isLoggedIn ? (
-                <Button variant="ghost" onClick={handleSignOut} title="Sign Out">
+                <Button variant="ghost" size="icon" className="w-9 h-9" onClick={handleSignOut} title="Sign Out">
                     <LogOut className="h-4 w-4" />
                 </Button>
             ) : (
-                <Link className={buttonVariants({ variant: "ghost" })} href="/sign-in" title="Sign Up">
+                <Link className={cn(buttonVariants({ variant: "ghost" }), "w-9 h-9 flex items-center justify-center")} href="/sign-in" title="Sign Up">
                     <LogIn className="h-4 w-4" />
                 </Link>
             )}
