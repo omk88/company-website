@@ -11,14 +11,14 @@ interface CardData {
 
 function VisionCardItem({ card }: { card: CardData }) {
   return (
-    <Card className="flex flex-col justify-between overflow-hidden bg-card/70 backdrop-blur-md border-border/50 rounded-none transition-colors duration-300">
+    <Card className="flex flex-col justify-between overflow-hidden bg-card/70 backdrop-blur-md border-border/50 rounded-none shadow-md shadow-foreground/5 hover:shadow-xl hover:shadow-foreground/10 transition-all duration-300 ease-out hover:-translate-y-1">
       <div className="w-full aspect-video bg-muted/20 flex items-center justify-center relative overflow-hidden group">
         <Image
           src={card.imageSrc}
           alt={card.imageAlt}
           fill
           priority
-          className="object-contain transition-transform duration-300 group-hover:scale-105"
+          className="object-contain"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
       </div>
@@ -60,7 +60,7 @@ export default function VisionCards() {
   ];
 
   return (
-    <div className="w-full py-8 md:py-12">
+    <div className="w-full py-2 md:py-2">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {cardsData.map((card) => (
           <VisionCardItem key={card.id} card={card} />

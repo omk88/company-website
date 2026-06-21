@@ -6,85 +6,106 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { usePathname } from 'next/navigation'
 import * as THREE from 'three'
 
-const AVAILABLE_MODELS = [
-  '/cube1.glb', '/cube2.glb', '/cube3.glb', '/cube4.glb', '/cube5.glb',
-  '/cube6.glb', '/cube7.glb', '/cube8.glb', '/cube9.glb', '/cube10.glb'
-]
-
-if (typeof window !== 'undefined') {
-  AVAILABLE_MODELS.forEach((path) => useGLTF.preload(path));
+interface GridCubeProps {
+  models: string[];
+  storageKey?: string;
 }
 
-function getInitialModelPath(): string {
-  if (typeof window === 'undefined') return AVAILABLE_MODELS[0];
-  const navEntries = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
-  const isReload = navEntries.length > 0 && navEntries[0].type === 'reload';
-
-  if (isReload) {
-    sessionStorage.removeItem('homepage_cube_path');
-  }
-
-  const cached = sessionStorage.getItem('homepage_cube_path');
-  if (cached && AVAILABLE_MODELS.includes(cached)) {
-    return cached;
-  }
-
-  const randomIndex = Math.floor(Math.random() * AVAILABLE_MODELS.length);
-  const chosen = AVAILABLE_MODELS[randomIndex];
-  sessionStorage.setItem('homepage_cube_path', chosen);
-  return chosen;
-}
-
-const initialPath = getInitialModelPath();
-
-export default function GridCube() {
-  const [modelPath] = useState<string>(initialPath)
+export default function GridCube({ 
+  models, 
+  storageKey = 'global_cube_path' 
+}: GridCubeProps) {
   const pathname = usePathname()
-  
+  const [modelPath, setModelPath] = useState<string | null>(null)
   const [mounted, setMounted] = useState(false)
+  const [isInView, setIsInView] = useState(false) 
+  const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    const observerTarget = containerRef.current
+    if (!observerTarget) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true)
+          observer.unobserve(observerTarget)
+        }
+      },
+      {
+        rootMargin: '-50px 0px -50px 0px',
+        threshold: 0.1 
+      }
+    )
+
+    observer.observe(observerTarget)
+    return () => {
+      if (observerTarget) observer.unobserve(observerTarget)
+    }
+  }, [mounted])
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !models.length) return
+
+    models.forEach((path) => useGLTF.preload(path))
+
+    const navEntries = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[]
+    const isReload = navEntries.length > 0 && navEntries[0].type === 'reload'
+    if (isReload) {
+      sessionStorage.removeItem(storageKey)
+    }
+
+    let chosenPath = sessionStorage.getItem(storageKey)
+    if (!chosenPath || !models.includes(chosenPath)) {
+      const randomIndex = Math.floor(Math.random() * models.length)
+      chosenPath = models[randomIndex]
+      sessionStorage.setItem(storageKey, chosenPath)
+    }
+
+    setModelPath(chosenPath)
     setMounted(true)
+
     return () => setMounted(false)
-  }, [pathname])
+  }, [pathname, models, storageKey])
+
+  if (!mounted || !modelPath) return <div ref={containerRef} className="w-full h-full min-h-[400px]" />
 
   return (
     <div 
-      key={`cube-route-${pathname}`}
+      ref={containerRef}
+      key={`cube-route-${pathname}-${storageKey}`}
       className="w-full h-full min-h-[400px] relative select-none canvas-container-block"
     >
-      {mounted && (
-        <Suspense fallback={null}>
-          <Canvas 
-            camera={{ position: [40, 45, 80], fov: 5 }}
-            gl={{ 
-              antialias: true, 
-              powerPreference: "high-performance",
-              precision: "mediump",
-              alpha: true,
-              preserveDrawingBuffer: false
-            }}
-            dpr={[1, 2]} 
-          >
-            <ambientLight intensity={0.7} />
-            <directionalLight position={[20, 40, 20]} intensity={1.5} />
-            <directionalLight position={[-5, -5, -5]} intensity={0.5} />
+      <Suspense fallback={null}>
+        <Canvas 
+          camera={{ position: [40, 45, 80], fov: 5 }}
+          gl={{ 
+            antialias: true, 
+            powerPreference: "high-performance",
+            precision: "mediump",
+            alpha: true,
+            preserveDrawingBuffer: false
+          }}
+          dpr={[1, 2]} 
+        >
+          <ambientLight intensity={0.7} />
+          <directionalLight position={[20, 40, 20]} intensity={1.5} />
+          <directionalLight position={[-5, -5, -5]} intensity={0.5} />
 
-            <UniversalModel path={modelPath} />
-            
-            <OrbitControls 
-              target={[0, 0, 0]}
-              enablePan={false}
-              enableZoom={false} 
-            />
-          </Canvas>
-        </Suspense>
-      )}
+          <UniversalModel path={modelPath} animate={isInView} />
+          
+          <OrbitControls 
+            target={[0, 0, 0]}
+            enablePan={false}
+            enableZoom={false} 
+          />
+        </Canvas>
+      </Suspense>
     </div>
   )
 }
 
-function UniversalModel({ path }: { path: string }) {
+function UniversalModel({ path, animate }: { path: string; animate: boolean }) {
   const { scene } = useGLTF(path)
   const clonedScene = useMemo(() => scene.clone(), [scene])
   
@@ -110,7 +131,8 @@ function UniversalModel({ path }: { path: string }) {
   }, [path])
 
   useFrame((state, delta) => {
-    if (!groupRef.current || !isReadyToRender) return
+    if (!groupRef.current || !isReadyToRender || !animate) return
+    
     const smoothDelta = Math.min(delta, 0.1)
 
     if (!isIntroFinished) {

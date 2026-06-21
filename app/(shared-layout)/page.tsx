@@ -9,6 +9,8 @@ const spaceGrotesk = Space_Grotesk({
   weight: ['700'],
 });
 
+const HOME_MODELS = ['/cube1.glb', '/cube2.glb', '/cube3.glb', '/cube4.glb', '/cube5.glb', '/cube6.glb', '/cube7.glb', '/cube8.glb', '/cube9.glb', '/cube10.glb']
+
 export default function Home() {
   return (
     <div className="min-h-screen w-full relative overflow-hidden flex items-center justify-center py-12 lg:py-0">
@@ -46,7 +48,7 @@ export default function Home() {
           </div>
 
           <div className="w-full aspect-square max-w-md lg:max-w-[460px] mx-auto">
-            <GridCube />
+            <GridCube models={HOME_MODELS} storageKey="homepage_cube_path" />
           </div>
 
         </div>

@@ -25,7 +25,7 @@ export default function TypewriterEffect({ className }: TypewriterEffectProps) {
       {mounted ? (
         <DynamicTypewriter
           options={{
-            strings: ['Transformation.', 'Agility.', 'Velocity.', 'Ingenuity.', 'Disruption.', 'Innovation.'],
+            strings: ['Agility.', 'Velocity.', 'Ingenuity.', 'Disruption.', 'Innovation.', 'Transformation.'],
             autoStart: true,
             loop: true,
             delay: 40,     

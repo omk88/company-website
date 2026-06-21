@@ -7,6 +7,8 @@ import { cn } from "@/lib/utils";
 import { FaXTwitter } from "react-icons/fa6";
 import { NavbarAuth } from "./NavbarAuth"; 
 import { MobileMenu } from "./MobileMenu";
+import { Suspense } from "react";
+
 
 export function Navbar() { 
     const anim = "relative no-underline hover:no-underline after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100";
@@ -48,13 +50,15 @@ export function Navbar() {
                     
                     <div className="flex items-center gap-2">
                         <ThemeToggle />
-                        <NavbarAuth /> 
+                        <Suspense>
+                            <NavbarAuth /> 
+                        </Suspense>
                     </div>
                 </div>
 
                 <div className="flex md:hidden items-center gap-4">
                     <ThemeToggle />
-                    <MobileMenu anim={anim} navbarAuth={<NavbarAuth />} />
+                    <MobileMenu anim={anim} navbarAuth={<Suspense><NavbarAuth /></Suspense>} />
                 </div>
                 
             </nav>

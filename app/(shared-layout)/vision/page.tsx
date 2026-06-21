@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function About() {
   return (
     <div className="min-h-screen w-full max-w-7xl mx-auto px-6 md:px-12 relative pb-12">
-      <h1 className="mt-12 md:mt-20 font-bold text-center text-xl md:text-2xl text-foreground tracking-tight">
+      <h1 className="py-6 md:py-6 font-bold text-center text-xl md:text-2xl text-foreground tracking-tight">
         Building software that delivers.
       </h1>
       <VisionCards />

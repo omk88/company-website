@@ -10,7 +10,9 @@ const Navbar = dynamic(() => import("@/components/web/Navbar").then((mod) => mod
   ssr: true,
 });
 
-export default function SharedLayout({ children }: { children: ReactNode }) {
+
+export default async function SharedLayout({ children }: { children: ReactNode }) {
+  
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground transition-colors duration-300 ease-in-out">
       <Navbar />

@@ -23,8 +23,8 @@ export default function ToolsGrid({ tools }: ToolsGridProps) {
   const displayTools = tools || defaultTools
 
   return (
-    <div className="w-full py-6 md:py-12 relative z-10 box-border">
-      <div className="border border-border bg-card text-card-foreground p-8 sm:p-12">
+    <div className="w-full py-2 md:py-2 relative z-10 box-border">
+      <div className="border border-border bg-card text-card-foreground p-8 sm:p-12 shadow-md shadow-foreground/5 transition-all duration-300">
         
         <div className="text-right mb-14 space-y-2 border-b border-border pb-6">
           <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
@@ -41,13 +41,13 @@ export default function ToolsGrid({ tools }: ToolsGridProps) {
               key={tool.id} 
               className="relative flex items-center justify-center w-full"
             >
-              <div className="relative w-full h-20 max-w-[168px] mx-auto">
+              <div className="relative w-full h-20 max-w-[168px] mx-auto transition-transform duration-300 ease-out hover:scale-110">
                 <Image
                   src={tool.imageUrl}
                   alt={tool.name}
                   fill
                   sizes="(max-width: 640px) 50vw, 16vw"
-                  className="object-contain grayscale contrast-125 mix-blend-multiply dark:mix-blend-normal dark:invert"
+                  className="object-contain grayscale contrast-125 mix-blend-multiply dark:mix-blend-normal dark:invert transition-all duration-300 hover:grayscale-0"
                 />
               </div>
             </div>
