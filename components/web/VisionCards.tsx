@@ -9,9 +9,16 @@ interface CardData {
   description: string;
 }
 
-function VisionCardItem({ card }: { card: CardData }) {
+function VisionCardItem({ card, index }: { card: CardData; index: number }) {
   return (
-    <Card className="flex flex-col justify-between overflow-hidden bg-card/70 backdrop-blur-md border-border/50 rounded-none shadow-md shadow-foreground/5 hover:shadow-xl hover:shadow-foreground/10 transition-all duration-300 ease-out hover:-translate-y-1">
+    <Card 
+      className="flex flex-col justify-between overflow-hidden bg-card/70 backdrop-blur-md border-border/50 rounded-none shadow-md shadow-foreground/5 hover:shadow-xl hover:shadow-foreground/10 transition-all duration-300 ease-out hover:-translate-y-1"
+      style={{
+        animation: `slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards`,
+        animationDelay: `${index * 120}ms`,
+        opacity: 0,
+      }}
+    >
       <div className="w-full aspect-video bg-muted/20 flex items-center justify-center relative overflow-hidden group">
         <Image
           src={card.imageSrc}
@@ -61,9 +68,22 @@ export default function VisionCards() {
 
   return (
     <div className="w-full py-2 md:py-2">
+      <style>{`
+        @keyframes slideUpFade {
+          from {
+            opacity: 0;
+            transform: translateY(24px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {cardsData.map((card) => (
-          <VisionCardItem key={card.id} card={card} />
+        {cardsData.map((card, index) => (
+          <VisionCardItem key={card.id} card={card} index={index} />
         ))}
       </div>
     </div>
