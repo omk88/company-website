@@ -19,15 +19,17 @@ function VisionCardItem({ card, index }: { card: CardData; index: number }) {
         opacity: 0,
       }}
     >
-      <div className="w-full aspect-video bg-muted/20 flex items-center justify-center relative overflow-hidden group">
-        <Image
-          src={card.imageSrc}
-          alt={card.imageAlt}
-          fill
-          priority
-          className="object-contain"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        />
+      <div className="w-full aspect-video bg-muted/20 flex items-center justify-center relative overflow-hidden group p-6">
+        <div className="relative w-full h-full max-w-[80%] max-h-[85%] mx-auto">
+          <Image
+            src={card.imageSrc}
+            alt={card.imageAlt}
+            fill
+            priority
+            className="object-scale-down"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+        </div>
       </div>
       <CardHeader className="pt-4 flex flex-col gap-2">
         <CardTitle className="text-xl font-semibold tracking-tight text-foreground">

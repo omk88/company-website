@@ -58,14 +58,14 @@ export function BlogGridManager({ allPosts }: BlogGridManagerProps) {
   return (
     <div className="space-y-6">
       
-      <div className="my-12 flex flex-col items-center gap-4">
+      <div className="my-6 flex flex-col items-center gap-4">
         <p className="text-sm font-semibold uppercase tracking-wider text-gray-400">Filter by Topics</p>
 
         <div className="flex flex-wrap justify-center gap-3">
           <Toggle
             pressed={selectedTags.length === 0}
             onPressedChange={handleClearAll}
-            className="rounded-full px-4 py-2 border data-[state=on]:bg-black data-[state=on]:text-white data-[state=on]:hover:bg-black data-[state=on]:hover:text-white transition-all duration-200"
+            className="rounded-full px-4 py-2 border border-border/50 bg-card text-foreground shadow-sm shadow-black/5 dark:shadow-black/40 hover:shadow-md hover:shadow-black/10 dark:hover:shadow-black/60 hover:-translate-y-0.5 data-[state=on]:bg-black data-[state=on]:text-white dark:data-[state=on]:bg-white dark:data-[state=on]:text-black data-[state=on]:hover:bg-black data-[state=on]:hover:text-white dark:data-[state=on]:hover:bg-white dark:data-[state=on]:hover:text-black transition-all duration-200 cursor-pointer"
           >
             All Posts
           </Toggle>
@@ -77,7 +77,7 @@ export function BlogGridManager({ allPosts }: BlogGridManagerProps) {
                 key={tag}
                 pressed={isPressed}
                 onPressedChange={() => handleTagToggle(tag)}
-                className="rounded-full px-4 py-2 border data-[state=on]:bg-black data-[state=on]:text-white data-[state=on]:hover:bg-black data-[state=on]:hover:text-white transition-all duration-200"
+                className="rounded-full px-4 py-2 border border-border/50 bg-card text-foreground shadow-sm shadow-black/5 dark:shadow-black/40 hover:shadow-md hover:shadow-black/10 dark:hover:shadow-black/60 hover:-translate-y-0.5 data-[state=on]:bg-black data-[state=on]:text-white dark:data-[state=on]:bg-white dark:data-[state=on]:text-black data-[state=on]:hover:bg-black data-[state=on]:hover:text-white dark:data-[state=on]:hover:bg-white dark:data-[state=on]:hover:text-black transition-all duration-200 cursor-pointer"
               >
                 {tag}
               </Toggle>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import GridCube from "../3d/GridCube";
 
 const ABOUT_MODELS = ['/cloud.glb']
@@ -8,8 +9,11 @@ const ABOUT_MODELS = ['/cloud.glb']
 export default function VisionDescription() {
   const [hasIntersected, setHasIntersected] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
+    setHasIntersected(false);
+
     const observerTarget = cardRef.current;
     if (!observerTarget) return;
 
@@ -30,7 +34,7 @@ export default function VisionDescription() {
     return () => {
       if (observerTarget) observer.unobserve(observerTarget);
     };
-  }, []);
+  }, [pathname]);
 
   return (
     <div className="w-full py-8 relative z-10 box-border">
