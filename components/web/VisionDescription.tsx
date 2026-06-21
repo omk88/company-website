@@ -1,13 +1,64 @@
+'use client';
+
+import { useState, useEffect, useRef } from "react";
 import GridCube from "../3d/GridCube";
 
 const ABOUT_MODELS = ['/cloud.glb']
 
 export default function VisionDescription() {
+  const [hasIntersected, setHasIntersected] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observerTarget = cardRef.current;
+    if (!observerTarget) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setHasIntersected(true);
+          observer.unobserve(observerTarget);
+        }
+      },
+      {
+        rootMargin: "-40px 0px -40px 0px", 
+        threshold: 0.1,
+      }
+    );
+
+    observer.observe(observerTarget);
+    return () => {
+      if (observerTarget) observer.unobserve(observerTarget);
+    };
+  }, []);
+
   return (
     <div className="w-full py-8 relative z-10 box-border">
+      <style>{`
+        @keyframes slideRightFade {
+          from {
+            opacity: 0;
+            transform: translateX(-32px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+      `}</style>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
         
-        <div className="border border-border bg-card text-card-foreground p-8 sm:p-12 h-full flex flex-col justify-center shadow-md shadow-foreground/5 hover:shadow-xl hover:shadow-foreground/10 transition-all duration-300 ease-out hover:-translate-y-1">
+        <div 
+          ref={cardRef}
+          className="border border-border bg-card text-card-foreground p-8 sm:p-12 h-full flex flex-col justify-center shadow-md shadow-black/5 dark:shadow-black/40 hover:shadow-xl hover:shadow-black/10 dark:hover:shadow-black/60 transition-all duration-300 ease-out hover:-translate-y-1"
+          style={{
+            animation: hasIntersected 
+              ? `slideRightFade 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards` 
+              : "none",
+            opacity: hasIntersected ? 1 : 0,
+          }}
+        >
           <div className="mb-8 space-y-2 border-b border-border pb-6">
             <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
               Why TaQtiQ?

@@ -12,7 +12,7 @@ interface CardData {
 function VisionCardItem({ card, index }: { card: CardData; index: number }) {
   return (
     <Card 
-      className="flex flex-col justify-between overflow-hidden bg-card/70 backdrop-blur-md border-border/50 rounded-none shadow-md shadow-foreground/5 hover:shadow-xl hover:shadow-foreground/10 transition-all duration-300 ease-out hover:-translate-y-1"
+      className="flex flex-col justify-between overflow-hidden bg-card/70 backdrop-blur-md border-border/50 rounded-none shadow-md shadow-black/5 dark:shadow-black/40 hover:shadow-xl hover:shadow-black/10 dark:hover:shadow-black/60 transition-all duration-300 ease-out hover:-translate-y-1"
       style={{
         animation: `slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards`,
         animationDelay: `${index * 120}ms`,

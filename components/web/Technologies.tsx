@@ -24,7 +24,7 @@ export default function ToolsGrid({ tools }: ToolsGridProps) {
 
   return (
     <div className="w-full py-2 md:py-2 relative z-10 box-border">
-      <div className="border border-border bg-card text-card-foreground p-8 sm:p-12 shadow-md shadow-foreground/5 transition-all duration-300">
+      <div className="border border-border bg-card text-card-foreground p-8 sm:p-12 shadow-md shadow-black/5 dark:shadow-black/40 transition-all duration-300">
         
         <div className="text-right mb-14 space-y-2 border-b border-border pb-6">
           <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
