@@ -3,10 +3,17 @@
 import { useState } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { Button } from "@/components/ui/button";
+import { Button } from "../ui/button";
+import { FieldGroup, Field, FieldLabel } from "../ui/field";
+import { Input } from "../ui/input";
 import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
-export function ContactForm() {
+interface ContactFormProps {
+  onSuccess?: () => void;
+}
+
+export function ContactForm({ onSuccess }: ContactFormProps) {
   const submitContact = useMutation(api.contact.sendMessage);
   const [isPending, setIsPending] = useState(false);
 
@@ -26,6 +33,7 @@ export function ContactForm() {
       await submitContact(data);
       toast.success("Message sent! We will get back to you shortly.");
       (event.target as HTMLFormElement).reset(); 
+      if (onSuccess) onSuccess();
     } catch (error) {
       toast.error("Something went wrong. Please try again.");
     } finally {
@@ -34,53 +42,60 @@ export function ContactForm() {
   };
 
   return (
-    <form 
-      onSubmit={handleSubmit} 
-      className="space-y-3.5 w-full bg-card/70 backdrop-blur-md p-6 sm:p-8 border border-border/50 rounded-none shadow-md shadow-black/5 dark:shadow-black/40 transition-all duration-300 ease-in-out"
-    >
-      <div>
-        <label className="block text-sm font-semibold text-foreground mb-1 font-mono uppercase tracking-wider text-xs">Name</label>
-        <input 
-          required 
-          name="name" 
-          type="text" 
-          className="w-full bg-background text-foreground px-3 py-2 border border-input rounded-none text-sm focus:outline-none focus:ring-1 focus:ring-border/80 transition-colors duration-200" 
-        />
-      </div>
+    <form onSubmit={handleSubmit}>
+      <FieldGroup className="gap-y-4">
+        <Field>
+          <FieldLabel>Name</FieldLabel>
+          <Input 
+            required 
+            name="name" 
+            placeholder="John Doe" 
+            type="text" 
+          />
+        </Field>
 
-      <div>
-        <label className="block text-sm font-semibold text-foreground mb-1 font-mono uppercase tracking-wider text-xs">Email</label>
-        <input 
-          required 
-          name="email" 
-          type="email" 
-          className="w-full bg-background text-foreground px-3 py-2 border border-input rounded-none text-sm focus:outline-none focus:ring-1 focus:ring-border/80 transition-colors duration-200" 
-        />
-      </div>
+        <Field>
+          <FieldLabel>Email</FieldLabel>
+          <Input 
+            required 
+            name="email" 
+            placeholder="john@doe.com" 
+            type="email" 
+          />
+        </Field>
 
-      <div>
-        <label className="block text-sm font-semibold text-foreground mb-1 font-mono uppercase tracking-wider text-xs">Subject</label>
-        <input 
-          required 
-          name="subject" 
-          type="text" 
-          className="w-full bg-background text-foreground px-3 py-2 border border-input rounded-none text-sm focus:outline-none focus:ring-1 focus:ring-border/80 transition-colors duration-200" 
-        />
-      </div>
+        <Field>
+          <FieldLabel>Subject</FieldLabel>
+          <Input 
+            required 
+            name="subject" 
+            placeholder="How can we help?" 
+            type="text" 
+          />
+        </Field>
 
-      <div>
-        <label className="block text-sm font-semibold text-foreground mb-1 font-mono uppercase tracking-wider text-xs">Message</label>
-        <textarea 
-          required 
-          name="message" 
-          rows={4}
-          className="w-full bg-background text-foreground px-3 py-2 border border-input rounded-none text-sm focus:outline-none focus:ring-1 focus:ring-border/80 resize-none transition-colors duration-200" 
-        />
-      </div>
+        <Field>
+          <FieldLabel>Message</FieldLabel>
+          <textarea 
+            required 
+            name="message" 
+            rows={5}
+            placeholder="Leave your message here..."
+            className="flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-xs transition-colors placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm resize-none" 
+          />
+        </Field>
 
-      <Button type="submit" disabled={isPending} className="w-full font-semibold rounded-none bg-foreground text-background hover:bg-foreground/90 font-mono uppercase tracking-wider text-xs h-11 mt-2">
-        {isPending ? "Sending..." : "Send Message"}
-      </Button>
+        <Button type="submit" className="w-full mt-2" disabled={isPending}>
+          {isPending ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Sending
+            </>
+          ) : (
+            "Send Message"
+          )}
+        </Button>
+      </FieldGroup>
     </form>
   );
 }
