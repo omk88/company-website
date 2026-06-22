@@ -29,7 +29,7 @@ export default function ContactPage() {
           <FAQSection />
         </div>
 
-        <div className="w-full max-w-3xl mx-auto md:mx-0">
+        <div className="w-full">
           <ContactForm />
         </div>
 

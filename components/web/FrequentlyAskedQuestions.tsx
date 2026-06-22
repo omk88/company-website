@@ -79,7 +79,7 @@ export default function UnifiedFAQCard() {
   const visibleFaqs = showAll ? allFaqs : allFaqs.slice(0, 3);
 
   return (
-    <div className="w-full max-w-4xl mx-auto py-6 md:py-10">
+    <div className="w-full">
       <style>{`
         @keyframes slideUpFade {
           from {
