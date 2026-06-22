@@ -36,49 +36,49 @@ export function ContactForm() {
   return (
     <form 
       onSubmit={handleSubmit} 
-      className="space-y-4 w-full max-w-xl mx-auto bg-card p-6 border border-border transition-colors duration-300 ease-in-out"
+      className="space-y-3.5 w-full bg-card/70 backdrop-blur-md p-6 sm:p-8 border border-border/50 rounded-none shadow-md shadow-black/5 dark:shadow-black/40 transition-all duration-300 ease-in-out"
     >
       <div>
-        <label className="block text-sm font-semibold text-foreground mb-1">Name</label>
+        <label className="block text-sm font-semibold text-foreground mb-1 font-mono uppercase tracking-wider text-xs">Name</label>
         <input 
           required 
           name="name" 
           type="text" 
-          className="w-full bg-background text-foreground px-3 py-2 border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-colors duration-200" 
+          className="w-full bg-background text-foreground px-3 py-2 border border-input rounded-none text-sm focus:outline-none focus:ring-1 focus:ring-border/80 transition-colors duration-200" 
         />
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-foreground mb-1">Email</label>
+        <label className="block text-sm font-semibold text-foreground mb-1 font-mono uppercase tracking-wider text-xs">Email</label>
         <input 
           required 
           name="email" 
           type="email" 
-          className="w-full bg-background text-foreground px-3 py-2 border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-colors duration-200" 
+          className="w-full bg-background text-foreground px-3 py-2 border border-input rounded-none text-sm focus:outline-none focus:ring-1 focus:ring-border/80 transition-colors duration-200" 
         />
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-foreground mb-1">Subject</label>
+        <label className="block text-sm font-semibold text-foreground mb-1 font-mono uppercase tracking-wider text-xs">Subject</label>
         <input 
           required 
           name="subject" 
           type="text" 
-          className="w-full bg-background text-foreground px-3 py-2 border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-colors duration-200" 
+          className="w-full bg-background text-foreground px-3 py-2 border border-input rounded-none text-sm focus:outline-none focus:ring-1 focus:ring-border/80 transition-colors duration-200" 
         />
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-foreground mb-1">Message</label>
+        <label className="block text-sm font-semibold text-foreground mb-1 font-mono uppercase tracking-wider text-xs">Message</label>
         <textarea 
           required 
           name="message" 
-          rows={5} 
-          className="w-full bg-background text-foreground px-3 py-2 border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none transition-colors duration-200" 
+          rows={4}
+          className="w-full bg-background text-foreground px-3 py-2 border border-input rounded-none text-sm focus:outline-none focus:ring-1 focus:ring-border/80 resize-none transition-colors duration-200" 
         />
       </div>
 
-      <Button type="submit" disabled={isPending} className="w-full font-semibold">
+      <Button type="submit" disabled={isPending} className="w-full font-semibold rounded-none bg-foreground text-background hover:bg-foreground/90 font-mono uppercase tracking-wider text-xs h-11 mt-2">
         {isPending ? "Sending..." : "Send Message"}
       </Button>
     </form>

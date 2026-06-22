@@ -36,22 +36,34 @@ export default function NewsletterSubscriptionForm() {
     };
 
     return (
-        <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-2 w-full mt-4">
+        <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3 w-full mt-4">
             <Input 
                 type="email"
                 required
                 disabled={isSubmitting}
-                className="bg-background h-12 text-lg w-full" 
+                className="bg-background h-12 text-sm w-full rounded-full border border-input px-5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border/80 transition-colors duration-200" 
                 placeholder="Enter your email..." 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
             />
+            
             <Button 
                 type="submit" 
                 disabled={isSubmitting}
-                className="h-12 text-lg px-6 w-full sm:w-auto shrink-0"
+                className="group h-12 px-6 bg-foreground hover:bg-foreground/90 text-background font-semibold text-sm rounded-full transition-all duration-200 active:scale-98 inline-flex items-center justify-center gap-2 shadow-sm w-full sm:w-auto shrink-0"
             >
-                {isSubmitting ? "Joining..." : "Subscribe"}
+                <span>{isSubmitting ? "Joining..." : "Subscribe"}</span>
+                {!isSubmitting && (
+                    <svg 
+                        className="w-3 h-3 text-background transform group-hover:translate-x-0.5 transition-transform duration-200" 
+                        fill="none" 
+                        viewBox="0 0 24 24" 
+                        stroke="currentColor" 
+                        strokeWidth={4}
+                    >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                )}
             </Button> 
         </form>
     );
