@@ -10,7 +10,6 @@ export default function SignIn() {
     return (
         <div className="min-h-screen flex flex-col items-center justify-center p-4">
             <div className="w-[400px] flex flex-col items-start gap-4">
-                
                 <Link className={buttonVariants({variant: "outline"})} href="/">
                     <ArrowLeft className="size-4 mr-2" />
                     Back to home page

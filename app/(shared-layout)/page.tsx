@@ -16,7 +16,6 @@ export default function Home() {
     <div className="min-h-screen w-full relative overflow-hidden flex items-center justify-center py-12 lg:py-0">
       <div className="w-full max-w-6xl mx-auto px-6 relative z-10 box-border">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-center w-full justify-items-center">
-          
           <div className="flex flex-col items-center lg:items-start text-center lg:text-left w-full max-w-lg gap-8 lg:justify-self-center">
             <div className="flex flex-col items-center lg:items-start gap-6 w-full">
               <TypewriterEffect className={`${spaceGrotesk.className} text-4xl sm:text-5xl font-extrabold text-foreground tracking-tight leading-none`} /> 

@@ -18,7 +18,6 @@ export default function ContactPage() {
   return (
     <section className="w-full max-w-7xl mx-auto px-6 md:px-12 pb-12 min-h-[calc(100vh-4rem)]">
       <div className="flex flex-col gap-6 md:gap-8 w-full mt-6 md:mt-10">
-        
         <div className="flex flex-col text-center md:text-left max-w-2xl">
           <h1 className="text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl mb-4 font-sans">
             Get in Touch
@@ -41,8 +40,8 @@ export default function ContactPage() {
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
         <SheetContent 
           side="right" 
-          className="fixed inset-y-0 right-0 z-50 h-full w-full border-l border-border bg-card/95 backdrop-blur-md p-6 sm:p-8 shadow-lg sm:max-w-md transform transition-transform ease-in-out duration-300 data-[state=closed]:translate-x-full data-[state=open]:translate-x-0"
-        >
+          className="w-full sm:max-w-md bg-card/95 backdrop-blur-md p-6 sm:p-8"
+          >
           <SheetHeader className="mb-6 text-left">
             <SheetTitle className="text-2xl font-extrabold tracking-tight text-foreground font-sans">
               Send us a Message
