@@ -39,7 +39,7 @@ const allFaqs: FAQItem[] = [
           here
         </a>
         .
-      </>
+      </      >
     ),
   },
   {
@@ -80,58 +80,41 @@ export default function UnifiedFAQCard() {
 
   return (
     <div className="w-full">
-      <style>{`
-        @keyframes slideUpFade {
-          from {
-            opacity: 0;
-            transform: translateY(24px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
-
-      <Card 
-        className="w-full p-6 md:p-10 flex flex-col items-center bg-card/70 backdrop-blur-md border-border/50 rounded-none shadow-md shadow-black/5 dark:shadow-black/40 transition-all duration-300 ease-out"
-        style={{
-          animation: `slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards`,
-          opacity: 0,
-        }}
-      >
-        <Accordion type="single" collapsible className="w-full space-y-4">
-          {visibleFaqs.map((faq) => {
-            const Icon = faq.icon;
-            return (
-              <AccordionItem 
-                value={faq.id} 
-                key={faq.id}
-                className="border-none py-1"
-              >
-                <AccordionTrigger className="flex items-center gap-4 py-3 hover:no-underline group text-left">
-                  <div className="flex items-center gap-4 flex-1">
-                    <div className="flex items-center justify-center w-11 h-11 border border-border/80 rounded-xl bg-background shadow-sm shrink-0">
-                      <Icon className="w-5 h-5 text-foreground stroke-[1.75]" />
-                    </div>
-                    <span className="text-base font-semibold tracking-tight text-foreground md:text-lg">
+      <Card className="w-full pt-4 pb-8 flex flex-col items-center bg-white dark:bg-card border-border/50 rounded-none shadow-md shadow-black/5 dark:shadow-black/40 transition-all duration-300 ease-out">
+        <div 
+          className="w-full"
+          style={{
+            animation: `slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards`,
+            opacity: 0,
+          }}
+        >
+          <Accordion type="single" collapsible className="w-full">
+            {visibleFaqs.map((faq) => {
+              return (
+                <AccordionItem 
+                  value={faq.id} 
+                  key={faq.id}
+                  className="border-b border-border/60 px-6 md:px-10 py-1 transition-colors duration-200 last:border-b-0"
+                >
+                  <AccordionTrigger className="flex items-center justify-between py-4 hover:no-underline group text-left">
+                    <span className="text-base font-semibold tracking-tight text-foreground md:text-lg transition-colors duration-200 group-hover:text-foreground/80">
                       {faq.question}
                     </span>
-                  </div>
-                </AccordionTrigger>
-                
-                <AccordionContent className="pl-[60px] pr-4 text-sm md:text-base leading-relaxed text-muted-foreground pb-4">
-                  {faq.answer}
-                </AccordionContent>
-              </AccordionItem>
-            );
-          })}
-        </Accordion>
+                  </AccordionTrigger>
+                  
+                  <AccordionContent className="text-sm md:text-base leading-relaxed text-muted-foreground pb-5 max-w-3xl">
+                    {faq.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              );
+            })}
+          </Accordion>
+        </div>
 
         {!showAll && (
           <Button
             onClick={() => setShowAll(true)}
-            className="mt-8 px-6 py-5 rounded-full bg-[#0B0F19] text-white hover:bg-[#161B26] text-sm font-medium transition-colors"
+            className="mt-2 px-6 py-5 rounded-full bg-[#0B0F19] text-white hover:bg-[#161B26] dark:bg-white dark:text-black dark:hover:bg-white/90 text-sm font-medium transition-colors shadow-xs"
           >
             Load more
           </Button>

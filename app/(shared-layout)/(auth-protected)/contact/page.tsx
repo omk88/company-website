@@ -54,11 +54,11 @@ export default function ContactPage() {
 
   return (
     <>
-      <section className="w-full max-w-7xl mx-auto px-6 md:px-12 pt-6 pb-4 flex flex-col items-center min-h-[calc(100vh-64px)] justify-between">
+      <section className="w-full max-w-7xl mx-auto px-6 md:px-12 pt-6 pb-4 flex flex-col items-center h-[calc(100vh-64px)] justify-between overflow-visible">
       
         <div className="flex flex-col items-center w-full flex-1 justify-between gap-6">
           
-          <div className="w-full h-24 max-w-md lg:max-w-[460px] flex items-center justify-center relative overflow-hidden shrink-0">
+          <div className="w-full h-24 max-w-md lg:max-w-[460px] flex items-center justify-center relative overflow-hidden shrink-0 transform-gpu">
             <GridCube models={CONTACT_MODELS} storageKey="contact_sphere_path" />
           </div>
 
@@ -71,14 +71,14 @@ export default function ContactPage() {
             </p>
           </div>
           
-          <div className="w-full mt-auto">
+          <div className="w-full mt-auto shrink-0">
             <ContactCards onMessageClick={() => setIsSheetOpen(true)} />
           </div>
         </div>
       </section>
 
-      <div id="faq-section" className="w-full max-w-7xl mx-auto px-6 md:px-12 pt-16 pb-24">
-        <div className="mb-8 md:mb-12 text-center md:text-left">
+      <div id="faq-section" className="w-full max-w-7xl mx-auto px-6 md:px-6 pt-8 pb-24">
+        <div className="mb-8 md:mb-6 text-center md:text-left">
           <h2 className="font-bold text-xl md:text-2xl text-foreground tracking-tight">
             Frequently Asked Questions
           </h2>
