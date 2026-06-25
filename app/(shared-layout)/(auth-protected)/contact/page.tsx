@@ -50,12 +50,17 @@ export default function ContactPage() {
   };
 
   return (
-    <section className="w-full max-w-7xl mx-auto px-6 md:px-12 pb-12 min-h-[calc(100vh-4rem)]">
-      <div className="min-h-screen w-full max-w-7xl mx-auto px-6 md:px-12 relative pb-12">
-      <h1 className="py-6 md:py-6 font-bold text-center text-xl md:text-2xl text-foreground tracking-tight">
-        Get in touch.
-      </h1>
+    <section className="w-full max-w-7xl mx-auto px-6 md:px-12 pb-16 min-h-[calc(100vh-4rem)]">
+      <div className="py-8 md:py-12 text-center space-y-2">
+        <h1 className="font-bold text-xl md:text-2xl text-foreground tracking-tight">
+          Get in touch.
+        </h1>
+        <p className="text-sm md:text-base text-muted-foreground max-w-md mx-auto leading-normal">
+          Have a question or want to work together? Drop us a message and our team will get back to you shortly.
+        </p>
+      </div>
       
+      <div className="flex flex-col gap-12 md:gap-20 w-full">
         <div className="w-full">
           <ContactCards onMessageClick={() => setIsSheetOpen(true)} />
         </div>
@@ -71,16 +76,16 @@ export default function ContactPage() {
           className="w-full sm:max-w-md bg-card flex flex-col h-full gap-0 overflow-hidden"
         >
           <form onSubmit={handleSubmit} className="flex flex-col h-full w-full">
-            <SheetHeader>
-              <SheetTitle>
+            <SheetHeader className="text-left shrink-0 p-6 pb-0 space-y-1">
+              <SheetTitle className="text-lg font-semibold tracking-tight text-foreground font-sans leading-none">
                 Send us a Message
               </SheetTitle>
-              <SheetDescription>
+              <SheetDescription className="text-sm text-muted-foreground font-sans leading-snug tracking-normal">
                 Fill out the form fields below and we will get back to you shortly.
               </SheetDescription>
             </SheetHeader>
 
-            <div className="p-6 flex-1 w-full">
+            <div className="p-6 flex-1 w-full overflow-y-auto">
               <FieldGroup className="gap-y-4">
                 <Field>
                   <FieldLabel>Name</FieldLabel>
@@ -110,7 +115,7 @@ export default function ContactPage() {
               </FieldGroup>
             </div>
 
-            <SheetFooter className="shrink-0 flex flex-col gap-2 sm:flex-col mt-auto pt-4">
+            <SheetFooter className="shrink-0 p-6 pt-4 flex flex-col gap-2 sm:flex-col mt-auto">
               <Button type="submit" className="w-full font-medium" disabled={isPending}>
                 {isPending ? (
                   <>
