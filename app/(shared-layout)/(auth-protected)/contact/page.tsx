@@ -19,6 +19,9 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import GridCube from "@/components/3d/GridCube";
+
+const CONTACT_MODELS = ['/sphere.glb']
 
 export default function ContactPage() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -50,24 +53,34 @@ export default function ContactPage() {
   };
 
   return (
-    <section className="w-full max-w-7xl mx-auto px-6 md:px-12 pb-16 min-h-[calc(100vh-4rem)]">
-      <div className="py-8 md:py-12 text-center space-y-2">
-        <h1 className="font-bold text-xl md:text-2xl text-foreground tracking-tight">
-          Get in touch.
-        </h1>
-        <p className="text-sm md:text-base text-muted-foreground max-w-md mx-auto leading-normal">
-          Have a question or want to work together? Drop us a message and our team will get back to you shortly.
-        </p>
-      </div>
+    <section className="w-full max-w-7xl mx-auto px-6 md:px-12 pt-4 pb-16 flex flex-col items-center">
       
-      <div className="flex flex-col gap-12 md:gap-20 w-full">
-        <div className="w-full">
+      <div className="w-full h-24 max-w-md lg:max-w-[460px] flex items-center justify-center relative overflow-hidden">
+        <GridCube models={CONTACT_MODELS} storageKey="contact_sphere_path" />
+      </div>
+
+      <div className="flex flex-col items-center pb-4 w-full mt-4">
+        <div className="py-2 pb-6 text-center space-y-1">
+          <h1 className="font-bold text-xl md:text-2xl text-foreground tracking-tight">
+            Get in touch.
+          </h1>
+          <p className="text-sm md:text-base text-muted-foreground max-w-md mx-auto leading-normal">
+            Have a question or want to work together? Drop us a message and our team will get back to you shortly.
+          </p>
+        </div>
+        
+        <div className="w-full mb-2">
           <ContactCards onMessageClick={() => setIsSheetOpen(true)} />
         </div>
-
-        <div id="faq-section" className="w-full">
-          <FAQSection />
+      </div>
+      
+      <div id="faq-section" className="w-full pt-20 md:pt-28">
+        <div className="mb-8 md:mb-12 text-center md:text-left">
+          <h2 className="font-bold text-xl md:text-2xl text-foreground tracking-tight">
+            Frequently Asked Questions
+          </h2>
         </div>
+        <FAQSection />
       </div>
 
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>

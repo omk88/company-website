@@ -22,20 +22,20 @@ function ContactCardItem({ card, index, onCardClick }: ContactCardItemProps) {
   return (
     <Card 
       onClick={() => onCardClick?.(card.id)}
-      className="flex flex-col justify-between overflow-hidden bg-card/70 backdrop-blur-md border-border/50 rounded-none shadow-md shadow-black/5 dark:shadow-black/40 hover:shadow-xl hover:shadow-black/10 dark:hover:shadow-black/60 transition-all duration-300 ease-out hover:-translate-y-1 cursor-pointer" // Added cursor-pointer
+      className="flex flex-col justify-between overflow-hidden bg-card/70 backdrop-blur-md border-border/50 rounded-none shadow-md shadow-black/5 dark:shadow-black/40 hover:shadow-xl hover:shadow-black/10 dark:hover:shadow-black/60 transition-all duration-300 ease-out hover:-translate-y-1 cursor-pointer"
       style={{
         animation: `slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards`,
         animationDelay: `${index * 120}ms`,
         opacity: 0,
       }}
     >
-      <div className="pt-8 px-6 flex items-center justify-start">
-        <div className="p-3 bg-muted/40 rounded-md text-primary dark:text-foreground">
-          <Icon className="w-8 h-8 stroke-[1.5]" />
+      <div className="pt-4 px-5 flex items-center justify-start">
+        <div className="p-1.5 bg-muted/40 rounded-md text-primary dark:text-foreground">
+          <Icon className="w-5 h-5 stroke-[1.5]" />
         </div>
       </div>
 
-      <CardHeader className="pt-2 flex flex-col gap-2">
+      <CardHeader className="pt-0 px-5 pb-5 flex flex-col gap-2">
         <CardTitle className="text-xl font-semibold tracking-tight text-foreground">
           {card.title}
         </CardTitle>
@@ -83,7 +83,7 @@ export default function ContactCards({ onMessageClick }: ContactCardsProps) {
   };
 
   return (
-    <div className="w-full py-2 md:py-2">
+    <div className="w-full py-2">
       <style>{`
         @keyframes slideUpFade {
           from {
