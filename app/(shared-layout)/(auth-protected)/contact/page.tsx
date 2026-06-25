@@ -53,28 +53,31 @@ export default function ContactPage() {
   };
 
   return (
-    <section className="w-full max-w-7xl mx-auto px-6 md:px-12 pt-4 pb-16 flex flex-col items-center">
+    <>
+      <section className="w-full max-w-7xl mx-auto px-6 md:px-12 pt-6 pb-4 flex flex-col items-center min-h-[calc(100vh-64px)] justify-between">
       
-      <div className="w-full h-24 max-w-md lg:max-w-[460px] flex items-center justify-center relative overflow-hidden">
-        <GridCube models={CONTACT_MODELS} storageKey="contact_sphere_path" />
-      </div>
+        <div className="flex flex-col items-center w-full flex-1 justify-between gap-6">
+          
+          <div className="w-full h-24 max-w-md lg:max-w-[460px] flex items-center justify-center relative overflow-hidden shrink-0">
+            <GridCube models={CONTACT_MODELS} storageKey="contact_sphere_path" />
+          </div>
 
-      <div className="flex flex-col items-center pb-4 w-full mt-4">
-        <div className="py-2 pb-6 text-center space-y-1">
-          <h1 className="font-bold text-xl md:text-2xl text-foreground tracking-tight">
-            Get in touch.
-          </h1>
-          <p className="text-sm md:text-base text-muted-foreground max-w-md mx-auto leading-normal">
-            Have a question or want to work together? Drop us a message and our team will get back to you shortly.
-          </p>
+          <div className="py-2 text-center space-y-1.5 max-w-xl shrink-0">
+            <h1 className="font-bold text-xl md:text-2xl text-foreground tracking-tight">
+              Get in touch.
+            </h1>
+            <p className="text-sm md:text-base text-muted-foreground max-w-md mx-auto leading-normal">
+              Have a question or want to work together? Drop us a message and our team will get back to you shortly.
+            </p>
+          </div>
+          
+          <div className="w-full mt-auto">
+            <ContactCards onMessageClick={() => setIsSheetOpen(true)} />
+          </div>
         </div>
-        
-        <div className="w-full mb-2">
-          <ContactCards onMessageClick={() => setIsSheetOpen(true)} />
-        </div>
-      </div>
-      
-      <div id="faq-section" className="w-full pt-20 md:pt-28">
+      </section>
+
+      <div id="faq-section" className="w-full max-w-7xl mx-auto px-6 md:px-12 pt-16 pb-24">
         <div className="mb-8 md:mb-12 text-center md:text-left">
           <h2 className="font-bold text-xl md:text-2xl text-foreground tracking-tight">
             Frequently Asked Questions
@@ -148,6 +151,6 @@ export default function ContactPage() {
           </form>
         </SheetContent>
       </Sheet>
-    </section>
+    </>
   );
 }
