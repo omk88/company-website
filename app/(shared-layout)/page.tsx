@@ -9,7 +9,7 @@ const spaceGrotesk = Space_Grotesk({
   weight: ['700'],
 });
 
-const HOME_MODELS = ['/cube1.glb', '/cube2.glb', '/cube3.glb', '/cube4.glb', '/cube5.glb', '/cube6.glb', '/cube7.glb', '/cube8.glb', '/cube9.glb', '/cube10.glb']
+const HOME_MODELS = ['/cube2.glb', '/cube4.glb', '/cube5.glb', '/cube7.glb', '/cube8.glb']
 
 export default function Home() {
   return (
