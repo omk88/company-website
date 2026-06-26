@@ -101,7 +101,10 @@ export default function ContactPage() {
           </h2>
         </div>
         
-        <FAQSection />
+        <FAQSection 
+          onMessageClick={() => setIsSheetOpen(true)} 
+          onChatbotClick={() => setIsChatbotOpen(true)} 
+        />
       </div>
 
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>

@@ -22,15 +22,23 @@ import {
   Search,
   X,
   Frown,
+  MessageSquare,
+  Bot,
   LucideIcon,
+  Lock,
 } from "lucide-react";
 
 interface FAQItem {
   id: string;
-  category: "pricing" | "support";
+  category: "pricing" | "support" | "security";
   question: string;
   answer: React.ReactNode;
   icon: LucideIcon;
+}
+
+interface UnifiedFAQCardProps {
+  onMessageClick?: () => void;
+  onChatbotClick?: () => void;
 }
 
 const allFaqs: FAQItem[] = [
@@ -95,9 +103,20 @@ const allFaqs: FAQItem[] = [
       </>
     ),
   },
+  {
+    id: "data-encryption",
+    category: "security",
+    question: "How is my data secured? Is it encrypted?",
+    icon: Lock,
+    answer: (
+      <>
+        Yes. All data is encrypted during storage and transit. 
+      </>
+    ),
+  },
 ];
 
-export default function UnifiedFAQCard() {
+export default function UnifiedFAQCard({ onMessageClick, onChatbotClick }: UnifiedFAQCardProps) {
   const [activeTab, setActiveTab] = useState("pricing");
   const [showAll, setShowAll] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -114,6 +133,12 @@ export default function UnifiedFAQCard() {
       faq.question.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const securityMatches = allFaqs.filter(
+    (faq) =>
+      faq.category === "security" &&
+      faq.question.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   useEffect(() => {
     if (searchQuery.trim() !== "") {
       if (activeTab === "pricing" && pricingMatches.length === 0 && supportMatches.length > 0) {
@@ -124,7 +149,16 @@ export default function UnifiedFAQCard() {
     }
   }, [searchQuery, pricingMatches.length, supportMatches.length, activeTab]);
 
-  const filteredFaqs = activeTab === "pricing" ? pricingMatches : supportMatches;
+  const getFilteredFaqs = () => {
+    switch (activeTab) {
+      case "pricing": return pricingMatches;
+      case "support": return supportMatches;
+      case "security": return securityMatches;
+      default: return pricingMatches;
+    }
+  };
+
+  const filteredFaqs = getFilteredFaqs();
   const visibleFaqs = showAll ? filteredFaqs : filteredFaqs.slice(0, 3);
 
   const handleTabChange = (value: string) => {
@@ -140,29 +174,34 @@ export default function UnifiedFAQCard() {
   return (
     <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
       
-      <div className="w-full grid grid-cols-1 md:grid-cols-3 items-center gap-6 mb-6">
+      <div className="w-full flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         
-        <div className="hidden md:block" />
-
-        <div className="w-full max-w-md mx-auto justify-self-center flex justify-center">
-          <TabsList className="flex w-auto gap-1 p-1">
-            <TabsTrigger value="pricing" className="flex items-center gap-1.5 px-4">
+        <div className="flex-1 overflow-x-auto no-scrollbar min-w-0 pr-4">
+          <TabsList className="flex w-max gap-1 p-1">
+            <TabsTrigger value="pricing" className="flex items-center gap-1.5 px-4 whitespace-nowrap">
               <span>Plans & Pricing</span>
               <span className="text-xs font-mono text-muted-foreground/60 font-normal">
                 {pricingMatches.length}
               </span>
             </TabsTrigger>
             
-            <TabsTrigger value="support" className="flex items-center gap-1.5 px-4">
+            <TabsTrigger value="support" className="flex items-center gap-1.5 px-4 whitespace-nowrap">
               <span>Product & Support</span>
               <span className="text-xs font-mono text-muted-foreground/60 font-normal">
                 {supportMatches.length}
               </span>
             </TabsTrigger>
+
+            <TabsTrigger value="security" className="flex items-center gap-1.5 px-4 whitespace-nowrap">
+              <span>Security, Privacy & Compliance</span>
+              <span className="text-xs font-mono text-muted-foreground/60 font-normal">
+                {securityMatches.length}
+              </span>
+            </TabsTrigger>
           </TabsList>
         </div>
 
-        <div className="relative w-full max-w-xs md:justify-self-end">
+        <div className="relative w-full md:w-64 shrink-0">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground stroke-[1.5]" />
           <Input
             type="text"
@@ -222,9 +261,39 @@ export default function UnifiedFAQCard() {
               })}
             </Accordion>
           ) : (
-            <div className="w-full py-12 flex flex-col items-center justify-center text-muted-foreground gap-2">
-              <Frown className="h-8 w-8 stroke-[1.2] text-muted-foreground/70" />
-              <p className="text-sm font-medium">No results found for "{searchQuery}"</p>
+            <div className="w-full py-12 flex flex-col items-center justify-center text-muted-foreground gap-4 text-center max-w-md mx-auto px-4">
+              <div className="flex flex-col items-center gap-2">
+                <Frown className="h-8 w-8 stroke-[1.2] text-muted-foreground/70" />
+                <p className="text-sm font-medium">No results found for "{searchQuery}"</p>
+                <p className="text-xs text-muted-foreground/80 max-w-xs">
+                  We couldn't find what you were looking for. Try reaching out to our team directly!
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-center gap-2 mt-1">
+                {onMessageClick && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={onMessageClick}
+                    className="gap-2 h-9 text-xs font-medium cursor-pointer"
+                  >
+                    <MessageSquare className="w-3.5 h-3.5" />
+                    Send a Message
+                  </Button>
+                )}
+                {onChatbotClick && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={onChatbotClick}
+                    className="gap-2 h-9 text-xs font-medium cursor-pointer"
+                  >
+                    <Bot className="w-3.5 h-3.5" />
+                    Ask Assistant
+                  </Button>
+                )}
+              </div>
             </div>
           )}
         </div>
