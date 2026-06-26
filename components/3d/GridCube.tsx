@@ -15,7 +15,7 @@ interface GridCubeProps {
 export default function GridCube({ 
   models, 
   storageKey = 'global_cube_path',
-  glitchEnabled = false
+  glitchEnabled = false 
 }: GridCubeProps) {
   const pathname = usePathname()
   const [modelPath, setModelPath] = useState<string | null>(null)
@@ -127,6 +127,8 @@ function UniversalModel({ path, animate, glitchEnabled }: UniversalModelProps) {
   const glitchDurationRef = useRef(0)
   const glitchTypeRef = useRef(0) 
 
+  const isFilterActiveRef = useRef(false)
+
   const colorBase = useMemo(() => new THREE.Color('#ffffff'), [])
   const colorBlackGlitch = useMemo(() => new THREE.Color('#000000'), []) 
 
@@ -141,6 +143,7 @@ function UniversalModel({ path, animate, glitchEnabled }: UniversalModelProps) {
     }
     setIsIntroFinished(false)
     isGlitchingRef.current = false
+    isFilterActiveRef.current = false
     glitchTimeRef.current = 0
 
     const rafId = requestAnimationFrame(() => {
@@ -198,6 +201,21 @@ function UniversalModel({ path, animate, glitchEnabled }: UniversalModelProps) {
         
         if (ambientLight) ambientLight.color.copy(colorBase)
         dirLights.forEach(light => light.color.copy(colorBase))
+
+        if (Math.random() > 0.5) {
+          isFilterActiveRef.current = !isFilterActiveRef.current
+          
+          clonedScene.traverse((child) => {
+            if (child instanceof THREE.Mesh && child.material) {
+              const materials = Array.isArray(child.material) ? child.material : [child.material];
+              materials.forEach((mat) => {
+                mat.transparent = isFilterActiveRef.current;
+                mat.opacity = isFilterActiveRef.current ? 0.25 : 1.0; 
+                mat.depthWrite = !isFilterActiveRef.current;         
+              });
+            }
+          });
+        }
       } else {
         const subTickChance = Math.random()
 
