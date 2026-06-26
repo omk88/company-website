@@ -96,7 +96,7 @@ export default function UnifiedFAQCard() {
                   key={faq.id}
                   className="border-b border-border/60 px-6 md:px-10 py-1 transition-colors duration-200 last:border-b-0"
                 >
-                  <AccordionTrigger className="flex items-center justify-between py-4 hover:no-underline group text-left">
+                  <AccordionTrigger className="flex items-center justify-between py-2 hover:no-underline group text-left">
                     <span className="text-base font-semibold tracking-tight text-foreground md:text-lg transition-colors duration-200 group-hover:text-foreground/80">
                       {faq.question}
                     </span>
@@ -114,7 +114,7 @@ export default function UnifiedFAQCard() {
         {!showAll && (
           <Button
             onClick={() => setShowAll(true)}
-            className="mt-2 px-6 py-5 rounded-full bg-[#0B0F19] text-white hover:bg-[#161B26] dark:bg-white dark:text-black dark:hover:bg-white/90 text-sm font-medium transition-colors shadow-xs"
+            className="mt-2 px-6 py-2 rounded-full bg-[#0B0F19] text-white hover:bg-[#161B26] dark:bg-white dark:text-black dark:hover:bg-white/90 text-sm font-medium transition-colors shadow-xs"
           >
             Load more
           </Button>

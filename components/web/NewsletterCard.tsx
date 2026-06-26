@@ -29,7 +29,7 @@ export function NewsletterCard() {
       <div className="relative z-20 w-full md:flex-1 max-w-xl flex flex-col gap-4">
         <div>
           <p className="text-xs md:text-sm font-mono text-muted-foreground uppercase tracking-widest mb-2">
-            insights // newsletter
+            insights
           </p>
           <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-foreground leading-none">
             Newsletter.

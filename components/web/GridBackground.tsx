@@ -21,7 +21,8 @@ export default function GridBackground({ children }: { children: React.ReactNode
             linear-gradient(to right, var(--line-color) 1px, transparent 1px),
             linear-gradient(to bottom, var(--line-color) 1px, transparent 1px)
           `,
-          backgroundSize: '60px 60px', 
+          backgroundSize: '60px 60px',
+          backgroundPosition: '-1px -1px', 
           
           maskImage: `
             linear-gradient(to bottom, white 70%, transparent 100%),

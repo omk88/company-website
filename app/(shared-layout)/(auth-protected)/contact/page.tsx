@@ -63,29 +63,32 @@ export default function ContactPage() {
 
   return (
     <>
-      <section className="w-full max-w-7xl mx-auto px-6 md:px-12 pt-6 pb-4 flex flex-col items-center h-[calc(100vh-64px)] justify-between overflow-visible">
+      <section className="w-full max-w-7xl mx-auto px-6 md:px-12 pt-4 pb-16 flex flex-col items-center h-[calc(100vh-64px)] justify-start overflow-hidden">
       
-        <div className="flex flex-col items-center w-full flex-1 justify-between gap-6">
+        <div className="flex flex-col items-center w-full flex-1 justify-start gap-4 md:gap-6">
           
           <div className="w-full h-30 max-w-md lg:max-w-[460px] flex items-center justify-center relative overflow-hidden shrink-0 transform-gpu">
             <GridCube models={CONTACT_MODELS} storageKey="contact_sphere_path" />
           </div>
 
-          <div className="py-2 text-center space-y-1.5 max-w-xl shrink-0">
-            <h1 className="font-bold text-xl md:text-2xl text-foreground tracking-tight">
-              Get in touch.
-            </h1>
-            <p className="text-sm md:text-base text-muted-foreground max-w-md mx-auto leading-normal">
-              Have a question or want to work together? Drop us a message and our team will get back to you shortly.
-            </p>
+          <div className="w-full flex flex-col items-center gap-6 -mt-2 md:-mt-4">
+            <div className="py-2 text-center space-y-1.5 max-w-xl shrink-0">
+              <h1 className="font-bold text-xl md:text-2xl text-foreground tracking-tight">
+                Get in touch.
+              </h1>
+              <p className="text-sm md:text-base text-muted-foreground max-w-md mx-auto leading-normal">
+                Have a question or want to work together? Drop us a message and our team will get back to you shortly.
+              </p>
+            </div>
+            
+            <div className="w-full shrink-0">
+              <ContactCards 
+                onMessageClick={() => setIsSheetOpen(true)} 
+                onChatbotClick={() => setIsChatbotOpen(true)}
+              />
+            </div>
           </div>
-          
-          <div className="w-full mt-auto shrink-0">
-            <ContactCards 
-              onMessageClick={() => setIsSheetOpen(true)} 
-              onChatbotClick={() => setIsChatbotOpen(true)}
-            />
-          </div>
+
         </div>
       </section>
 
