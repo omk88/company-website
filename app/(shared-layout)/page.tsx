@@ -47,7 +47,7 @@ export default function Home() {
           </div>
 
           <div className="w-full aspect-square max-w-md lg:max-w-[460px] mx-auto">
-            <GridCube models={HOME_MODELS} storageKey="homepage_cube_path" />
+            <GridCube models={HOME_MODELS} storageKey="homepage_cube_path" glitchEnabled={true} />
           </div>
 
         </div>

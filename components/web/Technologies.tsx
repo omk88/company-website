@@ -1,4 +1,7 @@
+'use client'
+
 import Image from 'next/image'
+import { Layers2 } from 'lucide-react'
 
 interface ToolItem {
   id: string
@@ -24,24 +27,27 @@ export default function ToolsGrid({ tools }: ToolsGridProps) {
 
   return (
     <div className="w-full py-2 md:py-2 relative z-10 box-border">
+      <style>{`
+        @keyframes marquee {
+          0% {
+            transform: translateX(0%);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
+        }
+        .animate-marquee {
+          animation: marquee 25s linear infinite;
+        }
+        .animate-marquee:hover {
+          animation-play-state: paused; /* Optional: pauses the slide on mouse hover */
+        }
+      `}</style>
+
       <div className="relative overflow-hidden border border-border/50 bg-card/70 backdrop-blur-md text-card-foreground p-8 sm:p-12 shadow-md shadow-black/5 dark:shadow-black/40 transition-all duration-300">
       
-        <div className="absolute right-[-5%] top-[-10%] w-[50%] h-[110%] pointer-events-none opacity-80 dark:opacity-40 hidden md:block select-none z-10 isolate will-change-transform transform translate-z-0" aria-hidden="true">
-          <svg 
-            viewBox="0 0 500 400" 
-            fill="none" 
-            xmlns="http://www.w3.org/2000/svg" 
-            className="w-full h-full transform scale-110 origin-top-right"
-          >
-            <path d="M 150 0 C 250 120, 320 220, 500 240" stroke="currentColor" className="text-muted-foreground/40" strokeWidth="1" />
-            <path d="M 180 0 C 275 130, 340 240, 500 265" stroke="currentColor" className="text-muted-foreground/35" strokeWidth="1" />
-            <path d="M 210 0 C 300 140, 360 260, 500 290" stroke="currentColor" className="text-muted-foreground/30" strokeWidth="1" />
-            <path d="M 240 0 C 325 150, 380 280, 500 315" stroke="currentColor" className="text-muted-foreground/25" strokeWidth="1" />
-            <path d="M 270 0 C 350 160, 400 300, 500 340" stroke="currentColor" className="text-muted-foreground/20" strokeWidth="1" />
-            <path d="M 300 0 C 375 170, 420 320, 500 365" stroke="currentColor" className="text-muted-foreground/15" strokeWidth="1" />
-            <path d="M 330 0 C 400 180, 440 340, 500 390" stroke="currentColor" className="text-muted-foreground/10" strokeWidth="1" />
-            <path d="M 360 0 C 425 190, 460 360, 500 415" stroke="currentColor" className="text-muted-foreground/5" strokeWidth="1" />
-          </svg>
+        <div className="absolute top-6 left-6 sm:top-8 sm:left-8 z-30 text-muted-foreground/40 dark:text-muted-foreground/30 pointer-events-none select-none">
+          <Layers2 className="w-6 h-6 sm:w-8 sm:h-8 stroke-[1.2]" />
         </div>
 
         <div className="relative z-20">
@@ -54,23 +60,45 @@ export default function ToolsGrid({ tools }: ToolsGridProps) {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-12 py-8 sm:grid-cols-3 sm:gap-16 md:grid-cols-6">
-            {displayTools.map((tool) => (
-              <div 
-                key={tool.id} 
-                className="relative flex items-center justify-center w-full"
-              >
-                <div className="relative w-full h-20 max-w-[168px] mx-auto transition-transform duration-300 ease-out hover:scale-110">
-                  <Image
-                    src={tool.imageUrl}
-                    alt={tool.name}
-                    fill
-                    sizes="(max-width: 640px) 50vw, 16vw"
-                    className="object-contain grayscale contrast-125 mix-blend-multiply dark:mix-blend-normal dark:invert transition-all duration-300 hover:grayscale-0"
-                  />
+          <div className="relative w-full overflow-hidden py-4 [mask-image:linear-gradient(to_right,transparent_0%,black_10%,black_90%,transparent_100%)]">
+            
+            <div className="flex w-max items-center gap-16 pr-16 animate-marquee">
+              
+              {displayTools.map((tool) => (
+                <div 
+                  key={`original-${tool.id}`} 
+                  className="relative flex items-center justify-center w-28 sm:w-36 shrink-0"
+                >
+                  <div className="relative w-full h-14 transition-transform duration-300 ease-out hover:scale-110">
+                    <Image
+                      src={tool.imageUrl}
+                      alt={tool.name}
+                      fill
+                      sizes="150px"
+                      className="object-contain grayscale contrast-125 mix-blend-multiply dark:mix-blend-normal dark:invert transition-all duration-300 hover:grayscale-0"
+                    />
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+
+              {displayTools.map((tool) => (
+                <div 
+                  key={`duplicate-${tool.id}`} 
+                  className="relative flex items-center justify-center w-28 sm:w-36 shrink-0"
+                >
+                  <div className="relative w-full h-14 transition-transform duration-300 ease-out hover:scale-110">
+                    <Image
+                      src={tool.imageUrl}
+                      alt={tool.name}
+                      fill
+                      sizes="150px"
+                      className="object-contain grayscale contrast-125 mix-blend-multiply dark:mix-blend-normal dark:invert transition-all duration-300 hover:grayscale-0"
+                    />
+                  </div>
+                </div>
+              ))}
+
+            </div>
           </div>
         </div>
 

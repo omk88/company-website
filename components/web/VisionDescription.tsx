@@ -2,9 +2,10 @@
 
 import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
+import { Blocks } from "lucide-react";
 import GridCube from "../3d/GridCube";
 
-const ABOUT_MODELS = ['/cloud.glb']
+const ABOUT_MODELS = ['/cloud.glb'];
 
 export default function VisionDescription() {
   const [hasIntersected, setHasIntersected] = useState(false);
@@ -63,6 +64,10 @@ export default function VisionDescription() {
             opacity: hasIntersected ? 1 : 0,
           }}
         >
+          <div className="absolute top-6 right-6 sm:top-8 sm:right-8 z-30 text-muted-foreground/40 dark:text-muted-foreground/30 pointer-events-none select-none">
+            <Blocks className="w-6 h-6 sm:w-8 sm:h-8 stroke-[1.2]" />
+          </div>
+
           <div className="absolute left-[-15%] bottom-[-20%] w-[80%] h-[80%] pointer-events-none opacity-80 dark:opacity-40 select-none z-10 isolate will-change-transform transform translate-z-0" aria-hidden="true">
             <svg 
               viewBox="0 0 500 500" 
@@ -105,7 +110,7 @@ export default function VisionDescription() {
         </div>
 
         <div className="w-full h-[400px] lg:h-[500px] flex items-center justify-center relative overflow-hidden">
-          <GridCube models={ABOUT_MODELS} storageKey="aboutpage_cube_path" />
+          <GridCube models={ABOUT_MODELS} storageKey="aboutpage_cube_path" glitchEnabled={false} />
         </div>
 
       </div>

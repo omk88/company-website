@@ -68,7 +68,7 @@ export default function ContactPage() {
         <div className="flex flex-col items-center w-full flex-1 justify-start gap-4 md:gap-6">
           
           <div className="w-full h-30 max-w-md lg:max-w-[460px] flex items-center justify-center relative overflow-hidden shrink-0 transform-gpu">
-            <GridCube models={CONTACT_MODELS} storageKey="contact_sphere_path" />
+            <GridCube models={CONTACT_MODELS} storageKey="contact_sphere_path" glitchEnabled={false} />
           </div>
 
           <div className="w-full flex flex-col items-center gap-6 -mt-2 md:-mt-4">
