@@ -49,9 +49,10 @@ function ContactCardItem({ card, index, onCardClick }: ContactCardItemProps) {
 
 interface ContactCardsProps {
   onMessageClick?: () => void;
+  onChatbotClick?: () => void; 
 }
 
-export default function ContactCards({ onMessageClick }: ContactCardsProps) {
+export default function ContactCards({ onMessageClick, onChatbotClick }: ContactCardsProps) {
   const cardsData: CardData[] = [
     {
       id: "faq",
@@ -76,6 +77,9 @@ export default function ContactCards({ onMessageClick }: ContactCardsProps) {
   const handleCardClick = (id: string) => {
     if (id === "contact" && onMessageClick) {
       onMessageClick();
+    }
+    if (id === "chatbot" && onChatbotClick) {
+      onChatbotClick();
     }
     if (id === "faq") {
       document.getElementById("faq-section")?.scrollIntoView({ behavior: "smooth" });

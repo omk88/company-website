@@ -19,14 +19,23 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import GridCube from "@/components/3d/GridCube";
 
-const CONTACT_MODELS = ['/sphere.glb']
+const CONTACT_MODELS = ['/pipes.glb'];
 
 export default function ContactPage() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const submitContact = useMutation(api.contact.sendMessage);
+  const [isChatbotOpen, setIsChatbotOpen] = useState(false);
   const [isPending, setIsPending] = useState(false);
+  
+  const submitContact = useMutation(api.contact.sendMessage);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -58,7 +67,7 @@ export default function ContactPage() {
       
         <div className="flex flex-col items-center w-full flex-1 justify-between gap-6">
           
-          <div className="w-full h-24 max-w-md lg:max-w-[460px] flex items-center justify-center relative overflow-hidden shrink-0 transform-gpu">
+          <div className="w-full h-30 max-w-md lg:max-w-[460px] flex items-center justify-center relative overflow-hidden shrink-0 transform-gpu">
             <GridCube models={CONTACT_MODELS} storageKey="contact_sphere_path" />
           </div>
 
@@ -72,7 +81,10 @@ export default function ContactPage() {
           </div>
           
           <div className="w-full mt-auto shrink-0">
-            <ContactCards onMessageClick={() => setIsSheetOpen(true)} />
+            <ContactCards 
+              onMessageClick={() => setIsSheetOpen(true)} 
+              onChatbotClick={() => setIsChatbotOpen(true)}
+            />
           </div>
         </div>
       </section>
@@ -151,6 +163,21 @@ export default function ContactPage() {
           </form>
         </SheetContent>
       </Sheet>
+
+      <Dialog open={isChatbotOpen} onOpenChange={setIsChatbotOpen}>
+        <DialogContent className="sm:max-w-[500px] h-[550px] flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-semibold tracking-tight">AI Assistant</DialogTitle>
+            <DialogDescription>
+              Ask our chatbot anything about our services and products.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="flex-1 flex items-center justify-center border rounded-lg border-dashed text-muted-foreground text-sm bg-muted/20">
+            Chatbot interface coming soon...
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
