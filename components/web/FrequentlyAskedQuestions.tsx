@@ -13,9 +13,10 @@ import {
   Smile,
   Layers,
   CreditCard,
-  Mail,
-  MessageCircle,
-  PlayCircle,
+  BadgeDollarSign,
+  HandCoins,
+  HeartHandshake,
+  Timer,
   LucideIcon,
 } from "lucide-react";
 
@@ -29,24 +30,19 @@ interface FAQItem {
 const allFaqs: FAQItem[] = [
   {
     id: "free-trial",
-    question: "Is there a free trial available?",
+    question: "Are there free trials available for your products?",
     icon: Smile,
     answer: (
       <>
-        Yes, you can try us for free for 30 days. If you want, we'll provide you with a free
-        30-minute onboarding call to get you up and running. Book a call{" "}
-        <a href="#" className="underline font-medium hover:text-foreground">
-          here
-        </a>
-        .
-      </      >
+        Yes, there are free 14-day trials available for all of our products that have monthly subscriptions. To get a free trial, navigate to the page for the individual product you are interested in.
+      </>
     ),
   },
   {
     id: "change-plan",
-    question: "Can I change my plan later?",
+    question: "Can I change my plan later for any of your products?",
     icon: Layers,
-    answer: "Yes, you can upgrade, downgrade, or cancel your subscription plan at any time directly from your dashboard settings.",
+    answer: "Yes, you can upgrade, downgrade, or cancel your subscription plan at any time directly from the settings section of the product you are using.",
   },
   {
     id: "cancellation",
@@ -55,22 +51,36 @@ const allFaqs: FAQItem[] = [
     answer: "Our plans are month-to-month. You can cancel at any time and you will retain access to your premium features until the end of your billing cycle.",
   },
   {
-    id: "change-email",
-    question: "How do I change my account email?",
-    icon: Mail,
-    answer: "You can change your email address in your Account Settings. For security reasons, you will need to verify the new email address before the change takes effect.",
+    id: "annual-discounts",
+    question: "Do you offer annual discounts for your products?",
+    icon: BadgeDollarSign,
+    answer: "Yes, all products are discounted if you purchase an annual subscription.",
+  },
+  {
+    id: "hidden-fees",
+    question: "Are there any hidden fees or setup costs?",
+    icon: HandCoins,
+    answer: "No! All fees are explicity stated when purchasing any of our services!",
   },
   {
     id: "support",
-    question: "How does support work?",
-    icon: MessageCircle,
-    answer: "Our support team is available 24/7 via live chat and email. Enterprise tier users also get access to a dedicated Slack channel and phone support.",
+    question: "What kind of support do you provide?",
+    icon: HeartHandshake,
+    answer: (
+    <>
+      We are working 24/7 to get you the best experience with our services. If you need support for a product you've purchased or need help with something specific - get in touch through our <a href="#" className="underline">contact page</a> and we'll get back to you ASAP!
+    </>
+    ),
   },
   {
-    id: "tutorials",
-    question: "Do you provide tutorials?",
-    icon: PlayCircle,
-    answer: "Yes, we have a comprehensive library of video tutorials, step-by-step documentation, and weekly live webinars to help you master the platform.",
+    id: "response-time",
+    question: "What are your typical response times?",
+    icon: Timer,
+    answer: (
+    <>
+      We aim to respond to every enquiry within 72 hours. If this timeframe has passed and you still haven't got a response - hang tight! We are most likely answering other questions and will get to yours in due course.
+    </>
+    ),
   },
 ];
 
@@ -96,11 +106,17 @@ export default function UnifiedFAQCard() {
                   key={faq.id}
                   className="border-b border-border/60 px-6 md:px-10 py-1 transition-colors duration-200 last:border-b-0"
                 >
-                  <AccordionTrigger className="flex items-center justify-between py-2 hover:no-underline group text-left">
-                    <span className="text-base font-semibold tracking-tight text-foreground md:text-lg transition-colors duration-200 group-hover:text-foreground/80">
-                      {faq.question}
-                    </span>
-                  </AccordionTrigger>
+                    <AccordionTrigger className="flex items-start justify-between py-4 hover:no-underline group text-left">
+                      <div className="flex items-start gap-4">
+                        <div className="p-1.5 bg-muted/40 rounded-md text-primary dark:text-foreground shrink-0 mt-0.5">
+                          <faq.icon className="w-5 h-5 stroke-[1.5]" />
+                        </div>
+                        
+                        <span className="text-base font-semibold tracking-tight text-foreground md:text-lg transition-colors duration-200 group-hover:text-foreground/80 pt-1">
+                          {faq.question}
+                        </span>
+                      </div>
+                    </AccordionTrigger>
                   
                   <AccordionContent className="text-sm md:text-base leading-relaxed text-muted-foreground pb-5 max-w-3xl">
                     {faq.answer}
