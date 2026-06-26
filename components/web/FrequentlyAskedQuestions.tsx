@@ -9,6 +9,7 @@ import {
   AccordionTrigger,
 } from "../ui/accordion";
 import { Button } from "../ui/button";
+import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
 import {
   Smile,
   Layers,
@@ -22,6 +23,7 @@ import {
 
 interface FAQItem {
   id: string;
+  category: "pricing" | "support";
   question: string;
   answer: React.ReactNode;
   icon: LucideIcon;
@@ -30,6 +32,7 @@ interface FAQItem {
 const allFaqs: FAQItem[] = [
   {
     id: "free-trial",
+    category: "pricing",
     question: "Are there free trials available for your products?",
     icon: Smile,
     answer: (
@@ -40,56 +43,78 @@ const allFaqs: FAQItem[] = [
   },
   {
     id: "change-plan",
+    category: "pricing",
     question: "Can I change my plan later for any of your products?",
     icon: Layers,
     answer: "Yes, you can upgrade, downgrade, or cancel your subscription plan at any time directly from the settings section of the product you are using.",
   },
   {
     id: "cancellation",
+    category: "pricing",
     question: "What is your cancellation policy?",
     icon: CreditCard,
     answer: "Our plans are month-to-month. You can cancel at any time and you will retain access to your premium features until the end of your billing cycle.",
   },
   {
     id: "annual-discounts",
+    category: "pricing",
     question: "Do you offer annual discounts for your products?",
     icon: BadgeDollarSign,
     answer: "Yes, all products are discounted if you purchase an annual subscription.",
   },
   {
     id: "hidden-fees",
+    category: "pricing",
     question: "Are there any hidden fees or setup costs?",
     icon: HandCoins,
     answer: "No! All fees are explicity stated when purchasing any of our services!",
   },
   {
     id: "support",
+    category: "support",
     question: "What kind of support do you provide?",
     icon: HeartHandshake,
     answer: (
-    <>
-      We are working 24/7 to get you the best experience with our services. If you need support for a product you've purchased or need help with something specific - get in touch through our <a href="#" className="underline">contact page</a> and we'll get back to you ASAP!
-    </>
+      <>
+        We are working 24/7 to get you the best experience with our services. If you need support for a product you've purchased or need help with something specific - get in touch through our <a href="#" className="underline">contact page</a> and we'll get back to you ASAP!
+      </>
     ),
   },
   {
     id: "response-time",
+    category: "support",
     question: "What are your typical response times?",
     icon: Timer,
     answer: (
-    <>
-      We aim to respond to every enquiry within 72 hours. If this timeframe has passed and you still haven't got a response - hang tight! We are most likely answering other questions and will get to yours in due course.
-    </>
+      <>
+        We aim to respond to every enquiry within 72 hours. If this timeframe has passed and you still haven't got a response - hang tight! We are most likely answering other questions and will get to yours in due course.
+      </>
     ),
   },
 ];
 
 export default function UnifiedFAQCard() {
+  const [activeTab, setActiveTab] = useState("pricing");
   const [showAll, setShowAll] = useState(false);
-  const visibleFaqs = showAll ? allFaqs : allFaqs.slice(0, 3);
+
+  const filteredFaqs = allFaqs.filter((faq) => faq.category === activeTab);
+  const visibleFaqs = showAll ? filteredFaqs : filteredFaqs.slice(0, 3);
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    setShowAll(false);
+  };
 
   return (
-    <div className="w-full">
+    <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+      
+      <div className="w-full max-w-md mx-auto mb-4">
+        <TabsList className="w-full grid grid-cols-2">
+          <TabsTrigger value="pricing">Plans & Pricing</TabsTrigger>
+          <TabsTrigger value="support">Product & Support</TabsTrigger>
+        </TabsList>
+      </div>
+
       <Card className="w-full pt-4 pb-8 flex flex-col items-center bg-white dark:bg-card border-border/50 rounded-none shadow-md shadow-black/5 dark:shadow-black/40 transition-all duration-300 ease-out">
         <div 
           className="w-full"
@@ -106,17 +131,16 @@ export default function UnifiedFAQCard() {
                   key={faq.id}
                   className="border-b border-border/60 px-6 md:px-10 py-1 transition-colors duration-200 last:border-b-0"
                 >
-                    <AccordionTrigger className="flex items-start justify-between py-4 hover:no-underline group text-left">
-                      <div className="flex items-start gap-4">
-                        <div className="p-1.5 bg-muted/40 rounded-md text-primary dark:text-foreground shrink-0 mt-0.5">
-                          <faq.icon className="w-5 h-5 stroke-[1.5]" />
-                        </div>
-                        
-                        <span className="text-base font-semibold tracking-tight text-foreground md:text-lg transition-colors duration-200 group-hover:text-foreground/80 pt-1">
-                          {faq.question}
-                        </span>
+                  <AccordionTrigger className="flex items-start justify-between py-4 hover:no-underline group text-left">
+                    <div className="flex items-start gap-4">
+                      <div className="p-1.5 bg-muted/40 rounded-md text-primary dark:text-foreground shrink-0 mt-0.5">
+                        <faq.icon className="w-5 h-5 stroke-[1.5]" />
                       </div>
-                    </AccordionTrigger>
+                      <span className="text-base font-semibold tracking-tight text-foreground md:text-lg transition-colors duration-200 group-hover:text-foreground/80 pt-1">
+                        {faq.question}
+                      </span>
+                    </div>
+                  </AccordionTrigger>
                   
                   <AccordionContent className="text-sm md:text-base leading-relaxed text-muted-foreground pb-5 max-w-3xl">
                     {faq.answer}
@@ -127,15 +151,15 @@ export default function UnifiedFAQCard() {
           </Accordion>
         </div>
 
-        {!showAll && (
+        {!showAll && filteredFaqs.length > 3 && (
           <Button
             onClick={() => setShowAll(true)}
-            className="mt-2 px-6 py-2 rounded-full bg-[#0B0F19] text-white hover:bg-[#161B26] dark:bg-white dark:text-black dark:hover:bg-white/90 text-sm font-medium transition-colors shadow-xs"
+            className="mt-6 px-6 py-2 rounded-full bg-[#0B0F19] text-white hover:bg-[#161B26] dark:bg-white dark:text-black dark:hover:bg-white/90 text-sm font-medium transition-colors shadow-xs"
           >
             Load more
           </Button>
         )}
       </Card>
-    </div>
+    </Tabs>
   );
 }
