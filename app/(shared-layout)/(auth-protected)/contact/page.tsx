@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { FieldGroup, Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { CircleHelp, Loader2 } from "lucide-react";
+import { CircleHelp, Loader2, MessageCircleQuestionMark } from "lucide-react";
 import {
   Sheet,
   SheetClose,
@@ -73,8 +73,9 @@ export default function ContactPage() {
 
           <div className="w-full flex flex-col items-center gap-6 -mt-2 md:-mt-4">
             <div className="py-2 text-center space-y-1.5 max-w-xl shrink-0">
-              <h1 className="font-bold text-xl md:text-2xl text-foreground tracking-tight">
-                Get in touch.
+              <h1 className="flex items-center justify-center gap-2.5 font-bold text-xl md:text-2xl text-foreground tracking-tight">
+                <MessageCircleQuestionMark className="w-5 h-5 md:w-6 md:h-6 stroke-[2.3] shrink-0" />
+                <span>Get in touch.</span>
               </h1>
               <p className="text-sm md:text-base text-muted-foreground max-w-md mx-auto leading-normal">
                 Have a question or want to work together? Drop us a message and our team will get back to you shortly.
@@ -94,7 +95,7 @@ export default function ContactPage() {
 
       <div id="faq-section" className="w-full max-w-7xl mx-auto px-6 pt-8 pb-24">
         <div className="mb-8 md:mb-6 flex items-center justify-center md:justify-start gap-2.5 text-foreground">
-          <CircleHelp className="w-5 h-5 md:w-6 md:h-6 stroke-[1.5] shrink-0" />
+          <CircleHelp className="w-5 h-5 md:w-6 md:h-6 stroke-[2.3] shrink-0" />
           <h2 className="font-bold text-xl md:text-2xl tracking-tight">
             Frequently Asked Questions
           </h2>
