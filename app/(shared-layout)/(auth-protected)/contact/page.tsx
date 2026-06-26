@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { FieldGroup, Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { CircleHelp, Loader2 } from "lucide-react";
 import {
   Sheet,
   SheetClose,
@@ -92,12 +92,14 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <div id="faq-section" className="w-full max-w-7xl mx-auto px-6 md:px-6 pt-8 pb-24">
-        <div className="mb-8 md:mb-6 text-center md:text-left">
-          <h2 className="font-bold text-xl md:text-2xl text-foreground tracking-tight">
+      <div id="faq-section" className="w-full max-w-7xl mx-auto px-6 pt-8 pb-24">
+        <div className="mb-8 md:mb-6 flex items-center justify-center md:justify-start gap-2.5 text-foreground">
+          <CircleHelp className="w-5 h-5 md:w-6 md:h-6 stroke-[1.5] shrink-0" />
+          <h2 className="font-bold text-xl md:text-2xl tracking-tight">
             Frequently Asked Questions
           </h2>
         </div>
+        
         <FAQSection />
       </div>
 

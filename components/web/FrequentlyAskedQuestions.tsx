@@ -20,7 +20,7 @@ import {
   HeartHandshake,
   Timer,
   Search,
-  X, // Imported X icon for the clear functionality
+  X,
   Frown,
   LucideIcon,
 } from "lucide-react";
