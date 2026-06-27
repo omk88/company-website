@@ -1,5 +1,8 @@
+'use client';
+
+import { useState, useEffect, useRef } from "react";
 import { LucideIcon, Wrench, ChevronsUp, Zap } from "lucide-react";
-import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 
 interface CardData {
@@ -11,14 +14,17 @@ interface CardData {
   description: string;
 }
 
-function VisionCardItem({ card, index }: { card: CardData; index: number }) {
+function VisionCardItem({ card, index, isVisible }: { card: CardData; index: number; isVisible: boolean }) {
   const Icon = card.icon;
   
   return (
     <Card 
       className="flex flex-col justify-between overflow-hidden bg-card/70 backdrop-blur-md border-border/50 rounded-none shadow-md shadow-black/5 dark:shadow-black/40 hover:shadow-xl hover:shadow-black/10 dark:hover:shadow-black/60 transition-all duration-300 ease-out hover:-translate-y-1"
       style={{
-        animation: `slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards`,
+        animationName: isVisible ? 'slideUpFade' : 'none',
+        animationDuration: '0.6s',
+        animationTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
+        animationFillMode: 'forwards',
         animationDelay: `${index * 120}ms`,
         opacity: 0,
       }}
@@ -55,6 +61,32 @@ function VisionCardItem({ card, index }: { card: CardData; index: number }) {
 }
 
 export default function VisionCards() {
+  const [hasBeenSeen, setHasBeenSeen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setHasBeenSeen(true);
+            if (containerRef.current) observer.unobserve(containerRef.current);
+          }
+        },
+        {
+          threshold: 0.35,
+          rootMargin: "0px 0px -50px 0px", 
+        }
+      );
+
+      if (containerRef.current) {
+        observer.observe(containerRef.current);
+      }
+
+      return () => {
+        observer.disconnect();
+      };
+    }, []);
+
   const cardsData: CardData[] = [
     {
       id: "tools",
@@ -83,7 +115,7 @@ export default function VisionCards() {
   ];
 
   return (
-    <div className="w-full py-2 md:py-2">
+    <div ref={containerRef} className="w-full py-2 md:py-2">
       <style>{`
         @keyframes slideUpFade {
           from {
@@ -99,7 +131,12 @@ export default function VisionCards() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {cardsData.map((card, index) => (
-          <VisionCardItem key={card.id} card={card} index={index} />
+          <VisionCardItem 
+            key={card.id} 
+            card={card} 
+            index={index} 
+            isVisible={hasBeenSeen} 
+          />
         ))}
       </div>
     </div>
