@@ -112,7 +112,6 @@ export default function ContactPage() {
   return (
     <>
       <section className="w-full max-w-7xl mx-auto px-6 md:px-12 pt-4 pb-16 flex flex-col items-center h-[calc(100vh-64px)] justify-start overflow-hidden">
-      
         <div className="flex flex-col items-center w-full flex-1 justify-start gap-4 md:gap-6">
           
           <div className="w-full h-30 max-w-md lg:max-w-[460px] flex items-center justify-center relative overflow-hidden shrink-0 transform-gpu">
