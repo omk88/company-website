@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "next-themes";
 import GridBackground from "@/components/web/GridBackground"; 
+import { Suspense } from "react";
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -41,7 +42,9 @@ export default function RootLayout({
         >
           <GridBackground>
             <main className="w-full flex-1 flex flex-col">
-              {children}
+              <Suspense>
+                {children}
+              </Suspense>
             </main>
           </GridBackground>
           <Toaster />

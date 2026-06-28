@@ -5,12 +5,15 @@ import { RxLinkedinLogo } from "react-icons/rx";
 import { AiOutlineInstagram } from "react-icons/ai";
 import { cn } from "@/lib/utils";
 import { FaXTwitter } from "react-icons/fa6";
-import { NavbarAuth } from "./NavbarAuth"; 
 import { MobileMenu } from "./MobileMenu";
-import { Suspense } from "react";
+import { NavbarAuthClient } from "./NavbarAuthClient";
+
+interface NavBarProps {
+    isAuth: boolean;
+}
 
 
-export function Navbar() { 
+export function Navbar({ isAuth }: NavBarProps) { 
     const anim = "relative no-underline hover:no-underline after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100";
 
     return (
@@ -50,15 +53,13 @@ export function Navbar() {
                     
                     <div className="flex items-center gap-2">
                         <ThemeToggle />
-                        <Suspense>
-                            <NavbarAuth /> 
-                        </Suspense>
+                        <NavbarAuthClient initialIsAuth={isAuth} /> 
                     </div>
                 </div>
 
                 <div className="flex md:hidden items-center gap-4">
                     <ThemeToggle />
-                    <MobileMenu anim={anim} navbarAuth={<Suspense><NavbarAuth /></Suspense>} />
+                    <MobileMenu anim={anim} navbarAuth={ <NavbarAuthClient initialIsAuth={isAuth} /> } />
                 </div>
                 
             </nav>
