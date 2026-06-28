@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { FaXTwitter } from "react-icons/fa6";
 import { MobileMenu } from "./MobileMenu";
 import { NavbarAuthClient } from "./NavbarAuthClient";
+import { TooltipProvider } from "../ui/tooltip";
 
 interface NavBarProps {
     isAuth: boolean;
@@ -53,7 +54,7 @@ export function Navbar({ isAuth }: NavBarProps) {
                     
                     <div className="flex items-center gap-2">
                         <ThemeToggle />
-                        <NavbarAuthClient initialIsAuth={isAuth} /> 
+                        <TooltipProvider><NavbarAuthClient initialIsAuth={isAuth} /></TooltipProvider>
                     </div>
                 </div>
 

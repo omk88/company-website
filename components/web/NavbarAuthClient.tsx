@@ -6,6 +6,7 @@ import { Button, buttonVariants } from "../ui/button";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { LogIn, LogOut } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 
 interface NavbarAuthClientProps {
     initialIsAuth: boolean;
@@ -33,16 +34,32 @@ export function NavbarAuthClient({ initialIsAuth }: NavbarAuthClientProps) {
     const isLoggedIn = isPending ? initialIsAuth : !!session;
 
     return (
-        <div className="flex items-center gap-3">
-            {isLoggedIn ? (
-                <Button variant="ghost" onClick={handleSignOut} title="Sign Out">
-                    <LogOut className="h-4 w-4" />
-                </Button>
-            ) : (
-                <Link className={buttonVariants({ variant: "ghost" })} href="/sign-in" title="Sign Up">
-                    <LogIn className="h-4 w-4" />
-                </Link>
-            )}
-        </div>
+<TooltipProvider delayDuration={200}> {/* Controls hover delay in ms */}
+            <div className="flex items-center gap-3">
+                {isLoggedIn ? (
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" onClick={handleSignOut}>
+                                <LogOut className="h-4 w-4" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" align="center">
+                            <p className="text-xs font-medium">Sign Out</p>
+                        </TooltipContent>
+                    </Tooltip>
+                ) : (
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Link className={buttonVariants({ variant: "ghost", size: "icon" })} href="/sign-in">
+                                <LogIn className="h-4 w-4" />
+                            </Link>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" align="center">
+                            <p className="text-xs font-medium">Sign In</p>
+                        </TooltipContent>
+                    </Tooltip>
+                )}
+            </div>
+        </TooltipProvider>
     );
 }
