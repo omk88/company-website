@@ -34,7 +34,7 @@ export function NavbarAuthClient({ initialIsAuth }: NavbarAuthClientProps) {
     const isLoggedIn = isPending ? initialIsAuth : !!session;
 
     return (
-<TooltipProvider delayDuration={200}> {/* Controls hover delay in ms */}
+        <TooltipProvider delayDuration={200}>
             <div className="flex items-center gap-3">
                 {isLoggedIn ? (
                     <Tooltip>
