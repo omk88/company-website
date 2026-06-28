@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api"; 
 import { toast } from "sonner";
+import { ArrowRight } from "lucide-react"; 
 
 export default function NewsletterSubscriptionForm() {
     const [email, setEmail] = useState("");
@@ -36,33 +37,28 @@ export default function NewsletterSubscriptionForm() {
     };
 
     return (
-        <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3 w-full">
+        <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3 w-full items-stretch sm:items-center">
             <Input 
                 type="email"
                 required
                 disabled={isSubmitting}
-                className="bg-background h-12 text-sm w-full rounded-full border border-input px-5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border/80 transition-colors duration-200" 
-                placeholder="Enter your email..." 
+                placeholder="john@doe.com" 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                className="w-full bg-white dark:bg-background h-12 rounded-md px-3 focus-visible:ring-1 focus-visible:ring-ring transition-colors duration-200"
             />
             
             <Button 
                 type="submit" 
                 disabled={isSubmitting}
-                className="group h-12 px-6 bg-foreground hover:bg-foreground/90 text-background font-semibold text-sm rounded-full transition-all duration-200 active:scale-98 inline-flex items-center justify-center gap-2 shadow-sm w-full sm:w-auto shrink-0"
+                className="group px-6 py-3.5 bg-foreground hover:bg-foreground/90 text-background font-semibold text-sm rounded-full transition-all duration-200 active:scale-98 inline-flex items-center justify-center gap-2 shadow-sm w-full sm:w-auto shrink-0 cursor-pointer h-12"
             >
                 <span>{isSubmitting ? "Joining..." : "Subscribe"}</span>
                 {!isSubmitting && (
-                    <svg 
-                        className="w-3 h-3 text-background transform group-hover:translate-x-0.5 transition-transform duration-200" 
-                        fill="none" 
-                        viewBox="0 0 24 24" 
-                        stroke="currentColor" 
-                        strokeWidth={4}
-                    >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                    </svg>
+                    <ArrowRight 
+                        className="w-4 h-4 text-background transform transition-transform duration-200 group-hover:translate-x-0.5" 
+                        strokeWidth={2.5} 
+                    />
                 )}
             </Button> 
         </form>

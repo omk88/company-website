@@ -119,7 +119,7 @@ export default function ContactPage() {
           </div>
 
           <div className="w-full flex flex-col items-center gap-6 -mt-2 md:-mt-4">
-            <div className="py-2 text-center space-y-1.5 max-w-xl shrink-0">
+            <div className="text-center space-y-1.5 max-w-xl shrink-0">
               <h1 className="flex items-center justify-center gap-2.5 font-bold text-xl md:text-2xl text-foreground tracking-tight">
                 <MessageCircleQuestionMark className="w-5 h-5 md:w-6 md:h-6 stroke-[2.3] shrink-0" />
                 <span>Get in touch.</span>
