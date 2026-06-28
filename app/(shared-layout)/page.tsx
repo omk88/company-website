@@ -6,7 +6,7 @@ import GridCube from '@/components/3d/GridCube';
 import Technologies from '@/components/web/Technologies';
 import VisionCards from '@/components/web/VisionCards';
 import VisionDescription from '@/components/web/VisionDescription';
-import { TrendingUp } from 'lucide-react';
+import { ArrowRight, TrendingUp } from 'lucide-react';
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
@@ -46,9 +46,10 @@ export default function Home() {
                   className="group px-6 py-3.5 bg-foreground hover:bg-foreground/90 text-background font-semibold text-sm rounded-full transition-all duration-200 active:scale-98 inline-flex items-center gap-2 shadow-sm"
                 >
                   <span>See our products</span>
-                  <svg className="w-3 h-3 text-background transform group-hover:translate-x-0.5 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={4}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                  </svg>
+                  <ArrowRight 
+                    className="w-4 h-4 text-background transform transition-transform duration-200 group-hover:translate-x-0.5" 
+                    strokeWidth={2.5} 
+                  />
                 </Link>
               </div>
             </div>
