@@ -94,10 +94,8 @@ export default function FeaturedBlogMarquee({ posts }: FeaturedBlogMarqueeProps)
       {marqueePosts.length > 0 && (
         <div className="relative w-full overflow-hidden space-y-4">
           <div className="relative w-full overflow-hidden py-2">
-            {/* Added items-stretch here to force unified row tracks */}
             <div className="flex w-max items-stretch gap-6 pr-6 animate-blog-marquee">
               
-              {/* Loop 1: Original Set */}
               {marqueePosts.map((post, idx) => (
                 <div 
                   key={`original-${post._id}-${idx}`} 
@@ -109,7 +107,6 @@ export default function FeaturedBlogMarquee({ posts }: FeaturedBlogMarqueeProps)
                 </div>
               ))}
 
-              {/* Loop 2: Duplicate Set */}
               {marqueePosts.map((post, idx) => (
                 <div 
                   key={`duplicate-${post._id}-${idx}`} 

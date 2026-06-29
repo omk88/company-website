@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { Eye, ThumbsDown, ThumbsUp } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -40,12 +41,29 @@ export function BlogCard({ post }: BlogCardProps) {
         />
       </div>
 
+      <div className="flex items-center gap-4 px-6">
+        <h1 className="font-mono flex items-center justify-start gap-1 text-base md:text-s text-muted-foreground tracking-tight">
+          <Eye className="w-4 h-4 stroke-[2.3] shrink-0 text-muted-foreground" />
+          <span>167</span>
+        </h1>
+
+        <h1 className="font-mono flex items-center justify-start gap-1 text-base md:text-s text-muted-foreground tracking-tight">
+          <ThumbsUp className="w-4 h-4 stroke-[2.3] shrink-0 text-muted-foreground" />
+          <span>34</span>
+        </h1>
+
+        <h1 className="font-mono flex items-center justify-start gap-1 text-base md:text-s text-muted-foreground tracking-tight">
+          <ThumbsDown className="w-4 h-4 stroke-[2.3] shrink-0 text-muted-foreground" />
+          <span>7</span>
+        </h1>
+      </div>
+
       <div className="px-6 pt-2 text-xs font-mono uppercase tracking-wider text-muted-foreground shrink-0">
         {post.author} • {formattedDate}
       </div>
 
       <div className="px-6 space-y-2 flex-grow flex flex-col justify-start">
-        <h3 className="text-xl font-semibold tracking-tight line-clamp-2 text-foreground transition-colors duration-200 group-hover:text-primary">
+        <h3 className="text-xl font-bold tracking-tight line-clamp-2 text-foreground transition-colors duration-200 group-hover:text-primary">
           {post.title}
         </h3>
         <p className="text-muted-foreground line-clamp-3 leading-relaxed text-sm">
