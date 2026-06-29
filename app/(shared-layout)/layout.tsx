@@ -1,7 +1,7 @@
 import GridBackground from "@/components/web/GridBackground";
 import { isAuthenticated } from "@/lib/auth-server";
 import dynamic from "next/dynamic";
-import { ReactNode } from "react";
+import { ReactNode, Suspense } from "react";
 
 const Footer = dynamic(() => import("@/components/web/Footer"), {
   ssr: true,
@@ -13,15 +13,17 @@ const Navbar = dynamic(() => import("@/components/web/Navbar").then((mod) => mod
 
 
 export default async function SharedLayout({ children }: { children: ReactNode }) {
-  
-  const userIsAuthenticated = await isAuthenticated();
-  
+    
   return (
       <div className="min-h-screen flex flex-col bg-background text-foreground transition-colors duration-300 ease-in-out">
-        <Navbar isAuth={userIsAuthenticated} />
-        <GridBackground>
-          {children} 
-        </GridBackground>
+        <Suspense>
+          <Navbar/>
+        </Suspense>
+        <div className="flex-1 pt-16">
+          <GridBackground>
+            {children} 
+          </GridBackground>
+        </div>
       <Footer />
     </div>
   );

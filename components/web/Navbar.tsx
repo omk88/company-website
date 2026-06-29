@@ -7,17 +7,14 @@ import { cn } from "@/lib/utils";
 import { FaXTwitter } from "react-icons/fa6";
 import { MobileMenu } from "./MobileMenu";
 import { NavbarAuthClient } from "./NavbarAuthClient";
+import { isAuthenticated } from "@/lib/auth-server";
 
-interface NavBarProps {
-    isAuth: boolean;
-}
-
-
-export function Navbar({ isAuth }: NavBarProps) { 
+export async function Navbar() { 
     const anim = "relative no-underline hover:no-underline after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100";
-
+    const isAuth = await isAuthenticated();
+    
     return (
-        <header className="w-full bg-background border-b border-border sticky top-0 z-50 transition-colors duration-300 ease-in-out"> 
+        <header className="w-full fixed top-0 left-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border transition-colors duration-300 ease-in-out"> 
             <nav className="w-full px-6 md:px-12 h-16 flex items-center justify-between relative">
                 
                 <div className="flex items-center gap-8">

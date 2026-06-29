@@ -42,9 +42,7 @@ export default function RootLayout({
         >
           <GridBackground>
             <main className="w-full flex-1 flex flex-col">
-              <Suspense>
-                {children}
-              </Suspense>
+              {children}
             </main>
           </GridBackground>
           <Toaster />
