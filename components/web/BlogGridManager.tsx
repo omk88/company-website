@@ -14,7 +14,8 @@ import {
   CalendarArrowUp,
   CalendarArrowDown,
   ArrowDownAZ,
-  ArrowUpAZ
+  ArrowUpAZ,
+  BookOpen
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -107,9 +108,13 @@ export function BlogGridManager({ allPosts }: BlogGridManagerProps) {
   return (
     <div className="space-y-6">
       
-      <div className="my-6 flex flex-col lg:flex-row lg:items-end justify-between gap-4 pb-4 border-b border-border/40">
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 pb-4 border-b border-border/40">
         
         <div className="space-y-2 flex-1">
+          <h1 className="flex items-center justify-start gap-2 font-bold text-base md:text-lg text-muted-foreground tracking-tight">
+            <BookOpen className="w-4 h-4 stroke-[2.3] shrink-0 text-muted-foreground" />
+            <span>All articles</span>
+          </h1>
           <p className="text-xs font-medium text-muted-foreground">Topics</p>
           <div className="flex flex-wrap gap-2">
             <Toggle
