@@ -94,17 +94,33 @@ export default function FeaturedBlogMarquee({ posts }: FeaturedBlogMarqueeProps)
       {marqueePosts.length > 0 && (
         <div className="relative w-full overflow-hidden space-y-4">
           <div className="relative w-full overflow-hidden py-2">
+            {/* Added items-stretch here to force unified row tracks */}
             <div className="flex w-max items-stretch gap-6 pr-6 animate-blog-marquee">
+              
+              {/* Loop 1: Original Set */}
               {marqueePosts.map((post, idx) => (
-                <div key={`original-${post._id}-${idx}`} className="w-[320px] sm:w-[400px] shrink-0 flex">
-                  <BlogCard post={post} index={idx} />
+                <div 
+                  key={`original-${post._id}-${idx}`} 
+                  className="w-[320px] sm:w-[400px] min-w-[320px] sm:min-w-[400px] shrink-0 flex"
+                >
+                  <div className="w-full flex flex-col flex-1 items-stretch">
+                    <BlogCard post={post} index={idx} />
+                  </div>
                 </div>
               ))}
+
+              {/* Loop 2: Duplicate Set */}
               {marqueePosts.map((post, idx) => (
-                <div key={`duplicate-${post._id}-${idx}`} className="w-[320px] sm:w-[400px] shrink-0 flex">
-                  <BlogCard post={post} index={idx} />
+                <div 
+                  key={`duplicate-${post._id}-${idx}`} 
+                  className="w-[320px] sm:w-[400px] min-w-[320px] sm:min-w-[400px] shrink-0 flex"
+                >
+                  <div className="w-full flex flex-col flex-1 items-stretch">
+                    <BlogCard post={post} index={idx} />
+                  </div>
                 </div>
               ))}
+              
             </div>
           </div>
         </div>

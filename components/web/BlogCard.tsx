@@ -28,9 +28,9 @@ export function BlogCard({ post }: BlogCardProps) {
   return (
     <Link 
       href={`/insights/${post._id}`} 
-      className="group flex flex-col gap-4 cursor-pointer block text-inherit no-underline border border-border/50 rounded-none bg-card/70 backdrop-blur-md shadow-md shadow-black/5 dark:shadow-black/40 hover:shadow-xl hover:shadow-black/10 dark:hover:shadow-black/60 transition-all duration-300 ease-out hover:-translate-y-1"
+      className="group flex flex-col gap-4 cursor-pointer w-full h-full text-inherit no-underline border border-border/50 rounded-none bg-card/70 backdrop-blur-md shadow-md shadow-black/5 dark:shadow-black/40 hover:shadow-xl hover:shadow-black/10 dark:hover:shadow-black/60 transition-all duration-300 ease-out hover:-translate-y-1"
     >
-      <div className="relative aspect-video w-full overflow-hidden bg-muted border-b border-border/50">
+      <div className="relative aspect-video w-full overflow-hidden bg-muted border-b border-border/50 shrink-0">
         <Image
           src={post.imageUrl}
           alt={post.title}
@@ -40,11 +40,11 @@ export function BlogCard({ post }: BlogCardProps) {
         />
       </div>
 
-      <div className="px-6 pt-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
+      <div className="px-6 pt-2 text-xs font-mono uppercase tracking-wider text-muted-foreground shrink-0">
         {post.author} • {formattedDate}
       </div>
 
-      <div className="px-6 space-y-2 flex-grow">
+      <div className="px-6 space-y-2 flex-grow flex flex-col justify-start">
         <h3 className="text-xl font-semibold tracking-tight line-clamp-2 text-foreground transition-colors duration-200 group-hover:text-primary">
           {post.title}
         </h3>
@@ -53,7 +53,7 @@ export function BlogCard({ post }: BlogCardProps) {
         </p>
       </div>
 
-      <div className="flex flex-wrap gap-2 px-6 pb-6 pt-2">
+      <div className="flex flex-wrap gap-2 px-6 pb-6 pt-2 shrink-0">
         {post.tags && post.tags.length > 0 ? (
           post.tags.map((tag) => (
             <Badge 
