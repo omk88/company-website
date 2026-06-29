@@ -59,13 +59,12 @@ export function BlogCard({ post }: BlogCardProps) {
             <Badge 
               key={tag} 
               variant="secondary" 
-              className="border border-border bg-muted/40 text-foreground font-mono text-[10px] uppercase rounded-none px-2.5 py-0.5 whitespace-nowrap"
             >
               {tag}
             </Badge>
           ))
         ) : (
-          <Badge variant="outline" className="border border-border text-muted-foreground font-mono text-[10px] uppercase rounded-none px-2.5 py-0.5">
+          <Badge variant="outline">
             General
           </Badge>
         )}

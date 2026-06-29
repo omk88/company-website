@@ -64,13 +64,12 @@ export default function FeaturedBlogMarquee({ posts }: FeaturedBlogMarqueeProps)
                   <Badge 
                     key={tag} 
                     variant="secondary" 
-                    className="border border-border/60 bg-background/80 text-foreground font-mono text-[10px] uppercase rounded-none px-2.5 py-0.5 backdrop-blur-sm"
                   >
                     {tag}
                   </Badge>
                 ))
               ) : (
-                <Badge variant="outline" className="border border-border bg-background/80 text-muted-foreground font-mono text-[10px] uppercase rounded-none px-2.5 py-0.5">
+                <Badge variant="outline">
                   General
                 </Badge>
               )}
