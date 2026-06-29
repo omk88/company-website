@@ -41,8 +41,10 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <GridBackground>
-            <main className="w-full flex-1 flex flex-col">
-              {children}
+            <main className="w-full flex-1 flex flex-col pt-16">
+              <Suspense>
+                {children}
+              </Suspense>
             </main>
           </GridBackground>
           <Toaster />

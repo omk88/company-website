@@ -22,7 +22,7 @@ export default function FeaturedBlogMarquee({ posts }: FeaturedBlogMarqueeProps)
   })
 
   return (
-    <div className="w-full relative z-10 box-border space-y-12 py-8">
+    <div className="w-full relative z-10 box-border space-y-12">
       <style>{`
         @keyframes blogMarquee {
           0% { transform: translateX(0%); }
@@ -37,11 +37,10 @@ export default function FeaturedBlogMarquee({ posts }: FeaturedBlogMarqueeProps)
       `}</style>
 
       <div className="w-full max-w-7xl mx-auto px-4 md:px-6 space-y-4">
-        <h1 className="flex items-center justify-start gap-2.5 font-bold text-xl md:text-2xl text-foreground tracking-tight">
-          <Star className="w-5 h-5 stroke-[2.3] shrink-0 text-primary" />
-          <span>Featured Spotlight</span>
+        <h1 className="flex items-center justify-start gap-2 font-bold text-base md:text-lg text-muted-foreground tracking-tight">
+          <Star className="w-4 h-4 stroke-[2.3] shrink-0 text-muted-foreground" />
+          <span>Featured</span>
         </h1>
-
         <Link 
           href={`/insights/${heroPost._id}`}
           className="group relative block w-full aspect-[16/10] md:aspect-[21/9] overflow-hidden border border-border/50 bg-card/70 backdrop-blur-md shadow-xl transition-all duration-300"
@@ -95,12 +94,6 @@ export default function FeaturedBlogMarquee({ posts }: FeaturedBlogMarqueeProps)
 
       {marqueePosts.length > 0 && (
         <div className="relative w-full overflow-hidden space-y-4">
-          <div className="w-full max-w-7xl mx-auto px-4 md:px-6">
-            <h3 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">
-              More Insights
-            </h3>
-          </div>
-
           <div className="relative w-full overflow-hidden py-2">
             <div className="flex w-max items-stretch gap-6 pr-6 animate-blog-marquee">
               {marqueePosts.map((post, idx) => (
