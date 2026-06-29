@@ -159,7 +159,7 @@ export default function UnifiedFAQCard({ onMessageClick, onChatbotClick }: Unifi
   };
 
   const filteredFaqs = getFilteredFaqs();
-  const visibleFaqs = showAll ? filteredFaqs : filteredFaqs.slice(0, 3);
+  const visibleFaqs = showAll ? filteredFaqs : filteredFaqs.slice(0, 5);
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);

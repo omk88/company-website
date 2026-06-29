@@ -1,4 +1,3 @@
-import { NewsletterCard } from "@/components/web/NewsletterCard";
 import { AddBlogButton } from "@/components/web/AddBlogButton";
 import { CachedBlogGrid } from "@/components/web/CachedBlogGrid";
 import { SkeletonLoadingUi } from "@/components/web/SkeletonLoadingUI";
@@ -7,6 +6,7 @@ import { Metadata } from "next";
 import GridCube from "@/components/3d/GridCube";
 import { Megaphone } from "lucide-react";
 import NewsletterSubscriptionForm from "@/components/web/NewsletterSubscriptionForm";
+import { CachedFeaturedBlogsMarquee } from "@/components/web/CachedFeaturedBlogsMarquee";
 
 export const metadata: Metadata = {
   title: "Insights",
@@ -17,11 +17,9 @@ const INSIGHTS_MODELS = ['/cross.glb'];
 export default function InsightsPage() {
     return (
         <main className="w-full">
-            <section className="w-full max-w-7xl mx-auto px-6 md:px-12 pt-4 pb-16 flex flex-col items-center h-[calc(100vh-64px)] justify-start overflow-hidden">
-                <div className="flex flex-col items-center w-full flex-1 justify-start gap-4 md:gap-6">
-                    
+            <section className="w-full max-w-7xl mx-auto px-6 md:px-12 pt-4 pb-8 flex flex-col items-center justify-start">
+                <div className="flex flex-col items-center w-full justify-start gap-4 md:gap-6">
                     <AddBlogButton />
-
                     <div className="w-full h-30 max-w-md lg:max-w-[460px] flex items-center justify-center relative overflow-hidden shrink-0 transform-gpu">
                         <GridCube models={INSIGHTS_MODELS} storageKey="insights_cross_path" glitchEnabled={false} />
                     </div>
@@ -45,6 +43,10 @@ export default function InsightsPage() {
                 </div>
             </section>
 
+            <Suspense>
+                <CachedFeaturedBlogsMarquee />
+            </Suspense>
+            
             <div id="blog-grid-section" className="w-full max-w-7xl mx-auto px-6 pt-8 pb-24">
                 <Suspense fallback={<SkeletonLoadingUi />}>
                     <CachedBlogGrid />

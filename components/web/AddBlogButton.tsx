@@ -37,7 +37,7 @@ export function AddBlogButton() {
                 </DropdownMenuTrigger>
                 
                 <DropdownMenuContent side="top" align="end" className="w-56 mb-2">
-                    <DropdownMenuLabel>Admin Dashboard</DropdownMenuLabel>
+                    <DropdownMenuLabel>Admin Controls</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     
                     <DropdownMenuItem asChild className="cursor-pointer">
