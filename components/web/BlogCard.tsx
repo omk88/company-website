@@ -1,7 +1,8 @@
 import { Badge } from "@/components/ui/badge";
-import { Eye, ThumbsDown, ThumbsUp } from "lucide-react";
+import { ThumbsDown, ThumbsUp } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { LiveViews } from "./LiveViews";
 
 export interface BlogPostPreview {
   _id: string;
@@ -43,10 +44,7 @@ export function BlogCard({ post }: BlogCardProps) {
       </div>
 
       <div className="flex items-center gap-4 px-6">
-        <h1 className="font-mono flex items-center justify-start gap-1 text-base md:text-s text-muted-foreground tracking-tight">
-          <Eye className="w-4 h-4 stroke-[2.3] shrink-0 text-muted-foreground" />
-          <span>{post.views ?? 0}</span> 
-        </h1>
+        <LiveViews postId={post._id} initialViews={post.views} />
 
         <h1 className="font-mono flex items-center justify-start gap-1 text-base md:text-s text-muted-foreground tracking-tight">
           <ThumbsUp className="w-4 h-4 stroke-[2.3] shrink-0 text-muted-foreground" />
