@@ -11,6 +11,7 @@ import ReactMarkdown from 'react-markdown';
 import { EditBlogButton } from "@/components/web/EditBlogButton";
 import { BlogCTA } from "@/components/web/BlogCTA";
 import { CommentSection } from "@/components/web/CommentSection";
+import { ViewTracker } from "@/components/web/ViewTracker";
 
 interface postIdRouteProps {
     params: Promise<{
@@ -54,6 +55,7 @@ export default async function postIdRoute({ params }: postIdRouteProps) {
 
     return (
         <div className="max-w-6xl mx-auto py-8 px-4 animate-in fade-in duration-500 relative">
+            <ViewTracker postId={postId} />
             <Link className={buttonVariants({variant: "outline", className: "mb-4"})} href="/insights">
                 <ArrowLeft className="size-4" />
                 Back to blog

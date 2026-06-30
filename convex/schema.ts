@@ -12,6 +12,7 @@ const schema = defineSchema({
         tags: v.array(v.string()), 
         storageId: v.string(),
         createdAt: v.number(),
+        views: v.number(),
     }),
 
     subscribers: defineTable({

@@ -28,10 +28,29 @@ export const createPost = mutation({
       tags: args.tags,
       storageId: args.storageId,
       imageUrl: generatedImageUrl || "",
+      views: 0,
       createdAt: Date.now(),
     });
 
     return newBlogId;
+  },
+});
+
+export const incrementViews = mutation({
+  args: { postId: v.id("blogs") },
+  handler: async (ctx, args) => {
+    const post = await ctx.db.get(args.postId);
+    if (!post) {
+      throw new Error("Post not found");
+    }
+
+    const currentViews = post.views ?? 0; 
+
+    await ctx.db.patch(args.postId, {
+      views: currentViews + 1,
+    });
+
+    return currentViews + 1;
   },
 });
 

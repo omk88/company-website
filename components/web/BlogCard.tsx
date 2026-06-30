@@ -11,6 +11,7 @@ export interface BlogPostPreview {
   imageUrl: string;
   tags: string[]; 
   createdAt: number;
+  views?: number;
 }
 
 interface BlogCardProps {
@@ -44,7 +45,7 @@ export function BlogCard({ post }: BlogCardProps) {
       <div className="flex items-center gap-4 px-6">
         <h1 className="font-mono flex items-center justify-start gap-1 text-base md:text-s text-muted-foreground tracking-tight">
           <Eye className="w-4 h-4 stroke-[2.3] shrink-0 text-muted-foreground" />
-          <span>167</span>
+          <span>{post.views ?? 0}</span> 
         </h1>
 
         <h1 className="font-mono flex items-center justify-start gap-1 text-base md:text-s text-muted-foreground tracking-tight">
