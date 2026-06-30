@@ -29,6 +29,8 @@ export const createPost = mutation({
       storageId: args.storageId,
       imageUrl: generatedImageUrl || "",
       views: 0,
+      likes: 0,
+      dislikes: 0,
       createdAt: Date.now(),
     });
 
@@ -51,6 +53,42 @@ export const incrementViews = mutation({
     });
 
     return currentViews + 1;
+  },
+});
+
+export const incrementLikes = mutation({
+  args: { postId: v.id("blogs") },
+  handler: async (ctx, args) => {
+    const post = await ctx.db.get(args.postId);
+    if (!post) {
+      throw new Error("Post not found");
+    }
+
+    const currentLikes = post.likes ?? 0; 
+
+    await ctx.db.patch(args.postId, {
+      likes: currentLikes + 1,
+    });
+
+    return currentLikes + 1;
+  },
+});
+
+export const incrementDislikes = mutation({
+  args: { postId: v.id("blogs") },
+  handler: async (ctx, args) => {
+    const post = await ctx.db.get(args.postId);
+    if (!post) {
+      throw new Error("Post not found");
+    }
+
+    const currentDislikes = post.dislikes ?? 0; 
+
+    await ctx.db.patch(args.postId, {
+      dislikes: currentDislikes + 1,
+    });
+
+    return currentDislikes + 1;
   },
 });
 

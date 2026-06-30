@@ -1,8 +1,8 @@
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { fetchQuery, preloadQuery } from "convex/nextjs";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ThumbsDown, ThumbsUp } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
@@ -12,6 +12,7 @@ import { EditBlogButton } from "@/components/web/EditBlogButton";
 import { BlogCTA } from "@/components/web/BlogCTA";
 import { CommentSection } from "@/components/web/CommentSection";
 import { ViewTracker } from "@/components/web/ViewTracker";
+import { IncrementLikesDislikes } from "@/components/web/IncrementLikesDislikes";
 
 interface postIdRouteProps {
     params: Promise<{
@@ -82,6 +83,8 @@ export default async function postIdRoute({ params }: postIdRouteProps) {
                     </p>
                 </div>
             </div>
+
+            <IncrementLikesDislikes postId={postId}  />
 
             <Separator className="my-8" />
 
