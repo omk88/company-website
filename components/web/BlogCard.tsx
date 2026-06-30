@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { ThumbsDown, ThumbsUp } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { LiveViews } from "./LiveViews";
+import { LiveMetrics } from "./LiveMetrics";
 
 export interface BlogPostPreview {
   _id: string;
@@ -13,6 +13,8 @@ export interface BlogPostPreview {
   tags: string[]; 
   createdAt: number;
   views?: number;
+  likes?: number,
+  dislikes?: number,
 }
 
 interface BlogCardProps {
@@ -43,19 +45,7 @@ export function BlogCard({ post }: BlogCardProps) {
         />
       </div>
 
-      <div className="flex items-center gap-4 px-6">
-        <LiveViews postId={post._id} initialViews={post.views} />
-
-        <h1 className="font-mono flex items-center justify-start gap-1 text-base md:text-s text-muted-foreground tracking-tight">
-          <ThumbsUp className="w-4 h-4 stroke-[2.3] shrink-0 text-muted-foreground" />
-          <span>34</span>
-        </h1>
-
-        <h1 className="font-mono flex items-center justify-start gap-1 text-base md:text-s text-muted-foreground tracking-tight">
-          <ThumbsDown className="w-4 h-4 stroke-[2.3] shrink-0 text-muted-foreground" />
-          <span>7</span>
-        </h1>
-      </div>
+      <LiveMetrics postId={post._id} initialViews={post.views} initialLikes={post.likes} initialDislikes={post.dislikes} />
 
       <div className="px-6 pt-2 text-xs font-mono uppercase tracking-wider text-muted-foreground shrink-0">
         {post.author} • {formattedDate}
