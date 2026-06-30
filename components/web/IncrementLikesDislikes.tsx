@@ -5,60 +5,85 @@ import { Id } from "@/convex/_generated/dataModel";
 import { useMutation } from "convex/react";
 import { ThumbsUp, ThumbsDown } from "lucide-react";
 import { Button } from "../ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface IncrementLikesDislikesProps {
   postId: Id<"blogs">;
 }
 
+type VoteState = "none" | "liked" | "disliked";
+
 export function IncrementLikesDislikes({ postId }: IncrementLikesDislikesProps) {
-    const incrementLikes = useMutation(api.blogs.incrementLikes);
-    const incrementDislikes = useMutation(api.blogs.incrementDislikes);
+    const handleVoteMutation = useMutation(api.blogs.handleVote);
 
     const [isPending, setIsPending] = useState(false);
+    const [userVote, setUserVote] = useState<VoteState>("none");
 
-    const handleLike = async () => {
-        if (isPending) return;
-        setIsPending(true);
-        try {
-        await incrementLikes({ postId });
-        } catch (error) {
-        console.error("Failed to register like:", error);
-        } finally {
-        setIsPending(false);
+    useEffect(() => {
+        const savedVote = localStorage.getItem(`vote_${postId}`) as VoteState;
+        if (savedVote) {
+        setUserVote(savedVote);
         }
-    };
+    }, [postId]);
 
-    const handleDislike = async () => {
+    const executeVoteChange = async (targetVote: VoteState) => {
         if (isPending) return;
+
+        const nextVoteState = userVote === targetVote ? "none" : targetVote;
+        const previousVoteState = userVote;
+
         setIsPending(true);
+
         try {
-        await incrementDislikes({ postId });
+            await handleVoteMutation({
+                postId,
+                currentVote: nextVoteState,
+                previousVote: previousVoteState,
+            });
+
+            localStorage.setItem(`vote_${postId}`, nextVoteState);
+            setUserVote(nextVoteState);
         } catch (error) {
-        console.error("Failed to register dislike:", error);
+            console.error("Failed to update vote choice:", error);
         } finally {
-        setIsPending(false);
+            setIsPending(false);
         }
     };
 
     return (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 border border-border/60 rounded-full bg-muted/40 p-1 w-fit">
             <Button 
-                variant="outline" 
+                variant="ghost" 
                 size="icon"
-                onClick={handleLike} 
+                onClick={() => executeVoteChange("liked")} 
                 disabled={isPending}
+                className={`rounded-full transition-all ${
+                    userVote === "liked" 
+                        ? "text-emerald-500 bg-emerald-500/10 hover:bg-emerald-500/20 hover:text-emerald-600" 
+                        : "text-muted-foreground hover:text-foreground"
+                }`}
             >
-                <ThumbsUp className="h-4 w-4" />
+                <ThumbsUp
+                    className="h-4 w-4 transition-transform active:scale-90"
+                    fill={userVote === "liked" ? "currentColor" : "none"}
+                />
             </Button>
             
             <Button 
-                variant="outline" 
+                variant="ghost" 
                 size="icon"
-                onClick={handleDislike} 
+                onClick={() => executeVoteChange("disliked")} 
                 disabled={isPending}
+                className={`rounded-full transition-all ${
+                userVote === "disliked" 
+                    ? "text-destructive bg-destructive/10 hover:bg-destructive/20 hover:text-destructive-foreground" 
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
             >
-                <ThumbsDown className="h-4 w-4" />
+                <ThumbsDown
+                    className="h-4 w-4 transition-transform active:scale-90"
+                    fill={userVote === "disliked" ? "currentColor" : "none"}
+                />
             </Button>
         </div>
     )

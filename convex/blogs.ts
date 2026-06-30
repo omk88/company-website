@@ -1,3 +1,4 @@
+import { ArrowRightSquare } from "lucide-react";
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
@@ -56,41 +57,37 @@ export const incrementViews = mutation({
   },
 });
 
-export const incrementLikes = mutation({
-  args: { postId: v.id("blogs") },
+export const handleVote = mutation({
+  args: {
+    postId: v.id("blogs"),
+    currentVote: v.union(v.literal("none"), v.literal("liked"), v.literal("disliked")),
+    previousVote: v.union(v.literal("none"), v.literal("liked"), v.literal("disliked")),
+  },
   handler: async (ctx, args) => {
     const post = await ctx.db.get(args.postId);
-    if (!post) {
-      throw new Error("Post not found");
-    }
+    if (!post) throw new Error("Post not found");
 
-    const currentLikes = post.likes ?? 0; 
+    let likesChange = 0;
+    let dislikesChange = 0;
 
-    await ctx.db.patch(args.postId, {
-      likes: currentLikes + 1,
-    });
+    if (args.previousVote === "liked") likesChange -= 1;
+    if (args.previousVote === "disliked") dislikesChange -= 1;
 
-    return currentLikes + 1;
-  },
-});
+    if (args.currentVote === "liked") likesChange += 1;
+    if (args.currentVote === "disliked") dislikesChange += 1;
 
-export const incrementDislikes = mutation({
-  args: { postId: v.id("blogs") },
-  handler: async (ctx, args) => {
-    const post = await ctx.db.get(args.postId);
-    if (!post) {
-      throw new Error("Post not found");
-    }
-
-    const currentDislikes = post.dislikes ?? 0; 
+    const currentLikes = post.likes ?? 0;
+    const currentDislikes = post.dislikes ?? 0;
 
     await ctx.db.patch(args.postId, {
-      dislikes: currentDislikes + 1,
+      likes: Math.max(0, currentLikes + likesChange),
+      dislikes: Math.max(0, currentDislikes + dislikesChange)
     });
 
-    return currentDislikes + 1;
-  },
-});
+    return { success: true };
+
+  }
+})
 
 export const deletePost = mutation({
   args: {
