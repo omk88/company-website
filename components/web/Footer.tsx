@@ -4,7 +4,8 @@ import { Separator } from "@/components/ui/separator";
 
 export default function Footer() {
   return (
-    <div className="w-full">
+    // Added 'relative z-50 bg-background' to force the footer in front of the sidebars
+    <div className="w-full relative z-50 bg-background">
       <Separator />
 
       <footer className="w-full max-w-7xl mx-auto py-12 px-6 text-sm text-muted-foreground">

@@ -46,7 +46,7 @@ export function BlogCard({ post }: BlogCardProps) {
       </div>
 
       <LiveMetrics postId={post._id} initialViews={post.views} initialLikes={post.likes} initialDislikes={post.dislikes} />
-
+      
       <div className="px-6 pt-2 text-xs font-mono uppercase tracking-wider text-muted-foreground shrink-0">
         {post.author} • {formattedDate}
       </div>

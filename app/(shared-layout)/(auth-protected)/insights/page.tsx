@@ -6,7 +6,6 @@ import { Metadata } from "next";
 import GridCube from "@/components/3d/GridCube";
 import { Megaphone } from "lucide-react";
 import NewsletterSubscriptionForm from "@/components/web/NewsletterSubscriptionForm";
-import { CachedFeaturedBlogsMarquee } from "@/components/web/CachedFeaturedBlogsMarquee";
 
 export const metadata: Metadata = {
   title: "Insights",
@@ -14,44 +13,59 @@ export const metadata: Metadata = {
 
 const INSIGHTS_MODELS = ['/cross.glb'];
 
-export default function InsightsPage() {
-    return (
-        <main className="w-full">
-            <section className="w-full max-w-7xl mx-auto px-6 md:px-12 pt-4 pb-8 flex flex-col items-center justify-start">
-                <div className="flex flex-col items-center w-full justify-start gap-4 md:gap-6">
-                    <AddBlogButton />
-                    <div className="w-full h-30 max-w-md lg:max-w-[460px] flex items-center justify-center relative overflow-hidden shrink-0 transform-gpu">
-                        <GridCube models={INSIGHTS_MODELS} storageKey="insights_cross_path" glitchEnabled={false} />
-                    </div>
+interface PageProps {
+  searchParams: Promise<{
+    search?: string;
+    sort?: string;
+    tags?: string;
+    page?: string;
+  }>;
+}
 
-                    <div className="w-full flex flex-col items-center gap-4 -mt-2 md:-mt-4">
-                        <div className="text-center space-y-1.5 max-w-xl shrink-0">
-                            <h1 className="flex items-center justify-center gap-2.5 font-bold text-xl md:text-2xl text-foreground tracking-tight">
-                                <Megaphone className="w-5 h-5 md:w-6 md:h-6 stroke-[2.3] shrink-0" />
-                                <span>Insights.</span>
-                            </h1>
-                            <p className="text-sm md:text-base text-muted-foreground max-w-md mx-auto leading-normal">
-                                Subscribe to our newsletter to learn more about our latest insights, news and product launches.
-                            </p>
-                        </div>
-                        
-                        <div className="w-full max-w-md shrink-0 mx-auto">
-                            <NewsletterSubscriptionForm />
-                        </div>
-                    </div>
+export default async function InsightsPage({ searchParams }: PageProps) {
+  const resolvedParams = await searchParams;
 
-                </div>
-            </section>
+  return (
+    <div className="w-full space-y-8">
+      
+      <section className="w-full max-w-3xl mx-auto pt-4 pb-4 flex flex-col items-center justify-start">
+        <div className="flex flex-col items-center w-full justify-start gap-4 md:gap-6">
+          <AddBlogButton />
+          
+          <div className="w-full h-30 max-w-md lg:max-w-[460px] flex items-center justify-center relative overflow-hidden shrink-0 transform-gpu">
+            <GridCube 
+              models={INSIGHTS_MODELS} 
+              storageKey="insights_cross_path" 
+              glitchEnabled={false} 
+            />
+          </div>
 
-            <Suspense>
-                <CachedFeaturedBlogsMarquee />
-            </Suspense>
-            
-            <div id="blog-grid-section" className="w-full max-w-7xl mx-auto px-6 pt-8 pb-24">
-                <Suspense fallback={<SkeletonLoadingUi />}>
-                    <CachedBlogGrid />
-                </Suspense>
+          <div className="w-full flex flex-col items-center gap-4 -mt-2 md:-mt-4">
+            <div className="text-center space-y-1.5 max-w-xl shrink-0">
+              <h1 className="flex items-center justify-center gap-2.5 font-bold text-xl md:text-2xl text-foreground tracking-tight">
+                <Megaphone className="w-5 h-5 md:w-6 md:h-6 stroke-[2.3] shrink-0" />
+                <span>Insights.</span>
+              </h1>
+              <p className="text-sm md:text-base text-muted-foreground max-w-md mx-auto leading-normal">
+                Subscribe to our newsletter to learn more about our latest insights, news and product launches.
+              </p>
             </div>
-        </main>
-    );
+            
+            <div className="w-full max-w-md shrink-0 mx-auto">
+              <NewsletterSubscriptionForm />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="w-full border-t border-border/40" />
+
+      <section id="blog-grid-section" className="w-full max-w-5xl mx-auto pb-24">
+        <Suspense key={JSON.stringify(resolvedParams)} fallback={<SkeletonLoadingUi />}>
+          <CachedBlogGrid searchParams={resolvedParams} />
+        </Suspense>
+      </section>
+      
+    </div>
+  );
 }
