@@ -47,7 +47,7 @@ export function BlogGrid({ initialPosts }: BlogGridProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-y-10 my-6 w-full">
+    <div className="grid grid-cols-1 gap-y-3 my-6 w-full">
       {initialPosts.map((post, index) => (
         <BlogCard key={post._id} post={post} index={index} />
       ))}
