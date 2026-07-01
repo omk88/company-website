@@ -5,9 +5,9 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 
 export default function InsightsLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="w-full flex relative items-stretch justify-between">
+    <div className="w-full flex relative items-stretch justify-between min-h-[calc(100vh-4rem)]">
         <SidebarProvider>
-            <aside className="z-10">
+            <aside className="sticky top-16 h-[calc(100vh-4rem)] z-30">
                 <LeftSidebar />
             </aside>
 
@@ -15,7 +15,7 @@ export default function InsightsLayout({ children }: { children: ReactNode }) {
                 {children}
             </main>
 
-            <aside className="z-10">
+            <aside className="sticky top-16 h-[calc(100vh-4rem)] z-30">
                 <RightSidebar />
             </aside>
         </SidebarProvider>

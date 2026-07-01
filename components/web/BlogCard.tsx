@@ -1,5 +1,4 @@
 import { Badge } from "@/components/ui/badge";
-import { ThumbsDown, ThumbsUp } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { LiveMetrics } from "./LiveMetrics";
@@ -23,7 +22,6 @@ interface BlogCardProps {
 }
 
 export function BlogCard({ post }: BlogCardProps) {
-
   const formattedDate = new Date(post.createdAt).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
@@ -33,48 +31,53 @@ export function BlogCard({ post }: BlogCardProps) {
   return (
     <Link 
       href={`/insights/${post._id}`} 
-      className="group flex flex-col gap-4 cursor-pointer w-full h-full text-inherit no-underline border border-border/50 rounded-none bg-card/70 backdrop-blur-md shadow-md shadow-black/5 dark:shadow-black/40 hover:shadow-xl hover:shadow-black/10 dark:hover:shadow-black/60 transition-all duration-300 ease-out hover:-translate-y-1"
+      className="group flex flex-col md:flex-row gap-0 cursor-pointer w-full text-inherit no-underline border border-border/50 rounded-none bg-card/70 backdrop-blur-md shadow-md shadow-black/5 dark:shadow-black/40 hover:shadow-xl hover:shadow-black/10 dark:hover:shadow-black/60 transition-all duration-300 ease-out hover:-translate-y-1 overflow-hidden"
     >
-      <div className="relative aspect-video w-full overflow-hidden bg-muted border-b border-border/50 shrink-0">
+      <div className="relative aspect-video md:aspect-auto w-full md:w-2/5 min-h-[220px] overflow-hidden bg-muted border-b md:border-b-0 md:border-r border-border/50 shrink-0">
         <Image
           src={post.imageUrl}
           alt={post.title}
           fill
-          className="object-cover"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+          sizes="(max-width: 768px) 100vw, 40vw"
         />
       </div>
 
-      <LiveMetrics postId={post._id} initialViews={post.views} initialLikes={post.likes} initialDislikes={post.dislikes} />
-      
-      <div className="px-6 pt-2 text-xs font-mono uppercase tracking-wider text-muted-foreground shrink-0">
-        {post.author} • {formattedDate}
-      </div>
+      <div className="flex flex-col flex-1 justify-between p-6">
+        <div>
+          <div className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-2">
+            {post.author} • {formattedDate}
+          </div>
 
-      <div className="px-6 space-y-2 flex-grow flex flex-col justify-start">
-        <h3 className="text-xl font-bold tracking-tight line-clamp-2 text-foreground transition-colors duration-200 group-hover:text-primary">
-          {post.title}
-        </h3>
-        <p className="text-muted-foreground line-clamp-3 leading-relaxed text-sm">
-          {post.subtitle}
-        </p>
-      </div>
+          <div className="space-y-2">
+            <h3 className="text-xl md:text-2xl font-bold tracking-tight line-clamp-2 text-foreground transition-colors duration-200 group-hover:text-primary">
+              {post.title}
+            </h3>
+            <p className="text-muted-foreground line-clamp-2 md:line-clamp-3 leading-relaxed text-sm">
+              {post.subtitle}
+            </p>
+          </div>
+        </div>
 
-      <div className="flex flex-wrap gap-2 px-6 pb-6 pt-2 shrink-0">
-        {post.tags && post.tags.length > 0 ? (
-          post.tags.map((tag) => (
-            <Badge 
-              key={tag} 
-              variant="secondary" 
-            >
-              {tag}
-            </Badge>
-          ))
-        ) : (
-          <Badge variant="outline">
-            General
-          </Badge>
-        )}
+        <div className="mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-border/30">
+          
+          <div className="shrink-0">
+            <LiveMetrics postId={post._id} initialViews={post.views} initialLikes={post.likes} initialDislikes={post.dislikes} />
+          </div>
+          
+          <div className="flex flex-wrap gap-2">
+            {post.tags && post.tags.length > 0 ? (
+              post.tags.map((tag) => (
+                <Badge key={tag} variant="secondary">
+                  {tag}
+                </Badge>
+              ))
+            ) : (
+              <Badge variant="outline">General</Badge>
+            )}
+          </div>
+
+        </div>
       </div>
     </Link>
   );

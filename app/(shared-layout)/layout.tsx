@@ -1,5 +1,4 @@
 import GridBackground from "@/components/web/GridBackground";
-import { LeftSidebar } from "@/components/web/LeftSidebar";
 import { isAuthenticated } from "@/lib/auth-server";
 import dynamic from "next/dynamic";
 import { ReactNode } from "react";

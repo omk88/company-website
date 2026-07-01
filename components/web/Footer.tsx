@@ -4,7 +4,6 @@ import { Separator } from "@/components/ui/separator";
 
 export default function Footer() {
   return (
-    // Added 'relative z-50 bg-background' to force the footer in front of the sidebars
     <div className="w-full relative z-50 bg-background">
       <Separator />
 
