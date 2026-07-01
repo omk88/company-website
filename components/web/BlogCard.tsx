@@ -31,7 +31,7 @@ export function BlogCard({ post }: BlogCardProps) {
   return (
     <Link 
       href={`/insights/${post._id}`} 
-      className="group flex flex-col md:flex-row gap-0 cursor-pointer w-full text-inherit no-underline border border-border/50 rounded-none bg-card/70 backdrop-blur-md shadow-md shadow-black/5 dark:shadow-black/40 hover:shadow-xl hover:shadow-black/10 dark:hover:shadow-black/60 transition-all duration-300 ease-out hover:-translate-y-1 overflow-hidden"
+      className="group flex flex-col md:flex-row gap-0 cursor-pointer w-full text-inherit no-underline border border-border/50 rounded-none bg-card/70 backdrop-blur-md transition-all duration-300 ease-out hover:-translate-y-1 overflow-hidden"
     >
       <div className="relative aspect-video md:aspect-auto w-full md:w-2/5 min-h-[220px] overflow-hidden bg-muted border-b md:border-b-0 md:border-r border-border/50 shrink-0">
         <Image

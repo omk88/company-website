@@ -2,16 +2,15 @@
 
 import { Toggle } from "@/components/ui/toggle";
 import { useUpdateParams } from "@/hooks/use-update-search-params";
+import { useSearchParams } from "next/navigation";
 
 const AVAILABLE_TAGS = ["Tutorials", "Research", "Design", "Technology", "Product", "Opinion"];
 
-interface SidebarTopicsProps {
-  currentTags: string;
-}
-
-export function SidebarTopics({ currentTags }: SidebarTopicsProps) {
+export function SidebarTopics() {
   const { setParam } = useUpdateParams();
   
+  const searchParams = useSearchParams();
+  const currentTags = searchParams.get("tags") || ""; 
   const activeTags = currentTags ? currentTags.split(",") : [];
 
   const handleTagToggle = (tag: string) => {

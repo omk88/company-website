@@ -4,7 +4,7 @@ import { SkeletonLoadingUi } from "@/components/web/SkeletonLoadingUI";
 import { Suspense } from "react";
 import { Metadata } from "next";
 import GridCube from "@/components/3d/GridCube";
-import { Megaphone } from "lucide-react";
+import { Eye } from "lucide-react";
 import NewsletterSubscriptionForm from "@/components/web/NewsletterSubscriptionForm";
 
 export const metadata: Metadata = {
@@ -43,7 +43,7 @@ export default async function InsightsPage({ searchParams }: PageProps) {
           <div className="w-full flex flex-col items-center gap-4 -mt-2 md:-mt-4">
             <div className="text-center space-y-1.5 max-w-xl shrink-0">
               <h1 className="flex items-center justify-center gap-2.5 font-bold text-xl md:text-2xl text-foreground tracking-tight">
-                <Megaphone className="w-5 h-5 md:w-6 md:h-6 stroke-[2.3] shrink-0" />
+                <Eye className="w-5 h-5 md:w-6 md:h-6 stroke-[2.3] shrink-0" />
                 <span>Insights.</span>
               </h1>
               <p className="text-sm md:text-base text-muted-foreground max-w-md mx-auto leading-normal">
@@ -58,9 +58,10 @@ export default async function InsightsPage({ searchParams }: PageProps) {
         </div>
       </section>
 
-      <div className="w-full border-t border-border/40" />
-
-      <section id="blog-grid-section" className="w-full max-w-4xl mx-auto px-4 pb-24">
+      <section 
+        id="blog-grid-section" 
+        className="w-full max-w-4xl mx-auto px-4 bg-white dark:bg-zinc-950 border-x border-t border-border/40 pb-24"
+      >
         <Suspense key={JSON.stringify(resolvedParams)} fallback={<SkeletonLoadingUi />}>
           <CachedBlogGrid searchParams={resolvedParams} />
         </Suspense>
