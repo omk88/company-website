@@ -50,10 +50,11 @@ export function BlogCard({ post }: BlogCardProps) {
           </div>
 
           <div className="space-y-2">
-            <h3 className="text-xl md:text-2xl font-bold tracking-tight line-clamp-2 text-foreground transition-colors duration-200 group-hover:text-blue-600">
+            <h3 className="text-xl md:text-2xl font-bold tracking-tight line-clamp-2 text-foreground transition-colors duration-200 group-hover:text-blue-600 uppercase break-words">
               {post.title}
             </h3>
-            <p className="text-muted-foreground line-clamp-2 md:line-clamp-3 leading-relaxed text-sm">
+            
+            <p className="text-muted-foreground line-clamp-2 md:line-clamp-3 leading-relaxed text-sm break-words">
               {post.subtitle}
             </p>
           </div>
