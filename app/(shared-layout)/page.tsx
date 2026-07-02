@@ -7,6 +7,7 @@ import Technologies from '@/components/web/Technologies';
 import VisionCards from '@/components/web/VisionCards';
 import VisionDescription from '@/components/web/VisionDescription';
 import { ArrowRight, TrendingUp } from 'lucide-react';
+import Footer from '@/components/web/Footer';
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
@@ -76,6 +77,8 @@ export default function Home() {
           <Technologies />
         </div>
       </section>
+
+      <Footer />
 
     </div>
   );

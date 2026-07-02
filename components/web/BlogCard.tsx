@@ -11,7 +11,7 @@ export interface BlogPostPreview {
   imageUrl: string;
   tags: string[]; 
   createdAt: number;
-  views?: number;
+  totalViews?: number;
   likes?: number,
   dislikes?: number,
 }
@@ -62,7 +62,7 @@ export function BlogCard({ post }: BlogCardProps) {
         <div className="mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-border/30">
           
           <div className="shrink-0">
-            <LiveMetrics postId={post._id} initialViews={post.views} initialLikes={post.likes} initialDislikes={post.dislikes} />
+            <LiveMetrics postId={post._id} initialViews={post.totalViews} initialLikes={post.likes} initialDislikes={post.dislikes} />
           </div>
           
           <div className="flex flex-wrap gap-2">

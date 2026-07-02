@@ -10,6 +10,7 @@ import {
 } from "../ui/sidebar";
 import { FeaturedBlogs } from "./FeaturedBlogs";
 import { Separator } from "../ui/separator";
+import { TrendingBlogs } from "./TrendingBlogs";
 
 export function RightSidebar() {
   return (
@@ -42,6 +43,7 @@ export function RightSidebar() {
             </h1>
           </SidebarGroupLabel>
           <SidebarGroupContent>
+            <TrendingBlogs />
           </SidebarGroupContent>
         </SidebarGroup>
 

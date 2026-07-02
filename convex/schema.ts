@@ -12,11 +12,16 @@ const schema = defineSchema({
         tags: v.array(v.string()), 
         storageId: v.string(),
         createdAt: v.number(),
-        views: v.number(),
+        totalViews: v.number(),
         likes: v.number(),
         dislikes: v.number(),
         featured: v.boolean(),
     }),
+
+    viewLogs: defineTable({
+        blogId: v.id("blogs"),
+        viewedAt: v.number(),
+    }).index("by_viewedAt", ["viewedAt"]),
 
     subscribers: defineTable({
         email: v.string(),

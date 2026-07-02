@@ -21,7 +21,6 @@ export default async function SharedLayout({ children }: { children: ReactNode }
       <GridBackground>
         {children} 
       </GridBackground>
-      <Footer />
     </div>
   );
 }

@@ -10,7 +10,7 @@ interface ViewTrackerProps {
 }
 
 export function ViewTracker({ postId }: ViewTrackerProps) {
-  const incrementViews = useMutation(api.blogs.incrementViews);
+  const recordView = useMutation(api.blogs.recordView);
   const hasIncremented = useRef(false);
 
   useEffect(() => {
@@ -22,11 +22,11 @@ export function ViewTracker({ postId }: ViewTrackerProps) {
       
       sessionStorage.setItem(viewedKey, "true");
       
-      incrementViews({ postId }).catch((err) =>
-        console.error("Failed to increment views:", err)
+      recordView({ blogId: postId }).catch((err) =>
+        console.error("Failed to record view event:", err)
       );
     }
-  }, [postId, incrementViews]);
+  }, [postId, recordView]);
 
   return null;
 }

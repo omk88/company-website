@@ -1,3 +1,4 @@
+import { Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
@@ -28,7 +29,7 @@ export const createPost = mutation({
       tags: args.tags,
       storageId: args.storageId,
       imageUrl: generatedImageUrl || "",
-      views: 0,
+      totalViews: 0,
       likes: 0,
       dislikes: 0,
       featured: false,
@@ -38,6 +39,8 @@ export const createPost = mutation({
     return newBlogId;
   },
 });
+
+
 
 export const toggleFeatured = mutation({
   args: { postId: v.id("blogs") },
@@ -57,21 +60,20 @@ export const toggleFeatured = mutation({
   },
 });
 
-export const incrementViews = mutation({
-  args: { postId: v.id("blogs") },
+export const recordView = mutation({
+  args: { blogId: v.id("blogs") },
   handler: async (ctx, args) => {
-    const post = await ctx.db.get(args.postId);
-    if (!post) {
-      throw new Error("Post not found");
-    }
-
-    const currentViews = post.views ?? 0; 
-
-    await ctx.db.patch(args.postId, {
-      views: currentViews + 1,
+    await ctx.db.insert("viewLogs", {
+      blogId: args.blogId,
+      viewedAt: Date.now(),
     });
 
-    return currentViews + 1;
+    const blog = await ctx.db.get(args.blogId);
+    if (blog) {
+      await ctx.db.patch(args.blogId, {
+        totalViews: (blog.totalViews ?? 0) + 1,
+      });
+    }
   },
 });
 
@@ -203,6 +205,43 @@ export const getFeaturedState = query({
     return {
       isFeatured: blog.featured ?? false, 
     };
+  },
+});
+
+export const getTrendingPosts = query({
+  args: {},
+  handler: async (ctx) => {
+    const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+
+    const recentViews = await ctx.db
+      .query("viewLogs")
+      .withIndex("by_viewedAt", (q) => q.gte("viewedAt", sevenDaysAgo))
+      .collect();
+
+    const viewCounts: Record<string, number> = {};
+    recentViews.forEach((log) => {
+      viewCounts[log.blogId] = (viewCounts[log.blogId] || 0) + 1;
+    });
+
+    const sortedBlogIds = Object.keys(viewCounts).sort(
+      (a, b) => viewCounts[b] - viewCounts[a]
+    );
+
+    const topTrendingIds = sortedBlogIds.slice(0, 5);
+
+    const trendingBlogsRaw = await Promise.all(
+      topTrendingIds.map(async (id) => {
+        const blog = await ctx.db.get(id as Id<"blogs">); 
+        if (!blog) return null; 
+        
+        return {
+          ...blog,
+          recentViews: viewCounts[id],
+        };
+      })
+    );
+
+    return trendingBlogsRaw.filter((blog): blog is NonNullable<typeof blog> => blog !== null);
   },
 });
 
