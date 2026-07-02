@@ -181,6 +181,19 @@ export const getPosts = query({
   },
 });
 
+export const getFeaturedPosts = query({
+  args: {},
+  handler: async (ctx) => {
+    const posts = await ctx.db
+      .query("blogs")
+      .filter((q) => q.eq(q.field("featured"), true))
+      .order("desc")
+      .collect();
+
+    return posts.map(({ content, ...previewFields }) => previewFields);
+  },
+});
+
 export const getFeaturedState = query({
   args: { postId: v.id("blogs") },
   handler: async (ctx, args) => {
