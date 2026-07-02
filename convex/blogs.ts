@@ -1,4 +1,3 @@
-import { ArrowRightSquare } from "lucide-react";
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
@@ -32,10 +31,29 @@ export const createPost = mutation({
       views: 0,
       likes: 0,
       dislikes: 0,
+      featured: false,
       createdAt: Date.now(),
     });
 
     return newBlogId;
+  },
+});
+
+export const toggleFeatured = mutation({
+  args: { postId: v.id("blogs") },
+  handler: async (ctx, args) => {
+    const post = await ctx.db.get(args.postId);
+    if (!post) {
+      throw new Error("Post not found");
+    }
+
+    const currentFeatured = post.featured ?? false; 
+
+    await ctx.db.patch(args.postId, {
+      featured: !currentFeatured,
+    });
+
+    return !currentFeatured;
   },
 });
 

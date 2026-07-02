@@ -14,7 +14,8 @@ const schema = defineSchema({
         createdAt: v.number(),
         views: v.number(),
         likes: v.number(),
-        dislikes: v.number()
+        dislikes: v.number(),
+        featured: v.boolean(),
     }),
 
     subscribers: defineTable({
