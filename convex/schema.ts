@@ -41,7 +41,7 @@ const schema = defineSchema({
         authorId: v.string(),
         authorName: v.string(),
         body: v.string()
-    })
+    }).index("by_postId", ["postId"])
 });
 
 export default schema;

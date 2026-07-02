@@ -16,6 +16,20 @@ export const getCommentsByPost = query({
     }
 });
 
+export const getCommentNumber = query({
+    args: {
+        postId: v.id("blogs")
+    },
+    handler: async (ctx, args) => {
+        const data = await ctx.db
+            .query("comments")
+            .withIndex("by_postId", (q) => q.eq("postId", args.postId))
+            .collect();
+
+        return data.length;
+    }
+});
+
 export const createComment = mutation({
     args: {
         body: v.string(),
