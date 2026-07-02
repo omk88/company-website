@@ -2,8 +2,8 @@
 
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
-import { useMutation } from "convex/react";
-import { ThumbsUp, ThumbsDown } from "lucide-react";
+import { useMutation, useQuery } from "convex/react";
+import { ThumbsUp, ThumbsDown, Star } from "lucide-react";
 import { Button } from "../ui/button";
 import { useEffect, useState } from "react";
 
@@ -15,14 +15,19 @@ type VoteState = "none" | "liked" | "disliked";
 
 export function IncrementLikesDislikes({ postId }: IncrementLikesDislikesProps) {
     const handleVoteMutation = useMutation(api.blogs.handleVote);
+    const toggleFeaturedMutation = useMutation(api.blogs.toggleFeatured);
 
     const [isPending, setIsPending] = useState(false);
     const [userVote, setUserVote] = useState<VoteState>("none");
 
+    const featuredState = useQuery(api.blogs.getFeaturedState, { postId });
+    const isFeatured = featuredState?.isFeatured ?? false;
+    
     useEffect(() => {
         const savedVote = localStorage.getItem(`vote_${postId}`) as VoteState;
+        
         if (savedVote) {
-        setUserVote(savedVote);
+            setUserVote(savedVote);
         }
     }, [postId]);
 
@@ -45,6 +50,18 @@ export function IncrementLikesDislikes({ postId }: IncrementLikesDislikesProps) 
             setUserVote(nextVoteState);
         } catch (error) {
             console.error("Failed to update vote choice:", error);
+        } finally {
+            setIsPending(false);
+        }
+    };
+
+    const handleToggleFeatured = async () => {
+        if (isPending) return;
+        setIsPending(true);
+        try {
+            await toggleFeaturedMutation({ postId });
+        } catch (error) {
+            console.error("Failed to toggle featured status:", error);
         } finally {
             setIsPending(false);
         }
@@ -83,6 +100,24 @@ export function IncrementLikesDislikes({ postId }: IncrementLikesDislikesProps) 
                 <ThumbsDown
                     className="h-4 w-4 transition-transform active:scale-90"
                     fill={userVote === "disliked" ? "currentColor" : "none"}
+                />
+            </Button>
+
+
+            <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={handleToggleFeatured} 
+                disabled={isPending || featuredState === undefined}
+                className={`rounded-full transition-all ${
+                isFeatured 
+                    ? "text-amber-500 bg-amber-500/10 hover:bg-amber-500/20" 
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+            >
+                <Star
+                    className="h-4 w-4 transition-transform active:scale-90"
+                    fill={isFeatured ? "currentColor" : "none"}
                 />
             </Button>
         </div>

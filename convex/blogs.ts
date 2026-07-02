@@ -181,6 +181,18 @@ export const getPosts = query({
   },
 });
 
+export const getFeaturedState = query({
+  args: { postId: v.id("blogs") },
+  handler: async (ctx, args) => {
+    const blog = await ctx.db.get(args.postId);
+    if (!blog) return null;
+    
+    return {
+      isFeatured: blog.featured ?? false, 
+    };
+  },
+});
+
 export const getPostById = query({
     args: {
         postId: v.id("blogs")
