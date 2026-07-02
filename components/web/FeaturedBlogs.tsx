@@ -26,7 +26,7 @@ export function FeaturedBlogs() {
     });
 
     return (
-        <div className="w-full">
+        <div className="mt-2 w-full">
             <div className="relative aspect-video w-full overflow-hidden bg-muted border border-border/50 shrink-0">
                 <Image
                     src={mainPost.imageUrl}
@@ -37,17 +37,18 @@ export function FeaturedBlogs() {
                     priority
                 />
             </div>
-            <div className="flex flex-col flex-1 justify-between p-6">
+            <div className="flex flex-col flex-1 justify-between p-2">
                 <div>
-                <div className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-2">
-                    {mainPost.author} • {formattedDate}
+                <div className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                    <h1>{mainPost.author}</h1>
+                    <h1>{formattedDate}</h1>
                 </div>
 
-                <div className="space-y-2">
-                    <h3 className="text-xl md:text-2xl font-bold tracking-tight line-clamp-2 text-foreground transition-colors duration-200 group-hover:text-primary">
+                <div>
+                    <h3 className="break-words text-lg md:text-lg font-bold tracking-tight line-clamp-2 text-foreground transition-colors duration-200 group-hover:text-primary">
                     {mainPost.title}
                     </h3>
-                    <p className="text-muted-foreground line-clamp-2 md:line-clamp-3 leading-relaxed text-sm">
+                    <p className="break-words text-muted-foreground line-clamp-2 md:line-clamp-3 leading-relaxed text-sm">
                     {mainPost.subtitle}
                     </p>
                 </div>
