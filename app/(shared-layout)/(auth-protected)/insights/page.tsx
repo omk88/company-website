@@ -60,7 +60,7 @@ export default async function InsightsPage({ searchParams }: PageProps) {
 
       <section 
         id="blog-grid-section" 
-        className="w-full max-w-4xl mx-auto px-4 bg-white dark:bg-zinc-950 border-x border-t border-border/40 pb-24"
+        className="w-full max-w-4xl mx-auto px-4 bg-white dark:bg-zinc-950 border-x border-t border-border/40"
       >
         <Suspense key={JSON.stringify(resolvedParams)} fallback={<SkeletonLoadingUi />}>
           <CachedBlogGrid searchParams={resolvedParams} />
