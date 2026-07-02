@@ -14,16 +14,16 @@ import { TrendingBlogs } from "./TrendingBlogs";
 
 export function RightSidebar() {
   return (
-    <Sidebar side="right" className="!top-16 !z-40 !h-full flex flex-col">
-      <SidebarHeader>
+    <Sidebar side="right" className="!top-16 !z-40 h-[calc(100vh-4rem)] flex flex-col overflow-hidden">
+      <SidebarHeader className="shrink-0">
         <h1 className="mt-2 flex items-center justify-center gap-2.5 font-bold text-sm md:text-sm text-muted-foreground tracking-tight">
           <MessageCircleWarning className="w-4 h-4 md:w-4 md:h-4 stroke-[2.3] shrink-0" />
           <span>Noteworthy</span>
         </h1>
       </SidebarHeader>
-      <Separator />
-      
-      <SidebarContent className="flex-1 overflow-y-auto scrollbar-thin">
+      <Separator className="shrink-0" />
+    
+      <SidebarContent className="flex-1 min-h-0 overflow-y-auto scrollbar-thin pb-6">
         <SidebarGroup>
           <SidebarGroupLabel className="w-full justify-center">
             <h1 className="mt-2 flex items-center justify-center gap-2.5 font-bold text-sm text-muted-foreground tracking-tight">
@@ -49,7 +49,7 @@ export function RightSidebar() {
         </SidebarGroup>
       </SidebarContent>
       
-      <SidebarFooter />
+      <SidebarFooter className="shrink-0" />
     </Sidebar>
   );
 }
