@@ -75,15 +75,15 @@ export function FeaturedBlogs() {
                         <h1>{formattedDate}</h1>
                     </div>
 
-                    <div className="mt-2 flex flex-col">
-                        <div className="h-[28px] overflow-hidden">
-                            <h3 className="break-all text-lg font-bold tracking-tight line-clamp-1 text-foreground transition-colors duration-200 group-hover/content:text-blue-600 leading-tight">
+                    <div className="mt-2 flex flex-col gap-2">
+                        <div className="h-[4.875rem] overflow-hidden">
+                            <h3 className="break-words text-lg font-bold tracking-tight line-clamp-3 text-foreground transition-colors duration-200 group-hover/content:text-blue-600 leading-snug">
                                 {currentPost.title}
                             </h3>
                         </div>
                         
-                        <div className="h-[60px] overflow-hidden">
-                            <p className="break-all text-muted-foreground line-clamp-3 leading-relaxed text-sm -mt-0.5">
+                        <div className="h-[3.938rem] overflow-hidden">
+                            <p className="break-words text-muted-foreground line-clamp-3 leading-normal text-sm">
                                 {currentPost.subtitle}
                             </p>
                         </div>

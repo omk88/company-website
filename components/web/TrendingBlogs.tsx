@@ -16,18 +16,20 @@ export function TrendingBlogs() {
     }
 
     return (
-        <div className="py-2 px-0.5 flex flex-col gap-3">
-            <ul className="list-none space-y-3">
+        <div className="w-full flex flex-col">
+            <ul className="list-none w-full m-0 p-0">
                 {trendingBlogs.map((blog) => (
-                    <li key={blog._id}>
+                    <li key={blog._id} className="w-full block">
                         <Link 
                             href={`/insights/${blog._id}`} 
-                            className="group/trending block text-inherit no-underline cursor-pointer"
+                            className="group/trending block w-full text-inherit no-underline cursor-pointer p-2 rounded transition-all duration-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 bg-transparent"
                         >
-                            <div className="flex flex-col">
-                                <h3 className="break-all text-sm font-semibold tracking-tight line-clamp-1 text-foreground transition-colors duration-200 group-hover/trending:text-blue-600 leading-tight">
-                                    {blog.title}
-                                </h3>
+                            <div className="w-full flex flex-col">
+                                <div className="h-[3.61rem] grid items-center overflow-hidden">
+                                    <h3 className="break-words text-sm font-semibold tracking-tight line-clamp-3 text-foreground transition-colors duration-200 group-hover/trending:text-blue-600 leading-snug">
+                                        {blog.title}
+                                    </h3>
+                                </div>
                             </div>
                         </Link>
                     </li>
