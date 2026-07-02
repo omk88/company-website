@@ -1,4 +1,4 @@
-import { Sparkles, TrendingUp } from "lucide-react";
+import { MessageCircleWarning, Sparkles, TrendingUp } from "lucide-react";
 import { 
   Sidebar, 
   SidebarHeader, 
@@ -9,13 +9,19 @@ import {
   SidebarFooter 
 } from "../ui/sidebar";
 import { FeaturedBlogs } from "./FeaturedBlogs";
+import { Separator } from "../ui/separator";
 
 export function RightSidebar() {
   return (
     <Sidebar side="right" className="!top-16 !z-40">
-      <SidebarHeader />
+      <SidebarHeader>
+        <h1 className="mt-2 flex items-center justify-center gap-2.5 font-bold text-sm md:text-sm text-muted-foreground tracking-tight">
+          <MessageCircleWarning className="w-4 h-4 md:w-4 md:h-4 stroke-[2.3] shrink-0" />
+          <span>Noteworthy</span>
+        </h1>
+      </SidebarHeader>
+      <Separator />
       <SidebarContent>
-        
         <SidebarGroup>
           <SidebarGroupLabel className="w-full justify-center">
             <h1 className="mt-2 flex items-center justify-center gap-2.5 font-bold text-sm text-muted-foreground tracking-tight">
