@@ -31,7 +31,7 @@ export function BlogCard({ post }: BlogCardProps) {
   return (
     <Link 
       href={`/insights/${post._id}`} 
-      className="group flex flex-col md:flex-row gap-0 cursor-pointer w-full text-inherit no-underline border border-border/50 rounded-none bg-card/70 backdrop-blur-md transition-all duration-300 ease-out hover:-translate-y-1 overflow-hidden"
+      className="group flex flex-col md:flex-row gap-0 cursor-pointer w-full text-inherit no-underline border border-border/50 rounded-none bg-card/70 backdrop-blur-md overflow-hidden"
     >
       <div className="relative aspect-video md:aspect-auto w-full md:w-2/5 min-h-[220px] overflow-hidden bg-muted border-b md:border-b-0 md:border-r border-border/50 shrink-0">
         <Image
@@ -50,7 +50,7 @@ export function BlogCard({ post }: BlogCardProps) {
           </div>
 
           <div className="space-y-2">
-            <h3 className="text-xl md:text-2xl font-bold tracking-tight line-clamp-2 text-foreground transition-colors duration-200 group-hover:text-primary">
+            <h3 className="text-xl md:text-2xl font-bold tracking-tight line-clamp-2 text-foreground transition-colors duration-200 group-hover:text-blue-600">
               {post.title}
             </h3>
             <p className="text-muted-foreground line-clamp-2 md:line-clamp-3 leading-relaxed text-sm">
