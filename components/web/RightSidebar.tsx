@@ -8,6 +8,7 @@ import {
   SidebarGroupContent,
   SidebarFooter 
 } from "../ui/sidebar";
+import { FeaturedBlogs } from "./FeaturedBlogs";
 
 export function RightSidebar() {
   return (
@@ -23,6 +24,7 @@ export function RightSidebar() {
             </h1>
           </SidebarGroupLabel>
           <SidebarGroupContent>
+            <FeaturedBlogs />
           </SidebarGroupContent>
         </SidebarGroup>
 
