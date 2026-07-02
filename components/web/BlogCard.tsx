@@ -1,7 +1,14 @@
+"use client";
+
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import Link from "next/link";
 import { LiveMetrics } from "./LiveMetrics";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 export interface BlogPostPreview {
   _id: string;
@@ -12,8 +19,8 @@ export interface BlogPostPreview {
   tags: string[]; 
   createdAt: number;
   totalViews?: number;
-  likes?: number,
-  dislikes?: number,
+  likes?: number;
+  dislikes?: number;
 }
 
 interface BlogCardProps {
@@ -60,19 +67,62 @@ export function BlogCard({ post }: BlogCardProps) {
           </div>
         </div>
 
-        <div className="mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-border/30">
+        <div 
+          onMouseEnter={(e) => e.stopPropagation()}
+          onMouseLeave={(e) => e.stopPropagation()}
+          onClick={(e) => e.preventDefault()}
+          className="mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-border/30 cursor-default"
+        >
           
           <div className="shrink-0">
-            <LiveMetrics postId={post._id} initialViews={post.totalViews} initialLikes={post.likes} initialDislikes={post.dislikes} />
+            <LiveMetrics 
+              postId={post._id} 
+              initialViews={post.totalViews} 
+              initialLikes={post.likes} 
+              initialDislikes={post.dislikes} 
+            />
           </div>
           
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 items-center">
             {post.tags && post.tags.length > 0 ? (
-              post.tags.map((tag) => (
-                <Badge key={tag} variant="secondary">
-                  {tag}
-                </Badge>
-              ))
+              <>
+                {post.tags.slice(0, 2).map((tag) => (
+                  <Badge key={tag} variant="secondary" className="whitespace-nowrap">
+                    {tag}
+                  </Badge>
+                ))}
+                
+                {post.tags.length > 2 && (
+                  <HoverCard openDelay={100} closeDelay={100}>
+                    <HoverCardTrigger asChild>
+                      <Badge 
+                        variant="outline" 
+                        className="font-mono text-[10px] px-1.5 py-0.5 text-muted-foreground whitespace-nowrap cursor-help hover:bg-muted transition-colors"
+                      >
+                        +{post.tags.length - 2}
+                      </Badge>
+                    </HoverCardTrigger>
+                    
+                    <HoverCardContent 
+                      side="top" 
+                      align="end" 
+                    >
+                      <div className="space-y-2">
+                        <h4 className="text-[12px] text-muted-foreground">
+                          All Topics
+                        </h4>
+                        <div className="flex flex-wrap gap-1.5 max-h-[120px] overflow-y-auto pt-0.5">
+                          {post.tags.map((tag) => (
+                            <Badge key={tag} variant="secondary" className="text-[11px] px-2 py-0">
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    </HoverCardContent>
+                  </HoverCard>
+                )}
+              </>
             ) : (
               <Badge variant="outline">General</Badge>
             )}
