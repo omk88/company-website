@@ -15,63 +15,28 @@ interface BlogGridManagerProps {
 export function BlogGridManager({ allPosts }: BlogGridManagerProps) {
   const searchParams = useSearchParams();
   
-  const [localSearch, setLocalSearch] = useState(() => searchParams.get("search") || "");
-  const [localTags, setLocalTags] = useState<string[]>(() => {
-    const tagsParam = searchParams.get("tags") || "";
-    return tagsParam ? tagsParam.split(",") : [];
-  });
-  const [localSort, setLocalSort] = useState(() => searchParams.get("sort") || "recent");
+  const searchParam = searchParams.get("search") || "";
+  const tagsParam = searchParams.get("tags") || "";
+  const sortParam = searchParams.get("sort") || "recent";
   
   const [visibleCount, setVisibleCount] = useState(POSTS_PER_BATCH);
   const observerTarget = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const handleLocalSearchUpdate = (e: Event) => {
-      const customEvent = e as CustomEvent<string>;
-      setLocalSearch(customEvent.detail);
-    };
-
-    const handleLocalTagsUpdate = (e: Event) => {
-      const customEvent = e as CustomEvent<string[]>;
-      setLocalTags(customEvent.detail);
-    };
-
-    const handleLocalSortUpdate = (e: Event) => {
-      const customEvent = e as CustomEvent<string>;
-      setLocalSort(customEvent.detail);
-    };
-
-    window.addEventListener("local-search-update", handleLocalSearchUpdate);
-    window.addEventListener("local-tags-update", handleLocalTagsUpdate);
-    window.addEventListener("local-sort-update", handleLocalSortUpdate);
-    
-    return () => {
-      window.removeEventListener("local-search-update", handleLocalSearchUpdate);
-      window.removeEventListener("local-tags-update", handleLocalTagsUpdate);
-      window.removeEventListener("local-sort-update", handleLocalSortUpdate);
-    };
-  }, []);
-
-  useEffect(() => {
-    setLocalSearch(searchParams.get("search") || "");
-    
-    const tagsParam = searchParams.get("tags") || "";
-    setLocalTags(tagsParam ? tagsParam.split(",") : []);
-    
-    setLocalSort(searchParams.get("sort") || "recent");
-  }, [searchParams]);
+  const activeTags = useMemo(() => {
+    return tagsParam ? tagsParam.split(",") : [];
+  }, [tagsParam]);
 
   const filteredPosts = useMemo(() => {
     let posts = [...allPosts];
 
-    if (localTags.length > 0) {
+    if (activeTags.length > 0) {
       posts = posts.filter(post => 
-        localTags.every(tag => post.tags?.some((t: string) => t.toLowerCase() === tag.toLowerCase()))
+        activeTags.every(tag => post.tags?.some((t: string) => t.toLowerCase() === tag.toLowerCase()))
       );
     }
 
-    if (localSearch) {
-      const query = localSearch.toLowerCase().trim();
+    if (searchParam) {
+      const query = searchParam.toLowerCase().trim();
       posts = posts.filter(post => 
         post.title.toLowerCase().includes(query) || 
         (post.subtitle && post.subtitle.toLowerCase().includes(query))
@@ -79,16 +44,16 @@ export function BlogGridManager({ allPosts }: BlogGridManagerProps) {
     }
 
     return posts.sort((a, b) => {
-      if (localSort === "oldest") return a.createdAt - b.createdAt;
-      if (localSort === "title-az") return a.title.localeCompare(b.title);
-      if (localSort === "title-za") return b.title.localeCompare(a.title);
+      if (sortParam === "oldest") return a.createdAt - b.createdAt;
+      if (sortParam === "title-az") return a.title.localeCompare(b.title);
+      if (sortParam === "title-za") return b.title.localeCompare(a.title);
       return b.createdAt - a.createdAt;
     });
-  }, [allPosts, localSearch, localTags, localSort]);
+  }, [allPosts, searchParam, activeTags, sortParam]);
 
   useEffect(() => {
     setVisibleCount(POSTS_PER_BATCH);
-  }, [filteredPosts]);
+  }, [searchParam, tagsParam, sortParam]);
 
   const hasMore = visibleCount < filteredPosts.length;
 

@@ -3,7 +3,7 @@
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
-import { ThumbsUp, ThumbsDown, Star } from "lucide-react";
+import { ThumbsUp, ThumbsDown, Star, MessageSquare, Ellipsis } from "lucide-react";
 import { Button } from "../ui/button";
 import { useEffect, useState, useTransition } from "react";
 import { revalidateFeaturedBlogs } from "@/app/actions/blog";
@@ -69,54 +69,81 @@ export function IncrementLikesDislikes({ postId }: IncrementLikesDislikesProps) 
     };
 
     return (
-        <div className="flex items-center gap-1 border border-border/60 rounded-full bg-muted/40 p-1 w-fit">
+        <div className="flex flex-col items-center gap-4 p-6">
             <Button 
                 variant="ghost" 
-                size="icon"
                 onClick={() => executeVoteChange("liked")} 
                 disabled={isPending}
-                className={`rounded-full transition-all ${
+                className={`h-12 w-12 rounded-full transition-all ${
                     userVote === "liked" 
                         ? "text-emerald-500 bg-emerald-500/10 hover:bg-emerald-500/20 hover:text-emerald-600" 
                         : "text-muted-foreground hover:text-foreground"
                 }`}
             >
                 <ThumbsUp
-                    className="h-4 w-4 transition-transform active:scale-90"
+                    className="!h-5 !w-5 transition-transform active:scale-90"
                     fill={userVote === "liked" ? "currentColor" : "none"}
                 />
             </Button>
             
             <Button 
                 variant="ghost" 
-                size="icon"
                 onClick={() => executeVoteChange("disliked")} 
                 disabled={isPending}
-                className={`rounded-full transition-all ${
+                className={`h-12 w-12 rounded-full transition-all ${
                 userVote === "disliked" 
                     ? "text-destructive bg-destructive/10 hover:bg-destructive/20 hover:text-destructive-foreground" 
                     : "text-muted-foreground hover:text-foreground"
                 }`}
             >
                 <ThumbsDown
-                    className="h-4 w-4 transition-transform active:scale-90"
+                    className="!h-5 !w-5 transition-transform active:scale-90"
                     fill={userVote === "disliked" ? "currentColor" : "none"}
                 />
             </Button>
 
             <Button 
                 variant="ghost" 
-                size="icon"
+                disabled={isPending || featuredState === undefined}
+                className={`h-12 w-12 rounded-full transition-all ${
+                isFeatured 
+                    ? "text-amber-500 bg-amber-500/10 hover:bg-amber-500/20" 
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+            >
+                <MessageSquare
+                    className="!h-5 !w-5 transition-transform active:scale-90"
+                    fill={isFeatured ? "currentColor" : "none"}
+                />
+            </Button>
+
+            <Button 
+                variant="ghost" 
+                disabled={isPending || featuredState === undefined}
+                className={`h-12 w-12 rounded-full transition-all ${
+                isFeatured 
+                    ? "text-amber-500 bg-amber-500/10 hover:bg-amber-500/20" 
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+            >
+                <Ellipsis
+                    className="!h-5 !w-5 transition-transform active:scale-90"
+                    fill={isFeatured ? "currentColor" : "none"}
+                />
+            </Button>
+
+            <Button 
+                variant="ghost" 
                 onClick={handleToggleFeatured} 
                 disabled={isPending || featuredState === undefined}
-                className={`rounded-full transition-all ${
+                className={`h-12 w-12 rounded-full transition-all ${
                 isFeatured 
                     ? "text-amber-500 bg-amber-500/10 hover:bg-amber-500/20" 
                     : "text-muted-foreground hover:text-foreground"
                 }`}
             >
                 <Star
-                    className="h-4 w-4 transition-transform active:scale-90"
+                    className="!h-5 !w-5 transition-transform active:scale-90"
                     fill={isFeatured ? "currentColor" : "none"}
                 />
             </Button>
