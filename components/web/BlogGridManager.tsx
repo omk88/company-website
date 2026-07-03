@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect, useRef, useMemo } from "react";
-import { useSearchParams } from "next/navigation";
 import { BlogGrid } from "./BlogGrid";
 import { BlogPostPreview } from "./BlogCard";
 import { Frown } from "lucide-react";
+import { useLocalSearch } from "@/components/web/SearchContext"; 
 
 const POSTS_PER_BATCH = 9;
 
@@ -13,18 +13,10 @@ interface BlogGridManagerProps {
 }
 
 export function BlogGridManager({ allPosts }: BlogGridManagerProps) {
-  const searchParams = useSearchParams();
-  
-  const searchParam = searchParams.get("search") || "";
-  const tagsParam = searchParams.get("tags") || "";
-  const sortParam = searchParams.get("sort") || "recent";
+  const { searchTerm, activeTags, sortOrder } = useLocalSearch();
   
   const [visibleCount, setVisibleCount] = useState(POSTS_PER_BATCH);
   const observerTarget = useRef<HTMLDivElement>(null);
-
-  const activeTags = useMemo(() => {
-    return tagsParam ? tagsParam.split(",") : [];
-  }, [tagsParam]);
 
   const filteredPosts = useMemo(() => {
     let posts = [...allPosts];
@@ -35,8 +27,8 @@ export function BlogGridManager({ allPosts }: BlogGridManagerProps) {
       );
     }
 
-    if (searchParam) {
-      const query = searchParam.toLowerCase().trim();
+    if (searchTerm) {
+      const query = searchTerm.toLowerCase().trim();
       posts = posts.filter(post => 
         post.title.toLowerCase().includes(query) || 
         (post.subtitle && post.subtitle.toLowerCase().includes(query))
@@ -44,16 +36,16 @@ export function BlogGridManager({ allPosts }: BlogGridManagerProps) {
     }
 
     return posts.sort((a, b) => {
-      if (sortParam === "oldest") return a.createdAt - b.createdAt;
-      if (sortParam === "title-az") return a.title.localeCompare(b.title);
-      if (sortParam === "title-za") return b.title.localeCompare(a.title);
+      if (sortOrder === "oldest") return a.createdAt - b.createdAt;
+      if (sortOrder === "title-az") return a.title.localeCompare(b.title);
+      if (sortOrder === "title-za") return b.title.localeCompare(a.title);
       return b.createdAt - a.createdAt;
     });
-  }, [allPosts, searchParam, activeTags, sortParam]);
+  }, [allPosts, searchTerm, activeTags, sortOrder]);
 
   useEffect(() => {
     setVisibleCount(POSTS_PER_BATCH);
-  }, [searchParam, tagsParam, sortParam]);
+  }, [searchTerm, activeTags, sortOrder]);
 
   const hasMore = visibleCount < filteredPosts.length;
 
@@ -97,10 +89,7 @@ export function BlogGridManager({ allPosts }: BlogGridManagerProps) {
     <div className="w-full">
       <BlogGrid initialPosts={visiblePosts} />
       
-      <div 
-        ref={observerTarget} 
-        className="w-full h-4 clear-both flex justify-center items-center mb-2 text-center"
-      >
+      <div ref={observerTarget} className="w-full h-4 clear-both flex justify-center items-center mb-2 text-center">
         {hasMore && (
           <div className="text-sm font-mono text-muted-foreground animate-pulse py-2">
             Loading older insights...

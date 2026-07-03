@@ -1,46 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { useUpdateParams } from "@/hooks/use-update-search-params";
+import { useLocalSearch } from "@/components/web/SearchContext";
 
-export function SidebarSearch({ defaultValue }: { defaultValue: string }) {
-  const { setParam } = useUpdateParams();
-  const [value, setValue] = useState(defaultValue);
-
-  useEffect(() => {
-    setValue(defaultValue);
-  }, [defaultValue]);
-
-  const handleInputChange = (val: string) => {
-    setValue(val);
-    
-    const event = new CustomEvent("local-search-update", { detail: val });
-    window.dispatchEvent(event);
-  };
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setParam("search", value.trim() || null);
-    }, 400); 
-    return () => clearTimeout(timer);
-  }, [value]);
+export function SidebarSearch() {
+  const { searchTerm, setSearchTerm } = useLocalSearch();
 
   return (
     <div className="relative w-full">
       <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground stroke-[1.5]" />
+      
       <Input
         type="text"
         placeholder="Search insights..."
-        value={value}
-        onChange={(e) => handleInputChange(e.target.value)}
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
         className="pl-9 pr-9 h-9 text-xs bg-background border-border/50 rounded-md focus-visible:ring-1 focus-visible:ring-primary w-full"
       />
-      {value && (
-        <button
-          onClick={() => handleInputChange("")}
-          type="button"
+      
+      {searchTerm && (
+        <button 
+          onClick={() => setSearchTerm("")} 
+          type="button" 
           className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-0.5 rounded-sm hover:bg-muted"
         >
           <X className="h-3.5 w-3.5 stroke-[2]" />

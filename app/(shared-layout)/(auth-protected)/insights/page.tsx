@@ -9,6 +9,7 @@ import NewsletterSubscriptionForm from "@/components/web/NewsletterSubscriptionF
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { LeftSidebar } from "@/components/web/LeftSidebar";
 import { RightSidebar } from "@/components/web/RightSidebar";
+import { SearchProvider } from "@/components/web/SearchContext";
 
 export const metadata: Metadata = {
   title: "Insights",
@@ -26,10 +27,10 @@ interface PageProps {
 }
 
 export default async function InsightsPage({ searchParams }: PageProps) {
-  const resolvedParams = await searchParams;
 
   return (
     <SidebarProvider>
+      <SearchProvider>
         <aside className="sticky top-16 h-[calc(100vh-4rem)] z-30">
             <LeftSidebar />
         </aside>
@@ -69,7 +70,7 @@ export default async function InsightsPage({ searchParams }: PageProps) {
             id="blog-grid-section" 
             className="w-full max-w-4xl mx-auto px-4 bg-white dark:bg-zinc-950 border-x border-t border-border/40"
           >
-            <Suspense key={JSON.stringify(resolvedParams)} fallback={<SkeletonLoadingUi />}>
+            <Suspense fallback={<SkeletonLoadingUi />}>
               <CachedBlogGrid/>
             </Suspense>
           </section>
@@ -77,7 +78,7 @@ export default async function InsightsPage({ searchParams }: PageProps) {
         <aside className="sticky top-16 h-[calc(100vh-4rem)] z-30">
             <RightSidebar />
         </aside>
+      </SearchProvider>
     </SidebarProvider>
-
   );
 }

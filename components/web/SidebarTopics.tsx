@@ -1,27 +1,17 @@
 "use client";
 
 import { Toggle } from "@/components/ui/toggle";
-import { useUpdateParams } from "@/hooks/use-update-search-params";
-import { useSearchParams } from "next/navigation";
+import { useLocalSearch } from "@/components/web/SearchContext";
 
 const AVAILABLE_TAGS = ["Tutorials", "Research", "Design", "Technology", "Product", "Opinion"];
 
 export function SidebarTopics() {
-  const { setParam } = useUpdateParams();
-  const searchParams = useSearchParams();
-
-  const currentTagsParam = searchParams.get("tags") || "";
-  const activeTags = currentTagsParam ? currentTagsParam.split(",") : [];
+  const { activeTags, setActiveTags } = useLocalSearch();
 
   const handleTagToggle = (tag: string) => {
-    let nextTags = [...activeTags];
-    if (nextTags.includes(tag)) {
-      nextTags = nextTags.filter((t) => t !== tag);
-    } else {
-      nextTags.push(tag);
-    }
-    
-    setParam("tags", nextTags.length ? nextTags.join(",") : null);
+    setActiveTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+    );
   };
 
   return (
@@ -30,7 +20,7 @@ export function SidebarTopics() {
         variant="outline"
         size="sm"
         pressed={activeTags.length === 0}
-        onPressedChange={() => setParam("tags", null)}
+        onPressedChange={() => setActiveTags([])}
         className="w-full justify-start text-xs h-9 px-3 border-border/50 bg-background hover:bg-muted data-[state=on]:bg-black data-[state=on]:text-white dark:data-[state=on]:bg-white dark:data-[state=on]:text-black transition-colors cursor-pointer font-medium"
       >
         All Posts

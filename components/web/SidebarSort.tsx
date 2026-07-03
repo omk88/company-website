@@ -1,8 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useUpdateParams } from "@/hooks/use-update-search-params";
-import { useSearchParams } from "next/navigation";
+import { useLocalSearch } from "@/components/web/SearchContext";
 import {
   Select,
   SelectContent,
@@ -12,28 +10,12 @@ import {
 } from "@/components/ui/select";
 
 export function SidebarSort() {
-  const { setParam } = useUpdateParams();
-  const searchParams = useSearchParams();
-
-  const [activeSort, setActiveSort] = useState(() => searchParams.get("sort") || "recent");
-
-  useEffect(() => {
-    setActiveSort(searchParams.get("sort") || "recent");
-  }, [searchParams]);
-
-  const handleSortChange = (val: string) => {
-    setActiveSort(val);
-
-    const event = new CustomEvent("local-sort-update", { detail: val });
-    window.dispatchEvent(event);
-
-    setParam("sort", val === "recent" ? null : val);
-  };
+  const { sortOrder, setSortOrder } = useLocalSearch();
 
   return (
     <Select
-      value={activeSort}
-      onValueChange={handleSortChange}
+      value={sortOrder}
+      onValueChange={setSortOrder}
     >
       <SelectTrigger className="w-full text-xs h-9 bg-background border-border/50 shadow-xs focus:ring-1 focus:ring-primary">
         <SelectValue placeholder="Sort order" />

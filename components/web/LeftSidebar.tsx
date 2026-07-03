@@ -17,8 +17,8 @@ export function LeftSidebar() {
       <Separator/>
       <SidebarContent>
         <div className="p-2 flex flex-col gap-4">
-            <SidebarSearch defaultValue={""} />
-            <SidebarSort/>
+            <SidebarSearch />
+            <SidebarSort />
             <SidebarTopics /> 
         </div>
         <SidebarGroup />
