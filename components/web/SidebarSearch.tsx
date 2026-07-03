@@ -13,10 +13,17 @@ export function SidebarSearch({ defaultValue }: { defaultValue: string }) {
     setValue(defaultValue);
   }, [defaultValue]);
 
+  const handleInputChange = (val: string) => {
+    setValue(val);
+    
+    const event = new CustomEvent("local-search-update", { detail: val });
+    window.dispatchEvent(event);
+  };
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setParam("search", value.trim() || null);
-    }, 250);
+    }, 400); 
     return () => clearTimeout(timer);
   }, [value]);
 
@@ -27,12 +34,12 @@ export function SidebarSearch({ defaultValue }: { defaultValue: string }) {
         type="text"
         placeholder="Search insights..."
         value={value}
-        onChange={(e) => setValue(e.target.value)}
+        onChange={(e) => handleInputChange(e.target.value)}
         className="pl-9 pr-9 h-9 text-xs bg-background border-border/50 rounded-md focus-visible:ring-1 focus-visible:ring-primary w-full"
       />
       {value && (
         <button
-          onClick={() => setValue("")}
+          onClick={() => handleInputChange("")}
           type="button"
           className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-0.5 rounded-sm hover:bg-muted"
         >

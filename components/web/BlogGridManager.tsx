@@ -14,25 +14,58 @@ interface BlogGridManagerProps {
 
 export function BlogGridManager({ allPosts }: BlogGridManagerProps) {
   const searchParams = useSearchParams();
+  
+  const [localSearch, setLocalSearch] = useState(() => searchParams.get("search") || "");
+  const [localTags, setLocalTags] = useState<string[]>(() => {
+    const tagsParam = searchParams.get("tags") || "";
+    return tagsParam ? tagsParam.split(",") : [];
+  });
+  
   const [visibleCount, setVisibleCount] = useState(POSTS_PER_BATCH);
   const observerTarget = useRef<HTMLDivElement>(null);
-
-  const search = searchParams.get("search");
   const sort = searchParams.get("sort");
-  const tags = searchParams.get("tags");
+
+  useEffect(() => {
+    const handleLocalSearchUpdate = (e: Event) => {
+      const customEvent = e as CustomEvent<string>;
+      setLocalSearch(customEvent.detail);
+    };
+
+    const handleLocalTagsUpdate = (e: Event) => {
+      const customEvent = e as CustomEvent<string[]>;
+      setLocalTags(customEvent.detail);
+    };
+
+    window.addEventListener("local-search-update", handleLocalSearchUpdate);
+    window.addEventListener("local-tags-update", handleLocalTagsUpdate);
+    
+    return () => {
+      window.removeEventListener("local-search-update", handleLocalSearchUpdate);
+      window.removeEventListener("local-tags-update", handleLocalTagsUpdate);
+    };
+  }, []);
+
+  const urlSearch = searchParams.get("search") || "";
+  useEffect(() => {
+    setLocalSearch(urlSearch);
+  }, [urlSearch]);
+
+  const urlTags = searchParams.get("tags") || "";
+  useEffect(() => {
+    setLocalTags(urlTags ? urlTags.split(",") : []);
+  }, [urlTags]);
 
   const filteredPosts = useMemo(() => {
     let posts = [...allPosts];
 
-    if (tags) {
-      const selectedTags = tags.split(",");
+    if (localTags.length > 0) {
       posts = posts.filter(post => 
-        selectedTags.every(tag => post.tags?.some((t: string) => t.toLowerCase() === tag.toLowerCase()))
+        localTags.every(tag => post.tags?.some((t: string) => t.toLowerCase() === tag.toLowerCase()))
       );
     }
 
-    if (search) {
-      const query = search.toLowerCase();
+    if (localSearch) {
+      const query = localSearch.toLowerCase().trim();
       posts = posts.filter(post => 
         post.title.toLowerCase().includes(query) || 
         (post.subtitle && post.subtitle.toLowerCase().includes(query))
@@ -45,7 +78,7 @@ export function BlogGridManager({ allPosts }: BlogGridManagerProps) {
       if (sort === "title-za") return b.title.localeCompare(a.title);
       return b.createdAt - a.createdAt;
     });
-  }, [allPosts, search, sort, tags]);
+  }, [allPosts, localSearch, localTags, sort]);
 
   useEffect(() => {
     setVisibleCount(POSTS_PER_BATCH);
@@ -92,11 +125,7 @@ export function BlogGridManager({ allPosts }: BlogGridManagerProps) {
   return (
     <div className="w-full">
       <BlogGrid initialPosts={visiblePosts} />
-
-      <div 
-        ref={observerTarget} 
-        className="w-full h-4 clear-both flex justify-center items-center mb-2 text-center"
-      >
+      <div ref={observerTarget} className="w-full h-4 clear-both flex justify-center items-center mb-2 text-center">
         {hasMore && (
           <div className="text-sm font-mono text-muted-foreground animate-pulse py-2">
             Loading older insights...
