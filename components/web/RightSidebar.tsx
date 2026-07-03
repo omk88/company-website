@@ -21,7 +21,7 @@ export function RightSidebar() {
           <span>Noteworthy</span>
         </h1>
       </SidebarHeader>
-      <Separator className="shrink-0" />
+      <Separator/>
     
       <SidebarContent className="flex-1 min-h-0 overflow-y-auto scrollbar-thin pb-6">
         <SidebarGroup>

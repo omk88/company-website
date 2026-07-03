@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
+import { useSearchParams } from "next/navigation";
 import { BlogGrid } from "./BlogGrid";
 import { BlogPostPreview } from "./BlogCard";
 import { Frown } from "lucide-react";
@@ -12,14 +13,45 @@ interface BlogGridManagerProps {
 }
 
 export function BlogGridManager({ allPosts }: BlogGridManagerProps) {
+  const searchParams = useSearchParams();
   const [visibleCount, setVisibleCount] = useState(POSTS_PER_BATCH);
   const observerTarget = useRef<HTMLDivElement>(null);
 
+  const search = searchParams.get("search");
+  const sort = searchParams.get("sort");
+  const tags = searchParams.get("tags");
+
+  const filteredPosts = useMemo(() => {
+    let posts = [...allPosts];
+
+    if (tags) {
+      const selectedTags = tags.split(",");
+      posts = posts.filter(post => 
+        selectedTags.every(tag => post.tags?.some((t: string) => t.toLowerCase() === tag.toLowerCase()))
+      );
+    }
+
+    if (search) {
+      const query = search.toLowerCase();
+      posts = posts.filter(post => 
+        post.title.toLowerCase().includes(query) || 
+        (post.subtitle && post.subtitle.toLowerCase().includes(query))
+      );
+    }
+
+    return posts.sort((a, b) => {
+      if (sort === "oldest") return a.createdAt - b.createdAt;
+      if (sort === "title-az") return a.title.localeCompare(b.title);
+      if (sort === "title-za") return b.title.localeCompare(a.title);
+      return b.createdAt - a.createdAt;
+    });
+  }, [allPosts, search, sort, tags]);
+
   useEffect(() => {
     setVisibleCount(POSTS_PER_BATCH);
-  }, [allPosts]);
+  }, [filteredPosts]);
 
-  const hasMore = visibleCount < allPosts.length;
+  const hasMore = visibleCount < filteredPosts.length;
 
   useEffect(() => {
     if (!hasMore) return;
@@ -27,31 +59,23 @@ export function BlogGridManager({ allPosts }: BlogGridManagerProps) {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          setVisibleCount((prev) => Math.min(prev + POSTS_PER_BATCH, allPosts.length));
+          setVisibleCount((prev) => Math.min(prev + POSTS_PER_BATCH, filteredPosts.length));
         }
       },
-      { 
-        root: null,    
-        threshold: 0.1, 
-        rootMargin: "0px"
-      }
+      { root: null, threshold: 0.1, rootMargin: "0px" }
     );
 
     const currentTarget = observerTarget.current;
-    if (currentTarget) {
-      observer.observe(currentTarget);
-    }
+    if (currentTarget) observer.observe(currentTarget);
 
     return () => {
-      if (currentTarget) {
-        observer.unobserve(currentTarget);
-      }
+      if (currentTarget) observer.unobserve(currentTarget);
     };
-  }, [hasMore, allPosts.length]);
+  }, [hasMore, filteredPosts.length]);
 
-  const visiblePosts = allPosts.slice(0, visibleCount);
+  const visiblePosts = filteredPosts.slice(0, visibleCount);
 
-  if (allPosts.length === 0) {
+  if (filteredPosts.length === 0) {
     return (
       <div className="w-full py-20 flex flex-col items-center justify-center text-muted-foreground gap-3 text-center max-w-sm mx-auto px-4">
         <Frown className="h-8 w-8 stroke-[1.2] text-muted-foreground/60" />

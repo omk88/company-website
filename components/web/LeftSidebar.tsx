@@ -3,6 +3,7 @@ import { Sidebar, SidebarHeader, SidebarContent, SidebarGroup, SidebarFooter } f
 import { SidebarSearch } from "./SidebarSearch";
 import { SidebarSort } from "./SidebarSort";
 import { SidebarTopics } from "./SidebarTopics";
+import { Separator } from "../ui/separator";
 
 export function LeftSidebar() {
   return (
@@ -13,6 +14,7 @@ export function LeftSidebar() {
           <span>Filter articles</span>
         </h1>
       </SidebarHeader>
+      <Separator/>
       <SidebarContent>
         <div className="p-2 flex flex-col gap-4">
             <SidebarSearch defaultValue={""} />
