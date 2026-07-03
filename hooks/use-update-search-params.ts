@@ -12,7 +12,7 @@ export function useUpdateParams() {
     } else {
       params.delete(key);
     }
-    router.push(`${pathname}?${params.toString()}`);
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
   return { searchParams, setParam };
