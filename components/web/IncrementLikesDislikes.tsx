@@ -19,6 +19,11 @@ export function IncrementLikesDislikes({ postId }: IncrementLikesDislikesProps) 
     const handleVoteMutation = useMutation(api.blogs.handleVote);
     const toggleFeaturedMutation = useMutation(api.blogs.toggleFeatured);
 
+    const user = useQuery(api.auth.getCurrentUser);
+    const userEmail = user?.email || "";
+    const companyDomain = "@taqtiq.tech";
+    const isCompanyUser = userEmail.endsWith(companyDomain);
+
     const [isPending, startTransition] = useTransition(); 
     const [userVote, setUserVote] = useState<VoteState>("none");
 
@@ -136,55 +141,59 @@ export function IncrementLikesDislikes({ postId }: IncrementLikesDislikesProps) 
                 />
             </Button>
 
-            <Separator />
+            {isCompanyUser && (
+                <>
+                    <Separator />
 
-            <Button 
-                variant="ghost" 
-                onClick={handleToggleFeatured} 
-                disabled={isPending || featuredState === undefined}
-                className={`h-12 w-12 rounded-full transition-all ${
-                isFeatured 
-                    ? "text-amber-500 bg-amber-500/10 hover:bg-amber-500/20" 
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-            >
-                <Star
-                    className="!h-5 !w-5 transition-transform active:scale-90"
-                    fill={isFeatured ? "currentColor" : "none"}
-                />
-            </Button>
+                    <Button 
+                        variant="ghost" 
+                        onClick={handleToggleFeatured} 
+                        disabled={isPending || featuredState === undefined}
+                        className={`h-12 w-12 rounded-full transition-all ${
+                        isFeatured 
+                            ? "text-amber-500 bg-amber-500/10 hover:bg-amber-500/20" 
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                    >
+                        <Star
+                            className="!h-5 !w-5 transition-transform active:scale-90"
+                            fill={isFeatured ? "currentColor" : "none"}
+                        />
+                    </Button>
 
-            <Button 
-                variant="ghost" 
-                onClick={handleToggleFeatured} 
-                disabled={isPending || featuredState === undefined}
-                className={`h-12 w-12 rounded-full transition-all ${
-                isFeatured 
-                    ? "text-amber-500 bg-amber-500/10 hover:bg-amber-500/20" 
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-            >
-                <SquarePen
-                    className="!h-5 !w-5 transition-transform active:scale-90"
-                    fill={isFeatured ? "currentColor" : "none"}
-                />
-            </Button>
+                    <Button 
+                        variant="ghost" 
+                        onClick={handleToggleFeatured} 
+                        disabled={isPending || featuredState === undefined}
+                        className={`h-12 w-12 rounded-full transition-all ${
+                        isFeatured 
+                            ? "text-amber-500 bg-amber-500/10 hover:bg-amber-500/20" 
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                    >
+                        <SquarePen
+                            className="!h-5 !w-5 transition-transform active:scale-90"
+                            fill={isFeatured ? "currentColor" : "none"}
+                        />
+                    </Button>
 
-            <Button 
-                variant="ghost" 
-                onClick={handleToggleFeatured} 
-                disabled={isPending || featuredState === undefined}
-                className={`h-12 w-12 rounded-full transition-all ${
-                isFeatured 
-                    ? "text-amber-500 bg-amber-500/10 hover:bg-amber-500/20" 
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-            >
-                <Trash2
-                    className="!h-5 !w-5 transition-transform active:scale-90"
-                    fill={isFeatured ? "currentColor" : "none"}
-                />
-            </Button>
+                    <Button 
+                        variant="ghost" 
+                        onClick={handleToggleFeatured} 
+                        disabled={isPending || featuredState === undefined}
+                        className={`h-12 w-12 rounded-full transition-all ${
+                        isFeatured 
+                            ? "text-amber-500 bg-amber-500/10 hover:bg-amber-500/20" 
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                    >
+                        <Trash2
+                            className="!h-5 !w-5 transition-transform active:scale-90"
+                            fill={isFeatured ? "currentColor" : "none"}
+                        />
+                    </Button>
+                </>
+            )}
         </div>
     );
 }
