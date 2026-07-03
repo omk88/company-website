@@ -19,6 +19,15 @@ export function IncrementLikesDislikes({ postId }: IncrementLikesDislikesProps) 
     const handleVoteMutation = useMutation(api.blogs.handleVote);
     const toggleFeaturedMutation = useMutation(api.blogs.toggleFeatured);
 
+    let initialViews = 0;
+    let initialLikes = 0;
+    let initialDislikes = 0;
+
+    const post = useQuery(api.blogs.getPostById, { postId: postId as Id<"blogs"> });
+    const commentCount = useQuery(api.comments.getCommentNumber, { postId: postId as Id<"blogs"> });
+
+    const { totalViews = initialViews, likes = initialLikes, dislikes = initialDislikes } = post ?? {};
+
     const user = useQuery(api.auth.getCurrentUser);
     const userEmail = user?.email || "";
     const companyDomain = "@taqtiq.tech";
@@ -90,7 +99,7 @@ export function IncrementLikesDislikes({ postId }: IncrementLikesDislikesProps) 
                     className="!h-5 !w-5 transition-transform active:scale-90"
                     fill={userVote === "liked" ? "currentColor" : "none"}
                 />
-                <h1>0</h1>
+                <h1>{ likes }</h1>
             </Button>
             
             <Button 
@@ -107,7 +116,7 @@ export function IncrementLikesDislikes({ postId }: IncrementLikesDislikesProps) 
                     className="!h-5 !w-5 transition-transform active:scale-90"
                     fill={userVote === "disliked" ? "currentColor" : "none"}
                 />
-                <h1>0</h1>
+                <h1>{ dislikes }</h1>
             </Button>
 
             <Button 
@@ -123,7 +132,7 @@ export function IncrementLikesDislikes({ postId }: IncrementLikesDislikesProps) 
                     className="!h-5 !w-5 transition-transform active:scale-90"
                     fill={isFeatured ? "currentColor" : "none"}
                 />
-                <h1>0</h1>
+                <h1>{ commentCount }</h1>
             </Button>
 
             <Button 
