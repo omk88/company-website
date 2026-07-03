@@ -3,10 +3,11 @@
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
-import { ThumbsUp, ThumbsDown, Star, MessageSquare, Ellipsis } from "lucide-react";
+import { ThumbsUp, ThumbsDown, Star, MessageSquare, Ellipsis, SquarePen, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
 import { useEffect, useState, useTransition } from "react";
 import { revalidateFeaturedBlogs } from "@/app/actions/blog";
+import { Separator } from "../ui/separator";
 
 interface IncrementLikesDislikesProps {
   postId: Id<"blogs">;
@@ -135,6 +136,8 @@ export function IncrementLikesDislikes({ postId }: IncrementLikesDislikesProps) 
                 />
             </Button>
 
+            <Separator />
+
             <Button 
                 variant="ghost" 
                 onClick={handleToggleFeatured} 
@@ -146,6 +149,38 @@ export function IncrementLikesDislikes({ postId }: IncrementLikesDislikesProps) 
                 }`}
             >
                 <Star
+                    className="!h-5 !w-5 transition-transform active:scale-90"
+                    fill={isFeatured ? "currentColor" : "none"}
+                />
+            </Button>
+
+            <Button 
+                variant="ghost" 
+                onClick={handleToggleFeatured} 
+                disabled={isPending || featuredState === undefined}
+                className={`h-12 w-12 rounded-full transition-all ${
+                isFeatured 
+                    ? "text-amber-500 bg-amber-500/10 hover:bg-amber-500/20" 
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+            >
+                <SquarePen
+                    className="!h-5 !w-5 transition-transform active:scale-90"
+                    fill={isFeatured ? "currentColor" : "none"}
+                />
+            </Button>
+
+            <Button 
+                variant="ghost" 
+                onClick={handleToggleFeatured} 
+                disabled={isPending || featuredState === undefined}
+                className={`h-12 w-12 rounded-full transition-all ${
+                isFeatured 
+                    ? "text-amber-500 bg-amber-500/10 hover:bg-amber-500/20" 
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+            >
+                <Trash2
                     className="!h-5 !w-5 transition-transform active:scale-90"
                     fill={isFeatured ? "currentColor" : "none"}
                 />

@@ -5,10 +5,10 @@ import NewsletterSubscriptionForm from "./NewsletterSubscriptionForm";
 
 export function BlogCTA() {
   return (
-    <div className="my-12 p-8 rounded-2xl bg-neutral-50 border border-neutral-200 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+    <div className="my-6 p-4 rounded-lg bg-neutral-50 border border-neutral-200 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
       
       <div className="space-y-2 lg:col-span-5 text-center lg:text-left">
-        <h3 className="text-2xl font-bold tracking-tight text-neutral-900">
+        <h3 className="text-xl font-bold tracking-tight text-neutral-900">
           Ready to see what we're building?
         </h3>
         <p className="text-neutral-500 text-sm max-w-md mx-auto lg:mx-0">
