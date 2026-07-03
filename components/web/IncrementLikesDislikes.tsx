@@ -5,7 +5,8 @@ import { Id } from "@/convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
 import { ThumbsUp, ThumbsDown, Star } from "lucide-react";
 import { Button } from "../ui/button";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
+import { revalidateFeaturedBlogs } from "@/app/actions/blog";
 
 interface IncrementLikesDislikesProps {
   postId: Id<"blogs">;
@@ -17,7 +18,7 @@ export function IncrementLikesDislikes({ postId }: IncrementLikesDislikesProps) 
     const handleVoteMutation = useMutation(api.blogs.handleVote);
     const toggleFeaturedMutation = useMutation(api.blogs.toggleFeatured);
 
-    const [isPending, setIsPending] = useState(false);
+    const [isPending, startTransition] = useTransition(); 
     const [userVote, setUserVote] = useState<VoteState>("none");
 
     const featuredState = useQuery(api.blogs.getFeaturedState, { postId });
@@ -37,34 +38,34 @@ export function IncrementLikesDislikes({ postId }: IncrementLikesDislikesProps) 
         const nextVoteState = userVote === targetVote ? "none" : targetVote;
         const previousVoteState = userVote;
 
-        setIsPending(true);
+        startTransition(async () => {
+            try {
+                await handleVoteMutation({
+                    postId,
+                    currentVote: nextVoteState,
+                    previousVote: previousVoteState,
+                });
 
-        try {
-            await handleVoteMutation({
-                postId,
-                currentVote: nextVoteState,
-                previousVote: previousVoteState,
-            });
-
-            localStorage.setItem(`vote_${postId}`, nextVoteState);
-            setUserVote(nextVoteState);
-        } catch (error) {
-            console.error("Failed to update vote choice:", error);
-        } finally {
-            setIsPending(false);
-        }
+                localStorage.setItem(`vote_${postId}`, nextVoteState);
+                setUserVote(nextVoteState);
+            } catch (error) {
+                console.error("Failed to update vote choice:", error);
+            }
+        });
     };
 
-    const handleToggleFeatured = async () => {
+    const handleToggleFeatured = () => {
         if (isPending) return;
-        setIsPending(true);
-        try {
-            await toggleFeaturedMutation({ postId });
-        } catch (error) {
-            console.error("Failed to toggle featured status:", error);
-        } finally {
-            setIsPending(false);
-        }
+        
+        startTransition(async () => {
+            try {
+                await toggleFeaturedMutation({ postId });
+                
+                await revalidateFeaturedBlogs();
+            } catch (error) {
+                console.error("Failed to toggle featured status:", error);
+            }
+        });
     };
 
     return (
@@ -103,7 +104,6 @@ export function IncrementLikesDislikes({ postId }: IncrementLikesDislikesProps) 
                 />
             </Button>
 
-
             <Button 
                 variant="ghost" 
                 size="icon"
@@ -121,5 +121,5 @@ export function IncrementLikesDislikes({ postId }: IncrementLikesDislikesProps) 
                 />
             </Button>
         </div>
-    )
+    );
 }

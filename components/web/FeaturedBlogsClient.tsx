@@ -64,28 +64,21 @@ export function FeaturedBlogsClient({ initialFeaturedBlogs }: FeaturedBlogsClien
                     </div>
                 </div>
                 
-                <div className="py-2 px-0.5">
+                <div className="pt-2 px-0.5">
                     <div className="text-xs font-mono uppercase tracking-wider text-muted-foreground flex justify-between">
                         <h1>{currentPost.author}</h1>
                         <h1>{formattedDate}</h1>
                     </div>
 
-                    <div className="mt-2 flex flex-col h-[9.25rem] overflow-hidden justify-start">
-                        <h3 className="break-words text-lg font-bold tracking-tight line-clamp-3 text-foreground transition-colors duration-200 group-hover/content:text-blue-600 leading-snug mb-1.5 shrink-0">
+                    <div className="mt-2 h-[3.25rem] flex flex-col justify-start overflow-hidden">
+                        <h3 className="break-words text-lg font-bold tracking-tight text-foreground transition-colors duration-200 group-hover/content:text-blue-600 leading-snug line-clamp-2">
                             {currentPost.title}
                         </h3>
-                        
-                        <div className="flex-1 overflow-hidden relative">
-                            <p className="break-words text-muted-foreground line-clamp-none leading-[1.3125rem] text-sm pb-4">
-                                {currentPost.subtitle}
-                            </p>
-                            <div className="absolute bottom-0 left-0 w-full h-7 bg-gradient-to-t from-sidebar via-sidebar/80 to-transparent pointer-events-none" />
-                        </div>
                     </div>
                 </div>
             </Link>
 
-            <div className="flex flex-row justify-center items-center gap-2 mt-auto border-t pt-2 pb-2 border-border/40">
+            <div className="flex flex-row justify-center items-center gap-2 pt-3 pb-2 border-border/40">
                 <Button variant="ghost" size="icon" onClick={handlePrev}>
                     <ArrowLeft className="h-4 w-4" />
                 </Button>
