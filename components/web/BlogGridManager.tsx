@@ -20,10 +20,10 @@ export function BlogGridManager({ allPosts }: BlogGridManagerProps) {
     const tagsParam = searchParams.get("tags") || "";
     return tagsParam ? tagsParam.split(",") : [];
   });
+  const [localSort, setLocalSort] = useState(() => searchParams.get("sort") || "recent");
   
   const [visibleCount, setVisibleCount] = useState(POSTS_PER_BATCH);
   const observerTarget = useRef<HTMLDivElement>(null);
-  const sort = searchParams.get("sort");
 
   useEffect(() => {
     const handleLocalSearchUpdate = (e: Event) => {
@@ -36,24 +36,30 @@ export function BlogGridManager({ allPosts }: BlogGridManagerProps) {
       setLocalTags(customEvent.detail);
     };
 
+    const handleLocalSortUpdate = (e: Event) => {
+      const customEvent = e as CustomEvent<string>;
+      setLocalSort(customEvent.detail);
+    };
+
     window.addEventListener("local-search-update", handleLocalSearchUpdate);
     window.addEventListener("local-tags-update", handleLocalTagsUpdate);
+    window.addEventListener("local-sort-update", handleLocalSortUpdate);
     
     return () => {
       window.removeEventListener("local-search-update", handleLocalSearchUpdate);
       window.removeEventListener("local-tags-update", handleLocalTagsUpdate);
+      window.removeEventListener("local-sort-update", handleLocalSortUpdate);
     };
   }, []);
 
-  const urlSearch = searchParams.get("search") || "";
   useEffect(() => {
-    setLocalSearch(urlSearch);
-  }, [urlSearch]);
-
-  const urlTags = searchParams.get("tags") || "";
-  useEffect(() => {
-    setLocalTags(urlTags ? urlTags.split(",") : []);
-  }, [urlTags]);
+    setLocalSearch(searchParams.get("search") || "");
+    
+    const tagsParam = searchParams.get("tags") || "";
+    setLocalTags(tagsParam ? tagsParam.split(",") : []);
+    
+    setLocalSort(searchParams.get("sort") || "recent");
+  }, [searchParams]);
 
   const filteredPosts = useMemo(() => {
     let posts = [...allPosts];
@@ -73,12 +79,12 @@ export function BlogGridManager({ allPosts }: BlogGridManagerProps) {
     }
 
     return posts.sort((a, b) => {
-      if (sort === "oldest") return a.createdAt - b.createdAt;
-      if (sort === "title-az") return a.title.localeCompare(b.title);
-      if (sort === "title-za") return b.title.localeCompare(a.title);
+      if (localSort === "oldest") return a.createdAt - b.createdAt;
+      if (localSort === "title-az") return a.title.localeCompare(b.title);
+      if (localSort === "title-za") return b.title.localeCompare(a.title);
       return b.createdAt - a.createdAt;
     });
-  }, [allPosts, localSearch, localTags, sort]);
+  }, [allPosts, localSearch, localTags, localSort]);
 
   useEffect(() => {
     setVisibleCount(POSTS_PER_BATCH);
@@ -125,7 +131,11 @@ export function BlogGridManager({ allPosts }: BlogGridManagerProps) {
   return (
     <div className="w-full">
       <BlogGrid initialPosts={visiblePosts} />
-      <div ref={observerTarget} className="w-full h-4 clear-both flex justify-center items-center mb-2 text-center">
+      
+      <div 
+        ref={observerTarget} 
+        className="w-full h-4 clear-both flex justify-center items-center mb-2 text-center"
+      >
         {hasMore && (
           <div className="text-sm font-mono text-muted-foreground animate-pulse py-2">
             Loading older insights...
