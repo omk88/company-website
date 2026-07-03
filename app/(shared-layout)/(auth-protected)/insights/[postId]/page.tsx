@@ -97,7 +97,7 @@ export default async function postIdRoute({ params }: postIdRouteProps) {
                 </div>
             </main>
 
-            <RightSidebarArticles />
+            <RightSidebarArticles authorName={post.author}  />
             
         </SidebarProvider>
     )

@@ -208,6 +208,19 @@ export const getFeaturedState = query({
   },
 });
 
+export const getPostsByAuthor = query({
+  args: { authorName: v.string() },
+  handler: async (ctx, args) => {
+    const posts = await ctx.db
+      .query("blogs")
+      .filter((q) => q.eq(q.field("author"), args.authorName))
+      .order("desc")
+      .take(6);
+
+    return posts.map(({ content, ...previewFields }) => previewFields);
+  },
+});
+
 export const getTrendingPosts = query({
   args: {},
   handler: async (ctx) => {

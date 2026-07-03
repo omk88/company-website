@@ -14,7 +14,7 @@ export function LeftSidebarControls({ postId }: ViewTrackerProps) {
   return (
     <Sidebar className="!w-40 !top-16 !z-40">
       <SidebarHeader>
-        <Link className={buttonVariants({variant: "outline"})} href="/insights">
+        <Link className={buttonVariants({variant: "ghost"})} href="/insights">
             <ArrowLeft className="size-4" />
             Back to blog
         </Link>
