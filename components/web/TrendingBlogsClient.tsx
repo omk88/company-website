@@ -1,25 +1,22 @@
 "use client";
 
-import { api } from "@/convex/_generated/api";
-import { useQuery } from "convex/react";
 import Link from "next/link"; 
 import { LiveMetrics } from "./LiveMetrics";
+import { BlogPostPreview } from "./BlogCard";
 
-export function TrendingBlogs() {
-    const trendingBlogs = useQuery(api.blogs.getTrendingPosts);
+interface TrendingBlogsClientProps {
+    initialTrendingBlogs: BlogPostPreview[];
+}
 
-    if (trendingBlogs === undefined) {
-        return <div className="h-24 w-full bg-muted animate-pulse rounded" />;
-    }
-
-    if (trendingBlogs.length === 0) {
-        return <p className="text-sm text-muted-foreground">No trending posts in the last 7 days.</p>;
+export function TrendingBlogsClient({ initialTrendingBlogs }: TrendingBlogsClientProps) {
+    if (initialTrendingBlogs.length === 0) {
+        return <p className="text-sm text-muted-foreground p-2">No trending posts in the last 7 days.</p>;
     }
 
     return (
         <div className="w-full flex flex-col">
             <ul className="list-none w-full m-0 p-0">
-                {trendingBlogs.map((blog) => (
+                {initialTrendingBlogs.map((blog) => (
                     <li key={blog._id} className="w-full block">
                         <Link 
                             href={`/insights/${blog._id}`} 
@@ -32,7 +29,7 @@ export function TrendingBlogs() {
                                     </h3>
                                 </div>
                                 
-                                <div className="-ml-6 scale-90 origin-left opacity-80 group-hover/trending:opacity-100 transition-opacity duration-200">
+                                <div className="-ml-6 scale-90 origin-left opacity-80 group-hover/trending:opacity-100 transition-opacity duration-200 transform-gpu will-change-opacity">
                                     <LiveMetrics 
                                         postId={blog._id} 
                                         initialViews={blog.totalViews} 

@@ -10,9 +10,10 @@ import {
 } from "../ui/sidebar";
 import { FeaturedBlogs } from "./FeaturedBlogsContainer";
 import { Separator } from "../ui/separator";
-import { TrendingBlogs } from "./TrendingBlogs";
+import { TrendingBlogs } from "./TrendingBlogsContainer";
 import { Suspense } from "react";
 import { FeaturedBlogsSkeleton } from "./FeaturedBlogsSkeleton";
+import { TrendingBlogsSkeleton } from "./TrendingBlogsSkeleton";
 
 export function RightSidebar() {
   return (
@@ -48,12 +49,14 @@ export function RightSidebar() {
             </h1>
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            <TrendingBlogs />
+            <Suspense fallback={<TrendingBlogsSkeleton />}>
+                <TrendingBlogs />
+            </Suspense>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
       
-      <SidebarFooter className="shrink-0" />
+      <SidebarFooter/>
     </Sidebar>
   );
 }
