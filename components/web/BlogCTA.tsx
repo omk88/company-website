@@ -12,7 +12,7 @@ export function BlogCTA() {
           Ready to see what we're building?
         </h3>
         <p className="text-neutral-500 text-sm max-w-md mx-auto lg:mx-0">
-          Explore our complete suite of products tailored to help optimize your workflow and scale seamlessly.
+          Explore our suite of products designed to make your life a whole lot easier.
         </p>
         <div className="pt-2">
           <Link 
@@ -37,7 +37,7 @@ export function BlogCTA() {
             Stay up to date
           </h4>
           <p className="text-neutral-500 text-sm">
-            Subscribe to our newsletter so you don't miss our latest updates.
+            Subscribe to our newsletter so you don't miss out on our latest updates.
           </p>
         </div>
         

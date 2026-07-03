@@ -59,10 +59,9 @@ export default async function postIdRoute({ params }: postIdRouteProps) {
             
             <main className="w-full max-w-4xl mx-auto py-3 px-3 animate-in fade-in duration-500">
                 <ViewTracker postId={postId} />
-                
                 <EditBlogButton blogId={postId} />
 
-                <div className="relative w-full h-[400px] mb-8 overflow-hidden rounded-lg">
+                <div className="relative w-full h-[400px] mb-3 overflow-hidden rounded-lg">
                     <Image 
                         src={post.imageUrl || "/brain.png"} 
                         alt={post.title} 
@@ -73,13 +72,13 @@ export default async function postIdRoute({ params }: postIdRouteProps) {
                 </div>
                 
                 <div className="px-1 sm:px-6 md:px-2">
-                    <div className="space-y-4 flex flex-col">
+                    <div className="flex flex-col">
                         <h1 className="text-4xl font-bold tracking-tight text-neutral-950">{post.title}</h1>
-                        <div className="flex flex-col gap-1">
-                            <p className="text-lg text-neutral-600 font-medium">{post.subtitle}</p>
-                            <p className="text-xs text-neutral-400">
+                        <div className="flex flex-col gap-6">
+                            <p className="text-lg text-muted-foreground">
                                 Posted by {post.author} on {new Date(post._creationTime).toLocaleDateString("en-US")}
                             </p>
+                            <p className="text-lg text-neutral-600 font-medium">{post.subtitle}</p>
                         </div>
                     </div>
 
