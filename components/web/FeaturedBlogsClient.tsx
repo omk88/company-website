@@ -1,48 +1,44 @@
 "use client";
 
-import { api } from "@/convex/_generated/api";
-import { useQuery } from "convex/react";
 import Image from "next/image";
 import { Button } from "../ui/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useState, useEffect, MouseEvent } from "react";
 import Link from "next/link";
+import { BlogPostPreview } from "./BlogCard";
 
-export function FeaturedBlogs() {
-    const featuredBlogList = useQuery(api.blogs.getFeaturedPosts);
-    const featuredBlogs = featuredBlogList ?? [];
+interface FeaturedBlogsClientProps {
+    initialFeaturedBlogs: BlogPostPreview[];
+}
 
+export function FeaturedBlogsClient({ initialFeaturedBlogs }: FeaturedBlogsClientProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
 
     const handlePrev = (e: MouseEvent<HTMLButtonElement>) => {
         setCurrentIndex((prevIndex) => 
-            prevIndex === 0 ? featuredBlogs.length - 1 : prevIndex - 1
+            prevIndex === 0 ? initialFeaturedBlogs.length - 1 : prevIndex - 1
         );
     };
 
     const handleNext = (e: MouseEvent<HTMLButtonElement> | { preventDefault: () => void }) => {
         setCurrentIndex((prevIndex) => 
-            prevIndex === featuredBlogs.length - 1 ? 0 : prevIndex + 1
+            prevIndex === initialFeaturedBlogs.length - 1 ? 0 : prevIndex + 1
         );
     };
 
     useEffect(() => {
-        if (featuredBlogs.length <= 1) return;
+        if (initialFeaturedBlogs.length <= 1) return;
         const interval = setInterval(() => {
             handleNext({ preventDefault: () => {} });
         }, 10000);
         return () => clearInterval(interval);
-    }, [featuredBlogs.length, currentIndex]);
+    }, [initialFeaturedBlogs.length, currentIndex]);
 
-    if (featuredBlogList === undefined) {
-        return <div className="min-h-[220px] bg-muted animate-pulse" />; 
-    }
-
-    if (featuredBlogs.length === 0) {
+    if (initialFeaturedBlogs.length === 0) {
         return <div className="p-4 text-muted-foreground">No featured posts found.</div>;
     }
 
-    const currentPost = featuredBlogs[currentIndex];
+    const currentPost = initialFeaturedBlogs[currentIndex];
     const formattedDate = new Date(currentPost.createdAt).toLocaleDateString("en-US", {
         month: "short",
         day: "numeric",
@@ -51,7 +47,6 @@ export function FeaturedBlogs() {
 
     return (
         <div className="flex flex-col gap-0 w-full text-inherit overflow-hidden">
-            
             <Link 
                 href={`/insights/${currentPost._id}`}
                 className="group/content flex flex-col w-full text-inherit no-underline cursor-pointer"
@@ -76,7 +71,6 @@ export function FeaturedBlogs() {
                     </div>
 
                     <div className="mt-2 flex flex-col h-[9.25rem] overflow-hidden justify-start">
-                        
                         <h3 className="break-words text-lg font-bold tracking-tight line-clamp-3 text-foreground transition-colors duration-200 group-hover/content:text-blue-600 leading-snug mb-1.5 shrink-0">
                             {currentPost.title}
                         </h3>
@@ -85,10 +79,8 @@ export function FeaturedBlogs() {
                             <p className="break-words text-muted-foreground line-clamp-none leading-[1.3125rem] text-sm pb-4">
                                 {currentPost.subtitle}
                             </p>
-                            
                             <div className="absolute bottom-0 left-0 w-full h-7 bg-gradient-to-t from-sidebar via-sidebar/80 to-transparent pointer-events-none" />
                         </div>
-                        
                     </div>
                 </div>
             </Link>
@@ -104,7 +96,6 @@ export function FeaturedBlogs() {
                     <ArrowRight className="h-4 w-4" />
                 </Button>
             </div>
-
         </div>
     );
 }

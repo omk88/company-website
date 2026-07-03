@@ -8,9 +8,11 @@ import {
   SidebarGroupContent,
   SidebarFooter 
 } from "../ui/sidebar";
-import { FeaturedBlogs } from "./FeaturedBlogs";
+import { FeaturedBlogs } from "./FeaturedBlogsContainer";
 import { Separator } from "../ui/separator";
 import { TrendingBlogs } from "./TrendingBlogs";
+import { Suspense } from "react";
+import { FeaturedBlogsSkeleton } from "./FeaturedBlogsSkeleton";
 
 export function RightSidebar() {
   return (
@@ -32,7 +34,9 @@ export function RightSidebar() {
             </h1>
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            <FeaturedBlogs />
+            <Suspense fallback={<FeaturedBlogsSkeleton />}>
+              <FeaturedBlogs />
+            </Suspense>
           </SidebarGroupContent>
         </SidebarGroup>
 
