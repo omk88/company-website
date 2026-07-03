@@ -78,7 +78,7 @@ export function FeaturedBlogsClient({ initialFeaturedBlogs }: FeaturedBlogsClien
                 </div>
             </Link>
 
-            <div className="flex flex-row justify-center items-center gap-2 pt-3 pb-2 border-border/40">
+            <div className="flex flex-row justify-center items-center gap-2 border-border/40">
                 <Button variant="ghost" size="icon" onClick={handlePrev}>
                     <ArrowLeft className="h-4 w-4" />
                 </Button>

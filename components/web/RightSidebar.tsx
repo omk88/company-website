@@ -26,11 +26,11 @@ export function RightSidebar() {
       </SidebarHeader>
       <Separator/>
     
-      <SidebarContent className="flex-1 min-h-0 overflow-y-auto scrollbar-thin pb-6">
-        <SidebarGroup>
+      <SidebarContent className="flex-1 min-h-0 overflow-y-auto scrollbar-thin">
+        <SidebarGroup className="!pt-0"> 
           <SidebarGroupLabel className="w-full justify-center">
-            <h1 className="mt-2 flex items-center justify-center gap-2.5 font-bold text-sm text-muted-foreground tracking-tight">
-              <Sparkles className="w-4 h-4 stroke-[2.3] shrink-0" />
+            <h1 className="flex items-start justify-center gap-2 text-sm font-medium text-foreground">
+              <Sparkles className="w-4 h-4 md:w-4 md:h-4 stroke-[2.3] shrink-0" />
               <span>Featured</span>
             </h1>
           </SidebarGroupLabel>
@@ -40,11 +40,11 @@ export function RightSidebar() {
             </Suspense>
           </SidebarGroupContent>
         </SidebarGroup>
-
+        <Separator />
         <SidebarGroup>
           <SidebarGroupLabel className="w-full justify-center">
-            <h1 className="mt-2 flex items-center justify-center gap-2.5 font-bold text-sm text-muted-foreground tracking-tight">
-              <TrendingUp className="w-4 h-4 stroke-[2.3] shrink-0" />
+            <h1 className="flex items-start justify-center gap-2 text-sm font-medium text-foreground">
+              <TrendingUp className="w-4 h-4 md:w-4 md:h-4 stroke-[2.3] shrink-0" />
               <span>Trending</span>
             </h1>
           </SidebarGroupLabel>
