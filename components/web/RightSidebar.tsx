@@ -19,7 +19,7 @@ export function RightSidebar() {
   return (
     <Sidebar side="right" className="!top-16 !z-40 h-[calc(100vh-4rem)] flex flex-col overflow-hidden">
       <SidebarHeader className="shrink-0">
-        <h1 className="mt-2 flex items-center justify-center gap-2.5 font-bold text-sm md:text-sm text-muted-foreground tracking-tight">
+        <h1 className="flex items-start justify-center gap-2 p-2 text-sm font-medium text-foreground">
           <MessageCircleWarning className="w-4 h-4 md:w-4 md:h-4 stroke-[2.3] shrink-0" />
           <span>Noteworthy</span>
         </h1>

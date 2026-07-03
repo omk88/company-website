@@ -84,6 +84,7 @@ export function IncrementLikesDislikes({ postId }: IncrementLikesDislikesProps) 
                     className="!h-5 !w-5 transition-transform active:scale-90"
                     fill={userVote === "liked" ? "currentColor" : "none"}
                 />
+                <h1>0</h1>
             </Button>
             
             <Button 
@@ -100,6 +101,7 @@ export function IncrementLikesDislikes({ postId }: IncrementLikesDislikesProps) 
                     className="!h-5 !w-5 transition-transform active:scale-90"
                     fill={userVote === "disliked" ? "currentColor" : "none"}
                 />
+                <h1>0</h1>
             </Button>
 
             <Button 
@@ -115,6 +117,7 @@ export function IncrementLikesDislikes({ postId }: IncrementLikesDislikesProps) 
                     className="!h-5 !w-5 transition-transform active:scale-90"
                     fill={isFeatured ? "currentColor" : "none"}
                 />
+                <h1>0</h1>
             </Button>
 
             <Button 
