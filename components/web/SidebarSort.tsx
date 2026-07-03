@@ -24,7 +24,8 @@ export function SidebarSort({ currentSort }: SidebarSortProps) {
       <SelectTrigger className="w-full text-xs h-9 bg-background border-border/50 shadow-xs focus:ring-1 focus:ring-primary">
         <SelectValue placeholder="Sort order" />
       </SelectTrigger>
-      <SelectContent className="bg-card border-border/50">
+      
+      <SelectContent position="popper">
         <SelectItem value="recent" className="text-xs cursor-pointer">Most Recent</SelectItem>
         <SelectItem value="oldest" className="text-xs cursor-pointer">Least Recent</SelectItem>
         <SelectItem value="title-az" className="text-xs cursor-pointer">Title (A-Z)</SelectItem>

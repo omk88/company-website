@@ -12,7 +12,6 @@ export function useUpdateParams() {
     } else {
       params.delete(key);
     }
-    params.set("page", "1"); 
     router.push(`${pathname}?${params.toString()}`);
   };
 
