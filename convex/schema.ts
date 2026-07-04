@@ -16,7 +16,7 @@ const schema = defineSchema({
         likes: v.number(),
         dislikes: v.number(),
         featured: v.boolean(),
-    }),
+    }).index("by_featured", ["featured"]),
 
     viewLogs: defineTable({
         blogId: v.id("blogs"),

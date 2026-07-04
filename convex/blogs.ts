@@ -206,11 +206,23 @@ export const getFeaturedPosts = query({
   handler: async (ctx) => {
     const posts = await ctx.db
       .query("blogs")
-      .filter((q) => q.eq(q.field("featured"), true))
+      .withIndex("by_featured", (q) => q.eq("featured", true))
       .order("desc")
       .collect();
 
-    return posts.map(({ content, ...previewFields }) => previewFields);
+    return await Promise.all(
+      posts.map(async ({ content, ...previewFields }) => {
+        const comments = await ctx.db
+          .query("comments")
+          .withIndex("by_postId", (q) => q.eq("postId", previewFields._id))
+          .collect();
+
+        return {
+          ...previewFields,
+          commentCount: comments.length,
+        };
+      })
+    );
   },
 });
 
