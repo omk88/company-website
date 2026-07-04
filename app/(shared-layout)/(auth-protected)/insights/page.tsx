@@ -43,9 +43,7 @@ export default async function InsightsPage() {
                   </p>
                 </div>
                 
-                <div className="w-full max-w-md shrink-0 mx-auto">
-                  <NewsletterSubscriptionForm />
-                </div>
+
               </div>
             </div>
           </section>
