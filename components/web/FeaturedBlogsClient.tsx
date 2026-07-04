@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { Button } from "../ui/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import { useState, useEffect, MouseEvent } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { BlogPostPreview } from "./BlogCard";
 
@@ -14,13 +14,13 @@ interface FeaturedBlogsClientProps {
 export function FeaturedBlogsClient({ initialFeaturedBlogs }: FeaturedBlogsClientProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
 
-    const handlePrev = (e: MouseEvent<HTMLButtonElement>) => {
+    const handlePrev = () => {
         setCurrentIndex((prevIndex) => 
             prevIndex === 0 ? initialFeaturedBlogs.length - 1 : prevIndex - 1
         );
     };
 
-    const handleNext = (e: MouseEvent<HTMLButtonElement> | { preventDefault: () => void }) => {
+    const handleNext = () => {
         setCurrentIndex((prevIndex) => 
             prevIndex === initialFeaturedBlogs.length - 1 ? 0 : prevIndex + 1
         );
@@ -28,11 +28,9 @@ export function FeaturedBlogsClient({ initialFeaturedBlogs }: FeaturedBlogsClien
 
     useEffect(() => {
         if (initialFeaturedBlogs.length <= 1) return;
-        const interval = setInterval(() => {
-            handleNext({ preventDefault: () => {} });
-        }, 10000);
+        const interval = setInterval(handleNext, 10000);
         return () => clearInterval(interval);
-    }, [initialFeaturedBlogs.length, currentIndex]);
+    }, [initialFeaturedBlogs.length]);
 
     if (initialFeaturedBlogs.length === 0) {
         return <div className="p-4 text-muted-foreground">No featured posts found.</div>;
@@ -53,21 +51,26 @@ export function FeaturedBlogsClient({ initialFeaturedBlogs }: FeaturedBlogsClien
             >
                 <div className="w-full">
                     <div className="relative aspect-video w-full overflow-hidden bg-muted border border-border/50 shrink-0">
-                        <Image
-                            src={currentPost.imageUrl}
-                            alt={currentPost.title}
-                            fill
-                            className="object-cover"
-                            sizes="(max-width: 1200px) 100vw, 1200px"
-                            priority
-                        />
+                        {initialFeaturedBlogs.map((post, index) => (
+                            <Image
+                                key={post._id}
+                                src={post.imageUrl}
+                                alt={post.title}
+                                fill
+                                className={`object-cover ${
+                                    index === currentIndex ? "block" : "hidden"
+                                }`}
+                                sizes="(max-width: 1200px) 100vw, 1200px"
+                                priority={index === 0} 
+                            />
+                        ))}
                     </div>
                 </div>
                 
                 <div className="pt-2 px-0.5">
                     <div className="text-xs font-mono uppercase tracking-wider text-muted-foreground flex justify-between">
-                        <h1>{currentPost.author}</h1>
-                        <h1>{formattedDate}</h1>
+                        <span>{currentPost.author}</span>
+                        <span>{formattedDate}</span>
                     </div>
 
                     <div className="mt-2 h-[3.25rem] flex flex-col justify-start overflow-hidden">
@@ -82,9 +85,9 @@ export function FeaturedBlogsClient({ initialFeaturedBlogs }: FeaturedBlogsClien
                 <Button variant="ghost" size="icon" onClick={handlePrev}>
                     <ArrowLeft className="h-4 w-4" />
                 </Button>
-                <h1 className="text-center min-w-[16px] text-muted-foreground font-medium text-sm select-none">
+                <span className="text-center min-w-[16px] text-muted-foreground font-medium text-sm select-none">
                     {currentIndex + 1}
-                </h1>
+                </span>
                 <Button variant="ghost" size="icon" onClick={handleNext}>
                     <ArrowRight className="h-4 w-4" />
                 </Button>
