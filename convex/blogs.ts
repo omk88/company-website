@@ -41,8 +41,6 @@ export const createPost = mutation({
   },
 });
 
-
-
 export const toggleFeatured = mutation({
   args: { postId: v.id("blogs") },
   handler: async (ctx, args) => {
@@ -259,17 +257,26 @@ export const getTrendingPosts = query({
     const sortedBlogIds = Object.keys(viewCounts).sort(
       (a, b) => viewCounts[b] - viewCounts[a]
     );
-
     const topTrendingIds = sortedBlogIds.slice(0, 5);
 
     const trendingBlogsRaw = await Promise.all(
       topTrendingIds.map(async (id) => {
-        const blog = await ctx.db.get(id as Id<"blogs">); 
-        if (!blog) return null; 
+        const blogId = id as Id<"blogs">;
         
+        const [blog, comments] = await Promise.all([
+          ctx.db.get(blogId),
+          ctx.db
+            .query("comments")
+            .withIndex("by_postId", (q) => q.eq("postId", blogId))
+            .collect() 
+        ]);
+
+        if (!blog) return null; 
+
         return {
           ...blog,
           recentViews: viewCounts[id],
+          commentCount: comments.length, 
         };
       })
     );

@@ -4,8 +4,14 @@ import Link from "next/link";
 import { LiveMetrics } from "./LiveMetrics";
 import { BlogPostPreview } from "./BlogCard";
 
+// Extend your existing type to include the dynamic fields from the backend
+interface TrendingBlogItem extends BlogPostPreview {
+    commentCount: number;
+    recentViews: number;
+}
+
 interface TrendingBlogsClientProps {
-    initialTrendingBlogs: BlogPostPreview[];
+    initialTrendingBlogs: TrendingBlogItem[];
 }
 
 export function TrendingBlogsClient({ initialTrendingBlogs }: TrendingBlogsClientProps) {
@@ -31,10 +37,10 @@ export function TrendingBlogsClient({ initialTrendingBlogs }: TrendingBlogsClien
                                 
                                 <div className="-ml-6 scale-90 origin-left opacity-80 group-hover/trending:opacity-100 transition-opacity duration-200 transform-gpu will-change-opacity">
                                     <LiveMetrics 
-                                        postId={blog._id} 
-                                        initialViews={blog.totalViews} 
-                                        initialLikes={blog.likes} 
-                                        initialDislikes={blog.dislikes} 
+                                        views={blog.totalViews ?? 0} 
+                                        likes={blog.likes ?? 0} 
+                                        dislikes={blog.dislikes ?? 0} 
+                                        comments={blog.commentCount} 
                                     />
                                 </div>
                             </div>

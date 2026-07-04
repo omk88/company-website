@@ -48,7 +48,11 @@ export function RightSidebar() {
               <span>Trending</span>
             </h1>
           </SidebarGroupLabel>
-
+          <SidebarGroupContent>
+            <Suspense fallback={<TrendingBlogsSkeleton />}>
+                <TrendingBlogs />
+            </Suspense>
+          </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
       
