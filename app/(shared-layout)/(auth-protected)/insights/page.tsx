@@ -29,6 +29,9 @@ interface PageProps {
 
 export default async function InsightsPage({ searchParams }: PageProps) {
 
+  const params = await searchParams;
+  const currentPage = Number(params.page) || 1;
+
   return (
     <SidebarProvider>
       <SearchProvider>
@@ -76,33 +79,6 @@ export default async function InsightsPage({ searchParams }: PageProps) {
               <CachedBlogGrid/>
             </Suspense>
           </section>
-
-          <div className="w-full max-w-4xl mx-auto pb-8 pt-4 px-4 bg-white dark:bg-zinc-950 border-x border-b border-border/40 rounded-b-lg">
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious href="#" />
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationLink href="#">1</PaginationLink>
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationLink href="#" isActive>
-                    2
-                  </PaginationLink>
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationLink href="#">3</PaginationLink>
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationEllipsis />
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationNext href="#" />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
-          </div>
 
         </div>
 

@@ -1,7 +1,7 @@
 import { Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
-import { paginationOptsValidator } from "convex/server"; // 👈 Import this here instead
+import { paginationOptsValidator } from "convex/server";
 
 export const generateUploadUrl = mutation({
   args: {},
@@ -192,7 +192,7 @@ export const getPaginatedPosts = query({
     const result = await ctx.db
       .query("blogs")
       .order("desc")
-      .paginate(args.paginationOpts); 
+      .paginate(args.paginationOpts);
 
     const pageWithPreviews = result.page.map(({ content, ...previewFields }) => previewFields);
 

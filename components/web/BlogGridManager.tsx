@@ -10,21 +10,24 @@ import { api } from "@/convex/_generated/api";
 
 const POSTS_PER_BATCH = 9;
 
-interface BlogGridManagerProps {}
+interface BlogGridManagerProps {
+  initialServerPosts: any[]; 
+}
 
-export function BlogGridManager({}: BlogGridManagerProps) {
+export function BlogGridManager({ initialServerPosts }: BlogGridManagerProps) {
   const { searchTerm, activeTags, sortOrder } = useLocalSearch();
-  
   const observerTarget = useRef<HTMLDivElement>(null);
 
   const { results, status, loadMore } = usePaginatedQuery(
     api.blogs.getPaginatedPosts,
-    {}, 
+    {},
     { initialNumItems: POSTS_PER_BATCH }
   );
 
-  const filteredPosts = useMemo(() => {
-    let posts = [...results] as BlogPostPreview[];
+  const displayPosts = useMemo(() => {
+    const activeResults = status === "LoadingFirstPage" ? initialServerPosts : results;
+
+    let posts = [...activeResults] as BlogPostPreview[];
 
     if (activeTags.length > 0) {
       posts = posts.filter(post => 
@@ -46,7 +49,7 @@ export function BlogGridManager({}: BlogGridManagerProps) {
       if (sortOrder === "top") return b.title.localeCompare(a.title);
       return b.createdAt - a.createdAt;
     });
-  }, [results, searchTerm, activeTags, sortOrder]);
+  }, [results, status, initialServerPosts, searchTerm, activeTags, sortOrder]);
 
   const hasMore = status === "CanLoadMore";
   const isLoading = status === "LoadingMore";
@@ -71,7 +74,7 @@ export function BlogGridManager({}: BlogGridManagerProps) {
     };
   }, [hasMore, isLoading, loadMore]);
 
-  if (filteredPosts.length === 0 && status === "Exhausted") {
+  if (displayPosts.length === 0 && status === "Exhausted") {
     return (
       <div className="w-full py-20 flex flex-col items-center justify-center text-muted-foreground gap-3 text-center max-w-sm mx-auto px-4">
         <Frown className="h-8 w-8 stroke-[1.2] text-muted-foreground/60" />
@@ -87,10 +90,10 @@ export function BlogGridManager({}: BlogGridManagerProps) {
 
   return (
     <div className="w-full">
-      <BlogGrid initialPosts={filteredPosts} />
+      <BlogGrid initialPosts={displayPosts} />
       
       <div ref={observerTarget} className="w-full h-4 clear-both flex justify-center items-center mb-2 text-center">
-        {(hasMore || isLoading) && (
+        {(hasMore || isLoading || status === "LoadingFirstPage") && (
           <div className="text-sm font-mono text-muted-foreground animate-pulse py-2">
             Loading older insights...
           </div>
