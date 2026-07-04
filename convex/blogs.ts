@@ -229,13 +229,24 @@ export const getFeaturedState = query({
 export const getPostsByAuthor = query({
   args: { authorName: v.string() },
   handler: async (ctx, args) => {
-    const posts = await ctx.db
+    const blogs = await ctx.db
       .query("blogs")
       .filter((q) => q.eq(q.field("author"), args.authorName))
-      .order("desc")
-      .take(6);
+      .take(9);
 
-    return posts.map(({ content, ...previewFields }) => previewFields);
+    return await Promise.all(
+      blogs.map(async (blog) => {
+        const comments = await ctx.db
+          .query("comments")
+          .withIndex("by_postId", (q) => q.eq("postId", blog._id))
+          .take(9);
+
+        return {
+          ...blog,
+          commentCount: comments.length,
+        };
+      })
+    );
   },
 });
 

@@ -18,9 +18,10 @@ export interface BlogPostPreview {
   imageUrl: string;
   tags: string[]; 
   createdAt: number;
-  totalViews?: number;
-  likes?: number;
-  dislikes?: number;
+  totalViews: number;  
+  likes: number;        
+  dislikes: number;     
+  commentCount: number; 
 }
 
 interface BlogCardProps {
@@ -76,10 +77,10 @@ export function BlogCard({ post }: BlogCardProps) {
           
           <div className="shrink-0">
             <LiveMetrics 
-              postId={post._id} 
-              initialViews={post.totalViews} 
-              initialLikes={post.likes} 
-              initialDislikes={post.dislikes} 
+              views={post.totalViews} 
+              likes={post.likes} 
+              dislikes={post.dislikes} 
+              comments={post.commentCount} 
             />
           </div>
           

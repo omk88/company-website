@@ -1,5 +1,3 @@
-"use client";
-
 import { Eye, MessageSquare, ThumbsDown, ThumbsUp } from "lucide-react";
 
 interface LiveMetricsProps {

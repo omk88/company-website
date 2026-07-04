@@ -31,10 +31,10 @@ export function MoreFromClient({ initialBlogs }: MoreFromClientProps) {
                                 
                                 <div className="-ml-6 scale-90 origin-left opacity-80 group-hover/trending:opacity-100 transition-opacity duration-200 transform-gpu will-change-opacity">
                                     <LiveMetrics 
-                                        postId={blog._id} 
-                                        initialViews={blog.totalViews} 
-                                        initialLikes={blog.likes} 
-                                        initialDislikes={blog.dislikes} 
+                                        views={blog.totalViews} 
+                                        likes={blog.likes} 
+                                        dislikes={blog.dislikes} 
+                                        comments={blog.commentCount} 
                                     />
                                 </div>
                             </div>
