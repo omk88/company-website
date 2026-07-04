@@ -45,7 +45,7 @@ export default async function postIdRoute({ params }: postIdRouteProps) {
 
     return (
         <SidebarProvider className="bg-white grid grid-cols-[10rem_1fr_18.75rem] w-full min-h-screen items-start">
-            <LeftSidebarControls postId={postId} />
+            <LeftSidebarControls postId={postId} storageId={post.storageId} />
             
             <Suspense fallback={<MainContentSkeleton />}>
                 <PostContent postPromise={postPromise} preloadedCommentsPromise={preloadedCommentsPromise} />
@@ -101,7 +101,9 @@ async function PostContent({
                 <BlogCTA />
                 <Separator className="my-10" />
 
-                <CommentSection preloadedComments={preloadedComments} />
+                <div id="comments" >
+                    <CommentSection preloadedComments={preloadedComments} />
+                </div>
             </div>
         </main>
     );

@@ -8,9 +8,10 @@ import { Id } from "@/convex/_generated/dataModel";
 
 interface ViewTrackerProps {
   postId: Id<"blogs">;
+  storageId: string;
 }
 
-export function LeftSidebarControls({ postId }: ViewTrackerProps) {
+export function LeftSidebarControls({ postId, storageId }: ViewTrackerProps) {
   return (
     <Sidebar className="!w-40 !top-16 !z-40">
       <SidebarHeader>
@@ -21,7 +22,7 @@ export function LeftSidebarControls({ postId }: ViewTrackerProps) {
       </SidebarHeader>
       <Separator/>
       <SidebarContent>
-        <IncrementLikesDislikes postId={postId} />
+        <IncrementLikesDislikes postId={postId} storageId={storageId} />
         <SidebarGroup />
         <SidebarGroup />
       </SidebarContent>

@@ -1,25 +1,30 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import { BlogGrid } from "./BlogGrid";
 import { BlogPostPreview } from "./BlogCard";
 import { Frown } from "lucide-react";
 import { useLocalSearch } from "@/components/web/SearchContext"; 
+import { usePaginatedQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 const POSTS_PER_BATCH = 9;
 
-interface BlogGridManagerProps {
-  allPosts: BlogPostPreview[];
-}
+interface BlogGridManagerProps {}
 
-export function BlogGridManager({ allPosts }: BlogGridManagerProps) {
+export function BlogGridManager({}: BlogGridManagerProps) {
   const { searchTerm, activeTags, sortOrder } = useLocalSearch();
   
-  const [visibleCount, setVisibleCount] = useState(POSTS_PER_BATCH);
   const observerTarget = useRef<HTMLDivElement>(null);
 
+  const { results, status, loadMore } = usePaginatedQuery(
+    api.blogs.getPaginatedPosts,
+    {}, 
+    { initialNumItems: POSTS_PER_BATCH }
+  );
+
   const filteredPosts = useMemo(() => {
-    let posts = [...allPosts];
+    let posts = [...results] as BlogPostPreview[];
 
     if (activeTags.length > 0) {
       posts = posts.filter(post => 
@@ -36,26 +41,23 @@ export function BlogGridManager({ allPosts }: BlogGridManagerProps) {
     }
 
     return posts.sort((a, b) => {
-      if (sortOrder === "new") return a.createdAt - b.createdAt;
+      if (sortOrder === "new") return b.createdAt - a.createdAt;
       if (sortOrder === "hot") return a.title.localeCompare(b.title);
       if (sortOrder === "top") return b.title.localeCompare(a.title);
       return b.createdAt - a.createdAt;
     });
-  }, [allPosts, searchTerm, activeTags, sortOrder]);
+  }, [results, searchTerm, activeTags, sortOrder]);
+
+  const hasMore = status === "CanLoadMore";
+  const isLoading = status === "LoadingMore";
 
   useEffect(() => {
-    setVisibleCount(POSTS_PER_BATCH);
-  }, [searchTerm, activeTags, sortOrder]);
-
-  const hasMore = visibleCount < filteredPosts.length;
-
-  useEffect(() => {
-    if (!hasMore) return;
+    if (!hasMore || isLoading) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          setVisibleCount((prev) => Math.min(prev + POSTS_PER_BATCH, filteredPosts.length));
+          loadMore(POSTS_PER_BATCH);
         }
       },
       { root: null, threshold: 0.1, rootMargin: "0px" }
@@ -67,11 +69,9 @@ export function BlogGridManager({ allPosts }: BlogGridManagerProps) {
     return () => {
       if (currentTarget) observer.unobserve(currentTarget);
     };
-  }, [hasMore, filteredPosts.length]);
+  }, [hasMore, isLoading, loadMore]);
 
-  const visiblePosts = filteredPosts.slice(0, visibleCount);
-
-  if (filteredPosts.length === 0) {
+  if (filteredPosts.length === 0 && status === "Exhausted") {
     return (
       <div className="w-full py-20 flex flex-col items-center justify-center text-muted-foreground gap-3 text-center max-w-sm mx-auto px-4">
         <Frown className="h-8 w-8 stroke-[1.2] text-muted-foreground/60" />
@@ -87,10 +87,10 @@ export function BlogGridManager({ allPosts }: BlogGridManagerProps) {
 
   return (
     <div className="w-full">
-      <BlogGrid initialPosts={visiblePosts} />
+      <BlogGrid initialPosts={filteredPosts} />
       
       <div ref={observerTarget} className="w-full h-4 clear-both flex justify-center items-center mb-2 text-center">
-        {hasMore && (
+        {(hasMore || isLoading) && (
           <div className="text-sm font-mono text-muted-foreground animate-pulse py-2">
             Loading older insights...
           </div>

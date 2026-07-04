@@ -10,6 +10,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { LeftSidebar } from "@/components/web/LeftSidebar";
 import { RightSidebar } from "@/components/web/RightSidebar";
 import { SearchProvider } from "@/components/web/SearchContext";
+import { Pagination, PaginationContent, PaginationItem, PaginationPrevious, PaginationLink, PaginationEllipsis, PaginationNext } from "@/components/ui/pagination";
 
 export const metadata: Metadata = {
   title: "Insights",
@@ -32,9 +33,10 @@ export default async function InsightsPage({ searchParams }: PageProps) {
     <SidebarProvider>
       <SearchProvider>
         <aside className="sticky top-16 h-[calc(100vh-4rem)] z-30">
-            <LeftSidebar />
+          <LeftSidebar />
         </aside>
-        <div className="w-full space-y-8">
+
+        <div className="w-full space-y-8 flex flex-col">
           
           <section className="w-full max-w-3xl mx-auto pt-4 pb-4 flex flex-col items-center justify-start">
             <div className="flex flex-col items-center w-full justify-start gap-4 md:gap-6">
@@ -74,9 +76,38 @@ export default async function InsightsPage({ searchParams }: PageProps) {
               <CachedBlogGrid/>
             </Suspense>
           </section>
+
+          <div className="w-full max-w-4xl mx-auto pb-8 pt-4 px-4 bg-white dark:bg-zinc-950 border-x border-b border-border/40 rounded-b-lg">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious href="#" />
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationLink href="#">1</PaginationLink>
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationLink href="#" isActive>
+                    2
+                  </PaginationLink>
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationLink href="#">3</PaginationLink>
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationEllipsis />
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationNext href="#" />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+
         </div>
+
         <aside className="sticky top-16 h-[calc(100vh-4rem)] z-30">
-            <RightSidebar />
+          <RightSidebar />
         </aside>
       </SearchProvider>
     </SidebarProvider>

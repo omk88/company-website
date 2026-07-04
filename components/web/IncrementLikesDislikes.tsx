@@ -3,21 +3,32 @@
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
-import { ThumbsUp, ThumbsDown, Star, MessageSquare, Ellipsis, SquarePen, Trash2 } from "lucide-react";
+import { ThumbsUp, ThumbsDown, Star, MessageSquare, Ellipsis, SquarePen, Trash2, Copy, Loader2 } from "lucide-react";
 import { Button } from "../ui/button";
 import { useEffect, useState, useTransition } from "react";
 import { revalidateFeaturedBlogs } from "@/app/actions/blog";
 import { Separator } from "../ui/separator";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+
 
 interface IncrementLikesDislikesProps {
     postId: Id<"blogs">;
+    storageId: string;
 }
 
 type VoteState = "none" | "liked" | "disliked";
 
-export function IncrementLikesDislikes({ postId }: IncrementLikesDislikesProps) {
+export function IncrementLikesDislikes({ postId, storageId }: IncrementLikesDislikesProps) {
     const handleVoteMutation = useMutation(api.blogs.handleVote);
     const toggleFeaturedMutation = useMutation(api.blogs.toggleFeatured);
+    const deleteBlog = useMutation(api.blogs.deletePost);
+
+    const router = useRouter(); 
+
+    const [isDeleting, setIsDeleting] = useState(false);
 
     let initialViews = 0;
     let initialLikes = 0;
@@ -83,13 +94,51 @@ export function IncrementLikesDislikes({ postId }: IncrementLikesDislikesProps) 
         });
     };
 
+    const scrollToView = () => {
+        document.getElementById("comments")?.scrollIntoView({ behavior: "smooth" });
+    }
+
+    const handleDelete = async () => {
+        const confirmed = window.confirm("Are you sure you want to delete this blog post? This action cannot be undone.");
+        if (!confirmed) return;
+
+        try {
+            setIsDeleting(true);
+            
+            await deleteBlog({ 
+                id: postId as Id<"blogs">, 
+                storageId: storageId 
+            });
+
+            toast.success("Blog article deleted successfully!");
+
+            try {
+                const revalidateRes = await fetch("/api/revalidate", { method: "POST" });
+                if (!revalidateRes.ok) {
+                    console.error("Server-side tag revalidation returned an error status.");
+                }
+            } catch (err) {
+                console.error("Background revalidation network failure:", err);
+            }
+
+            router.push("/insights"); 
+            router.refresh(); 
+
+        } catch (error) {
+            console.error("Failed to delete the post:", error);
+            toast.error("Something went wrong while deleting the post.");
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
     return (
         <div className="flex flex-col items-center gap-4 p-6">
             <Button 
                 variant="ghost" 
                 onClick={() => executeVoteChange("liked")} 
                 disabled={isPending}
-                className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground"
+                className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground disabled:opacity-100"
             >
                 <ThumbsUp
                     className={`!h-5 !w-5 transition-transform active:scale-90 ${
@@ -97,14 +146,14 @@ export function IncrementLikesDislikes({ postId }: IncrementLikesDislikesProps) 
                     }`}
                     fill={userVote === "liked" ? "currentColor" : "none"}
                 />
-                <h1 className={userVote === "liked" ? "text-emerald-500" : ""}>{ likes }</h1>
+                <h1>{ likes }</h1>
             </Button>
             
             <Button 
                 variant="ghost" 
                 onClick={() => executeVoteChange("disliked")} 
                 disabled={isPending}
-                className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground"
+                className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground disabled:opacity-100"
             >
                 <ThumbsDown
                     className={`!h-5 !w-5 transition-transform active:scale-90 ${
@@ -117,34 +166,38 @@ export function IncrementLikesDislikes({ postId }: IncrementLikesDislikesProps) 
 
             <Button 
                 variant="ghost" 
-                disabled={isPending || featuredState === undefined}
-                className={`h-12 w-12 rounded-full transition-all ${
-                isFeatured 
-                    ? "text-amber-500 bg-amber-500/10 hover:bg-amber-500/20" 
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
+                disabled={isPending}
+                className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground disabled:opacity-100"
+                onClick={() => scrollToView()}
             >
-                <MessageSquare
-                    className="!h-5 !w-5 transition-transform active:scale-90"
-                    fill={isFeatured ? "currentColor" : "none"}
-                />
+                <MessageSquare className="!h-5 !w-5 transition-transform active:scale-90" />
                 <h1>{ commentCount }</h1>
             </Button>
 
-            <Button 
-                variant="ghost" 
-                disabled={isPending || featuredState === undefined}
-                className={`h-12 w-12 rounded-full transition-all ${
-                isFeatured 
-                    ? "text-amber-500 bg-amber-500/10 hover:bg-amber-500/20" 
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-            >
-                <Ellipsis
-                    className="!h-5 !w-5 transition-transform active:scale-90"
-                    fill={isFeatured ? "currentColor" : "none"}
-                />
-            </Button>
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button 
+                        variant="ghost" 
+                        disabled={isPending}
+                        className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground disabled:opacity-100"
+                    >
+                        <Ellipsis
+                            className="!h-5 !w-5 transition-transform active:scale-90"
+                            fill={isFeatured ? "currentColor" : "none"}
+                        />
+                    </Button>
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent>
+                    <DropdownMenuLabel>Share</DropdownMenuLabel>
+                    <DropdownMenuItem className="font-bold">
+                        <Copy className="h-4 w-4" strokeWidth={3} />Copy link
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>X</DropdownMenuItem>
+                    <DropdownMenuItem>LinkedIn</DropdownMenuItem>
+                    <DropdownMenuItem>Facebook</DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
 
             {isCompanyUser && (
                 <>
@@ -154,48 +207,37 @@ export function IncrementLikesDislikes({ postId }: IncrementLikesDislikesProps) 
                         variant="ghost" 
                         onClick={handleToggleFeatured} 
                         disabled={isPending || featuredState === undefined}
-                        className={`h-12 w-12 rounded-full transition-all ${
-                        isFeatured 
-                            ? "text-amber-500 bg-amber-500/10 hover:bg-amber-500/20" 
-                            : "text-muted-foreground hover:text-foreground"
-                        }`}
+                        className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground disabled:opacity-100"
                     >
                         <Star
-                            className="!h-5 !w-5 transition-transform active:scale-90"
-                            fill={isFeatured ? "currentColor" : "none"}
+                            className={`!h-5 !w-5 transition-all active:scale-90 ${
+                                isFeatured ? "text-amber-500 fill-amber-500" : ""
+                            }`}
                         />
                     </Button>
 
                     <Button 
                         variant="ghost" 
-                        onClick={handleToggleFeatured} 
-                        disabled={isPending || featuredState === undefined}
-                        className={`h-12 w-12 rounded-full transition-all ${
-                        isFeatured 
-                            ? "text-amber-500 bg-amber-500/10 hover:bg-amber-500/20" 
-                            : "text-muted-foreground hover:text-foreground"
-                        }`}
+                        disabled={isPending}
+                        className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground disabled:opacity-100"
+                        asChild
                     >
-                        <SquarePen
-                            className="!h-5 !w-5 transition-transform active:scale-90"
-                            fill={isFeatured ? "currentColor" : "none"}
-                        />
+                        <Link href={`/company/blog?id=${postId}`}>
+                            <SquarePen className="!h-5 !w-5 transition-transform active:scale-90" />
+                        </Link>
                     </Button>
 
                     <Button 
                         variant="ghost" 
-                        onClick={handleToggleFeatured} 
-                        disabled={isPending || featuredState === undefined}
-                        className={`h-12 w-12 rounded-full transition-all ${
-                        isFeatured 
-                            ? "text-amber-500 bg-amber-500/10 hover:bg-amber-500/20" 
-                            : "text-muted-foreground hover:text-foreground"
-                        }`}
+                        disabled={isDeleting || isPending}
+                        className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-destructive disabled:opacity-100"
+                        onClick={handleDelete}
                     >
-                        <Trash2
-                            className="!h-5 !w-5 transition-transform active:scale-90"
-                            fill={isFeatured ? "currentColor" : "none"}
-                        />
+                        {isDeleting ? (
+                            <Loader2 className="!h-5 !w-5 animate-spin text-destructive" />
+                        ) : (
+                            <Trash2 className="!h-5 !w-5 transition-transform active:scale-90" />
+                        )}
                     </Button>
                 </>
             )}
