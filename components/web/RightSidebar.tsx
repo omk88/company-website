@@ -34,7 +34,11 @@ export function RightSidebar() {
               <span>Featured</span>
             </h1>
           </SidebarGroupLabel>
-
+          <SidebarGroupContent>
+            <Suspense fallback={<FeaturedBlogsSkeleton />}>
+              <FeaturedBlogs />
+            </Suspense>
+          </SidebarGroupContent>
         </SidebarGroup>
         <Separator />
         <SidebarGroup>
