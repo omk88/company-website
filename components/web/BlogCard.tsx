@@ -74,14 +74,7 @@ export function BlogCard({ post }: BlogCardProps) {
           className="mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-border/30 cursor-default"
         >
           
-          <div className="shrink-0">
-            <LiveMetrics 
-              postId={post._id} 
-              initialViews={post.totalViews} 
-              initialLikes={post.likes} 
-              initialDislikes={post.dislikes} 
-            />
-          </div>
+
           
           <div className="flex flex-wrap gap-2 items-center">
             {post.tags && post.tags.length > 0 ? (

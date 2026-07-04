@@ -10,7 +10,6 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { LeftSidebar } from "@/components/web/LeftSidebar";
 import { RightSidebar } from "@/components/web/RightSidebar";
 import { SearchProvider } from "@/components/web/SearchContext";
-import { Pagination, PaginationContent, PaginationItem, PaginationPrevious, PaginationLink, PaginationEllipsis, PaginationNext } from "@/components/ui/pagination";
 
 export const metadata: Metadata = {
   title: "Insights",
