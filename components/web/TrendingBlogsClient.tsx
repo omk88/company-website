@@ -29,6 +29,14 @@ export function TrendingBlogsClient({ initialTrendingBlogs }: TrendingBlogsClien
                                     </h3>
                                 </div>
                                 
+                                <div className="-ml-6 scale-90 origin-left opacity-80 group-hover/trending:opacity-100 transition-opacity duration-200 transform-gpu will-change-opacity">
+                                    <LiveMetrics 
+                                        postId={blog._id} 
+                                        initialViews={blog.totalViews} 
+                                        initialLikes={blog.likes} 
+                                        initialDislikes={blog.dislikes} 
+                                    />
+                                </div>
                             </div>
                         </Link>
                     </li>

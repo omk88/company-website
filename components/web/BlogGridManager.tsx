@@ -25,7 +25,7 @@ export function BlogGridManager({ initialServerPosts }: BlogGridManagerProps) {
   );
 
   const displayPosts = useMemo(() => {
-    const activeResults = status === "LoadingFirstPage" ? initialServerPosts : results;
+    const activeResults = results.length === 0 ? initialServerPosts : results;
 
     let posts = [...activeResults] as BlogPostPreview[];
 
@@ -49,7 +49,7 @@ export function BlogGridManager({ initialServerPosts }: BlogGridManagerProps) {
       if (sortOrder === "top") return b.title.localeCompare(a.title);
       return b.createdAt - a.createdAt;
     });
-  }, [results, status, initialServerPosts, searchTerm, activeTags, sortOrder]);
+  }, [results, initialServerPosts, searchTerm, activeTags, sortOrder]);
 
   const hasMore = status === "CanLoadMore";
   const isLoading = status === "LoadingMore";
@@ -63,7 +63,7 @@ export function BlogGridManager({ initialServerPosts }: BlogGridManagerProps) {
           loadMore(POSTS_PER_BATCH);
         }
       },
-      { root: null, threshold: 0.1, rootMargin: "0px" }
+      { root: null, threshold: 0.1, rootMargin: "100px" }
     );
 
     const currentTarget = observerTarget.current;
@@ -93,7 +93,7 @@ export function BlogGridManager({ initialServerPosts }: BlogGridManagerProps) {
       <BlogGrid initialPosts={displayPosts} />
       
       <div ref={observerTarget} className="w-full h-4 clear-both flex justify-center items-center mb-2 text-center">
-        {(hasMore || isLoading || status === "LoadingFirstPage") && (
+        {(hasMore || isLoading) && (
           <div className="text-sm font-mono text-muted-foreground animate-pulse py-2">
             Loading older insights...
           </div>

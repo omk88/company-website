@@ -13,32 +13,31 @@ interface LiveMetricsProps {
   initialMessages?: number;
 }
 
-export function LiveMetrics({ postId, initialViews = 0, initialLikes = 0, initialDislikes = 0, initialMessages = 0 }: LiveMetricsProps) {
+export function LiveMetrics({ postId, initialViews = 0, initialLikes = 0, initialDislikes = 0 }: LiveMetricsProps) {
   const post = useQuery(api.blogs.getPostById, { postId: postId as Id<"blogs"> });
   const commentCount = useQuery(api.comments.getCommentNumber, { postId: postId as Id<"blogs"> });
 
   const { totalViews = initialViews, likes = initialLikes, dislikes = initialDislikes } = post ?? {};
-
   const comments = commentCount ?? 0;
 
   return (
-    <div className="flex items-center gap-4 px-6">
-      <h1 className="font-mono flex items-center justify-start gap-1 text-base md:text-s text-muted-foreground tracking-tight">
-        <Eye className="w-4 h-4 stroke-[2.3] shrink-0 text-muted-foreground" />
+    <div className="flex items-center gap-4 px-6 text-sm text-muted-foreground font-mono tracking-tight">
+      <div className="flex items-center gap-1">
+        <Eye className="w-4 h-4 stroke-[2.3] shrink-0" />
         <span>{totalViews}</span>
-      </h1>
-      <h1 className="font-mono flex items-center justify-start gap-1 text-base md:text-s text-muted-foreground tracking-tight">
-        <ThumbsUp className="w-4 h-4 stroke-[2.3] shrink-0 text-muted-foreground" />
+      </div>
+      <div className="flex items-center gap-1">
+        <ThumbsUp className="w-4 h-4 stroke-[2.3] shrink-0" />
         <span>{likes}</span>
-      </h1>
-      <h1 className="font-mono flex items-center justify-start gap-1 text-base md:text-s text-muted-foreground tracking-tight">
-        <ThumbsDown className="w-4 h-4 stroke-[2.3] shrink-0 text-muted-foreground" />
+      </div>
+      <div className="flex items-center gap-1">
+        <ThumbsDown className="w-4 h-4 stroke-[2.3] shrink-0" />
         <span>{dislikes}</span>
-      </h1>
-      <h1 className="font-mono flex items-center justify-start gap-1 text-base md:text-s text-muted-foreground tracking-tight">
-        <MessageSquare className="w-4 h-4 stroke-[2.3] shrink-0 text-muted-foreground" />
+      </div>
+      <div className="flex items-center gap-1">
+        <MessageSquare className="w-4 h-4 stroke-[2.3] shrink-0" />
         <span>{comments}</span>
-      </h1>
+      </div>
     </div>
   );
 }
