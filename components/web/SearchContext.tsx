@@ -16,7 +16,7 @@ const SearchContext = createContext<SearchContextType | undefined>(undefined);
 export function SearchProvider({ children }: { children: ReactNode }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTags, setActiveTags] = useState<string[]>([]);
-  const [sortOrder, setSortOrder] = useState("recent");
+  const [sortOrder, setSortOrder] = useState("new");
 
   return (
     <SearchContext.Provider 

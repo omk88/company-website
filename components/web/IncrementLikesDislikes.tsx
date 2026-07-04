@@ -10,7 +10,7 @@ import { revalidateFeaturedBlogs } from "@/app/actions/blog";
 import { Separator } from "../ui/separator";
 
 interface IncrementLikesDislikesProps {
-  postId: Id<"blogs">;
+    postId: Id<"blogs">;
 }
 
 type VoteState = "none" | "liked" | "disliked";
@@ -89,34 +89,30 @@ export function IncrementLikesDislikes({ postId }: IncrementLikesDislikesProps) 
                 variant="ghost" 
                 onClick={() => executeVoteChange("liked")} 
                 disabled={isPending}
-                className={`h-12 w-12 rounded-full transition-all ${
-                    userVote === "liked" 
-                        ? "text-emerald-500 bg-emerald-500/10 hover:bg-emerald-500/20 hover:text-emerald-600" 
-                        : "text-muted-foreground hover:text-foreground"
-                }`}
+                className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground"
             >
                 <ThumbsUp
-                    className="!h-5 !w-5 transition-transform active:scale-90"
+                    className={`!h-5 !w-5 transition-transform active:scale-90 ${
+                        userVote === "liked" ? "text-emerald-500" : ""
+                    }`}
                     fill={userVote === "liked" ? "currentColor" : "none"}
                 />
-                <h1>{ likes }</h1>
+                <h1 className={userVote === "liked" ? "text-emerald-500" : ""}>{ likes }</h1>
             </Button>
             
             <Button 
                 variant="ghost" 
                 onClick={() => executeVoteChange("disliked")} 
                 disabled={isPending}
-                className={`h-12 w-12 rounded-full transition-all ${
-                userVote === "disliked" 
-                    ? "text-destructive bg-destructive/10 hover:bg-destructive/20 hover:text-destructive-foreground" 
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
+                className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground"
             >
                 <ThumbsDown
-                    className="!h-5 !w-5 transition-transform active:scale-90"
+                    className={`!h-5 !w-5 transition-transform active:scale-90 ${
+                        userVote === "disliked" ? "text-destructive" : ""
+                    }`}
                     fill={userVote === "disliked" ? "currentColor" : "none"}
                 />
-                <h1>{ dislikes }</h1>
+                <h1 className={userVote === "disliked" ? "text-destructive" : ""}>{ dislikes }</h1>
             </Button>
 
             <Button 

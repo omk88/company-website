@@ -4,10 +4,13 @@ import { useLocalSearch } from "@/components/web/SearchContext";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ArrowUp, CalendarArrowUp, Flame, Swords } from "lucide-react";
 
 export function SidebarSort() {
   const { sortOrder, setSortOrder } = useLocalSearch();
@@ -22,10 +25,13 @@ export function SidebarSort() {
       </SelectTrigger>
       
       <SelectContent position="popper">
-        <SelectItem value="recent" className="text-xs cursor-pointer">Most Recent</SelectItem>
-        <SelectItem value="oldest" className="text-xs cursor-pointer">Least Recent</SelectItem>
-        <SelectItem value="title-az" className="text-xs cursor-pointer">Title (A-Z)</SelectItem>
-        <SelectItem value="title-za" className="text-xs cursor-pointer">Title (Z-A)</SelectItem>
+        <SelectGroup>
+          <SelectLabel>Sort</SelectLabel>
+          <SelectItem value="new" className="text-xs cursor-pointer p-2"><CalendarArrowUp />New</SelectItem>
+          <SelectItem value="hot" className="text-xs cursor-pointer p-2"><Flame />Hot</SelectItem>
+          <SelectItem value="top" className="text-xs cursor-pointer p-2"><ArrowUp />Top</SelectItem>
+          <SelectItem value="controversial" className="text-xs cursor-pointer p-2"><Swords />Controversial</SelectItem>
+        </SelectGroup>
       </SelectContent>
     </Select>
   );

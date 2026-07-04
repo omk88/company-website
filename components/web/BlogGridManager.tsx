@@ -36,9 +36,9 @@ export function BlogGridManager({ allPosts }: BlogGridManagerProps) {
     }
 
     return posts.sort((a, b) => {
-      if (sortOrder === "oldest") return a.createdAt - b.createdAt;
-      if (sortOrder === "title-az") return a.title.localeCompare(b.title);
-      if (sortOrder === "title-za") return b.title.localeCompare(a.title);
+      if (sortOrder === "new") return a.createdAt - b.createdAt;
+      if (sortOrder === "hot") return a.title.localeCompare(b.title);
+      if (sortOrder === "top") return b.title.localeCompare(a.title);
       return b.createdAt - a.createdAt;
     });
   }, [allPosts, searchTerm, activeTags, sortOrder]);
