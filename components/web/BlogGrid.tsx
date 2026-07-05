@@ -1,5 +1,3 @@
-"use client";
-
 import { BlogCard, BlogPostPreview } from "./BlogCard";
 
 interface BlogGridProps {
