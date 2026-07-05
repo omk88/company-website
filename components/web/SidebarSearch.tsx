@@ -3,9 +3,23 @@
 import { Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useLocalSearch } from "@/components/web/SearchContext";
+import { useState, useEffect } from "react";
 
 export function SidebarSearch() {
   const { searchTerm, setSearchTerm } = useLocalSearch();
+  const [localValue, setLocalValue] = useState(searchTerm);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchTerm(localValue);
+    }, 200);
+
+    return () => clearTimeout(timer);
+  }, [localValue, setSearchTerm]);
+
+  useEffect(() => {
+    setLocalValue(searchTerm);
+  }, [searchTerm]);
 
   return (
     <div className="relative w-full">
@@ -14,16 +28,16 @@ export function SidebarSearch() {
       <Input
         type="text"
         placeholder="Search insights..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
+        value={localValue}
+        onChange={(e) => setLocalValue(e.target.value)}
         className="pl-9 pr-9 h-9 text-xs bg-background border-border/50 rounded-md focus-visible:ring-1 focus-visible:ring-primary w-full"
       />
       
-      {searchTerm && (
+      {localValue && (
         <button 
-          onClick={() => setSearchTerm("")} 
+          onClick={() => setLocalValue("")} 
           type="button" 
-          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-0.5 rounded-sm hover:bg-muted"
+          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted"
         >
           <X className="h-3.5 w-3.5 stroke-[2]" />
         </button>

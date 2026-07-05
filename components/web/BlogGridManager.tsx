@@ -28,17 +28,25 @@ export function BlogGridManager({ initialServerPosts }: BlogGridManagerProps) {
     { initialNumItems: POSTS_PER_BATCH }
   );
 
-  const isFilteringOrSearching = searchTerm !== "" || activeTags.length > 0;
+  const lastValidPosts = useRef<BlogPostPreview[]>(initialServerPosts);
+  
+  const wasLastStateEmpty = useRef<boolean>(false);
+  
+  const isLoadingFirstPage = status === "LoadingFirstPage";
 
-  const displayPosts = (status === "LoadingFirstPage" && !isFilteringOrSearching)
-    ? initialServerPosts 
-    : (results as BlogPostPreview[]);
+  if (!isLoadingFirstPage && results !== undefined) {
+    lastValidPosts.current = results as BlogPostPreview[];
+    wasLastStateEmpty.current = results.length === 0;
+  }
+
+  const showEmptyState = isLoadingFirstPage ? wasLastStateEmpty.current : (results?.length === 0);
+  const displayPosts = isLoadingFirstPage ? lastValidPosts.current : (results as BlogPostPreview[]);
 
   const hasMore = status === "CanLoadMore";
-  const isLoading = status === "LoadingMore";
+  const isLoadingMore = status === "LoadingMore";
 
   useEffect(() => {
-    if (!hasMore || isLoading) return;
+    if (!hasMore || isLoadingMore) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -55,29 +63,27 @@ export function BlogGridManager({ initialServerPosts }: BlogGridManagerProps) {
     return () => {
       if (currentTarget) observer.unobserve(currentTarget);
     };
-  }, [hasMore, isLoading, loadMore]);
-
-  if (displayPosts.length === 0 && status === "Exhausted") {
-    return (
-      <div className="w-full py-20 flex flex-col items-center justify-center text-muted-foreground gap-3 text-center max-w-sm mx-auto px-4">
-        <Frown className="h-8 w-8 stroke-[1.2] text-muted-foreground/60" />
-        <div className="space-y-1">
-          <p className="text-sm font-semibold text-foreground">No matches found</p>
-          <p className="text-xs text-muted-foreground/80 leading-relaxed">
-            We couldn't find any articles matching your query. Try updating your filters.
-          </p>
-        </div>
-      </div>
-    );
-  }
+  }, [hasMore, isLoadingMore, loadMore]);
 
   return (
     <div className="w-full">
-      <BlogGrid initialPosts={displayPosts} />
+      {showEmptyState ? (
+        <div className="w-full py-20 flex flex-col items-center justify-center text-muted-foreground gap-3 text-center max-w-sm mx-auto px-4">
+          <Frown className="h-8 w-8 stroke-[1.2] text-muted-foreground/60" />
+          <div className="space-y-1">
+            <p className="text-sm font-semibold text-foreground">No matches found</p>
+            <p className="text-xs text-muted-foreground/80 leading-relaxed">
+              We couldn't find any articles matching your query. Try updating your filters.
+            </p>
+          </div>
+        </div>
+      ) : (
+        <BlogGrid initialPosts={displayPosts} />
+      )}
       
       <div ref={observerTarget} className="w-full min-h-[60px] flex justify-center items-center my-4 text-center">
-        {isLoading && (
-          <div className="text-sm font-mono text-muted-foreground animate-pulse py-2">
+        {isLoadingMore && (
+          <div className="text-sm font-mono text-muted-foreground py-2">
             Loading older insights...
           </div>
         )}
