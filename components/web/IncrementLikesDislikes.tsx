@@ -13,31 +13,30 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-
 interface IncrementLikesDislikesProps {
     postId: Id<"blogs">;
     storageId: string;
+    likes: number;
+    dislikes: number;
+    comments: number;
 }
 
 type VoteState = "none" | "liked" | "disliked";
 
-export function IncrementLikesDislikes({ postId, storageId }: IncrementLikesDislikesProps) {
+export function IncrementLikesDislikes({ postId, storageId, likes, dislikes, comments }: IncrementLikesDislikesProps) {
     const handleVoteMutation = useMutation(api.blogs.handleVote);
     const toggleFeaturedMutation = useMutation(api.blogs.toggleFeatured);
     const deleteBlog = useMutation(api.blogs.deletePost);
 
     const router = useRouter(); 
-
     const [isDeleting, setIsDeleting] = useState(false);
 
-    let initialViews = 0;
-    let initialLikes = 0;
-    let initialDislikes = 0;
+    const post = useQuery(api.blogs.getPostById, { postId });
+    const liveCommentCount = useQuery(api.comments.getCommentNumber, { postId });
 
-    const post = useQuery(api.blogs.getPostById, { postId: postId as Id<"blogs"> });
-    const commentCount = useQuery(api.comments.getCommentNumber, { postId: postId as Id<"blogs"> });
-
-    const { totalViews = initialViews, likes = initialLikes, dislikes = initialDislikes } = post ?? {};
+    const displayLikes = post?.likes ?? likes;
+    const displayDislikes = post?.dislikes ?? dislikes;
+    const displayComments = liveCommentCount ?? comments;
 
     const user = useQuery(api.auth.getCurrentUser);
     const userEmail = user?.email || "";
@@ -52,7 +51,6 @@ export function IncrementLikesDislikes({ postId, storageId }: IncrementLikesDisl
     
     useEffect(() => {
         const savedVote = localStorage.getItem(`vote_${postId}`) as VoteState;
-        
         if (savedVote) {
             setUserVote(savedVote);
         }
@@ -86,7 +84,6 @@ export function IncrementLikesDislikes({ postId, storageId }: IncrementLikesDisl
         startTransition(async () => {
             try {
                 await toggleFeaturedMutation({ postId });
-                
                 await revalidateFeaturedBlogs();
             } catch (error) {
                 console.error("Failed to toggle featured status:", error);
@@ -96,7 +93,7 @@ export function IncrementLikesDislikes({ postId, storageId }: IncrementLikesDisl
 
     const scrollToView = () => {
         document.getElementById("comments")?.scrollIntoView({ behavior: "smooth" });
-    }
+    };
 
     const handleDelete = async () => {
         const confirmed = window.confirm("Are you sure you want to delete this blog post? This action cannot be undone.");
@@ -106,7 +103,7 @@ export function IncrementLikesDislikes({ postId, storageId }: IncrementLikesDisl
             setIsDeleting(true);
             
             await deleteBlog({ 
-                id: postId as Id<"blogs">, 
+                id: postId, 
                 storageId: storageId 
             });
 
@@ -146,7 +143,7 @@ export function IncrementLikesDislikes({ postId, storageId }: IncrementLikesDisl
                     }`}
                     fill={userVote === "liked" ? "currentColor" : "none"}
                 />
-                <h1>{ likes }</h1>
+                <h1>{displayLikes}</h1>
             </Button>
             
             <Button 
@@ -161,17 +158,17 @@ export function IncrementLikesDislikes({ postId, storageId }: IncrementLikesDisl
                     }`}
                     fill={userVote === "disliked" ? "currentColor" : "none"}
                 />
-                <h1 className={userVote === "disliked" ? "text-destructive" : ""}>{ dislikes }</h1>
+                <h1 className={userVote === "disliked" ? "text-destructive" : ""}>{displayDislikes}</h1>
             </Button>
 
             <Button 
                 variant="ghost" 
                 disabled={isPending}
                 className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground disabled:opacity-100"
-                onClick={() => scrollToView()}
+                onClick={scrollToView}
             >
                 <MessageSquare className="!h-5 !w-5 transition-transform active:scale-90" />
-                <h1>{ commentCount }</h1>
+                <h1>{displayComments}</h1>
             </Button>
 
             <DropdownMenu>
