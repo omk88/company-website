@@ -4,7 +4,6 @@ import Link from "next/link";
 import { LiveMetrics } from "./LiveMetrics";
 import { BlogPostPreview } from "./BlogCard";
 
-// Extend your existing type to include the dynamic fields from the backend
 interface TrendingBlogItem extends BlogPostPreview {
     commentCount: number;
     recentViews: number;
@@ -40,7 +39,7 @@ export function TrendingBlogsClient({ initialTrendingBlogs }: TrendingBlogsClien
                                         views={blog.totalViews ?? 0} 
                                         likes={blog.likes ?? 0} 
                                         dislikes={blog.dislikes ?? 0} 
-                                        comments={blog.commentCount} 
+                                        comments={blog.commentCount ?? 0} 
                                     />
                                 </div>
                             </div>
