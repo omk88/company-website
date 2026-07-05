@@ -16,7 +16,12 @@ export function LeftSidebar() {
       </SidebarHeader>
       <Separator/>
       <SidebarContent>
-        <SidebarGroup />
+        <SidebarGroup className="!pt-0"/>
+          <div className="flex flex-col p-2 gap-2">
+            <SidebarSearch />
+            <SidebarSort />
+            <SidebarTopics />
+          </div>
         <SidebarGroup />
       </SidebarContent>
       <SidebarFooter />
