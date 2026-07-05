@@ -37,7 +37,6 @@ export function BlogCard({ post }: BlogCardProps) {
         href={`/insights/${post._id}`} 
         className="absolute inset-0 z-10"
         aria-label={`Read ${post.title}`}
-        scroll={false}
       />
 
       <div className="relative aspect-video md:aspect-auto w-full md:w-2/5 md:h-full overflow-hidden bg-muted border-b md:border-b-0 md:border-r border-border/50 shrink-0">
