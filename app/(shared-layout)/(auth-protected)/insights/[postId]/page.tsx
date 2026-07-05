@@ -44,7 +44,7 @@ export default async function postIdRoute({ params }: postIdRouteProps) {
     }
 
     return (
-        <SidebarProvider className="bg-white grid grid-cols-[10rem_1fr_18.75rem] w-full min-h-screen items-start">
+        <SidebarProvider className="bg-white grid w-full min-h-screen items-start">
             <LeftSidebarControls postId={postId} storageId={post.storageId} />
             
             <Suspense fallback={<MainContentSkeleton />}>
