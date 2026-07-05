@@ -185,6 +185,8 @@ export const getPosts = query({
 export const getPaginatedPosts = query({
   args: {
     paginationOpts: paginationOptsValidator,
+    searchTerm: v.optional(v.string()),
+    activeTags: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
     const result = await ctx.db
@@ -192,7 +194,36 @@ export const getPaginatedPosts = query({
       .order("desc")
       .paginate(args.paginationOpts);
 
-    const pageWithPreviews = result.page.map(({ content, ...previewFields }) => previewFields);
+    let filteredPage = result.page;
+
+    if (args.activeTags && args.activeTags.length > 0) {
+      const lowerTags = args.activeTags.map(t => t.toLowerCase());
+      filteredPage = filteredPage.filter(post => 
+        lowerTags.every(tag => post.tags?.some((t: string) => t.toLowerCase() === tag))
+      );
+    }
+
+    if (args.searchTerm) {
+      const search = args.searchTerm.toLowerCase().trim();
+      filteredPage = filteredPage.filter(post => 
+        post.title.toLowerCase().includes(search) || 
+        (post.subtitle && post.subtitle.toLowerCase().includes(search))
+      );
+    }
+
+    const pageWithPreviews = await Promise.all(
+      filteredPage.map(async ({ content, ...previewFields }) => {
+        const comments = await ctx.db
+          .query("comments")
+          .withIndex("by_postId", (q) => q.eq("postId", previewFields._id))
+          .collect();
+
+        return {
+          ...previewFields,
+          commentCount: comments.length,
+        };
+      })
+    );
 
     return {
       ...result,

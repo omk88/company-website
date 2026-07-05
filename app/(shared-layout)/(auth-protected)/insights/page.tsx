@@ -60,6 +60,7 @@ export default async function InsightsPage() {
             id="blog-grid-section" 
             className="w-full max-w-4xl mx-auto px-4 bg-white dark:bg-zinc-950 border-x border-t border-border/40"
           >
+            <CachedBlogGrid />
           </section>
 
         </div>

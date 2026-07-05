@@ -11,7 +11,7 @@ import { api } from "@/convex/_generated/api";
 const POSTS_PER_BATCH = 9;
 
 interface BlogGridManagerProps {
-  initialServerPosts: any[]; 
+  initialServerPosts: BlogPostPreview[]; 
 }
 
 export function BlogGridManager({ initialServerPosts }: BlogGridManagerProps) {
@@ -20,28 +20,18 @@ export function BlogGridManager({ initialServerPosts }: BlogGridManagerProps) {
 
   const { results, status, loadMore } = usePaginatedQuery(
     api.blogs.getPaginatedPosts,
-    {},
+    { searchTerm: searchTerm || undefined, activeTags: activeTags.length > 0 ? activeTags : undefined },
     { initialNumItems: POSTS_PER_BATCH }
   );
 
+  const isFilteringOrSearching = searchTerm !== "" || activeTags.length > 0;
+
+  const activeResults = (results.length === 0 && !isFilteringOrSearching) 
+    ? initialServerPosts 
+    : results;
+
   const displayPosts = useMemo(() => {
-    const activeResults = results.length === 0 ? initialServerPosts : results;
-
-    let posts = [...activeResults] as BlogPostPreview[];
-
-    if (activeTags.length > 0) {
-      posts = posts.filter(post => 
-        activeTags.every(tag => post.tags?.some((t: string) => t.toLowerCase() === tag.toLowerCase()))
-      );
-    }
-
-    if (searchTerm) {
-      const query = searchTerm.toLowerCase().trim();
-      posts = posts.filter(post => 
-        post.title.toLowerCase().includes(query) || 
-        (post.subtitle && post.subtitle.toLowerCase().includes(query))
-      );
-    }
+    const posts = [...activeResults] as BlogPostPreview[];
 
     return posts.sort((a, b) => {
       if (sortOrder === "new") return b.createdAt - a.createdAt;
@@ -49,7 +39,7 @@ export function BlogGridManager({ initialServerPosts }: BlogGridManagerProps) {
       if (sortOrder === "top") return b.title.localeCompare(a.title);
       return b.createdAt - a.createdAt;
     });
-  }, [results, initialServerPosts, searchTerm, activeTags, sortOrder]);
+  }, [activeResults, sortOrder]);
 
   const hasMore = status === "CanLoadMore";
   const isLoading = status === "LoadingMore";
@@ -63,7 +53,7 @@ export function BlogGridManager({ initialServerPosts }: BlogGridManagerProps) {
           loadMore(POSTS_PER_BATCH);
         }
       },
-      { root: null, threshold: 0.1, rootMargin: "100px" }
+      { root: null, threshold: 0.1, rootMargin: "150px" }
     );
 
     const currentTarget = observerTarget.current;
@@ -92,7 +82,7 @@ export function BlogGridManager({ initialServerPosts }: BlogGridManagerProps) {
     <div className="w-full">
       <BlogGrid initialPosts={displayPosts} />
       
-      <div ref={observerTarget} className="w-full h-4 clear-both flex justify-center items-center mb-2 text-center">
+      <div ref={observerTarget} className="w-full min-h-[50px] clear-both flex justify-center items-center mb-2 text-center">
         {(hasMore || isLoading) && (
           <div className="text-sm font-mono text-muted-foreground animate-pulse py-2">
             Loading older insights...
