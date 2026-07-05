@@ -34,7 +34,8 @@ export function MoreFromClient({ initialBlogs }: MoreFromClientProps) {
                                         views={blog.totalViews} 
                                         likes={blog.likes} 
                                         dislikes={blog.dislikes} 
-                                        comments={blog.commentCount} 
+                                        comments={blog.commentCount}
+                                        showDislikes={false} 
                                     />
                                 </div>
                             </div>
