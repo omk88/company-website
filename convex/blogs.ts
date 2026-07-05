@@ -22,7 +22,7 @@ export const createPost = mutation({
   handler: async (ctx, args) => {
     const generatedImageUrl = await ctx.storage.getUrl(args.storageId);
 
-    const newBlogId = await ctx.db.insert("blogs", {
+    return await ctx.db.insert("blogs", {
       title: args.title,
       subtitle: args.subtitle,
       content: args.content,
@@ -33,11 +33,10 @@ export const createPost = mutation({
       totalViews: 0,
       likes: 0,
       dislikes: 0,
+      commentCount: 0,
       featured: false,
       createdAt: Date.now(),
     });
-
-    return newBlogId;
   },
 });
 
@@ -45,16 +44,10 @@ export const toggleFeatured = mutation({
   args: { postId: v.id("blogs") },
   handler: async (ctx, args) => {
     const post = await ctx.db.get(args.postId);
-    if (!post) {
-      throw new Error("Post not found");
-    }
+    if (!post) throw new Error("Post not found");
 
     const currentFeatured = post.featured ?? false; 
-
-    await ctx.db.patch(args.postId, {
-      featured: !currentFeatured,
-    });
-
+    await ctx.db.patch(args.postId, { featured: !currentFeatured });
     return !currentFeatured;
   },
 });
@@ -104,9 +97,8 @@ export const handleVote = mutation({
     });
 
     return { success: true };
-
   }
-})
+});
 
 export const deletePost = mutation({
   args: {
@@ -118,12 +110,10 @@ export const deletePost = mutation({
       try {
         await ctx.storage.delete(args.storageId);
       } catch (error) {
-        console.error("Failed to delete associated image from storage:", error);
+        console.error("Failed to delete asset:", error);
       }
     }
-
     await ctx.db.delete(args.id);
-
     return { success: true };
   },
 });
@@ -140,11 +130,8 @@ export const updatePost = mutation({
   },
   handler: async (ctx, args) => {
     const { postId, ...fieldsToUpdate } = args;
-
     const currentPost = await ctx.db.get(postId);
-    if (!currentPost) {
-      throw new Error("Update targeted a blog post that no longer exists.");
-    }
+    if (!currentPost) throw new Error("Post no longer exists.");
 
     let finalImageUrl = currentPost.imageUrl;
 
@@ -156,7 +143,7 @@ export const updatePost = mutation({
         try {
           await ctx.storage.delete(currentPost.storageId);
         } catch (e) {
-          console.warn("Could not remove orphaned storage asset:", e);
+          console.warn("Could not remove old asset:", e);
         }
       }
     }
@@ -175,6 +162,7 @@ export const getPosts = query({
   handler: async (ctx) => {
     const posts = await ctx.db
       .query("blogs")
+      .withIndex("by_createdAt")
       .order("desc")
       .collect();
 
@@ -187,47 +175,50 @@ export const getPaginatedPosts = query({
     paginationOpts: paginationOptsValidator,
     searchTerm: v.optional(v.string()),
     activeTags: v.optional(v.array(v.string())),
+    sortOrder: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const result = await ctx.db
-      .query("blogs")
-      .order("desc")
-      .paginate(args.paginationOpts);
+    const search = args.searchTerm?.trim();
+    const tags = args.activeTags || [];
+    const sort = args.sortOrder || "new";
 
-    let filteredPage = result.page;
+    let paginatedResults;
 
-    if (args.activeTags && args.activeTags.length > 0) {
-      const lowerTags = args.activeTags.map(t => t.toLowerCase());
+    if (search) {
+      paginatedResults = await ctx.db
+        .query("blogs")
+        .withSearchIndex("search_title_subtitle", (q) => q.search("title", search))
+        .paginate(args.paginationOpts);
+    } else {
+      let baseQuery;
+      
+      if (sort === "hot") {
+        baseQuery = ctx.db.query("blogs").withIndex("by_likes");
+      } else if (sort === "top") {
+        baseQuery = ctx.db.query("blogs").withIndex("by_totalViews");
+      } else {
+        baseQuery = ctx.db.query("blogs").withIndex("by_createdAt");
+      }
+      
+      paginatedResults = await baseQuery.order("desc").paginate(args.paginationOpts);
+    }
+
+    let filteredPage = paginatedResults.page;
+    if (tags.length > 0) {
+      const lowerTags = tags.map(t => t.toLowerCase());
       filteredPage = filteredPage.filter(post => 
         lowerTags.every(tag => post.tags?.some((t: string) => t.toLowerCase() === tag))
       );
     }
 
-    if (args.searchTerm) {
-      const search = args.searchTerm.toLowerCase().trim();
-      filteredPage = filteredPage.filter(post => 
-        post.title.toLowerCase().includes(search) || 
-        (post.subtitle && post.subtitle.toLowerCase().includes(search))
-      );
-    }
-
-    const pageWithPreviews = await Promise.all(
-      filteredPage.map(async ({ content, ...previewFields }) => {
-        const comments = await ctx.db
-          .query("comments")
-          .withIndex("by_postId", (q) => q.eq("postId", previewFields._id))
-          .collect();
-
-        return {
-          ...previewFields,
-          commentCount: comments.length,
-        };
-      })
-    );
+    const pagePreviews = filteredPage.map(({ content, ...previewFields }) => ({
+      ...previewFields,
+      commentCount: previewFields.commentCount || 0, 
+    }));
 
     return {
-      ...result,
-      page: pageWithPreviews,
+      ...paginatedResults,
+      page: pagePreviews,
     };
   },
 });
@@ -241,19 +232,7 @@ export const getFeaturedPosts = query({
       .order("desc")
       .collect();
 
-    return await Promise.all(
-      posts.map(async ({ content, ...previewFields }) => {
-        const comments = await ctx.db
-          .query("comments")
-          .withIndex("by_postId", (q) => q.eq("postId", previewFields._id))
-          .collect();
-
-        return {
-          ...previewFields,
-          commentCount: comments.length,
-        };
-      })
-    );
+    return posts.map(({ content, ...previewFields }) => previewFields);
   },
 });
 
@@ -262,10 +241,7 @@ export const getFeaturedState = query({
   handler: async (ctx, args) => {
     const blog = await ctx.db.get(args.postId);
     if (!blog) return null;
-    
-    return {
-      isFeatured: blog.featured ?? false, 
-    };
+    return { isFeatured: blog.featured ?? false };
   },
 });
 
@@ -274,22 +250,13 @@ export const getPostsByAuthor = query({
   handler: async (ctx, args) => {
     const blogs = await ctx.db
       .query("blogs")
-      .filter((q) => q.eq(q.field("author"), args.authorName))
-      .take(9);
+      .withIndex("by_createdAt") 
+      .order("desc")
+      .collect();
 
-    return await Promise.all(
-      blogs.map(async (blog) => {
-        const comments = await ctx.db
-          .query("comments")
-          .withIndex("by_postId", (q) => q.eq("postId", blog._id))
-          .take(9);
+    const matched = blogs.filter(b => b.author.toLowerCase() === args.authorName.toLowerCase()).slice(0, 9);
 
-        return {
-          ...blog,
-          commentCount: comments.length,
-        };
-      })
-    );
+    return matched.map(({ content, ...previewFields }) => previewFields);
   },
 });
 
@@ -316,21 +283,12 @@ export const getTrendingPosts = query({
     const trendingBlogsRaw = await Promise.all(
       topTrendingIds.map(async (id) => {
         const blogId = id as Id<"blogs">;
-        
-        const [blog, comments] = await Promise.all([
-          ctx.db.get(blogId),
-          ctx.db
-            .query("comments")
-            .withIndex("by_postId", (q) => q.eq("postId", blogId))
-            .collect() 
-        ]);
-
+        const blog = await ctx.db.get(blogId);
         if (!blog) return null; 
 
         return {
           ...blog,
           recentViews: viewCounts[id],
-          commentCount: comments.length, 
         };
       })
     );
@@ -340,21 +298,16 @@ export const getTrendingPosts = query({
 });
 
 export const getPostById = query({
-    args: {
-        postId: v.id("blogs")
-    },
-    handler: async (ctx, args) => {
-        const post = await ctx.db.get(args.postId);
+  args: { postId: v.id("blogs") },
+  handler: async (ctx, args) => {
+    const post = await ctx.db.get(args.postId);
+    if (!post) return null;
 
-        if(!post) {
-            return null;
-        }
+    const resolvedImageUrl = post.storageId !== undefined ? await ctx.storage.getUrl(post.storageId) : null;
 
-        const resolvedImageUrl = post?.storageId !== undefined ? await ctx.storage.getUrl(post.storageId) : null;
-
-        return {
-            ...post,
-            imageUrl: resolvedImageUrl
-        };
-    }
+    return {
+      ...post,
+      imageUrl: resolvedImageUrl
+    };
+  }
 });

@@ -4,11 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import Link from "next/link";
 import { LiveMetrics } from "./LiveMetrics";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 
 export interface BlogPostPreview {
   _id: string;
@@ -19,7 +15,7 @@ export interface BlogPostPreview {
   tags: string[]; 
   createdAt: number;
   totalViews: number;  
-  likes: number;        
+  likes: number;       
   dislikes: number;     
   commentCount: number; 
 }
@@ -37,16 +33,22 @@ export function BlogCard({ post }: BlogCardProps) {
   });
 
   return (
-    <Link 
-      href={`/insights/${post._id}`} 
-      className="group flex flex-col md:flex-row gap-0 cursor-pointer w-full text-inherit no-underline border border-border/50 rounded-none bg-card/70 backdrop-blur-md overflow-hidden"
-    >
+    <div className="group relative flex flex-col md:flex-row gap-0 border border-border/50 rounded-none bg-card/70 backdrop-blur-md overflow-hidden transition-all duration-200 hover:border-border-strong">
+      
+      {/* 1. Ghost Link covering everything except the interactive footer */}
+      <Link 
+        href={`/insights/${post._id}`} 
+        className="absolute inset-0 z-10"
+        aria-label={`Read ${post.title}`}
+      />
+
+      {/* Visual Content */}
       <div className="relative aspect-video md:aspect-auto w-full md:w-2/5 min-h-[220px] overflow-hidden bg-muted border-b md:border-b-0 md:border-r border-border/50 shrink-0">
         <Image
           src={post.imageUrl}
           alt={post.title}
           fill
-          className="object-cover"
+          className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
           sizes="(max-width: 768px) 100vw, 40vw"
         />
       </div>
@@ -61,21 +63,16 @@ export function BlogCard({ post }: BlogCardProps) {
             <h3 className="text-xl md:text-2xl font-bold tracking-tight line-clamp-2 text-foreground transition-colors duration-200 group-hover:text-blue-600 uppercase break-words">
               {post.title}
             </h3>
-            
             <p className="text-muted-foreground line-clamp-2 md:line-clamp-3 leading-relaxed text-sm break-words">
               {post.subtitle}
             </p>
           </div>
         </div>
 
-        <div 
-          onMouseEnter={(e) => e.stopPropagation()}
-          onMouseLeave={(e) => e.stopPropagation()}
-          onClick={(e) => e.preventDefault()}
-          className="mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-border/30 cursor-default"
-        >
-          
-          <div className="shrink-0">
+        {/* 2. Purely Interactive Layer raised above the ghost link using z-20 */}
+        <div className="relative z-20 mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-border/30">
+          <div className="shrink-0 -ml-6"> 
+            {/* Adjusted margin because LiveMetrics has its own inner horizontal padding */}
             <LiveMetrics 
               views={post.totalViews} 
               likes={post.likes} 
@@ -104,14 +101,9 @@ export function BlogCard({ post }: BlogCardProps) {
                       </Badge>
                     </HoverCardTrigger>
                     
-                    <HoverCardContent 
-                      side="top" 
-                      align="end" 
-                    >
+                    <HoverCardContent side="top" align="end">
                       <div className="space-y-2">
-                        <h4 className="text-[12px] text-muted-foreground">
-                          All Topics
-                        </h4>
+                        <h4 className="text-[12px] text-muted-foreground">All Topics</h4>
                         <div className="flex flex-wrap gap-1.5 max-h-[120px] overflow-y-auto pt-0.5">
                           {post.tags.map((tag) => (
                             <Badge key={tag} variant="secondary" className="text-[11px] px-2 py-0">
@@ -128,9 +120,9 @@ export function BlogCard({ post }: BlogCardProps) {
               <Badge variant="outline">General</Badge>
             )}
           </div>
-
         </div>
+
       </div>
-    </Link>
+    </div>
   );
 }

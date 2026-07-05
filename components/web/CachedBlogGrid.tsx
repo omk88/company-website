@@ -9,7 +9,8 @@ export async function CachedBlogGrid() {
     cacheLife("days"); 
 
     const initialData = await fetchQuery(api.blogs.getPaginatedPosts, {
-      paginationOpts: { numItems: 9, cursor: null }
+        paginationOpts: { numItems: 9, cursor: null },
+        sortOrder: "new"
     }) ?? { page: [], isDone: false, continueCursor: "" };
 
     return <BlogGridManager initialServerPosts={initialData.page} />;

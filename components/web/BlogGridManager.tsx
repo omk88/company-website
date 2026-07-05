@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useMemo } from "react";
+import { useEffect, useRef } from "react";
 import { BlogGrid } from "./BlogGrid";
 import { BlogPostPreview } from "./BlogCard";
 import { Frown } from "lucide-react";
@@ -20,26 +20,19 @@ export function BlogGridManager({ initialServerPosts }: BlogGridManagerProps) {
 
   const { results, status, loadMore } = usePaginatedQuery(
     api.blogs.getPaginatedPosts,
-    { searchTerm: searchTerm || undefined, activeTags: activeTags.length > 0 ? activeTags : undefined },
+    { 
+      searchTerm: searchTerm || undefined, 
+      activeTags: activeTags.length > 0 ? activeTags : undefined,
+      sortOrder: sortOrder
+    },
     { initialNumItems: POSTS_PER_BATCH }
   );
 
   const isFilteringOrSearching = searchTerm !== "" || activeTags.length > 0;
 
-  const activeResults = (results.length === 0 && !isFilteringOrSearching) 
+  const displayPosts = (status === "LoadingFirstPage" && !isFilteringOrSearching)
     ? initialServerPosts 
-    : results;
-
-  const displayPosts = useMemo(() => {
-    const posts = [...activeResults] as BlogPostPreview[];
-
-    return posts.sort((a, b) => {
-      if (sortOrder === "new") return b.createdAt - a.createdAt;
-      if (sortOrder === "hot") return a.title.localeCompare(b.title);
-      if (sortOrder === "top") return b.title.localeCompare(a.title);
-      return b.createdAt - a.createdAt;
-    });
-  }, [activeResults, sortOrder]);
+    : (results as BlogPostPreview[]);
 
   const hasMore = status === "CanLoadMore";
   const isLoading = status === "LoadingMore";
@@ -53,7 +46,7 @@ export function BlogGridManager({ initialServerPosts }: BlogGridManagerProps) {
           loadMore(POSTS_PER_BATCH);
         }
       },
-      { root: null, threshold: 0.1, rootMargin: "150px" }
+      { root: null, threshold: 0.1, rootMargin: "200px" } 
     );
 
     const currentTarget = observerTarget.current;
@@ -71,7 +64,7 @@ export function BlogGridManager({ initialServerPosts }: BlogGridManagerProps) {
         <div className="space-y-1">
           <p className="text-sm font-semibold text-foreground">No matches found</p>
           <p className="text-xs text-muted-foreground/80 leading-relaxed">
-            We couldn't find any articles matching your query. Try updating your filters in the sidebar.
+            We couldn't find any articles matching your query. Try updating your filters.
           </p>
         </div>
       </div>
@@ -82,8 +75,8 @@ export function BlogGridManager({ initialServerPosts }: BlogGridManagerProps) {
     <div className="w-full">
       <BlogGrid initialPosts={displayPosts} />
       
-      <div ref={observerTarget} className="w-full min-h-[50px] clear-both flex justify-center items-center mb-2 text-center">
-        {(hasMore || isLoading) && (
+      <div ref={observerTarget} className="w-full min-h-[60px] flex justify-center items-center my-4 text-center">
+        {isLoading && (
           <div className="text-sm font-mono text-muted-foreground animate-pulse py-2">
             Loading older insights...
           </div>
