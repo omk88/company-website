@@ -84,18 +84,22 @@ async function PostContent({
             
             <div className="px-1 sm:px-6 md:px-2">
                 <div className="flex flex-col">
-                    <h1 className="text-4xl font-bold tracking-tight text-neutral-950">{post.title}</h1>
+                    <h1 className="uppercase text-4xl font-bold tracking-tight text-neutral-950 dark:text-neutral-50">
+                        {post.title}
+                    </h1>
                     <div className="flex flex-col gap-6">
                         <p className="text-lg text-muted-foreground">
                             Posted by {post.author} on {new Date(post._creationTime).toLocaleDateString("en-US")}
                         </p>
-                        <p className="text-lg text-neutral-600 font-medium">{post.subtitle}</p>
+                        <p className="text-lg text-neutral-600 dark:text-neutral-400 font-medium">
+                            {post.subtitle}
+                        </p>
                     </div>
                 </div>
 
                 <Separator className="my-8" />
 
-                <div className="prose prose-neutral max-w-none text-lg leading-relaxed text-neutral-800">
+                <div className="prose prose-neutral dark:prose-invert max-w-none text-lg leading-relaxed text-neutral-800 dark:text-neutral-200">
                     <ReactMarkdown>{post.content}</ReactMarkdown>
                 </div>
 
