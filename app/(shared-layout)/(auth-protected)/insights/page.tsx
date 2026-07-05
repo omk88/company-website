@@ -25,12 +25,18 @@ export default async function InsightsPage() {
         <aside className="sticky top-16 h-[calc(100vh-4rem)] z-30">
           <LeftSidebar />
         </aside>
-
         <div className="w-full space-y-8 flex flex-col">
           
           <section className="w-full max-w-3xl mx-auto pt-4 pb-4 flex flex-col items-center justify-start">
             <div className="flex flex-col items-center w-full justify-start gap-4 md:gap-6">
               <AddBlogButton />
+              <div className="w-full h-30 max-w-md lg:max-w-[460px] flex items-center justify-center relative overflow-hidden shrink-0 transform-gpu">
+                <GridCube 
+                  models={INSIGHTS_MODELS} 
+                  storageKey="insights_cross_path" 
+                  glitchEnabled={false} 
+                />
+              </div>
 
               <div className="w-full flex flex-col items-center gap-4 -mt-2 md:-mt-4">
                 <div className="text-center space-y-1.5 max-w-xl shrink-0">
