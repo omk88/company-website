@@ -44,12 +44,14 @@ export default async function postIdRoute({ params }: postIdRouteProps) {
     }
 
     return (
-        <SidebarProvider className="bg-white grid w-full min-h-screen items-start">
+        <SidebarProvider className="bg-white w-full min-h-screen relative block">
             <LeftSidebarControls postId={postId} storageId={post.storageId} />
             
-            <Suspense fallback={<MainContentSkeleton />}>
-                <PostContent postPromise={postPromise} preloadedCommentsPromise={preloadedCommentsPromise} />
-            </Suspense>
+            <div className="w-full pl-40 pr-75">
+                <Suspense fallback={<MainContentSkeleton />}>
+                    <PostContent postPromise={postPromise} preloadedCommentsPromise={preloadedCommentsPromise} />
+                </Suspense>
+            </div>
 
             <RightSidebarArticles authorName={post.author}  />
         </SidebarProvider>
