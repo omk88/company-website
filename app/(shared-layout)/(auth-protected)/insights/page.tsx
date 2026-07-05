@@ -23,7 +23,7 @@ export default async function InsightsPage() {
           <LeftSidebar />
         </aside>
 
-        <div className="w-full space-y-8 flex flex-col">
+        <div className="w-full flex flex-col">
           
           <section className="w-full pt-4 pb-4">
             <div className="w-full md:px-[var(--sidebar-width)]">
@@ -58,10 +58,9 @@ export default async function InsightsPage() {
 
           <section 
             id="blog-grid-section" 
-            className="w-full bg-white dark:bg-zinc-950"
-          >
+            className="w-full bg-white dark:bg-zinc-950 border-t border-border/50">
             <div className="w-full md:px-[var(--sidebar-width)]">
-              <div className="w-full max-w-5xl mx-auto px-4 py-6">
+              <div className="w-full max-w-5xl mx-auto px-4 pb-4">
                 <CachedBlogGrid />
               </div>
             </div>

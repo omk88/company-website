@@ -68,11 +68,12 @@ export function FeaturedBlogsClient({ initialFeaturedBlogs }: FeaturedBlogsClien
                 <div className="pt-3 px-3 pb-2">
                     <div className="text-xs font-mono uppercase tracking-wider text-muted-foreground flex justify-between">
                         <span>{currentPost.author}</span>
+                        <span>•</span>
                         <span>{formattedDate}</span>
                     </div>
 
                     <div className="mt-2 h-[3.25rem] flex flex-col justify-start overflow-hidden">
-                        <h3 className="break-words text-lg font-bold tracking-tight text-foreground transition-colors duration-200 group-hover/content:text-blue-600 leading-snug line-clamp-2">
+                        <h3 className="uppercase break-words text-lg font-bold tracking-tight text-foreground transition-colors duration-200 group-hover/content:text-blue-600 leading-snug line-clamp-2">
                             {currentPost.title}
                         </h3>
                     </div>

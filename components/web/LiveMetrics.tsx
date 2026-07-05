@@ -5,6 +5,7 @@ interface LiveMetricsProps {
   likes: number;
   dislikes: number;
   comments: number;
+  showDislikes: boolean;
 }
 
 const compactFormatter = new Intl.NumberFormat("en", {
@@ -13,7 +14,7 @@ const compactFormatter = new Intl.NumberFormat("en", {
   maximumFractionDigits: 1,
 });
 
-export function LiveMetrics({ views, likes, dislikes, comments }: LiveMetricsProps) {
+export function LiveMetrics({ views, likes, dislikes, comments, showDislikes }: LiveMetricsProps) {
   return (
     <div className="flex items-center gap-4 px-6 text-sm text-muted-foreground font-mono tracking-tight select-none">
       <div className="flex items-center gap-1.5 min-w-[3.5rem]">
@@ -24,10 +25,12 @@ export function LiveMetrics({ views, likes, dislikes, comments }: LiveMetricsPro
         <ThumbsUp className="w-4 h-4 stroke-[2.3] shrink-0" />
         <span>{compactFormatter.format(likes)}</span>
       </div>
-      <div className="flex items-center gap-1.5 min-w-[3rem]">
-        <ThumbsDown className="w-4 h-4 stroke-[2.3] shrink-0" />
-        <span>{compactFormatter.format(dislikes)}</span>
-      </div>
+      {showDislikes && (
+        <div className="flex items-center gap-1.5 min-w-[3rem]">
+          <ThumbsDown className="w-4 h-4 stroke-[2.3] shrink-0" />
+          <span>{compactFormatter.format(dislikes)}</span>
+        </div>
+      )}
       <div className="flex items-center gap-1.5 min-w-[3rem]">
         <MessageSquare className="w-4 h-4 stroke-[2.3] shrink-0" />
         <span>{compactFormatter.format(comments)}</span>

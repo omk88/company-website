@@ -20,7 +20,9 @@ export function LeftSidebarControls({ postId, storageId }: ViewTrackerProps) {
             Back to blog
         </Link>
       </SidebarHeader>
-      <Separator/>
+      <div className="w-1/2 mx-auto">
+        <Separator />
+      </div>
       <SidebarContent>
         <IncrementLikesDislikes postId={postId} storageId={storageId} />
         <SidebarGroup />

@@ -56,10 +56,10 @@ export function BlogCard({ post }: BlogCardProps) {
           </div>
 
           <div className="space-y-1.5">
-            <h3 className="text-xl font-bold tracking-tight line-clamp-1 md:line-clamp-2 text-foreground transition-colors duration-200 group-hover:text-blue-600 uppercase break-words">
+            <h3 className="text-2xl font-bold tracking-tight line-clamp-1 md:line-clamp-2 text-foreground transition-colors duration-200 group-hover:text-blue-600 uppercase break-words">
               {post.title}
             </h3>
-            <p className="text-muted-foreground line-clamp-2 md:line-clamp-2 leading-relaxed text-sm break-words">
+            <p className="text-muted-foreground line-clamp-3 md:line-clamp-3 leading-relaxed text-sm break-words">
               {post.subtitle}
             </p>
           </div>
@@ -73,6 +73,7 @@ export function BlogCard({ post }: BlogCardProps) {
               likes={post.likes} 
               dislikes={post.dislikes} 
               comments={post.commentCount} 
+              showDislikes={true}
             />
           </div>
           

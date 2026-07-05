@@ -53,7 +53,11 @@ export function BlogGridManager({ initialServerPosts }: BlogGridManagerProps) {
           loadMore(POSTS_PER_BATCH);
         }
       },
-      { root: null, threshold: 0.1, rootMargin: "200px" } 
+      { 
+        root: null, 
+        threshold: 0, 
+        rootMargin: "0px 0px 400px 0px" 
+      } 
     );
 
     observer.observe(currentTarget);
@@ -79,13 +83,13 @@ export function BlogGridManager({ initialServerPosts }: BlogGridManagerProps) {
         <BlogGrid initialPosts={displayPosts} />
       )}
       
-      <div ref={observerTarget} className="w-full min-h-[60px] flex justify-center items-center my-4 text-center">
-        {status === "LoadingMore" && (
-          <div className="text-sm font-mono text-muted-foreground py-2">
-            Loading older insights...
-          </div>
-        )}
-      </div>
+      <div ref={observerTarget} className="w-full h-0 pointer-events-none" aria-hidden="true" />
+
+      {status === "LoadingMore" && (
+        <div className="w-full text-center text-sm font-mono text-muted-foreground py-2">
+          Loading older insights...
+        </div>
+      )}
     </div>
   );
 }

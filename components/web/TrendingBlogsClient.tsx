@@ -40,6 +40,7 @@ export function TrendingBlogsClient({ initialTrendingBlogs }: TrendingBlogsClien
                                         likes={blog.likes ?? 0} 
                                         dislikes={blog.dislikes ?? 0} 
                                         comments={blog.commentCount ?? 0} 
+                                        showDislikes={false}
                                     />
                                 </div>
                             </div>

@@ -140,18 +140,21 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <div id="faq-section" className="w-full max-w-7xl mx-auto px-6 pt-8 pb-24">
-        <div className="mb-8 md:mb-6 flex items-center justify-center md:justify-start gap-2.5 text-foreground">
-          <CircleHelp className="w-5 h-5 md:w-6 md:h-6 stroke-[2.3] shrink-0" />
-          <h2 className="font-bold text-xl md:text-2xl tracking-tight">
-            Frequently Asked Questions
-          </h2>
+      <div id="faq-section" className="w-full bg-white dark:bg-zinc-950 border-t border-border/50">
+        <div className="max-w-7xl mx-auto px-6 pt-16 pb-24">
+          <div className="mb-8 md:mb-6 flex items-center justify-center md:justify-start gap-2.5 text-foreground">
+            <CircleHelp className="w-5 h-5 md:w-6 md:h-6 stroke-[2.3] shrink-0" />
+            <h2 className="font-bold text-xl md:text-2xl tracking-tight">
+              Frequently Asked Questions
+            </h2>
+          </div>
+          
+          <FAQSection 
+            onMessageClick={() => setIsSheetOpen(true)} 
+            onChatbotClick={() => setIsChatbotOpen(true)} 
+          />
+
         </div>
-        
-        <FAQSection 
-          onMessageClick={() => setIsSheetOpen(true)} 
-          onChatbotClick={() => setIsChatbotOpen(true)} 
-        />
       </div>
 
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>

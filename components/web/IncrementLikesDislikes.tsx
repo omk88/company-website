@@ -201,7 +201,9 @@ export function IncrementLikesDislikes({ postId, storageId }: IncrementLikesDisl
 
             {isCompanyUser && (
                 <>
-                    <Separator />
+                    <div className="w-1/2 mx-auto">
+                        <Separator />
+                    </div>
 
                     <Button 
                         variant="ghost" 
