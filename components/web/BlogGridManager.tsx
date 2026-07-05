@@ -29,41 +29,39 @@ export function BlogGridManager({ initialServerPosts }: BlogGridManagerProps) {
   );
 
   const lastValidPosts = useRef<BlogPostPreview[]>(initialServerPosts);
-  
   const wasLastStateEmpty = useRef<boolean>(false);
   
   const isLoadingFirstPage = status === "LoadingFirstPage";
 
-  if (!isLoadingFirstPage && results !== undefined) {
-    lastValidPosts.current = results as BlogPostPreview[];
-    wasLastStateEmpty.current = results.length === 0;
-  }
+  useEffect(() => {
+    if (status !== "LoadingFirstPage" && results !== undefined) {
+      lastValidPosts.current = results as BlogPostPreview[];
+      wasLastStateEmpty.current = results.length === 0;
+    }
+  }, [results, status]);
 
   const showEmptyState = isLoadingFirstPage ? wasLastStateEmpty.current : (results?.length === 0);
   const displayPosts = isLoadingFirstPage ? lastValidPosts.current : (results as BlogPostPreview[]);
 
-  const hasMore = status === "CanLoadMore";
-  const isLoadingMore = status === "LoadingMore";
-
   useEffect(() => {
-    if (!hasMore || isLoadingMore) return;
+    const currentTarget = observerTarget.current;
+    if (!currentTarget) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) {
+        if (entries[0].isIntersecting && status === "CanLoadMore") {
           loadMore(POSTS_PER_BATCH);
         }
       },
       { root: null, threshold: 0.1, rootMargin: "200px" } 
     );
 
-    const currentTarget = observerTarget.current;
-    if (currentTarget) observer.observe(currentTarget);
-
+    observer.observe(currentTarget);
+    
     return () => {
-      if (currentTarget) observer.unobserve(currentTarget);
+      observer.unobserve(currentTarget);
     };
-  }, [hasMore, isLoadingMore, loadMore]);
+  }, [status, loadMore]); 
 
   return (
     <div className="w-full">
@@ -82,7 +80,7 @@ export function BlogGridManager({ initialServerPosts }: BlogGridManagerProps) {
       )}
       
       <div ref={observerTarget} className="w-full min-h-[60px] flex justify-center items-center my-4 text-center">
-        {isLoadingMore && (
+        {status === "LoadingMore" && (
           <div className="text-sm font-mono text-muted-foreground py-2">
             Loading older insights...
           </div>
