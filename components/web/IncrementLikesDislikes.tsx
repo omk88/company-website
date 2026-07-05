@@ -12,6 +12,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { FaXTwitter } from "react-icons/fa6";
+import { RxLinkedinLogo } from "react-icons/rx";
+import { FaFacebook } from "react-icons/fa";
 
 interface IncrementLikesDislikesProps {
     postId: Id<"blogs">;
@@ -185,14 +188,52 @@ export function IncrementLikesDislikes({ postId, storageId, likes, dislikes, com
                     </Button>
                 </DropdownMenuTrigger>
 
-                <DropdownMenuContent>
+                <DropdownMenuContent className="w-48">
                     <DropdownMenuLabel>Share</DropdownMenuLabel>
-                    <DropdownMenuItem className="font-bold">
-                        <Copy className="h-4 w-4" strokeWidth={3} />Copy link
+                    
+                    <DropdownMenuItem 
+                        className="font-bold cursor-pointer flex items-center gap-2 whitespace-nowrap"
+                        onClick={() => {
+                            navigator.clipboard.writeText(window.location.href);
+                            toast.success("Link copied to clipboard!");
+                        }}
+                    >
+                        <Copy className="h-4 w-4 shrink-0" strokeWidth={3} />
+                        <span>Copy link</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem>X</DropdownMenuItem>
-                    <DropdownMenuItem>LinkedIn</DropdownMenuItem>
-                    <DropdownMenuItem>Facebook</DropdownMenuItem>
+
+                    <DropdownMenuItem 
+                        className="cursor-pointer flex items-center gap-2 whitespace-nowrap"
+                        onClick={() => {
+                            const shareUrl = `https://x.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent("Check out this article!")}`;
+                            window.open(shareUrl, "_blank", "noopener,noreferrer");
+                        }}
+                    >
+                        <FaXTwitter className="h-4 w-4 shrink-0" />
+                        <span>X (Twitter)</span>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem 
+                        className="cursor-pointer flex items-center gap-2 whitespace-nowrap"
+                        onClick={() => {
+                            const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`;
+                            window.open(shareUrl, "_blank", "noopener,noreferrer");
+                        }}
+                    >
+                        <RxLinkedinLogo className="h-4 w-4 shrink-0" />
+                        <span>LinkedIn</span>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem 
+                        className="cursor-pointer flex items-center gap-2 whitespace-nowrap"
+                        onClick={() => {
+                            const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`;
+                            window.open(shareUrl, "_blank", "noopener,noreferrer");
+                        }}
+                    >
+                        <FaFacebook className="h-4 w-4 shrink-0" />
+                        <span>Facebook</span>
+                    </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
 
