@@ -20,12 +20,12 @@ export function TrendingBlogsClient({ initialTrendingBlogs }: TrendingBlogsClien
 
     return (
         <div className="w-full flex flex-col">
-            <ul className="list-none w-full m-0 p-0">
+            <ul className="list-none w-full m-0 p-0 space-y-3">
                 {initialTrendingBlogs.map((blog) => (
                     <li key={blog._id} className="w-full block">
                         <Link 
                             href={`/insights/${blog._id}`} 
-                            className="group/trending block w-full text-inherit no-underline cursor-pointer p-2 rounded transition-all duration-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 bg-transparent"
+                            className="group/trending block w-full text-inherit no-underline cursor-pointer p-3 rounded-sm bg-muted transition-all duration-200 hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50"
                         >
                             <div className="w-full flex flex-col gap-1">
                                 <div className="overflow-hidden">
@@ -34,7 +34,7 @@ export function TrendingBlogsClient({ initialTrendingBlogs }: TrendingBlogsClien
                                     </h3>
                                 </div>
                                 
-                                <div className="-ml-6 scale-90 origin-left opacity-80 group-hover/trending:opacity-100 transition-opacity duration-200 transform-gpu will-change-opacity">
+                                <div className="-ml-5 w-[110%] scale-90 origin-left opacity-80 group-hover/trending:opacity-100 transition-opacity duration-200 transform-gpu will-change-opacity">
                                     <LiveMetrics 
                                         views={blog.totalViews ?? 0} 
                                         likes={blog.likes ?? 0} 

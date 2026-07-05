@@ -44,30 +44,28 @@ export function FeaturedBlogsClient({ initialFeaturedBlogs }: FeaturedBlogsClien
     });
 
     return (
-        <div className="flex flex-col gap-0 w-full text-inherit overflow-hidden">
+        <div className="flex flex-col gap-0 w-full bg-muted rounded-sm overflow-hidden">
             <Link 
                 href={`/insights/${currentPost._id}`}
                 className="group/content flex flex-col w-full text-inherit no-underline cursor-pointer"
             >
-                <div className="w-full">
-                    <div className="relative aspect-video w-full overflow-hidden bg-muted border border-border/50 shrink-0">
-                        {initialFeaturedBlogs.map((post, index) => (
-                            <Image
-                                key={post._id}
-                                src={post.imageUrl}
-                                alt={post.title}
-                                fill
-                                className={`object-cover ${
-                                    index === currentIndex ? "block" : "hidden"
-                                }`}
-                                sizes="(max-width: 1200px) 100vw, 1200px"
-                                priority={index === 0} 
-                            />
-                        ))}
-                    </div>
+                <div className="relative aspect-video w-full overflow-hidden shrink-0">
+                    {initialFeaturedBlogs.map((post, index) => (
+                        <Image
+                            key={post._id}
+                            src={post.imageUrl}
+                            alt={post.title}
+                            fill
+                            className={`object-cover ${
+                                index === currentIndex ? "block" : "hidden"
+                            }`}
+                            sizes="(max-width: 1200px) 100vw, 1200px"
+                            priority={index === 0} 
+                        />
+                    ))}
                 </div>
                 
-                <div className="pt-2 px-0.5">
+                <div className="pt-3 px-3 pb-2">
                     <div className="text-xs font-mono uppercase tracking-wider text-muted-foreground flex justify-between">
                         <span>{currentPost.author}</span>
                         <span>{formattedDate}</span>
@@ -81,7 +79,7 @@ export function FeaturedBlogsClient({ initialFeaturedBlogs }: FeaturedBlogsClien
                 </div>
             </Link>
 
-            <div className="flex flex-row justify-center items-center gap-2 border-border/40">
+            <div className="flex flex-row justify-center items-center gap-2 border-border/40 px-3 pb-3">
                 <Button variant="ghost" size="icon" onClick={handlePrev}>
                     <ArrowLeft className="h-4 w-4" />
                 </Button>
