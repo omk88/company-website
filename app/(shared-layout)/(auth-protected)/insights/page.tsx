@@ -1,7 +1,5 @@
 import { AddBlogButton } from "@/components/web/AddBlogButton";
 import { CachedBlogGrid } from "@/components/web/CachedBlogGrid";
-import { SkeletonLoadingUi } from "@/components/web/SkeletonLoadingUI";
-import { Suspense } from "react";
 import { Metadata } from "next";
 import GridCube from "@/components/3d/GridCube";
 import { Eye } from "lucide-react";
