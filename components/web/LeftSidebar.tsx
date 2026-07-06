@@ -3,6 +3,7 @@ import { Sidebar, SidebarContent, SidebarGroup, SidebarFooter, SidebarGroupLabel
 import { SidebarSearch } from "./SidebarSearch";
 import { SidebarSort } from "./SidebarSort";
 import { SidebarTopics } from "./SidebarTopics";
+import { AddBlogButton } from "./AddBlogButton";
 
 export function LeftSidebar() {
   return (
@@ -24,6 +25,7 @@ export function LeftSidebar() {
             <SidebarSort />
             <SidebarTopics />
           </div>
+          <AddBlogButton />
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="hidden" />

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Plus, LayoutDashboard, FileText, Settings } from "lucide-react";
+import { Plus, LayoutDashboard, FileText, Settings, Hammer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -24,19 +24,18 @@ export function AddBlogButton() {
     if (!isCompanyUser) return null;
 
     return (
-        <div className="fixed bottom-6 left-6 z-50 font-sans">
+        <div className="w-full pt-2">
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button 
-                        size="icon" 
-                        className="h-12 w-12 rounded-full shadow-lg cursor-pointer bg-foreground text-background hover:bg-foreground/90 transition-all duration-200 active:scale-95"
-                    >
-                        <Plus className="h-6 w-6 transition-transform duration-200 group-data-[state=open]:rotate-45" />
-                        <span className="sr-only">Open Admin Menu</span>
-                    </Button>
+                    <div className="bg-muted rounded-sm p-2 w-full flex items-center justify-center cursor-pointer">
+                        <Button className="flex items-center gap-2">
+                            <Hammer className="h-4 w-4 shrink-0" />
+                            <span>Admin controls</span>
+                        </Button>
+                    </div>
                 </DropdownMenuTrigger>
                 
-                <DropdownMenuContent side="top" align="end" className="w-56 mb-2">
+                <DropdownMenuContent side="bottom" align="center" className="w-56 mt-2">
                     <DropdownMenuLabel>Admin Controls</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     

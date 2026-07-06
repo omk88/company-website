@@ -28,7 +28,6 @@ export default async function InsightsPage() {
           <section className="w-full pt-4 pb-4">
             <div className="w-full md:px-[var(--sidebar-width)]">
               <div className="w-full max-w-xl mx-auto px-4 flex flex-col items-center justify-start gap-4 md:gap-6">
-                <AddBlogButton />
                 <div className="w-full h-30 max-w-md lg:max-w-[460px] flex items-center justify-center relative overflow-hidden shrink-0 transform-gpu">
                   <GridCube 
                     models={INSIGHTS_MODELS} 
