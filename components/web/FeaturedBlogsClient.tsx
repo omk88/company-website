@@ -44,10 +44,10 @@ export function FeaturedBlogsClient({ initialFeaturedBlogs }: FeaturedBlogsClien
     });
 
     return (
-        <div className="flex flex-col gap-0 w-full bg-muted rounded-sm overflow-hidden">
+        <div className="group/content flex flex-col gap-0 w-full bg-muted rounded-sm overflow-hidden transition-all duration-200 hover:bg-zinc-200 dark:hover:bg-zinc-900">
             <Link 
                 href={`/insights/${currentPost._id}`}
-                className="group/content flex flex-col w-full text-inherit no-underline cursor-pointer"
+                className="flex flex-col w-full text-inherit no-underline cursor-pointer"
             >
                 <div className="relative aspect-video w-full overflow-hidden shrink-0">
                     {initialFeaturedBlogs.map((post, index) => (

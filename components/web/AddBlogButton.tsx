@@ -27,8 +27,8 @@ export function AddBlogButton() {
         <div className="w-full pt-2">
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <div className="bg-muted rounded-sm p-2 w-full flex items-center justify-center cursor-pointer">
-                        <Button className="flex items-center gap-2">
+                    <div className="bg-muted rounded-sm p-2 w-full flex items-center justify-stretch cursor-pointer">
+                        <Button className="w-full flex items-center justify-center gap-2">
                             <Hammer className="h-4 w-4 shrink-0" />
                             <span>Admin controls</span>
                         </Button>

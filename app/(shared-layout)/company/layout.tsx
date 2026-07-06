@@ -1,4 +1,4 @@
-import { ConvexClientProvider } from "../ConvexClientProvider";
+import { ConvexClientProvider } from "../../ConvexClientProvider";
 
 interface CompanyLayoutProps {
   children: React.ReactNode;
@@ -8,8 +8,8 @@ interface CompanyLayoutProps {
 // Ensure that adding convex client provider here doesnt cause security issues
 export default function CompanyLayout({ children }: CompanyLayoutProps) {
   return (
-    <div className="company-dashboard-layout">            
-      <main className="p-6">
+    <div>            
+      <main>
         <ConvexClientProvider>
           {children}
         </ConvexClientProvider>
