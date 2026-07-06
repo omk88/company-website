@@ -44,7 +44,7 @@ function LivePostPreview({ control, previewImage }: { control: Control<BlogFormV
 
     return (
         <div>
-            <div className="w-full py-6 px-4 sm:px-6 md:px-8">
+            <div className="w-full">
                 <div className="relative w-full h-[240px] mb-4 overflow-hidden rounded-lg bg-neutral-100 dark:bg-neutral-900 flex items-center justify-center border border-dashed">
                     {previewImage ? (
                         <img 
@@ -85,15 +85,6 @@ function LivePostPreview({ control, previewImage }: { control: Control<BlogFormV
 
                 <div className="prose prose-neutral dark:prose-invert max-w-none text-base leading-relaxed text-neutral-800 dark:text-neutral-200 break-words">
                     <ReactMarkdown>{content}</ReactMarkdown>
-                </div>
-
-                <Separator className="my-6" />
-                <div>
-                    [BLOG CTA]
-                </div>
-                <Separator className="my-6" />
-                <div>
-                    [COMMENTS]
                 </div>
             </div>
         </div>
@@ -236,7 +227,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                 rules={{ required: "A blog title is required" }}
                                 render={({ field, fieldState }) => (
                                     <Field>
-                                        <Input aria-invalid={fieldState.invalid} placeholder="Web Dev Trends" type="text" disabled={isLoading} {...field} />
+                                        <Input aria-invalid={fieldState.invalid} placeholder="Title" type="text" disabled={isLoading} {...field} />
                                         {fieldState.error && <p className="text-xs text-destructive mt-1">{fieldState.error.message}</p>}
                                     </Field>
                                 )}
@@ -248,7 +239,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                 rules={{ required: "Author is required", maxLength: { value: 18, message: "Max 18 characters" } }}
                                 render={({ field, fieldState }) => (
                                     <Field>
-                                        <Input aria-invalid={fieldState.invalid} placeholder="John Doe" type="text" maxLength={18} disabled={isLoading} {...field} />
+                                        <Input aria-invalid={fieldState.invalid} placeholder="Author Name" type="text" maxLength={18} disabled={isLoading} {...field} />
                                         {fieldState.error && <p className="text-xs text-destructive mt-1">{fieldState.error.message}</p>}
                                     </Field>
                                 )}
@@ -260,7 +251,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                 rules={{ required: "A subtitle summary is required" }}
                                 render={({ field, fieldState }) => (
                                     <Field>
-                                        <Input aria-invalid={fieldState.invalid} placeholder="Give a brief summary..." type="text" disabled={isLoading} {...field} />
+                                        <Input aria-invalid={fieldState.invalid} placeholder="Summary" type="text" disabled={isLoading} {...field} />
                                         {fieldState.error && <p className="text-xs text-destructive mt-1">{fieldState.error.message}</p>}
                                     </Field>
                                 )}
@@ -322,11 +313,11 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                     <Field className="w-full">
                                         <textarea
                                             aria-invalid={fieldState.invalid}
-                                            placeholder="Write your post markdown here..."
+                                            placeholder="Post Content"
                                             disabled={isLoading}
-                                            rows={14}
+                                            rows={10}
                                             className={cn(
-                                                "flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 resize-y min-h-[350px]",
+                                                "flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 resize-y min-h-[300px]",
                                                 fieldState.invalid && "border-destructive focus-visible:ring-destructive"
                                             )}
                                             {...field}
@@ -336,9 +327,6 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                 )}
                             />
                             
-                            <Button type="submit" className="w-full mt-2" disabled={isLoading}>
-                                {isLoading ? "Saving..." : editingBlogId ? "Save Changes" : "Publish Blog Post"}
-                            </Button>
                         </FieldGroup>
                     </form>
                 </div>
