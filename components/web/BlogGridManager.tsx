@@ -28,20 +28,11 @@ export function BlogGridManager({ initialServerPosts }: BlogGridManagerProps) {
     { initialNumItems: POSTS_PER_BATCH }
   );
 
-  const lastValidPosts = useRef<BlogPostPreview[]>(initialServerPosts);
-  const wasLastStateEmpty = useRef<boolean>(false);
-  
-  const isLoadingFirstPage = status === "LoadingFirstPage";
+  const displayPosts = (results.length > 0 || status !== "LoadingFirstPage") 
+    ? (results as BlogPostPreview[]) 
+    : initialServerPosts;
 
-  useEffect(() => {
-    if (status !== "LoadingFirstPage" && results !== undefined) {
-      lastValidPosts.current = results as BlogPostPreview[];
-      wasLastStateEmpty.current = results.length === 0;
-    }
-  }, [results, status]);
-
-  const showEmptyState = isLoadingFirstPage ? wasLastStateEmpty.current : (results?.length === 0);
-  const displayPosts = isLoadingFirstPage ? lastValidPosts.current : (results as BlogPostPreview[]);
+  const showEmptyState = status === "Exhausted" && displayPosts.length === 0;
 
   useEffect(() => {
     const currentTarget = observerTarget.current;
@@ -55,38 +46,32 @@ export function BlogGridManager({ initialServerPosts }: BlogGridManagerProps) {
       },
       { 
         root: null, 
-        threshold: 0, 
-        rootMargin: "0px 0px 400px 0px" 
+        threshold: 0.1,
+        rootMargin: "0px 0px 150px 0px" 
       } 
     );
 
     observer.observe(currentTarget);
-    
-    return () => {
-      observer.unobserve(currentTarget);
-    };
+    return () => observer.unobserve(currentTarget);
   }, [status, loadMore]); 
+
+  if (showEmptyState) {
+    return (
+      <div className="w-full py-20 flex flex-col items-center justify-center text-muted-foreground gap-3 text-center max-w-sm mx-auto px-4">
+        <Frown className="h-8 w-8 stroke-[1.2]" />
+        <p className="text-sm font-semibold text-foreground">No matches found</p>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full">
-      {showEmptyState ? (
-        <div className="w-full py-20 flex flex-col items-center justify-center text-muted-foreground gap-3 text-center max-w-sm mx-auto px-4">
-          <Frown className="h-8 w-8 stroke-[1.2] text-muted-foreground/60" />
-          <div className="space-y-1">
-            <p className="text-sm font-semibold text-foreground">No matches found</p>
-            <p className="text-xs text-muted-foreground/80 leading-relaxed">
-              We couldn't find any articles matching your query. Try updating your filters.
-            </p>
-          </div>
-        </div>
-      ) : (
-        <BlogGrid initialPosts={displayPosts} />
-      )}
+      <BlogGrid initialPosts={displayPosts} />
       
-      <div ref={observerTarget} className="w-full h-0 pointer-events-none" aria-hidden="true" />
+      <div ref={observerTarget} className="w-full h-4 clear-both text-transparent" aria-hidden="true" />
 
       {status === "LoadingMore" && (
-        <div className="w-full text-center text-sm font-mono text-muted-foreground py-2">
+        <div className="w-full text-center text-sm font-mono text-muted-foreground py-4">
           Loading older insights...
         </div>
       )}
