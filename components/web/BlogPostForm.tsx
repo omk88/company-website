@@ -1,8 +1,7 @@
 "use client";
 
 import { Controller, useForm, useWatch, Control } from "react-hook-form";
-import { Button } from "../ui/button";
-import { FieldGroup, Field, FieldLabel } from "../ui/field";
+import { FieldGroup, Field } from "../ui/field";
 import { Input } from "../ui/input";
 import { toast } from "sonner";
 import { useState, useRef, useEffect } from "react";
@@ -16,6 +15,8 @@ import { Separator } from "../ui/separator";
 import { Id } from "@/convex/_generated/dataModel";
 import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
+import { Textarea } from "../ui/textarea";
+import { Image, Paperclip, X } from "lucide-react";
 
 const AVAILABLE_TAGS = ["Product", "Research", "Design", "Technology", "Opinion", "Tutorials"];
 
@@ -54,8 +55,8 @@ function LivePostPreview({ control, previewImage }: { control: Control<BlogFormV
                         />
                     ) : (
                         <div className="text-center p-4">
-                            <span className="text-2xl block mb-1">🖼️</span>
-                            <span className="text-xs text-muted-foreground block">No Cover Uploaded</span>
+                            <span className="flex justify-center text-2xl mb-1"><Image /></span>
+                            <span className="text-xs text-muted-foreground block">No Cover Image Uploaded</span>
                         </div>
                     )}
                 </div>
@@ -129,6 +130,14 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
         }
     }, [existingPost, reset]);
 
+    const clearImage = () => {
+        setSelectedImage(null);
+        setImagePreviewUrl(null);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+        }
+    };
+
     const onSubmit = async (data: BlogFormValues) => {
         if (data.tags.length === 0) {
             toast.error("Please select at least one tag.");
@@ -186,9 +195,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                 console.error("Background revalidation failure:", err);
             }
             
-            setSelectedImage(null);
-            setImagePreviewUrl(null);
-            if (fileInputRef.current) fileInputRef.current.value = "";
+            clearImage();
             reset(); 
 
             router.push("/insights");
@@ -204,132 +211,186 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
     return (
         <div className="w-full max-w-7xl mx-auto py-4 grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
             <div className="w-full">
-                    <form onSubmit={handleSubmit(onSubmit)}>
-                        <FieldGroup className="gap-y-2">
-                            <Field>
-                                <Input 
-                                    ref={fileInputRef}
-                                    type="file" 
-                                    accept="image/*" 
-                                    disabled={isLoading}
-                                    onChange={(e) => {
-                                        if (e.target.files && e.target.files[0]) {
-                                            const file = e.target.files[0];
-                                            setSelectedImage(file);
-                                            setImagePreviewUrl(URL.createObjectURL(file));
-                                        }
-                                    }}
-                                />
-                            </Field>
-                            <Controller
-                                name="title"
-                                control={control}
-                                rules={{ required: "A blog title is required" }}
-                                render={({ field, fieldState }) => (
-                                    <Field>
-                                        <Input aria-invalid={fieldState.invalid} placeholder="Title" type="text" disabled={isLoading} {...field} />
-                                        {fieldState.error && <p className="text-xs text-destructive mt-1">{fieldState.error.message}</p>}
-                                    </Field>
-                                )}
-                            />
-
-                            <Controller
-                                name="author"
-                                control={control}
-                                rules={{ required: "Author is required", maxLength: { value: 18, message: "Max 18 characters" } }}
-                                render={({ field, fieldState }) => (
-                                    <Field>
-                                        <Input aria-invalid={fieldState.invalid} placeholder="Author Name" type="text" maxLength={18} disabled={isLoading} {...field} />
-                                        {fieldState.error && <p className="text-xs text-destructive mt-1">{fieldState.error.message}</p>}
-                                    </Field>
-                                )}
-                            />
-
-                            <Controller
-                                name="subtitle"
-                                control={control}
-                                rules={{ required: "A subtitle summary is required" }}
-                                render={({ field, fieldState }) => (
-                                    <Field>
-                                        <Input aria-invalid={fieldState.invalid} placeholder="Summary" type="text" disabled={isLoading} {...field} />
-                                        {fieldState.error && <p className="text-xs text-destructive mt-1">{fieldState.error.message}</p>}
-                                    </Field>
-                                )}
-                            />
-
-                            <Controller
-                                name="tags"
-                                control={control}
-                                render={({ field, fieldState }) => {
-                                    const value = field.value || [];
-                                    const toggleTag = (tag: string) => {
-                                        const newValue = value.includes(tag) ? value.filter((t) => t !== tag) : [...value, tag];
-                                        field.onChange(newValue);
-                                    };
-
-                                    return (
-                                        <Field>
-                                            <Popover>
-                                                <PopoverTrigger asChild disabled={isLoading}>
-                                                    <div className={cn(
-                                                        "flex min-h-10 w-full flex-wrap gap-1.5 rounded-md border border-input bg-background px-3 py-2 text-sm cursor-pointer items-center justify-between",
-                                                        fieldState.invalid && "border-destructive"
-                                                    )}>
-                                                        {value.length === 0 ? (
-                                                            <span className="text-muted-foreground">Select tags...</span>
-                                                        ) : (
-                                                            <div className="flex flex-wrap gap-1">
-                                                                {value.map((tag) => (
-                                                                    <Badge key={tag} variant="secondary" className="text-xs">
-                                                                        {tag}
-                                                                    </Badge>
-                                                                ))}
-                                                            </div>
-                                                        )}
-                                                        <span className="text-muted-foreground text-xs">▼</span>
-                                                    </div>
-                                                </PopoverTrigger>
-                                                <PopoverContent className="w-[300px] p-2" align="start">
-                                                    <div className="space-y-2">
-                                                        {AVAILABLE_TAGS.map((tag) => (
-                                                            <div key={tag} className="flex items-center space-x-2 p-1 hover:bg-muted rounded-md cursor-pointer" onClick={() => toggleTag(tag)}>
-                                                                <Checkbox checked={value.includes(tag)} onCheckedChange={() => toggleTag(tag)} />
-                                                                <span className="text-sm font-medium select-none cursor-pointer">{tag}</span>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </PopoverContent>
-                                            </Popover>
-                                        </Field>
-                                    );
+                <form onSubmit={handleSubmit(onSubmit)}>
+                    <FieldGroup className="gap-y-2">
+                        <Field className="w-full">
+                            <input 
+                                id="cover-image-upload"
+                                ref={fileInputRef}
+                                type="file" 
+                                accept="image/*" 
+                                disabled={isLoading}
+                                className="hidden"
+                                onChange={(e) => {
+                                    if (e.target.files && e.target.files[0]) {
+                                        const file = e.target.files[0];
+                                        setSelectedImage(file);
+                                        setImagePreviewUrl(URL.createObjectURL(file));
+                                    }
                                 }}
                             />
-
-                            <Controller
-                                name="content"
-                                control={control}
-                                rules={{ required: "Blog content cannot be empty" }}
-                                render={({ field, fieldState }) => (
-                                    <Field className="w-full">
-                                        <textarea
-                                            aria-invalid={fieldState.invalid}
-                                            placeholder="Post Content"
-                                            disabled={isLoading}
-                                            rows={10}
-                                            className={cn(
-                                                "flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 resize-y min-h-[300px]",
-                                                fieldState.invalid && "border-destructive focus-visible:ring-destructive"
-                                            )}
-                                            {...field}
-                                        />
-                                        {fieldState.error && <p className="text-xs text-destructive mt-1">{fieldState.error.message}</p>}
-                                    </Field>
-                                )}
-                            />
                             
-                        </FieldGroup>
-                    </form>
-                </div>
+                            <label 
+                                htmlFor="cover-image-upload"
+                                className={cn(
+                                    "flex items-center justify-between w-full h-10 px-3 rounded-md border border-input bg-background text-sm cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors select-none",
+                                    isLoading && "opacity-50 cursor-not-allowed pointer-events-none"
+                                )}
+                            >
+                                <span className="flex flex-row items-center gap-2 text-muted-foreground hover:text-foreground transition-colors truncate max-w-[85%]">
+                                    <Paperclip className="h-4 w-4 shrink-0 stroke-[1.5]" />
+                                    <span className="truncate">
+                                        {selectedImage 
+                                            ? selectedImage.name 
+                                            : existingPost?.imageUrl 
+                                                ? "Change cover image..." 
+                                                : "Choose file..."
+                                        }
+                                    </span>
+                                </span>
+
+                                {imagePreviewUrl && (
+                                    <button 
+                                        type="button" 
+                                        onClick={(e) => {
+                                            e.preventDefault(); 
+                                            e.stopPropagation(); 
+                                            clearImage();
+                                        }}
+                                        disabled={isLoading}
+                                        className="text-muted-foreground hover:text-foreground p-1 rounded-sm hover:bg-muted shrink-0 transition-colors relative z-10"
+                                    >
+                                        <X className="h-4 w-4 stroke-[2]" />
+                                    </button>
+                                )}
+                            </label>
+                        </Field>
+
+                        <Controller
+                            name="title"
+                            control={control}
+                            rules={{ required: "A blog title is required" }}
+                            render={({ field, fieldState }) => (
+                                <Field>
+                                    <Input aria-invalid={fieldState.invalid} placeholder="Title" type="text" disabled={isLoading} {...field} />
+                                    {fieldState.error && <p className="text-xs text-destructive mt-1">{fieldState.error.message}</p>}
+                                </Field>
+                            )}
+                        />
+
+                        <Controller
+                            name="author"
+                            control={control}
+                            rules={{ required: "Author is required", maxLength: { value: 18, message: "Max 18 characters" } }}
+                            render={({ field, fieldState }) => (
+                                <Field>
+                                    <Input aria-invalid={fieldState.invalid} placeholder="Author Name" type="text" maxLength={18} disabled={isLoading} {...field} />
+                                    {fieldState.error && <p className="text-xs text-destructive mt-1">{fieldState.error.message}</p>}
+                                </Field>
+                            )}
+                        />
+
+                        <Controller
+                            name="subtitle"
+                            control={control}
+                            rules={{ required: "A subtitle summary is required" }}
+                            render={({ field, fieldState }) => (
+                                <Field>
+                                    <Input aria-invalid={fieldState.invalid} placeholder="Summary" type="text" disabled={isLoading} {...field} />
+                                    {fieldState.error && <p className="text-xs text-destructive mt-1">{fieldState.error.message}</p>}
+                                </Field>
+                            )}
+                        />
+
+                        <Controller
+                            name="tags"
+                            control={control}
+                            render={({ field, fieldState }) => {
+                                const value = field.value || [];
+                                const toggleTag = (tag: string) => {
+                                    const newValue = value.includes(tag) ? value.filter((t) => t !== tag) : [...value, tag];
+                                    field.onChange(newValue);
+                                };
+
+                                return (
+                                    <Field>
+                                        <Popover>
+                                            <PopoverTrigger asChild disabled={isLoading}>
+                                                <div className={cn(
+                                                    "flex min-h-10 w-full flex-wrap gap-1.5 rounded-md border border-input bg-background px-3 py-2 text-sm cursor-pointer items-center justify-between relative",
+                                                    fieldState.invalid && "border-destructive"
+                                                )}>
+                                                    {value.length === 0 ? (
+                                                        <span className="text-muted-foreground">Select tags...</span>
+                                                    ) : (
+                                                        <div className="flex flex-wrap gap-1 pr-14">
+                                                            {value.map((tag) => (
+                                                                <Badge key={tag} variant="secondary" className="text-xs">
+                                                                    {tag}
+                                                                </Badge>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                    
+                                                    <div className="flex items-center space-x-1 absolute right-3 top-1/2 -translate-y-1/2">
+                                                        {value.length > 0 && (
+                                                            <button
+                                                                type="button"
+                                                                disabled={isLoading}
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    field.onChange([]); 
+                                                                }}
+                                                                className="text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted"
+                                                            >
+                                                                <X className="h-3.5 w-3.5 stroke-[2]" />
+                                                            </button>
+                                                        )}
+                                                        <span className="text-muted-foreground text-xs select-none">▼</span>
+                                                    </div>
+                                                </div>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-[300px] p-2" align="start">
+                                                <div className="space-y-2">
+                                                    {AVAILABLE_TAGS.map((tag) => (
+                                                        <div key={tag} className="flex items-center space-x-2 p-1 hover:bg-muted rounded-md cursor-pointer" onClick={() => toggleTag(tag)}>
+                                                            <Checkbox checked={value.includes(tag)} onCheckedChange={() => toggleTag(tag)} />
+                                                            <span className="text-sm font-medium select-none cursor-pointer">{tag}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </PopoverContent>
+                                        </Popover>
+                                    </Field>
+                                );
+                            }}
+                        />
+
+                        <Controller
+                            name="content"
+                            control={control}
+                            rules={{ required: "Blog content cannot be empty" }}
+                            render={({ field, fieldState }) => (
+                                <Field className="w-full">
+                                    <Textarea
+                                        aria-invalid={fieldState.invalid}
+                                        placeholder="Post Content"
+                                        disabled={isLoading}
+                                        rows={10}
+                                        className={cn(
+                                            "flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 resize-y min-h-[300px]",
+                                            fieldState.invalid && "border-destructive focus-visible:ring-destructive"
+                                        )}
+                                        {...field}
+                                    />
+                                    {fieldState.error && <p className="text-xs text-destructive mt-1">{fieldState.error.message}</p>}
+                                </Field>
+                            )}
+                        />
+                        
+                    </FieldGroup>
+                </form>
+            </div>
             <LivePostPreview control={control} previewImage={imagePreviewUrl} />
         </div>
     );
