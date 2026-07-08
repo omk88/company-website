@@ -1,6 +1,6 @@
 import { Sidebar, SidebarContent, SidebarGroup, SidebarFooter, SidebarGroupLabel } from "../ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { GraduationCap, MessageSquareText, SquareLibrary } from "lucide-react";
+import { ChartNoAxesColumn, GraduationCap, MessageSquareText, SquareLibrary, Terminal, ThumbsUp } from "lucide-react";
 import { AiOutlineInstagram } from "react-icons/ai";
 import { FaXTwitter } from "react-icons/fa6";
 import { RxLinkedinLogo } from "react-icons/rx";
@@ -23,18 +23,21 @@ export function LeftSidebarProfile({ profile }: profileRouteProps) {
                 <AvatarImage src="https://github.com/shadcn.png" />
                 <AvatarFallback>CN</AvatarFallback>
             </Avatar>
-            <h1 className="flex items-start justify-left gap-2 text-sm font-medium text-foreground">
+            <h1 className="flex items-start justify-left gap-2 text-lg font-medium text-foreground mt-2">
               <span>{ profile }</span>
             </h1>
         </div>
-        <SidebarGroup className="!pt-0 !pl-0 !pl-2 !pr-0">
+        
+        <SidebarGroup>
             <div className="flex flex-col bg-muted rounded-sm p-3 gap-3">
-                <h1>Hello my name is NAME and I am a tech professional</h1>
-                <div className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground mb-2">
-                    <GraduationCap/>
+                <p className="text-sm leading-relaxed">
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library in London, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets.
+                </p>
+                <div className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                    <GraduationCap className="h-4 w-4 shrink-0" />
                     <h2>BSc Computer Science, University of Bath</h2>
                 </div>
-                <div className="flex flex-row gap-3 items-center">
+                <div className="flex flex-row gap-3 items-center pt-1">
                     <Link href="https://x.com/TaQtiQ_tech" target="_blank" rel="noopener noreferrer">
                         <FaXTwitter className="h-4 w-4 transition-transform hover:scale-105 cursor-pointer opacity-80 hover:opacity-100" />
                     </Link>
@@ -47,30 +50,48 @@ export function LeftSidebarProfile({ profile }: profileRouteProps) {
                         <RxLinkedinLogo className="h-4.5 w-4.5 transition-transform hover:scale-105 cursor-pointer opacity-80 hover:opacity-100" />
                     </Link>
 
-                    <Link href="https://www.linkedin.com/company/taqtiq-tech" target="_blank" rel="noopener noreferrer">
+                    <Link href="https://github.com" target="_blank" rel="noopener noreferrer">
                         <FaGithub className="h-4.5 w-4.5 transition-transform hover:scale-105 cursor-pointer opacity-80 hover:opacity-100" />
                     </Link>
                 </div>
             </div>
         </SidebarGroup>
+
         <SidebarGroup>
+            <SidebarGroupLabel className="w-full justify-center mb-1">
+                <h1 className="flex items-center justify-center gap-2 text-sm font-medium text-foreground">
+                    <Terminal className="w-4 h-4 stroke-[2.3] shrink-0" />
+                    <span>Skills/Languages</span>
+                </h1>
+            </SidebarGroupLabel>
             <div className="flex flex-col bg-muted rounded-sm p-3 gap-3">
                 <div className="flex flex-col items-start gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
-                    <h1>• NextJS</h1>
-                    <h2>• JavaScript</h2>
-                    <h3>• TypeScript</h3>
+                    <div>• NextJS</div>
+                    <div>• JavaScript</div>
+                    <div>• TypeScript</div>
                 </div>
             </div>
         </SidebarGroup>
+
         <SidebarGroup>
+            <SidebarGroupLabel className="w-full justify-center mb-1">
+                <h1 className="flex items-center justify-center gap-2 text-sm font-medium text-foreground">
+                    <ChartNoAxesColumn className="w-4 h-4 stroke-[2.3] shrink-0" />
+                    <span>Metrics</span>
+                </h1>
+            </SidebarGroupLabel>
             <div className="flex flex-col bg-muted rounded-sm p-3 gap-3">
-                <div className="flex flex-col items-start gap-2">
-                    <div className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground mb-2">
-                        <SquareLibrary />
+                <div className="flex flex-col items-start gap-2.5">
+                    <div className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                        <ThumbsUp className="h-4 w-4 shrink-0" />
+                        <h1>143 Total Likes</h1>
+                    </div>
+                    <div className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                        <SquareLibrary className="h-4 w-4 shrink-0" />
                         <h1>21 Insights Published</h1>
                     </div>
-                    <div className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground mb-2">
-                        <MessageSquareText />
+                    <div className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                        <MessageSquareText className="h-4 w-4 shrink-0" />
                         <h2>493 Comments Written</h2>
                     </div>
                 </div>

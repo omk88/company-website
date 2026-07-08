@@ -15,13 +15,14 @@ export default async function Profile({ params }: profileRouteProps) {
 
     return (
         <div>
-            <SidebarProvider>
+            <SidebarProvider style={{ "--sidebar-width": "24rem" } as React.CSSProperties}>
                 <SearchProvider>
                     <aside>
                         <LeftSidebarProfile profile={decodedProfile} />
                     </aside>
                 </SearchProvider>
-                <div>
+                
+                <div className="w-full pl-[var(--sidebar-width)] pt-16">
                     <ProfileBlogGridContainer authorName={profile} />
                 </div>
             </SidebarProvider>
