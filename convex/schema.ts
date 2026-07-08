@@ -22,6 +22,7 @@ const schema = defineSchema({
   .index("by_totalViews", ["totalViews"])
   .index("by_likes", ["likes"])
   .index("by_featured", ["featured"])
+  .index("by_author", ["author"])
   .searchIndex("search_title_subtitle", {
     searchField: "title",
     filterFields: ["subtitle"],

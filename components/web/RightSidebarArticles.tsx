@@ -21,12 +21,11 @@ export function RightSidebarArticles({ authorName }: RightSidebarArticlesProps) 
   return (
     <Sidebar side="right" className="!w-75 !top-16 !z-40 h-[calc(100vh-4rem)] flex flex-col overflow-hidden">
       <Separator/>
-    
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="w-full justify-center">
           <h1 className="flex justify-center gap-2 p-4 text-sm font-medium text-foreground whitespace-nowrap">              <Library className="size-4 stroke-[2.3] shrink-0 mt-0.5" />
-              <span>More from { authorName }</span>
+              <span>More from <span className="text-blue-600">{ authorName }</span></span>
           </h1>
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -36,7 +35,6 @@ export function RightSidebarArticles({ authorName }: RightSidebarArticlesProps) 
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      
       <SidebarFooter/>
     </Sidebar>
   );

@@ -1,28 +1,44 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BlogGrid } from "./BlogGrid";
 import { BlogPostPreview } from "./BlogCard";
 import { Frown } from "lucide-react";
 import { useLocalSearch } from "@/components/web/SearchContext"; 
 import { usePaginatedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
 
 const POSTS_PER_BATCH = 9;
 
 interface BlogGridManagerProps {
   initialServerPosts: BlogPostPreview[]; 
+  disableSearch?: boolean;
 }
 
-export function BlogGridManager({ initialServerPosts }: BlogGridManagerProps) {
-  const { searchTerm, activeTags, sortOrder } = useLocalSearch();
+function useSafeSearch(disableSearch: boolean) {
+  if (disableSearch) {
+    return { searchTerm: "", activeTags: [], sortOrder: "desc" };
+  }
+
+  try {
+    return useLocalSearch();
+  } catch (error) {
+    return { searchTerm: "", activeTags: [], sortOrder: "desc" };
+  }
+}
+
+export function BlogGridManager({ initialServerPosts, disableSearch = false }: BlogGridManagerProps) {
+  const { searchTerm, activeTags, sortOrder } = useSafeSearch(disableSearch);
   const observerTarget = useRef<HTMLDivElement>(null);
+
+  const [activeTab, setActiveTab] = useState("team");
 
   const { results, status, loadMore } = usePaginatedQuery(
     api.blogs.getPaginatedPosts,
     { 
-      searchTerm: searchTerm || undefined, 
-      activeTags: activeTags.length > 0 ? activeTags : undefined,
+      searchTerm: !disableSearch && searchTerm ? searchTerm : undefined, 
+      activeTags: !disableSearch && activeTags.length > 0 ? activeTags : undefined,
       sortOrder: sortOrder
     },
     { initialNumItems: POSTS_PER_BATCH }
@@ -64,8 +80,26 @@ export function BlogGridManager({ initialServerPosts }: BlogGridManagerProps) {
     );
   }
 
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+  };
+
   return (
     <div className="w-full">
+      <div className="p-4">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+          <TabsList className="flex w-max gap-1 p-1">
+            <TabsTrigger value="team" className="flex items-center gap-1.5 px-4 whitespace-nowrap">
+              <span>Team</span>
+            </TabsTrigger>
+            
+            <TabsTrigger value="community" className="flex items-center gap-1.5 px-4 whitespace-nowrap">
+              <span>Community</span>
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
+
       <BlogGrid initialPosts={displayPosts} />
       
       <div ref={observerTarget} className="w-full h-4 clear-both text-transparent" aria-hidden="true" />
