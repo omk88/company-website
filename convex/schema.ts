@@ -54,7 +54,7 @@ const schema = defineSchema({
 
   profiles: defineTable({
     userId: v.string(),
-    name: v.string(),
+    username: v.string(),
     firstName: v.string(),
     lastName: v.string(),
     profilePic: v.string(),

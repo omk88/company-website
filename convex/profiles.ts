@@ -4,7 +4,7 @@ import { mutation } from "./_generated/server";
 export const initialiseProfile = mutation({
     args: {
         userId: v.string(), 
-        name: v.string(),
+        username: v.string(),
         firstName: v.optional(v.string()),
         lastName: v.optional(v.string()),
         profilePic: v.optional(v.string()),
@@ -19,7 +19,7 @@ export const initialiseProfile = mutation({
 
         const profileId = await ctx.db.insert("profiles", {
             userId: args.userId,
-            name: args.name,
+            username: args.username,
             firstName: args.firstName ?? "",
             lastName: args.lastName ?? "",
             profilePic: args.profilePic ?? "",

@@ -13,8 +13,6 @@ import { toast } from "sonner";
 import { useState } from "react"; 
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
-import { useMutation } from "convex/react";
-import { api } from "@/convex/_generated/api";
 
 export default function SignUpForm() {
     const [isLoading, setIsLoading] = useState(false);
@@ -22,11 +20,8 @@ export default function SignUpForm() {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const router = useRouter();
 
-    const createProfile = useMutation(api.profiles.initialiseProfile);
-
     function onError(errors: any) {
         const firstErrorKey = Object.keys(errors)[0];
-        
         if (firstErrorKey) {
             const errorMessage = errors[firstErrorKey].message;
             toast.error(errorMessage);
@@ -48,31 +43,17 @@ export default function SignUpForm() {
 
         await authClient.signUp.email({
             email: data.email,
-            name: derivedName,
             password: data.password,
+            name: derivedName, 
         }, {
             onRequest: () => {
                 setIsLoading(true);
             },
-            onSuccess: async (ctx) => {
-                try {
-                    if (ctx.data?.user?.id) {
-                        await createProfile({
-                            userId: ctx.data.user.id as string,
-                            name: derivedName,
-                        });
-                    }
-
-                    setIsLoading(false);
-                    toast.success("Account created successfully!");
-                    
-                    router.push("/"); 
-                    router.refresh();
-                } catch (error) {
-                    console.error("Profile initialization failed:", error);
-                    setIsLoading(false);
-                    router.push("/");
-                }
+            onSuccess: async () => {
+                toast.success("Account created successfully!");
+                
+                router.push("/api/profile-callback"); 
+                router.refresh();
             },
             onError: (ctx) => {
                 setIsLoading(false);
@@ -84,7 +65,7 @@ export default function SignUpForm() {
     const handleGoogleSignIn = async () => {
         await authClient.signIn.social({
             provider: "google",
-            callbackURL: "/", 
+            callbackURL: "/api/profile-callback", 
         });
     };
     
