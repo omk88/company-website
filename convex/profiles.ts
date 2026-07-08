@@ -48,7 +48,7 @@ export const initialiseProfile = mutation({
       profilePic: args.profilePic,
       education: [],
       skills: [],
-      socials: [],
+      socials: [], 
       totalLikes: 0,
       articlesPublished: 0,
       commentsPublished: 0,
@@ -59,15 +59,15 @@ export const initialiseProfile = mutation({
 });
 
 export const getProfileByUsername = query({
-    args: {
-        username: v.string(),
-    },
-    handler: async (ctx, args) => {
-        const profile = await ctx.db
-            .query("profiles")
-            .withIndex("by_username", (q) => q.eq("username", args.username))
-            .unique();
+  args: {
+    username: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_username", (q) => q.eq("username", args.username))
+      .unique();
 
-        return profile;
-    },
+    return profile;
+  },
 });

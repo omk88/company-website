@@ -7,7 +7,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { LeftSidebar } from "@/components/web/LeftSidebar";
 import { RightSidebar } from "@/components/web/RightSidebar";
 import { SearchProvider } from "@/components/web/SearchContext";
-import { TabsSwitch } from "@/components/web/TabsSwitch";
+import { TabItem, TabsSwitch } from "@/components/web/TabsSwitch";
 
 export const metadata: Metadata = {
   title: "Insights",
@@ -15,7 +15,14 @@ export const metadata: Metadata = {
 
 const INSIGHTS_MODELS = ['/cross.glb'];
 
+
+
 export default async function InsightsPage() {
+
+  const tabs: TabItem[] = [
+    { value: "team", label: "Team" },
+    { value: "community", label: "Community" },
+  ];
 
   return (
     <SidebarProvider>
@@ -60,7 +67,7 @@ export default async function InsightsPage() {
             id="blog-grid-section" 
             className="w-full bg-white dark:bg-zinc-950 border-t border-border/50">
             <div className="w-full md:px-[var(--sidebar-width)]">
-              <TabsSwitch />
+              <TabsSwitch tabs={tabs} defaultValue="team" />
               <div className="w-full max-w-5xl mx-auto px-4 pb-4">
                 <CachedBlogGrid />
               </div>

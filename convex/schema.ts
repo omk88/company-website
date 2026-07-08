@@ -60,7 +60,12 @@ const schema = defineSchema({
     profilePic: v.string(),
     education: v.array(v.string()),
     skills: v.array(v.string()),
-    socials: v.array(v.string()),
+    socials: v.array(
+      v.object({
+        platform: v.string(),
+        url: v.string()
+      })
+    ),
     totalLikes: v.number(),
     articlesPublished: v.number(),
     commentsPublished: v.number(),

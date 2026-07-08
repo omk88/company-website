@@ -2,6 +2,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { LeftSidebarProfile } from "@/components/web/LeftSidebarProfile";
 import { ProfileBlogGridContainer } from "@/components/web/ProfileBlogGridContainer";
 import { SearchProvider } from "@/components/web/SearchContext";
+import { TabItem, TabsSwitch } from "@/components/web/TabsSwitch";
 import { api } from "@/convex/_generated/api";
 import { fetchQuery } from "convex/nextjs";
 
@@ -18,16 +19,22 @@ export default async function Profile({ params }: profileRouteProps) {
         username: username 
     });
 
+    const tabs: TabItem[] = [
+        { value: "blog-articles", label: "Blog Articles" },
+        { value: "comments", label: "Comments" },
+    ];
+
     return (
         <div>
             <SidebarProvider style={{ "--sidebar-width": "24rem" } as React.CSSProperties}>
                 <SearchProvider>
                     <aside>
-                        <LeftSidebarProfile username={profile?.username || ""} />
+                        <LeftSidebarProfile profile={ profile } />
                     </aside>
                 </SearchProvider>
-                
-                <div className="bg-white w-full pl-[var(--sidebar-width)] p-4 ml-2">
+
+                <div className="bg-white w-full pl-[var(--sidebar-width)] ml-2">
+                    <TabsSwitch tabs={tabs} defaultValue="blog-articles" />
                     <ProfileBlogGridContainer authorName={profile?.userId || ""} />
                 </div>
             </SidebarProvider>

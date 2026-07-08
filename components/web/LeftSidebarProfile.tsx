@@ -2,29 +2,50 @@ import { Sidebar, SidebarContent, SidebarGroup, SidebarFooter, SidebarGroupLabel
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { ChartNoAxesColumn, GraduationCap, MessageSquareText, SquareLibrary, Terminal, ThumbsUp } from "lucide-react";
 import { AiOutlineInstagram } from "react-icons/ai";
-import { FaXTwitter } from "react-icons/fa6";
+import { FaBluesky, FaXTwitter } from "react-icons/fa6";
 import { RxLinkedinLogo } from "react-icons/rx";
-import { FaGithub } from "react-icons/fa";
+import { FaFacebook, FaGithub, FaYoutube } from "react-icons/fa";
 import Link from "next/link";
+import { Doc } from "@/convex/_generated/dataModel";
+
+
+const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+    x: FaXTwitter,
+    instagram: AiOutlineInstagram,
+    linkedin: RxLinkedinLogo,
+    github: FaGithub,
+    bluesky: FaBluesky,
+    facebook: FaFacebook,
+    youtube: FaYoutube,
+};
 
 interface profileRouteProps {
-    username: string;
+    profile: Doc<"profiles"> | null;
 }
 
-export function LeftSidebarProfile({ username }: profileRouteProps) {
-  return (
+export function LeftSidebarProfile({ profile }: profileRouteProps) {
+    
+    if (!profile) {
+        return <div className="p-4 text-gray-500">Profile not found</div>;
+    }
+
+    const { username, firstName, lastName, profilePic } = profile;
+    
+    const displayName = (firstName && lastName) ? `${firstName} ${lastName}` : username;
+
+    return (
     <Sidebar 
-      className="flex flex-col !top-16 !z-40 overflow-hidden !p-0 bg-white"
-      style={{ height: "calc(100vh - 4rem)" }}
+        className="flex flex-col !top-16 !z-40 overflow-hidden !p-0 bg-white"
+        style={{ height: "calc(100vh - 4rem)" }}
     >
-      <SidebarContent className="!p-0">
+        <SidebarContent className="!p-0">
         <div className="p-2">
             <Avatar className="h-16 w-16 border-2 border-muted">
                 <AvatarImage src="https://github.com/shadcn.png" />
                 <AvatarFallback>CN</AvatarFallback>
             </Avatar>
             <h1 className="flex items-start justify-left gap-2 text-lg font-medium text-foreground mt-2">
-              <span>{ username }</span>
+                <span>{ displayName }</span>
             </h1>
         </div>
         
@@ -33,34 +54,45 @@ export function LeftSidebarProfile({ username }: profileRouteProps) {
                 <p className="text-sm leading-relaxed">
                     Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library in London, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets.
                 </p>
-                <div className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
-                    <GraduationCap className="h-4 w-4 shrink-0" />
-                    <h2>BSc Computer Science, University of Bath</h2>
-                </div>
-                <div className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
-                    <GraduationCap className="h-4 w-4 shrink-0" />
-                    <h2>BSc Computer Science, University of Bath</h2>
-                </div>
-                <div className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
-                    <GraduationCap className="h-4 w-4 shrink-0" />
-                    <h2>BSc Computer Science, University of Bath</h2>
-                </div>
+                {profile.education && profile.education.length > 0 ? (
+                    profile.education.map((item, index) => (
+                        <div 
+                            key={index} 
+                            className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground"
+                        >
+                            <GraduationCap className="h-4 w-4 shrink-0" />
+                            <h2>{item}</h2>
+                        </div>
+                    ))
+                ) : (
+                    <p className="text-xs text-muted-foreground italic">No education history added.</p>
+                )}
                 <div className="flex flex-row gap-3 items-center pt-1">
-                    <Link href="https://x.com/TaQtiQ_tech" target="_blank" rel="noopener noreferrer">
-                        <FaXTwitter className="h-4 w-4 transition-transform hover:scale-105 cursor-pointer opacity-80 hover:opacity-100" />
-                    </Link>
-                    
-                    <Link href="https://www.instagram.com/taqtiq_tech" target="_blank" rel="noopener noreferrer">
-                        <AiOutlineInstagram className="h-4.5 w-4.5 transition-transform hover:scale-105 cursor-pointer opacity-80 hover:opacity-100" />
-                    </Link>
-                    
-                    <Link href="https://www.linkedin.com/company/taqtiq-tech" target="_blank" rel="noopener noreferrer">
-                        <RxLinkedinLogo className="h-4.5 w-4.5 transition-transform hover:scale-105 cursor-pointer opacity-80 hover:opacity-100" />
-                    </Link>
+                    {profile.socials && profile.socials.length > 0 ? (
+                        profile.socials.map((social, index) => {
+                            const normalizedPlatform = social.platform.toLowerCase().trim();
+                            const IconComponent = ICON_MAP[normalizedPlatform];
 
-                    <Link href="https://github.com" target="_blank" rel="noopener noreferrer">
-                        <FaGithub className="h-4.5 w-4.5 transition-transform hover:scale-105 cursor-pointer opacity-80 hover:opacity-100" />
-                    </Link>
+                            if (!IconComponent || !social.url) return null;
+
+                            const iconSizeClass = normalizedPlatform === "x" ? "h-4 w-4" : "h-4.5 w-4.5";
+
+                            return (
+                                <Link 
+                                    key={index} 
+                                    href={social.url} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                >
+                                    <IconComponent 
+                                        className={`${iconSizeClass} transition-transform hover:scale-105 cursor-pointer opacity-80 hover:opacity-100`} 
+                                    />
+                                </Link>
+                            );
+                        })
+                    ) : (
+                        <span className="text-xs text-muted-foreground italic">No links connected</span>
+                    )}
                 </div>
             </div>
         </SidebarGroup>
@@ -74,9 +106,13 @@ export function LeftSidebarProfile({ username }: profileRouteProps) {
             </SidebarGroupLabel>
             <div className="flex flex-col bg-muted rounded-sm p-3 gap-3">
                 <div className="flex flex-col items-start gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
-                    <div>• NextJS</div>
-                    <div>• JavaScript</div>
-                    <div>• TypeScript</div>
+                    {profile.skills && profile.skills.length > 0 ? (
+                        profile.skills.map((skill, index) => (
+                            <div key={index}>• {skill}</div>
+                        ))
+                    ) : (
+                        <div className="italic text-muted-foreground/70">No skills added yet</div>
+                    )}
                 </div>
             </div>
         </SidebarGroup>
@@ -92,21 +128,21 @@ export function LeftSidebarProfile({ username }: profileRouteProps) {
                 <div className="flex flex-col items-start gap-2.5">
                     <div className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
                         <ThumbsUp className="h-4 w-4 shrink-0" />
-                        <h1>143 Total Likes</h1>
+                        <h1>{ profile.totalLikes } Total Likes</h1>
                     </div>
                     <div className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
                         <SquareLibrary className="h-4 w-4 shrink-0" />
-                        <h1>21 Insights Published</h1>
+                        <h1>{ profile.articlesPublished } Insights Published</h1>
                     </div>
                     <div className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
                         <MessageSquareText className="h-4 w-4 shrink-0" />
-                        <h2>493 Comments Written</h2>
+                        <h2>{ profile.commentsPublished } Comments Written</h2>
                     </div>
                 </div>
             </div>
         </SidebarGroup>
-      </SidebarContent>
-      <SidebarFooter className="hidden" />
+        </SidebarContent>
+        <SidebarFooter className="hidden" />
     </Sidebar>
-  );
+    );
 }
