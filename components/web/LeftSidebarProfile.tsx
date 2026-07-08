@@ -14,7 +14,7 @@ interface profileRouteProps {
 export function LeftSidebarProfile({ profile }: profileRouteProps) {
   return (
     <Sidebar 
-      className="flex flex-col !top-16 !z-40 overflow-hidden !p-0"
+      className="flex flex-col !top-16 !z-40 overflow-hidden !p-0 bg-white"
       style={{ height: "calc(100vh - 4rem)" }}
     >
       <SidebarContent className="!p-0">
@@ -33,6 +33,14 @@ export function LeftSidebarProfile({ profile }: profileRouteProps) {
                 <p className="text-sm leading-relaxed">
                     Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library in London, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets.
                 </p>
+                <div className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                    <GraduationCap className="h-4 w-4 shrink-0" />
+                    <h2>BSc Computer Science, University of Bath</h2>
+                </div>
+                <div className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                    <GraduationCap className="h-4 w-4 shrink-0" />
+                    <h2>BSc Computer Science, University of Bath</h2>
+                </div>
                 <div className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
                     <GraduationCap className="h-4 w-4 shrink-0" />
                     <h2>BSc Computer Science, University of Bath</h2>

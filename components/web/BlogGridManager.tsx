@@ -7,7 +7,6 @@ import { Frown } from "lucide-react";
 import { useLocalSearch } from "@/components/web/SearchContext"; 
 import { usePaginatedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
 
 const POSTS_PER_BATCH = 9;
 
@@ -31,8 +30,6 @@ function useSafeSearch(disableSearch: boolean) {
 export function BlogGridManager({ initialServerPosts, disableSearch = false }: BlogGridManagerProps) {
   const { searchTerm, activeTags, sortOrder } = useSafeSearch(disableSearch);
   const observerTarget = useRef<HTMLDivElement>(null);
-
-  const [activeTab, setActiveTab] = useState("team");
 
   const { results, status, loadMore } = usePaginatedQuery(
     api.blogs.getPaginatedPosts,
@@ -80,26 +77,8 @@ export function BlogGridManager({ initialServerPosts, disableSearch = false }: B
     );
   }
 
-  const handleTabChange = (value: string) => {
-    setActiveTab(value);
-  };
-
   return (
     <div className="w-full">
-      <div className="p-4">
-        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-          <TabsList className="flex w-max gap-1 p-1">
-            <TabsTrigger value="team" className="flex items-center gap-1.5 px-4 whitespace-nowrap">
-              <span>Team</span>
-            </TabsTrigger>
-            
-            <TabsTrigger value="community" className="flex items-center gap-1.5 px-4 whitespace-nowrap">
-              <span>Community</span>
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
-
       <BlogGrid initialPosts={displayPosts} />
       
       <div ref={observerTarget} className="w-full h-4 clear-both text-transparent" aria-hidden="true" />

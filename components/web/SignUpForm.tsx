@@ -13,12 +13,16 @@ import { toast } from "sonner";
 import { useState } from "react"; 
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 export default function SignUpForm() {
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const router = useRouter();
+
+    const createProfile = useMutation(api.profiles.initialiseProfile);
 
     function onError(errors: any) {
         const firstErrorKey = Object.keys(errors)[0];
@@ -34,27 +38,41 @@ export default function SignUpForm() {
         mode: "onTouched",
         defaultValues: {
             email: "",
-            name: "",
             password: "",
             confirmpassword: ""
         }
     });
 
     async function onSubmit(data: z.infer<typeof signUpSchema>) {
+        const derivedName = data.email.split("@")[0];
+
         await authClient.signUp.email({
             email: data.email,
-            name: data.name,
+            name: derivedName,
             password: data.password,
         }, {
             onRequest: () => {
                 setIsLoading(true);
             },
-            onSuccess: () => {
-                setIsLoading(false);
-                toast.success("Account created successfully!");
-                
-                router.push("/"); 
-                router.refresh();
+            onSuccess: async (ctx) => {
+                try {
+                    if (ctx.data?.user?.id) {
+                        await createProfile({
+                            userId: ctx.data.user.id as string,
+                            name: derivedName,
+                        });
+                    }
+
+                    setIsLoading(false);
+                    toast.success("Account created successfully!");
+                    
+                    router.push("/"); 
+                    router.refresh();
+                } catch (error) {
+                    console.error("Profile initialization failed:", error);
+                    setIsLoading(false);
+                    router.push("/");
+                }
             },
             onError: (ctx) => {
                 setIsLoading(false);
@@ -78,17 +96,7 @@ export default function SignUpForm() {
             </CardHeader>
             <CardContent>
                 <form onSubmit={form.handleSubmit(onSubmit, onError)}>
-                    <FieldGroup className="gap-y-4">
-                        <Controller
-                            name="name"
-                            control={form.control}
-                            render={({ field, fieldState }) => (
-                                <Field>
-                                    <FieldLabel>Username</FieldLabel>
-                                    <Input aria-invalid={fieldState.invalid} placeholder="User#123" disabled={isLoading} {...field}/>
-                                </Field>
-                            )}
-                        />
+                    <FieldGroup className="gap-y-4">                        
                         <Controller
                             name="email"
                             control={form.control}

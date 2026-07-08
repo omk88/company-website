@@ -14,6 +14,7 @@ import type * as chat from "../chat.js";
 import type * as comments from "../comments.js";
 import type * as contact from "../contact.js";
 import type * as http from "../http.js";
+import type * as profiles from "../profiles.js";
 import type * as subscribers from "../subscribers.js";
 
 import type {
@@ -29,6 +30,7 @@ declare const fullApi: ApiFromModules<{
   comments: typeof comments;
   contact: typeof contact;
   http: typeof http;
+  profiles: typeof profiles;
   subscribers: typeof subscribers;
 }>;
 

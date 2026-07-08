@@ -22,7 +22,7 @@ export default async function Profile({ params }: profileRouteProps) {
                     </aside>
                 </SearchProvider>
                 
-                <div className="w-full pl-[var(--sidebar-width)] pt-16">
+                <div className="bg-white w-full pl-[var(--sidebar-width)] p-4 ml-2">
                     <ProfileBlogGridContainer authorName={profile} />
                 </div>
             </SidebarProvider>

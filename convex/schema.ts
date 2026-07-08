@@ -15,7 +15,6 @@ const schema = defineSchema({
     likes: v.number(),
     dislikes: v.number(),
     featured: v.boolean(),
-    
     commentCount: v.number(), 
   })
   .index("by_createdAt", ["createdAt"])
@@ -51,7 +50,21 @@ const schema = defineSchema({
     authorId: v.string(),
     authorName: v.string(),
     body: v.string()
-  }).index("by_postId", ["postId"])
+  }).index("by_postId", ["postId"]),
+
+  profiles: defineTable({
+    userId: v.string(),
+    name: v.string(),
+    firstName: v.string(),
+    lastName: v.string(),
+    profilePic: v.string(),
+    education: v.array(v.string()),
+    skills: v.array(v.string()),
+    socials: v.array(v.string()),
+    totalLikes: v.number(),
+    articlesPublished: v.number(),
+    commentsPublished: v.number(),
+  }).index("by_userId", ["userId"]),
 });
 
 export default schema;
