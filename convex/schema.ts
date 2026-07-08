@@ -64,7 +64,9 @@ const schema = defineSchema({
     totalLikes: v.number(),
     articlesPublished: v.number(),
     commentsPublished: v.number(),
-  }).index("by_userId", ["userId"]),
+  })
+  .index("by_userId", ["userId"])
+  .index("by_username", ["username"]),
 });
 
 export default schema;

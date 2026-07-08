@@ -8,10 +8,10 @@ import { FaGithub } from "react-icons/fa";
 import Link from "next/link";
 
 interface profileRouteProps {
-    profile: string;
+    username: string;
 }
 
-export function LeftSidebarProfile({ profile }: profileRouteProps) {
+export function LeftSidebarProfile({ username }: profileRouteProps) {
   return (
     <Sidebar 
       className="flex flex-col !top-16 !z-40 overflow-hidden !p-0 bg-white"
@@ -24,7 +24,7 @@ export function LeftSidebarProfile({ profile }: profileRouteProps) {
                 <AvatarFallback>CN</AvatarFallback>
             </Avatar>
             <h1 className="flex items-start justify-left gap-2 text-lg font-medium text-foreground mt-2">
-              <span>{ profile }</span>
+              <span>{ username }</span>
             </h1>
         </div>
         

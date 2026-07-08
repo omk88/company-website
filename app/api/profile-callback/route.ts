@@ -18,7 +18,6 @@ export async function GET(request: Request) {
     const id = userData.id;
     const email = userData.email;
     const authName = userData.name;
-    const authUsername = userData.username;
 
     let firstName = "";
     let lastName = "";
@@ -29,16 +28,9 @@ export async function GET(request: Request) {
       lastName = nameParts.slice(1).join(" ");
     }
 
-    const processedUsername = authUsername || authName || email.split("@")[0];
-
-    console.log("Initializing Convex Profile for:", {
-      userId: id,
-      username: processedUsername,
-    });
-
     await fetchAuthMutation(api.profiles.initialiseProfile, {
       userId: id,
-      username: processedUsername,
+      email: email || "",
       firstName: firstName || "", 
       lastName: lastName || "",
       profilePic: userData.image || "",
