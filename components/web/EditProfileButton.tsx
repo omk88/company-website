@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
-import { ImagePlus, Pen, Plus, Trash2, Check, ChevronsUpDown } from "lucide-react";
+import { ImagePlus, Pen, Plus, Trash2, Check, ChevronsUpDown, GraduationCap, MapPin, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -34,7 +34,6 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Badge } from "@/components/ui/badge";
 import { AVAILABLE_PLATFORMS, ICON_MAP } from "@/lib/socials";
 import { ALLOWED_SKILLS } from "@/lib/skills";
-
 import { ALLOWED_SUBJECTS, ALLOWED_INSTITUTIONS } from "@/lib/data";
 
 const formatPlatformName = (name: string) => {
@@ -53,8 +52,29 @@ const profileFormSchema = z.object({
       degree: z.string().min(1, "Degree type is required"),
       subject: z.string().min(1, "Subject is required"),
       institution: z.string().min(1, "Institution is required"),
+      isCommitted: z.boolean(),
     })
-  ),
+  )
+    .max(3, "You can add up to 3 education histories")
+    .superRefine((educationList, ctx) => {
+      const seenCombinations = new Set<string>();
+      
+      educationList.forEach((edu, index) => {
+        if (!edu.degree || !edu.subject || !edu.institution) return;
+        
+        const comboKey = `${edu.degree.toLowerCase().trim()}|${edu.subject.toLowerCase().trim()}|${edu.institution.toLowerCase().trim()}`;
+        
+        if (seenCombinations.has(comboKey)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "This exact education record has already been added.",
+            path: [index, "institution"],
+          });
+        } else {
+          seenCombinations.add(comboKey);
+        }
+      });
+    }),
   skills: z.array(z.string()).max(10, "You can add up to 10 skills"),
   socials: z.array(
     z.object({
@@ -129,6 +149,11 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
   const [isOpen, setIsOpen] = useState(false);
   const [comboboxOpen, setComboboxOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  
+  // States handling async OpenStreetMap search logic
+  const [locationQuery, setLocationQuery] = useState("");
+  const [locationOptions, setLocationOptions] = useState<string[]>([]);
+  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -138,7 +163,10 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
       lastName: profile.lastName || "",
       location: profile.location || "",
       bio: profile.bio || "",
-      education: (profile.education as any) || [],
+      education: ((profile.education as any) || []).map((edu: any) => ({
+        ...edu,
+        isCommitted: true,
+      })),
       skills: profile.skills || [],
       socials: ((profile.socials as { platform: string; url: string }[]) || []).map(s => ({
         ...s,
@@ -155,7 +183,8 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
   const { 
     fields: educationFields, 
     append: appendEducation, 
-    remove: removeEducation 
+    remove: removeEducation,
+    update: updateEducation 
   } = useFieldArray({
     control: form.control,
     name: "education",
@@ -163,11 +192,48 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
 
   const watchedSkills = form.watch("skills") || [];
   const hasActiveDraft = fields.some((field) => !field.isCommitted);
+  const hasActiveEducationDraft = educationFields.some((field) => !field.isCommitted);
+
+  // Debounced API Search for Global Locations
+  useEffect(() => {
+    if (locationQuery.trim().length < 3) {
+      setLocationOptions([]);
+      return;
+    }
+
+    setIsLoadingLocation(true);
+    const delayDebounce = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+            locationQuery.trim()
+          )}&featuretype=settlement&addressdetails=1&limit=6`
+        );
+        const data = await res.json();
+        
+        const formattedCities = data.map((item: any) => {
+          const city = item.address.city || item.address.town || item.address.village || item.display_name.split(",")[0];
+          const state = item.address.state;
+          const country = item.address.country;
+          return state ? `${city}, ${state}, ${country}` : `${city}, ${country}`;
+        });
+
+        setLocationOptions([...new Set(formattedCities)] as string[]);
+      } catch (err) {
+        console.error("Error collecting global geocode data:", err);
+      } finally {
+        setIsLoadingLocation(false);
+      }
+    }, 400);
+
+    return () => clearTimeout(delayDebounce);
+  }, [locationQuery]);
 
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);
     if (open) {
       form.reset();
+      setLocationQuery("");
     }
   };
 
@@ -203,9 +269,31 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
     }
   };
 
+  const handleStartAddingEducation = () => {
+    if (educationFields.length >= 3 || hasActiveEducationDraft) return;
+    appendEducation({ degree: "", subject: "", institution: "", isCommitted: false });
+  };
+
+  const handleCommitEducation = async (index: number) => {
+    const isDegreeValid = await form.trigger(`education.${index}.degree`);
+    const isSubjectValid = await form.trigger(`education.${index}.subject`);
+    const isInstValid = await form.trigger(`education.${index}.institution`);
+    
+    const isArrayValid = await form.trigger("education");
+    
+    if (isDegreeValid && isSubjectValid && isInstValid && isArrayValid) {
+      const currentField = form.getValues(`education.${index}`);
+      updateEducation(index, {
+        ...currentField,
+        isCommitted: true,
+      });
+    }
+  };
+
   const onSubmit = (data: ProfileFormValues) => {
     const cleanedSocials = data.socials.map(({ platform, url }) => ({ platform, url }));
-    console.log("Saving changes...", { ...data, socials: cleanedSocials });
+    const cleanedEducation = data.education.map(({ degree, subject, institution }) => ({ degree, subject, institution }));
+    console.log("Saving changes...", { ...data, socials: cleanedSocials, education: cleanedEducation });
     setIsOpen(false); 
   };
 
@@ -251,10 +339,71 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
               <Input type="text" {...form.register("lastName")} />
             </Field>
           </div>
+
           <Field>
             <FieldLabel>Location</FieldLabel>
-            <Input type="text" {...form.register("location")} />
+            <Popover open={openDropdown === "location"} onOpenChange={(open) => setOpenDropdown(open ? "location" : null)}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  className="w-full justify-between font-normal text-xs h-9 bg-white text-left"
+                >
+                  <span className="truncate flex items-center gap-1.5">
+                    <MapPin className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                    {form.watch("location") || "Search city or town globally..."}
+                  </span>
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[340px] p-0" align="start">
+                <Command shouldFilter={false}>
+                  <CommandInput 
+                    value={locationQuery}
+                    onValueChange={setLocationQuery}
+                    placeholder="Type city name (e.g. Paris, Austin)..." 
+                    className="text-xs" 
+                  />
+                  <CommandList>
+                    {isLoadingLocation && (
+                      <div className="p-4 flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" /> Fetching cities...
+                      </div>
+                    )}
+                    {!isLoadingLocation && locationQuery.trim().length >= 3 && locationOptions.length === 0 && (
+                      <CommandEmpty>No results matching your query.</CommandEmpty>
+                    )}
+                    {locationQuery.trim().length < 3 && !isLoadingLocation && (
+                      <div className="p-3 text-center text-xs text-muted-foreground italic">
+                        Type at least 3 characters to query data
+                      </div>
+                    )}
+                    <CommandGroup>
+                      {locationOptions.map((city) => (
+                        <CommandItem
+                          key={city}
+                          value={city}
+                          onSelect={() => {
+                            form.setValue("location", city, { shouldValidate: true });
+                            setOpenDropdown(null);
+                          }}
+                          className="text-xs cursor-pointer"
+                        >
+                          <Check
+                            className={`mr-2 h-3.5 w-3.5 ${
+                              form.watch("location") === city ? "opacity-100" : "opacity-0"
+                            }`}
+                          />
+                          {city}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
           </Field>
+
           <Field>
             <FieldLabel>Bio</FieldLabel>
             <Textarea {...form.register("bio")} />
@@ -263,28 +412,53 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
           <Field>
             <div className="flex items-center justify-between mb-1">
               <FieldLabel>Education</FieldLabel>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="h-7 px-2 text-xs"
-                onClick={() => appendEducation({ degree: "", subject: "", institution: "" })}
-              >
-                <Plus className="mr-1 h-3 w-3" /> Add Education
-              </Button>
+              {educationFields.length < 3 && !hasActiveEducationDraft && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-7 px-2 text-xs"
+                  onClick={handleStartAddingEducation}
+                >
+                  <Plus className="mr-1 h-3 w-3" /> Add
+                </Button>
+              )}
             </div>
 
             <div className="space-y-3">
               {educationFields.map((field, index) => {
+                const isCommitted = field.isCommitted;
                 const selectedDegree = form.watch(`education.${index}.degree`);
                 const selectedSubject = form.watch(`education.${index}.subject`);
                 const selectedInstitution = form.watch(`education.${index}.institution`);
 
+                if (isCommitted) {
+                  const displayDegree = selectedDegree ? selectedDegree.charAt(0).toUpperCase() + selectedDegree.slice(1) : "";
+                  return (
+                    <div key={field.id} className="flex items-center justify-between p-2.5 border rounded-md bg-secondary/20">
+                      <div className="flex items-center gap-2.5 overflow-hidden pr-2">
+                        <GraduationCap className="h-4 w-4 text-muted-foreground shrink-0" />
+                        <p className="text-xs text-foreground">
+                          {displayDegree} in {selectedSubject} from {selectedInstitution}
+                        </p>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 shrink-0 hover:bg-destructive/10"
+                        onClick={() => removeEducation(index)}
+                      >
+                        <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                      </Button>
+                    </div>
+                  );
+                }
+
                 return (
-                  <div key={field.id} className="p-3 border rounded-md bg-muted/30 space-y-3 relative">
-                    
-                    <div className="flex gap-2 items-center justify-between">
-                      <div className="w-[140px]">
+                  <div key={field.id} className="p-3 border rounded-md bg-muted/30 space-y-3 relative flex gap-3 items-start">
+                    <div className="flex-1 space-y-3">
+                      <div>
                         <Select
                           value={selectedDegree}
                           onValueChange={(val) => form.setValue(`education.${index}.degree`, val, { shouldValidate: true })}
@@ -307,123 +481,133 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
                         )}
                       </div>
 
+                      <div>
+                        <Popover 
+                          open={openDropdown === `subject-${index}`} 
+                          onOpenChange={(open) => setOpenDropdown(open ? `subject-${index}` : null)}
+                        >
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className="w-full justify-between font-normal text-xs h-9 bg-white text-left"
+                            >
+                              <span className="truncate">
+                                {selectedSubject || "Search and select subject..."}
+                              </span>
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-[340px] p-0" align="start">
+                            <Command>
+                              <CommandInput placeholder="Search subject..." className="text-xs" />
+                              <CommandList>
+                                <CommandEmpty>No subject found.</CommandEmpty>
+                                <CommandGroup className="max-h-[200px] overflow-y-auto">
+                                  {ALLOWED_SUBJECTS.map((subject) => (
+                                    <CommandItem
+                                      key={subject}
+                                      value={subject}
+                                      onSelect={() => {
+                                        form.setValue(`education.${index}.subject`, subject, { shouldValidate: true });
+                                        setOpenDropdown(null);
+                                      }}
+                                      className="text-xs"
+                                    >
+                                      <Check
+                                        className={`mr-2 h-3.5 w-3.5 ${
+                                          selectedSubject === subject ? "opacity-100" : "opacity-0"
+                                        }`}
+                                      />
+                                      {subject}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                        {form.formState.errors.education?.[index]?.subject && (
+                          <p className="text-[10px] font-medium text-destructive mt-0.5">
+                            {form.formState.errors.education[index]?.subject?.message}
+                          </p>
+                        )}
+                      </div>
+
+                      <div>
+                        <Popover 
+                          open={openDropdown === `institution-${index}`} 
+                          onOpenChange={(open) => setOpenDropdown(open ? `institution-${index}` : null)}
+                        >
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className="w-full justify-between font-normal text-xs h-9 bg-white text-left"
+                            >
+                              <span className="truncate">
+                                {selectedInstitution || "Search and select institution..."}
+                              </span>
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-[340px] p-0" align="start">
+                            <Command>
+                              <CommandInput placeholder="Search institution / university..." className="text-xs" />
+                              <CommandList>
+                                <CommandEmpty>No institution found.</CommandEmpty>
+                                <CommandGroup className="max-h-[200px] overflow-y-auto">
+                                  {ALLOWED_INSTITUTIONS.map((inst) => (
+                                    <CommandItem
+                                      key={inst}
+                                      value={inst}
+                                      onSelect={() => {
+                                        form.setValue(`education.${index}.institution`, inst, { shouldValidate: true });
+                                        setOpenDropdown(null);
+                                      }}
+                                      className="text-xs"
+                                    >
+                                      <Check
+                                        className={`mr-2 h-3.5 w-3.5 ${
+                                          selectedInstitution === inst ? "opacity-100" : "opacity-0"
+                                        }`}
+                                      />
+                                      {inst}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                        {form.formState.errors.education?.[index]?.institution && (
+                          <p className="text-[10px] font-medium text-destructive mt-0.5">
+                            {form.formState.errors.education[index]?.institution?.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-1 shrink-0">
                       <Button
                         type="button"
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 shrink-0 hover:bg-destructive/10"
+                        className="h-9 w-9 text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700"
+                        onClick={() => handleCommitEducation(index)}
+                      >
+                        <Check className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-9 w-9 hover:bg-destructive/10 text-destructive"
                         onClick={() => removeEducation(index)}
                       >
-                        <Trash2 className="h-4 w-4 text-destructive" />
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
-
-                    <div>
-                      <Popover 
-                        open={openDropdown === `subject-${index}`} 
-                        onOpenChange={(open) => setOpenDropdown(open ? `subject-${index}` : null)}
-                      >
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            role="combobox"
-                            className="w-full justify-between font-normal text-xs h-9 bg-white text-left"
-                          >
-                            <span className="truncate">
-                              {selectedSubject || "Search and select subject..."}
-                            </span>
-                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-[360px] p-0" align="start">
-                          <Command>
-                            <CommandInput placeholder="Search subject (e.g. Computer Science)..." className="text-xs" />
-                            <CommandList>
-                              <CommandEmpty>No subject found.</CommandEmpty>
-                              <CommandGroup className="max-h-[200px] overflow-y-auto">
-                                {ALLOWED_SUBJECTS.map((subject) => (
-                                  <CommandItem
-                                    key={subject}
-                                    value={subject}
-                                    onSelect={() => {
-                                      form.setValue(`education.${index}.subject`, subject, { shouldValidate: true });
-                                      setOpenDropdown(null);
-                                    }}
-                                    className="text-xs"
-                                  >
-                                    <Check
-                                      className={`mr-2 h-3.5 w-3.5 ${
-                                        selectedSubject === subject ? "opacity-100" : "opacity-0"
-                                      }`}
-                                    />
-                                    {subject}
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
-                            </CommandList>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
-                      {form.formState.errors.education?.[index]?.subject && (
-                        <p className="text-[10px] font-medium text-destructive mt-0.5">
-                          {form.formState.errors.education[index]?.subject?.message}
-                        </p>
-                      )}
-                    </div>
-
-                    <div>
-                      <Popover 
-                        open={openDropdown === `institution-${index}`} 
-                        onOpenChange={(open) => setOpenDropdown(open ? `institution-${index}` : null)}
-                      >
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            role="combobox"
-                            className="w-full justify-between font-normal text-xs h-9 bg-white text-left"
-                          >
-                            <span className="truncate">
-                              {selectedInstitution || "Search and select institution..."}
-                            </span>
-                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-[360px] p-0" align="start">
-                          <Command>
-                            <CommandInput placeholder="Search institution / university..." className="text-xs" />
-                            <CommandList>
-                              <CommandEmpty>No institution found.</CommandEmpty>
-                              <CommandGroup className="max-h-[200px] overflow-y-auto">
-                                {ALLOWED_INSTITUTIONS.map((inst) => (
-                                  <CommandItem
-                                    key={inst}
-                                    value={inst}
-                                    onSelect={() => {
-                                      form.setValue(`education.${index}.institution`, inst, { shouldValidate: true });
-                                      setOpenDropdown(null);
-                                    }}
-                                    className="text-xs"
-                                  >
-                                    <Check
-                                      className={`mr-2 h-3.5 w-3.5 ${
-                                        selectedInstitution === inst ? "opacity-100" : "opacity-0"
-                                      }`}
-                                    />
-                                    {inst}
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
-                            </CommandList>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
-                      {form.formState.errors.education?.[index]?.institution && (
-                        <p className="text-[10px] font-medium text-destructive mt-0.5">
-                          {form.formState.errors.education[index]?.institution?.message}
-                        </p>
-                      )}
-                    </div>
-
                   </div>
                 );
               })}
@@ -432,6 +616,9 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
                 <p className="text-xs text-muted-foreground italic">No education history added yet.</p>
               )}
             </div>
+            {form.formState.errors.education?.root && (
+              <span className="text-xs text-destructive mt-1 block">{form.formState.errors.education.root.message}</span>
+            )}
           </Field>
 
           <Field>
@@ -523,7 +710,7 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
                   className="h-7 px-2 text-xs"
                   onClick={handleStartAddingSocial}
                 >
-                  <Plus className="mr-1 h-3 w-3" /> Add
+                  <Plus className="mr-1 h-3 w-3" /> Add 
                 </Button>
               )}
             </div>
@@ -538,7 +725,7 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
                 if (isCommitted) {
                   return (
                     <div key={field.id} className="flex items-center justify-between p-2.5 border rounded-md bg-secondary/20">
-                      <div className="flex items-center gap-2 overflow-hidden pr-2">
+                      <div className="flex items-center gap-2.5 overflow-hidden pr-2">
                         {SavedIcon && <SavedIcon className="h-4 w-4 text-muted-foreground shrink-0" />}
                         <a 
                           href={form.getValues(`socials.${index}.url`)} 
@@ -624,10 +811,10 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
                           type="button"
                           variant="ghost"
                           size="icon"
-                          className="h-9 w-9 hover:bg-destructive/10"
+                          className="h-9 w-9 hover:bg-destructive/10 text-destructive"
                           onClick={() => remove(index)}
                         >
-                          <Trash2 className="h-4 w-4 text-destructive" />
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
