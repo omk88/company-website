@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Plus, LayoutDashboard, FileText, Settings, Hammer } from "lucide-react";
+import { Plus, Hammer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";

@@ -15,8 +15,6 @@ export const metadata: Metadata = {
 
 const INSIGHTS_MODELS = ['/cross.glb'];
 
-
-
 export default async function InsightsPage() {
 
   const tabs: TabItem[] = [
