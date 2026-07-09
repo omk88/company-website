@@ -60,7 +60,13 @@ const schema = defineSchema({
     profilePic: v.string(),
     location: v.string(),
     bio: v.string(),
-    education: v.array(v.string()),
+    education: v.array(
+        v.object({
+          degree: v.string(),
+          subject: v.string(),
+          institution: v.string(),
+        })
+      ),
     skills: v.array(v.string()),
     socials: v.array(
       v.object({

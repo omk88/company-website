@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -146,14 +146,19 @@ interface EditProfileDialogProps {
 }
 
 export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileDialogProps) {
+    
   const [isOpen, setIsOpen] = useState(false);
   const [comboboxOpen, setComboboxOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   
-  // States handling async OpenStreetMap search logic
   const [locationQuery, setLocationQuery] = useState("");
   const [locationOptions, setLocationOptions] = useState<string[]>([]);
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewSrc, setPreviewSrc] = useState<string>("");
+  
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -194,7 +199,6 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
   const hasActiveDraft = fields.some((field) => !field.isCommitted);
   const hasActiveEducationDraft = educationFields.some((field) => !field.isCommitted);
 
-  // Debounced API Search for Global Locations
   useEffect(() => {
     if (locationQuery.trim().length < 3) {
       setLocationOptions([]);
@@ -297,6 +301,18 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
     setIsOpen(false); 
   };
 
+  const handleButtonClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      setPreviewSrc(URL.createObjectURL(file));
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>{children}</DialogTrigger>
@@ -307,20 +323,29 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
         </DialogHeader>
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="-mx-4 max-h-[60vh] overflow-y-auto px-4 pb-2 grid gap-4 no-scrollbar">
-          <div className="relative p-2 w-fit">
-            <Avatar className="h-16 w-16 border-2 border-muted">
-              <AvatarImage src={avatarSrc} />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
-            <button
-              type="button"
-              onClick={() => console.log("Avatar clicked!")}
-              className="absolute inset-2 flex items-center justify-center rounded-full bg-black/40 text-white"
-              aria-label="Change avatar"
-            >
-              <ImagePlus className="h-5 w-5" />
-            </button>
-          </div>
+            <div className="relative p-2 w-fit">
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    accept="image/*"
+                    className="hidden" 
+                />
+
+                <Avatar className="h-16 w-16 border-2 border-muted">
+                    <AvatarImage src={ previewSrc || avatarSrc } />
+                    <AvatarFallback>CN</AvatarFallback>
+                </Avatar>
+
+                <button
+                    type="button"
+                    onClick={handleButtonClick}
+                    className="absolute inset-2 flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 transition-colors cursor-pointer"
+                    aria-label="Change avatar"
+                >
+                <ImagePlus className="h-5 w-5" />
+                </button>
+            </div>
 
           <Field>
             <FieldLabel>Username</FieldLabel>
