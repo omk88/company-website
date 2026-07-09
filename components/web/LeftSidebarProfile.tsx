@@ -61,10 +61,17 @@ export function LeftSidebarProfile({ profile, avatarSrc }: profileRouteProps) {
               profile.education.map((item, index) => (
                 <div 
                   key={index} 
-                  className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground"
+                  className="flex flex-row items-start gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground"
                 >
-                  <GraduationCap className="h-4 w-4 shrink-0" />
-                  <h2>{item}</h2>
+                  <GraduationCap className="h-4 w-4 shrink-0 mt-0.5" />
+                  <div className="flex flex-col gap-0.5">
+                    <h2 className="font-semibold text-foreground">
+                      {item.degree} in {item.subject}
+                    </h2>
+                    <p className="text-[11px] lowercase first-letter:uppercase text-muted-foreground">
+                      {item.institution}
+                    </p>
+                  </div>
                 </div>
               ))
             ) : (
