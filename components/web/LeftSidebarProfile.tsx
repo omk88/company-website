@@ -21,9 +21,10 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
 
 interface profileRouteProps {
     profile: Doc<"profiles"> | null;
+    avatarSrc: string;
 }
 
-export function LeftSidebarProfile({ profile }: profileRouteProps) {
+export function LeftSidebarProfile({ profile, avatarSrc }: profileRouteProps) {
     
     if (!profile) {
         return <div className="p-4 text-gray-500">Profile not found</div>;
@@ -41,7 +42,7 @@ export function LeftSidebarProfile({ profile }: profileRouteProps) {
         <SidebarContent className="!p-0">
         <div className="p-2">
             <Avatar className="h-16 w-16 border-2 border-muted">
-                <AvatarImage src="https://github.com/shadcn.png" />
+                <AvatarImage src={ avatarSrc } />
                 <AvatarFallback>CN</AvatarFallback>
             </Avatar>
             <h1 className="flex items-start justify-left gap-2 text-lg font-medium text-foreground mt-2">
@@ -51,9 +52,24 @@ export function LeftSidebarProfile({ profile }: profileRouteProps) {
         
         <SidebarGroup>
             <div className="flex flex-col bg-muted rounded-sm p-3 gap-3">
-                <p className="text-sm leading-relaxed">
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library in London, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets.
-                </p>
+                {profile.bio && profile.bio.trim() !== "" ? (
+                    <p className="text-sm leading-relaxed text-foreground">
+                        {profile.bio}
+                    </p>
+                ) : (
+                    <p className="text-sm italic text-muted-foreground/70">
+                        No bio added.
+                    </p>
+                )}
+                {profile.location && profile.location.trim() !== "" ? (
+                    <p className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                        {profile.location}
+                    </p>
+                ) : (
+                    <p className="text-xs text-muted-foreground italic">
+                        No location added.
+                    </p>
+                )}
                 {profile.education && profile.education.length > 0 ? (
                     profile.education.map((item, index) => (
                         <div 
@@ -65,7 +81,7 @@ export function LeftSidebarProfile({ profile }: profileRouteProps) {
                         </div>
                     ))
                 ) : (
-                    <p className="text-xs text-muted-foreground italic">No education history added.</p>
+                    <p className="text-xs text-muted-foreground italic">No education added.</p>
                 )}
                 <div className="flex flex-row gap-3 items-center pt-1">
                     {profile.socials && profile.socials.length > 0 ? (
@@ -91,7 +107,7 @@ export function LeftSidebarProfile({ profile }: profileRouteProps) {
                             );
                         })
                     ) : (
-                        <span className="text-xs text-muted-foreground italic">No links connected</span>
+                        <span className="text-xs text-muted-foreground italic">No links connected.</span>
                     )}
                 </div>
             </div>
@@ -111,7 +127,7 @@ export function LeftSidebarProfile({ profile }: profileRouteProps) {
                             <div key={index}>• {skill}</div>
                         ))
                     ) : (
-                        <div className="italic text-muted-foreground/70">No skills added yet</div>
+                        <div className="italic text-muted-foreground/70">No skills added.</div>
                     )}
                 </div>
             </div>

@@ -19,6 +19,19 @@ export default async function Profile({ params }: profileRouteProps) {
         username: username 
     });
 
+    let resolvedAvatarUrl = "";
+
+    if (profile?.profilePic) {
+        if (profile.profilePic.startsWith("http")) {
+            resolvedAvatarUrl = profile.profilePic;
+        } else {
+            const storageUrl = await fetchQuery(api.profiles.getImageUrl, {
+                storageId: profile.profilePic,
+            });
+            resolvedAvatarUrl = storageUrl || "";
+        }
+    }
+
     const tabs: TabItem[] = [
         { value: "blog-articles", label: "Blog Articles" },
         { value: "comments", label: "Comments" },
@@ -29,7 +42,10 @@ export default async function Profile({ params }: profileRouteProps) {
             <SidebarProvider style={{ "--sidebar-width": "24rem" } as React.CSSProperties}>
                 <SearchProvider>
                     <aside>
-                        <LeftSidebarProfile profile={ profile } />
+                        <LeftSidebarProfile 
+                            profile={profile} 
+                            avatarSrc={resolvedAvatarUrl} 
+                        />
                     </aside>
                 </SearchProvider>
 

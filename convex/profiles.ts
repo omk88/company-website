@@ -46,6 +46,8 @@ export const initialiseProfile = mutation({
       firstName: args.firstName,
       lastName: args.lastName,
       profilePic: args.profilePic,
+      location: "",
+      bio: "",
       education: [],
       skills: [],
       socials: [], 
@@ -69,5 +71,19 @@ export const getProfileByUsername = query({
       .unique();
 
     return profile;
+  },
+});
+
+export const generateUploadUrl = mutation({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.storage.generateUploadUrl();
+  },
+});
+
+export const getImageUrl = query({
+  args: { storageId: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.storage.getUrl(args.storageId);
   },
 });
