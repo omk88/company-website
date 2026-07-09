@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
-import { ImagePlus, Pen, Plus, Trash2, Check } from "lucide-react";
+import { ImagePlus, Pen, Plus, Trash2, Check, ChevronsUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -29,7 +29,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Badge } from "@/components/ui/badge";
 import { AVAILABLE_PLATFORMS, ICON_MAP } from "@/lib/socials";
+import { ALLOWED_SKILLS } from "@/lib/skills";
+
+import { ALLOWED_SUBJECTS, ALLOWED_INSTITUTIONS } from "@/lib/data";
 
 const formatPlatformName = (name: string) => {
   if (name.toLowerCase() === "x") return "Twitter / X";
@@ -42,6 +48,14 @@ const profileFormSchema = z.object({
   lastName: z.string().optional(),
   location: z.string().optional(),
   bio: z.string().optional(),
+  education: z.array(
+    z.object({
+      degree: z.string().min(1, "Degree type is required"),
+      subject: z.string().min(1, "Subject is required"),
+      institution: z.string().min(1, "Institution is required"),
+    })
+  ),
+  skills: z.array(z.string()).max(10, "You can add up to 10 skills"),
   socials: z.array(
     z.object({
       platform: z.string(),
@@ -113,8 +127,8 @@ interface EditProfileDialogProps {
 
 export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [educationList, setEducationList] = useState<string[]>(profile.education || []);
-  const [skillsList, setSkillsList] = useState<string[]>(profile.skills || []);
+  const [comboboxOpen, setComboboxOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -124,6 +138,8 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
       lastName: profile.lastName || "",
       location: profile.location || "",
       bio: profile.bio || "",
+      education: (profile.education as any) || [],
+      skills: profile.skills || [],
       socials: ((profile.socials as { platform: string; url: string }[]) || []).map(s => ({
         ...s,
         isCommitted: true,
@@ -136,39 +152,33 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
     name: "socials",
   });
 
+  const { 
+    fields: educationFields, 
+    append: appendEducation, 
+    remove: removeEducation 
+  } = useFieldArray({
+    control: form.control,
+    name: "education",
+  });
+
+  const watchedSkills = form.watch("skills") || [];
   const hasActiveDraft = fields.some((field) => !field.isCommitted);
 
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);
     if (open) {
       form.reset();
-      setEducationList(profile.education || []);
-      setSkillsList(profile.skills || []);
     }
   };
 
-  const handleAddEducation = () => {
-    if (educationList.length < 3) setEducationList([...educationList, ""]);
-  };
-  const handleRemoveEducation = (index: number) => {
-    setEducationList(educationList.filter((_, i) => i !== index));
-  };
-  const handleEducationChange = (index: number, value: string) => {
-    const updated = [...educationList];
-    updated[index] = value;
-    setEducationList(updated);
-  };
-
-  const handleAddSkill = () => {
-    if (skillsList.length < 10) setSkillsList([...skillsList, ""]);
-  };
-  const handleRemoveSkill = (index: number) => {
-    setSkillsList(skillsList.filter((_, i) => i !== index));
-  };
-  const handleSkillChange = (index: number, value: string) => {
-    const updated = [...skillsList];
-    updated[index] = value;
-    setSkillsList(updated);
+  const handleToggleSkill = (skill: string) => {
+    const currentSkills = form.getValues("skills");
+    if (currentSkills.includes(skill)) {
+      form.setValue("skills", currentSkills.filter((s) => s !== skill));
+    } else {
+      if (currentSkills.length >= 10) return;
+      form.setValue("skills", [...currentSkills, skill]);
+    }
   };
 
   const handleStartAddingSocial = () => {
@@ -195,7 +205,7 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
 
   const onSubmit = (data: ProfileFormValues) => {
     const cleanedSocials = data.socials.map(({ platform, url }) => ({ platform, url }));
-    console.log("Saving changes...", { ...data, socials: cleanedSocials, educationList, skillsList });
+    console.log("Saving changes...", { ...data, socials: cleanedSocials });
     setIsOpen(false); 
   };
 
@@ -214,7 +224,6 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
               <AvatarImage src={avatarSrc} />
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
-
             <button
               type="button"
               onClick={() => console.log("Avatar clicked!")}
@@ -232,14 +241,16 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
               <span className="text-xs text-destructive">{form.formState.errors.username.message}</span>
             )}
           </Field>
-          <Field>
-            <FieldLabel>First Name</FieldLabel>
-            <Input type="text" {...form.register("firstName")} />
-          </Field>
-          <Field>
-            <FieldLabel>Last Name</FieldLabel>
-            <Input type="text" {...form.register("lastName")} />
-          </Field>
+          <div className="grid grid-cols-2 gap-2">
+            <Field>
+              <FieldLabel>First Name</FieldLabel>
+              <Input type="text" {...form.register("firstName")} />
+            </Field>
+            <Field>
+              <FieldLabel>Last Name</FieldLabel>
+              <Input type="text" {...form.register("lastName")} />
+            </Field>
+          </div>
           <Field>
             <FieldLabel>Location</FieldLabel>
             <Input type="text" {...form.register("location")} />
@@ -252,83 +263,253 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
           <Field>
             <div className="flex items-center justify-between mb-1">
               <FieldLabel>Education</FieldLabel>
-              {educationList.length < 3 && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="h-7 px-2 text-xs"
-                  onClick={handleAddEducation}
-                >
-                  <Plus className="mr-1 h-3 w-3" /> Add
-                </Button>
-              )}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="h-7 px-2 text-xs"
+                onClick={() => appendEducation({ degree: "", subject: "", institution: "" })}
+              >
+                <Plus className="mr-1 h-3 w-3" /> Add Education
+              </Button>
             </div>
-            <div className="space-y-2">
-              {educationList.map((edu, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <Input
-                    type="text"
-                    value={edu}
-                    placeholder="e.g., B.S. in Computer Science"
-                    onChange={(e) => handleEducationChange(index, e.target.value)}
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="h-9 w-9 shrink-0"
-                    onClick={() => handleRemoveEducation(index)}
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
-                </div>
-              ))}
-              {educationList.length === 0 && (
-                <p className="text-xs text-muted-foreground italic">No education added yet.</p>
+
+            <div className="space-y-3">
+              {educationFields.map((field, index) => {
+                const selectedDegree = form.watch(`education.${index}.degree`);
+                const selectedSubject = form.watch(`education.${index}.subject`);
+                const selectedInstitution = form.watch(`education.${index}.institution`);
+
+                return (
+                  <div key={field.id} className="p-3 border rounded-md bg-muted/30 space-y-3 relative">
+                    
+                    <div className="flex gap-2 items-center justify-between">
+                      <div className="w-[140px]">
+                        <Select
+                          value={selectedDegree}
+                          onValueChange={(val) => form.setValue(`education.${index}.degree`, val, { shouldValidate: true })}
+                        >
+                          <SelectTrigger className="h-9 text-xs bg-white">
+                            <SelectValue placeholder="Degree" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="bachelors" className="text-xs">Bachelors</SelectItem>
+                            <SelectItem value="masters" className="text-xs">Masters</SelectItem>
+                            <SelectItem value="phd" className="text-xs">PhD</SelectItem>
+                            <SelectItem value="associates" className="text-xs">Associates</SelectItem>
+                            <SelectItem value="diploma" className="text-xs">Diploma</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        {form.formState.errors.education?.[index]?.degree && (
+                          <p className="text-[10px] font-medium text-destructive mt-0.5">
+                            {form.formState.errors.education[index]?.degree?.message}
+                          </p>
+                        )}
+                      </div>
+
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 shrink-0 hover:bg-destructive/10"
+                        onClick={() => removeEducation(index)}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
+
+                    <div>
+                      <Popover 
+                        open={openDropdown === `subject-${index}`} 
+                        onOpenChange={(open) => setOpenDropdown(open ? `subject-${index}` : null)}
+                      >
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            className="w-full justify-between font-normal text-xs h-9 bg-white text-left"
+                          >
+                            <span className="truncate">
+                              {selectedSubject || "Search and select subject..."}
+                            </span>
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[360px] p-0" align="start">
+                          <Command>
+                            <CommandInput placeholder="Search subject (e.g. Computer Science)..." className="text-xs" />
+                            <CommandList>
+                              <CommandEmpty>No subject found.</CommandEmpty>
+                              <CommandGroup className="max-h-[200px] overflow-y-auto">
+                                {ALLOWED_SUBJECTS.map((subject) => (
+                                  <CommandItem
+                                    key={subject}
+                                    value={subject}
+                                    onSelect={() => {
+                                      form.setValue(`education.${index}.subject`, subject, { shouldValidate: true });
+                                      setOpenDropdown(null);
+                                    }}
+                                    className="text-xs"
+                                  >
+                                    <Check
+                                      className={`mr-2 h-3.5 w-3.5 ${
+                                        selectedSubject === subject ? "opacity-100" : "opacity-0"
+                                      }`}
+                                    />
+                                    {subject}
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                      {form.formState.errors.education?.[index]?.subject && (
+                        <p className="text-[10px] font-medium text-destructive mt-0.5">
+                          {form.formState.errors.education[index]?.subject?.message}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <Popover 
+                        open={openDropdown === `institution-${index}`} 
+                        onOpenChange={(open) => setOpenDropdown(open ? `institution-${index}` : null)}
+                      >
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            className="w-full justify-between font-normal text-xs h-9 bg-white text-left"
+                          >
+                            <span className="truncate">
+                              {selectedInstitution || "Search and select institution..."}
+                            </span>
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[360px] p-0" align="start">
+                          <Command>
+                            <CommandInput placeholder="Search institution / university..." className="text-xs" />
+                            <CommandList>
+                              <CommandEmpty>No institution found.</CommandEmpty>
+                              <CommandGroup className="max-h-[200px] overflow-y-auto">
+                                {ALLOWED_INSTITUTIONS.map((inst) => (
+                                  <CommandItem
+                                    key={inst}
+                                    value={inst}
+                                    onSelect={() => {
+                                      form.setValue(`education.${index}.institution`, inst, { shouldValidate: true });
+                                      setOpenDropdown(null);
+                                    }}
+                                    className="text-xs"
+                                  >
+                                    <Check
+                                      className={`mr-2 h-3.5 w-3.5 ${
+                                        selectedInstitution === inst ? "opacity-100" : "opacity-0"
+                                      }`}
+                                    />
+                                    {inst}
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                      {form.formState.errors.education?.[index]?.institution && (
+                        <p className="text-[10px] font-medium text-destructive mt-0.5">
+                          {form.formState.errors.education[index]?.institution?.message}
+                        </p>
+                      )}
+                    </div>
+
+                  </div>
+                );
+              })}
+
+              {educationFields.length === 0 && (
+                <p className="text-xs text-muted-foreground italic">No education history added yet.</p>
               )}
             </div>
           </Field>
 
           <Field>
             <div className="flex items-center justify-between mb-1">
-              <FieldLabel>Skills</FieldLabel>
-              {skillsList.length < 10 && (
+              <FieldLabel>Skills ({watchedSkills.length}/10)</FieldLabel>
+            </div>
+            
+            <Popover open={comboboxOpen} onOpenChange={setComboboxOpen}>
+              <PopoverTrigger asChild>
                 <Button
-                  type="button"
                   variant="outline"
-                  size="sm"
-                  className="h-7 px-2 text-xs"
-                  onClick={handleAddSkill}
+                  role="combobox"
+                  aria-expanded={comboboxOpen}
+                  className="w-full justify-between font-normal text-xs text-muted-foreground h-9 bg-white"
+                  disabled={watchedSkills.length >= 10}
                 >
-                  <Plus className="mr-1 h-3 w-3" /> Add
+                  {watchedSkills.length >= 10 
+                    ? "Max skills reached" 
+                    : "Search and add tech skills..."}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
-              )}
-            </div>
-            <div className="space-y-2">
-              {skillsList.map((skill, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <Input
-                    type="text"
-                    value={skill}
-                    placeholder="e.g., React, TypeScript, Node.js"
-                    onChange={(e) => handleSkillChange(index, e.target.value)}
-                  />
-                  <Button
+              </PopoverTrigger>
+              <PopoverContent className="w-[360px] p-0" align="start">
+                <Command>
+                  <CommandInput placeholder="Search skills (e.g. Next.js, Rust)..." className="text-xs" />
+                  <CommandList>
+                    <CommandEmpty>No tech skill found.</CommandEmpty>
+                    <CommandGroup className="max-h-[200px] overflow-y-auto">
+                      {ALLOWED_SKILLS.map((skill) => {
+                        const isSelected = watchedSkills.includes(skill);
+                        return (
+                          <CommandItem
+                            key={skill}
+                            value={skill}
+                            onSelect={() => {
+                              handleToggleSkill(skill);
+                            }}
+                            className="text-xs"
+                          >
+                            <Check
+                              className={`mr-2 h-3.5 w-3.5 ${
+                                isSelected ? "opacity-100" : "opacity-0"
+                              }`}
+                            />
+                            {skill}
+                          </CommandItem>
+                        );
+                      })}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+
+            <div className="flex flex-wrap gap-1.5 mt-2">
+              {watchedSkills.map((skill) => (
+                <Badge 
+                  key={skill} 
+                  variant="secondary" 
+                  className="text-[11px] px-2 py-0.5 flex items-center gap-1 bg-secondary/50"
+                >
+                  {skill}
+                  <button
                     type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="h-9 w-9 shrink-0"
-                    onClick={() => handleRemoveSkill(index)}
+                    onClick={() => handleToggleSkill(skill)}
+                    className="hover:bg-muted rounded-full p-0.5 transition-colors"
                   >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
-                </div>
+                    <Plus className="h-3 w-3 rotate-45 text-muted-foreground hover:text-foreground" />
+                  </button>
+                </Badge>
               ))}
-              {skillsList.length === 0 && (
-                <p className="text-xs text-muted-foreground italic">No skills added yet.</p>
+              {watchedSkills.length === 0 && (
+                <p className="text-xs text-muted-foreground italic">No skills selected yet.</p>
               )}
             </div>
+            {form.formState.errors.skills && (
+              <span className="text-xs text-destructive mt-1">{form.formState.errors.skills.message}</span>
+            )}
           </Field>
 
           <Field>

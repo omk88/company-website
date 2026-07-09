@@ -1,0 +1,18 @@
+export const ALLOWED_SKILLS = [
+  "JavaScript",
+  "TypeScript",
+  "React",
+  "Next.js",
+  "Node.js",
+  "Python",
+  "Go",
+  "Rust",
+  "Docker",
+  "Kubernetes",
+  "GraphQL",
+  "PostgreSQL",
+  "MongoDB",
+  "Tailwind CSS",
+  "Convex",
+  "Prisma",
+].sort();
