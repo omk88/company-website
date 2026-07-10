@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { FaXTwitter } from "react-icons/fa6";
 import { MobileMenu } from "./MobileMenu";
 import { NavbarAuthClient } from "./NavbarAuthClient";
+import { Avatar, AvatarImage } from "../ui/avatar";
 
 interface NavBarProps {
     isAuth: boolean;
@@ -14,6 +15,8 @@ interface NavBarProps {
 
 export function Navbar({ isAuth }: NavBarProps) { 
     const anim = "relative no-underline hover:no-underline after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100";
+
+    const defaultAvatarUrl = "/default.svg";
 
     return (
         <header className="w-full fixed top-0 left-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border transition-colors duration-300 ease-in-out"> 
@@ -53,6 +56,12 @@ export function Navbar({ isAuth }: NavBarProps) {
                     <div className="flex items-center gap-2">
                         <ThemeToggle />
                         <NavbarAuthClient initialIsAuth={isAuth} /> 
+
+                        {isAuth && (
+                            <Avatar className="h-4 w-4 border-1 border-muted">
+                                <AvatarImage src={defaultAvatarUrl} alt="User Profile" />
+                            </Avatar>
+                        )}
                     </div>
                 </div>
 
