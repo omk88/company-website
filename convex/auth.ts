@@ -50,6 +50,28 @@ export const getCurrentUser = query({
   args: {},
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
-    return identity; 
+    if (!identity) {
+      return null;
+    }
+
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
+      .unique();
+
+    let profilePicUrl = null;
+    if (profile?.profilePic) {
+      profilePicUrl = await ctx.storage.getUrl(profile.profilePic);
+    }
+
+    return {
+      userId: identity.subject,
+      email: identity.email,
+      name: identity.name,
+      profile: profile ? {
+        ...profile,
+        profilePicUrl
+      } : null
+    };
   },
 });

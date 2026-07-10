@@ -7,6 +7,10 @@ import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { LogIn, LogOut } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
+import { Avatar, AvatarImage } from "../ui/avatar";
+
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 interface NavbarAuthClientProps {
     initialIsAuth: boolean;
@@ -33,20 +37,43 @@ export function NavbarAuthClient({ initialIsAuth }: NavbarAuthClientProps) {
 
     const isLoggedIn = isPending ? initialIsAuth : !!session;
 
+    const userData = useQuery(api.auth.getCurrentUser, isLoggedIn ? {} : "skip");
+    
+    const defaultAvatarUrl = "/default.svg";
+
     return (
         <TooltipProvider delayDuration={200}>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
                 {isLoggedIn ? (
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon" onClick={handleSignOut}>
-                                <LogOut className="h-4 w-4" />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent side="bottom" align="center">
-                            <p className="text-xs font-medium">Sign Out</p>
-                        </TooltipContent>
-                    </Tooltip>
+                    <>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button variant="ghost" size="icon" onClick={handleSignOut}>
+                                    <LogOut className="h-4 w-4" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom" align="center">
+                                <p className="text-xs font-medium">Sign Out</p>
+                            </TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Link href={"/"+userData?.profile?.username}>
+                                    <Button variant="ghost" size="icon">
+                                        <Avatar className="h-5 w-5 border-1 border-muted">
+                                            <AvatarImage 
+                                                src={userData?.profile?.profilePicUrl || defaultAvatarUrl} 
+                                                alt={userData?.profile?.username || "User Profile"} 
+                                            />
+                                        </Avatar>
+                                    </Button>
+                                </Link>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom" align="center">
+                                <p className="text-xs font-medium">Profile</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </>
                 ) : (
                     <Tooltip>
                         <TooltipTrigger asChild>

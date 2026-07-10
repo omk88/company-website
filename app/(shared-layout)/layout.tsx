@@ -1,5 +1,6 @@
 import GridBackground from "@/components/web/GridBackground";
-import { isAuthenticated } from "@/lib/auth-server";
+import { api } from "@/convex/_generated/api";
+import { isAuthenticated, preloadAuthQuery } from "@/lib/auth-server";
 import dynamic from "next/dynamic";
 import { ReactNode } from "react";
 
