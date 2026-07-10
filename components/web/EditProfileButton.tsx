@@ -5,7 +5,7 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { api } from "@/convex/_generated/api";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { ImagePlus, Pen, Plus, Trash2, Check, ChevronsUpDown, GraduationCap, MapPin, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -43,16 +43,15 @@ const formatPlatformName = (name: string) => {
 
 const profileFormSchema = z.object({
   username: z.string().min(2, "Username must be at least 2 characters"),
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
-  location: z.string().optional(),
-  bio: z.string().optional(),
+  firstName: z.string(),
+  lastName: z.string(),
+  location: z.string(),
+  bio: z.string(),
   education: z.array(
     z.object({
       degree: z.string().min(1, "Degree type is required"),
       subject: z.string().min(1, "Subject is required"),
       institution: z.string().min(1, "Institution is required"),
-      isCommitted: z.boolean(),
     })
   )
     .max(3, "You can add up to 3 education histories")
@@ -80,7 +79,6 @@ const profileFormSchema = z.object({
     z.object({
       platform: z.string(),
       url: z.string().min(1, "URL is required"),
-      isCommitted: z.boolean(), 
     })
   ).superRefine((socials, ctx) => {
     socials.forEach((social, index) => {
@@ -157,6 +155,9 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewSrc, setPreviewSrc] = useState<string>("");
+  const generateUploadUrl = useMutation(api.profiles.generateUploadUrl);
+
+  const runUpdateProfile = useMutation(api.profiles.updateProfile);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -196,8 +197,8 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
   });
 
   const watchedSkills = form.watch("skills") || [];
-  const hasActiveDraft = fields.some((field) => !field.isCommitted);
-  const hasActiveEducationDraft = educationFields.some((field) => !field.isCommitted);
+  const [editingSocialIndex, setEditingSocialIndex] = useState<number | -1>(-1);
+  const [editingEduIndex, setEditingEduIndex] = useState<number | -1>(-1);
 
   useEffect(() => {
     if (locationQuery.trim().length < 3) {
@@ -252,52 +253,72 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
   };
 
   const handleStartAddingSocial = () => {
-    if (fields.length >= 7 || hasActiveDraft) return;
-    append({ platform: AVAILABLE_PLATFORMS[0] || "x", url: "", isCommitted: false });
+    if (fields.length >= 7 || editingSocialIndex !== -1) return;
+
+    append({ platform: AVAILABLE_PLATFORMS[0] || "x", url: "" });
+    setEditingSocialIndex(fields.length);
   };
 
   const handleCommitSocial = async (index: number) => {
     const isValid = await form.trigger(`socials.${index}.url`);
-    
     if (isValid) {
-      const currentField = form.getValues(`socials.${index}`);
-      const cleanUrl = currentField.url.trim().startsWith("http")
+        const currentField = form.getValues(`socials.${index}`);
+        const cleanUrl = currentField.url.trim().startsWith("http")
         ? currentField.url.trim()
         : `https://${currentField.url.trim()}`;
 
-      update(index, {
-        ...currentField,
-        url: cleanUrl,
-        isCommitted: true,
-      });
+        update(index, { ...currentField, url: cleanUrl });
+        setEditingSocialIndex(-1); 
     }
   };
 
-  const handleStartAddingEducation = () => {
-    if (educationFields.length >= 3 || hasActiveEducationDraft) return;
-    appendEducation({ degree: "", subject: "", institution: "", isCommitted: false });
-  };
+    const handleStartAddingEducation = () => {
+        if (educationFields.length >= 3 || editingEduIndex !== -1) return;
+        
+        appendEducation({ degree: "", subject: "", institution: "" });
+        
+        setEditingEduIndex(educationFields.length);
+    };
 
-  const handleCommitEducation = async (index: number) => {
-    const isDegreeValid = await form.trigger(`education.${index}.degree`);
-    const isSubjectValid = await form.trigger(`education.${index}.subject`);
-    const isInstValid = await form.trigger(`education.${index}.institution`);
-    
-    const isArrayValid = await form.trigger("education");
-    
-    if (isDegreeValid && isSubjectValid && isInstValid && isArrayValid) {
-      const currentField = form.getValues(`education.${index}`);
-      updateEducation(index, {
-        ...currentField,
-        isCommitted: true,
-      });
-    }
-  };
+    const handleCommitEducation = async (index: number) => {
+        const isDegreeValid = await form.trigger(`education.${index}.degree`);
+        const isSubjectValid = await form.trigger(`education.${index}.subject`);
+        const isInstValid = await form.trigger(`education.${index}.institution`);
+        
+        const isArrayValid = await form.trigger("education");
+        
+        if (isDegreeValid && isSubjectValid && isInstValid && isArrayValid) {
+            const currentField = form.getValues(`education.${index}`);
+            
+            updateEducation(index, currentField);
+            
+            setEditingEduIndex(-1);
+        }
+    };
 
-  const onSubmit = (data: ProfileFormValues) => {
+  const onSubmit = async (data: ProfileFormValues) => {
+    const storageId = await handleUpload();
     const cleanedSocials = data.socials.map(({ platform, url }) => ({ platform, url }));
     const cleanedEducation = data.education.map(({ degree, subject, institution }) => ({ degree, subject, institution }));
-    console.log("Saving changes...", { ...data, socials: cleanedSocials, education: cleanedEducation });
+    
+    try {
+        await runUpdateProfile({
+            userId: profile.userId, 
+            username: data.username,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            profilePic: storageId || avatarSrc,
+            location: data.location,
+            bio: data.bio,
+            education: cleanedEducation,
+            skills: data.skills,
+            socials: cleanedSocials,
+        });
+
+    } catch (error) {
+
+    }
+    
     setIsOpen(false); 
   };
 
@@ -310,6 +331,28 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
     if (file) {
       setSelectedFile(file);
       setPreviewSrc(URL.createObjectURL(file));
+    }
+  };
+
+  const handleUpload = async (): Promise<string | null> => {
+    if (!selectedFile) return null;
+
+    try {
+        const uploadUrl = await generateUploadUrl();
+
+        const result = await fetch(uploadUrl, {
+            method: "POST",
+            headers: { "Content-Type": selectedFile.type },
+            body: selectedFile,
+        });
+
+        if (!result.ok) throw new Error("Upload failed");
+
+        const { storageId } = await result.json();
+        return storageId;
+        
+    } catch (error) {
+        return null;
     }
   };
 
@@ -436,48 +479,51 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
 
           <Field>
             <div className="flex items-center justify-between mb-1">
-              <FieldLabel>Education</FieldLabel>
-              {educationFields.length < 3 && !hasActiveEducationDraft && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="h-7 px-2 text-xs"
-                  onClick={handleStartAddingEducation}
-                >
-                  <Plus className="mr-1 h-3 w-3" /> Add
-                </Button>
-              )}
-            </div>
+                <FieldLabel>Education</FieldLabel>
+                {educationFields.length < 3 && editingEduIndex === -1 && (
+                    <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-7 px-2 text-xs"
+                    onClick={handleStartAddingEducation}
+                    >
+                    <Plus className="mr-1 h-3 w-3" /> Add
+                    </Button>
+                )}
+                </div>
 
-            <div className="space-y-3">
-              {educationFields.map((field, index) => {
-                const isCommitted = field.isCommitted;
-                const selectedDegree = form.watch(`education.${index}.degree`);
-                const selectedSubject = form.watch(`education.${index}.subject`);
-                const selectedInstitution = form.watch(`education.${index}.institution`);
+                <div className="space-y-3">
+                {educationFields.map((field, index) => {
+                    const isCommitted = index !== editingEduIndex;
+                    const selectedDegree = form.watch(`education.${index}.degree`);
+                    const selectedSubject = form.watch(`education.${index}.subject`);
+                    const selectedInstitution = form.watch(`education.${index}.institution`);
 
-                if (isCommitted) {
-                  const displayDegree = selectedDegree ? selectedDegree.charAt(0).toUpperCase() + selectedDegree.slice(1) : "";
-                  return (
-                    <div key={field.id} className="flex items-center justify-between p-2.5 border rounded-md bg-secondary/20">
-                      <div className="flex items-center gap-2.5 overflow-hidden pr-2">
-                        <GraduationCap className="h-4 w-4 text-muted-foreground shrink-0" />
-                        <p className="text-xs text-foreground">
-                          {displayDegree} in {selectedSubject} from {selectedInstitution}
-                        </p>
-                      </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 shrink-0 hover:bg-destructive/10"
-                        onClick={() => removeEducation(index)}
-                      >
-                        <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                      </Button>
-                    </div>
-                  );
+                    if (isCommitted) {
+                    const displayDegree = selectedDegree ? selectedDegree.charAt(0).toUpperCase() + selectedDegree.slice(1) : "";
+                    return (
+                        <div key={field.id} className="flex items-center justify-between p-2.5 border rounded-md bg-secondary/20">
+                        <div className="flex items-center gap-2.5 overflow-hidden pr-2">
+                            <GraduationCap className="h-4 w-4 text-muted-foreground shrink-0" />
+                            <p className="text-xs text-foreground">
+                            {displayDegree} in {selectedSubject} from {selectedInstitution}
+                            </p>
+                        </div>
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 shrink-0 hover:bg-destructive/10"
+                            onClick={() => {
+                            removeEducation(index);
+                            if (editingEduIndex === index) setEditingEduIndex(-1);
+                            }}
+                        >
+                            <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                        </Button>
+                        </div>
+                    );
                 }
 
                 return (
@@ -726,52 +772,55 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
 
           <Field>
             <div className="flex items-center justify-between mb-1">
-              <FieldLabel>Social Links</FieldLabel>
-              {fields.length < 7 && !hasActiveDraft && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="h-7 px-2 text-xs"
-                  onClick={handleStartAddingSocial}
-                >
-                  <Plus className="mr-1 h-3 w-3" /> Add 
-                </Button>
-              )}
-            </div>
+                <FieldLabel>Social Links</FieldLabel>
+                {fields.length < 7 && editingSocialIndex === -1 && (
+                    <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-7 px-2 text-xs"
+                    onClick={handleStartAddingSocial}
+                    >
+                    <Plus className="mr-1 h-3 w-3" /> Add 
+                    </Button>
+                )}
+                </div>
 
-            <div className="space-y-3">
-              {fields.map((field, index) => {
-                const isCommitted = field.isCommitted;
-                const SavedIcon = ICON_MAP[field.platform];
-                const rowError = form.formState.errors.socials?.[index]?.url;
-                const activePlatform = form.watch(`socials.${index}.platform`);
+                <div className="space-y-3">
+                {fields.map((field, index) => {
+                    const isCommitted = index !== editingSocialIndex;
+                    const SavedIcon = ICON_MAP[field.platform];
+                    const rowError = form.formState.errors.socials?.[index]?.url;
+                    const activePlatform = form.watch(`socials.${index}.platform`);
 
-                if (isCommitted) {
-                  return (
-                    <div key={field.id} className="flex items-center justify-between p-2.5 border rounded-md bg-secondary/20">
-                      <div className="flex items-center gap-2.5 overflow-hidden pr-2">
-                        {SavedIcon && <SavedIcon className="h-4 w-4 text-muted-foreground shrink-0" />}
-                        <a 
-                          href={form.getValues(`socials.${index}.url`)} 
-                          target="_blank" 
-                          rel="noreferrer" 
-                          className="text-xs text-primary truncate hover:underline"
+                    if (isCommitted) {
+                    return (
+                        <div key={field.id} className="flex items-center justify-between p-2.5 border rounded-md bg-secondary/20">
+                        <div className="flex items-center gap-2.5 overflow-hidden pr-2">
+                            {SavedIcon && <SavedIcon className="h-4 w-4 text-muted-foreground shrink-0" />}
+                            <a 
+                            href={form.getValues(`socials.${index}.url`)} 
+                            target="_blank" 
+                            rel="noreferrer" 
+                            className="text-xs text-primary truncate hover:underline"
+                            >
+                            {form.getValues(`socials.${index}.url`)}
+                            </a>
+                        </div>
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 shrink-0 hover:bg-destructive/10"
+                            onClick={() => {
+                            remove(index);
+                            if (editingSocialIndex === index) setEditingSocialIndex(-1);
+                            }}
                         >
-                          {form.getValues(`socials.${index}.url`)}
-                        </a>
-                      </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 shrink-0 hover:bg-destructive/10"
-                        onClick={() => remove(index)}
-                      >
-                        <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                      </Button>
-                    </div>
-                  );
+                            <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                        </Button>
+                        </div>
+                    );
                 }
 
                 return (

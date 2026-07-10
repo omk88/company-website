@@ -87,3 +87,95 @@ export const getImageUrl = query({
     return await ctx.storage.getUrl(args.storageId);
   },
 });
+
+export const createProfile = mutation({
+  args: {
+    userId: v.string(),
+    username: v.string(),
+    firstName: v.string(),
+    lastName: v.string(),
+    profilePic: v.string(),
+    location: v.string(),
+    bio: v.string(),
+    education: v.array(
+      v.object({
+        degree: v.string(),
+        subject: v.string(),
+        institution: v.string(),
+      })
+    ),
+    skills: v.array(v.string()),
+    socials: v.array(
+      v.object({
+        platform: v.string(),
+        url: v.string()
+      })
+    ),
+    totalLikes: v.number(),
+    articlesPublished: v.number(),
+    commentsPublished: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const existingUser = await ctx.db
+      .query("profiles")
+      .withIndex("by_userId", (q) => q.eq("userId", args.userId))
+      .unique();
+
+    if (existingUser) {
+      throw new Error("Profile already exists for this user");
+    }
+
+    const profileId = await ctx.db.insert("profiles", args);
+    
+    return profileId;
+  },
+});
+
+export const updateProfile = mutation({
+  args: {
+    userId: v.string(), 
+    username: v.optional(v.string()),
+    firstName: v.optional(v.string()),
+    lastName: v.optional(v.string()),
+    profilePic: v.optional(v.string()),
+    location: v.optional(v.string()),
+    bio: v.optional(v.string()),
+    education: v.optional(
+      v.array(
+        v.object({
+          degree: v.string(),
+          subject: v.string(),
+          institution: v.string(),
+        })
+      )
+    ),
+    skills: v.optional(v.array(v.string())),
+    socials: v.optional(
+      v.array(
+        v.object({
+          platform: v.string(),
+          url: v.string()
+        })
+      )
+    ),
+    totalLikes: v.optional(v.number()),
+    articlesPublished: v.optional(v.number()),
+    commentsPublished: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const existingUser = await ctx.db
+      .query("profiles")
+      .withIndex("by_userId", (q) => q.eq("userId", args.userId))
+      .unique();
+
+    if (!existingUser) {
+      throw new Error("Profile not found");
+    }
+
+    const { userId, ...fieldsToUpdate } = args;
+
+    await ctx.db.patch(existingUser._id, fieldsToUpdate);
+
+    return existingUser._id;
+  },
+});
