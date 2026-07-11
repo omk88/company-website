@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { api } from "@/convex/_generated/api";
 import { useConvex, useMutation, useQuery } from "convex/react";
-import { ImagePlus, Pen, Plus, Trash2, Check, ChevronsUpDown, GraduationCap, MapPin, Loader2 } from "lucide-react";
+import { ImagePlus, Pen, Plus, Trash2, Check, ChevronsUpDown, GraduationCap, MapPin, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -424,23 +424,75 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
                 </button>
             </div>
 
-          <Field>
-            <FieldLabel>Username</FieldLabel>
-            <Input type="text" {...form.register("username")} />
-            {form.formState.errors.username && (
-              <span className="text-xs text-destructive">{form.formState.errors.username.message}</span>
-            )}
-          </Field>
-          <div className="grid grid-cols-2 gap-2">
             <Field>
-              <FieldLabel>First Name</FieldLabel>
-              <Input type="text" {...form.register("firstName")} />
+              <FieldLabel>Username</FieldLabel>
+              
+              <div className="relative w-full">
+                <Input 
+                  type="text" 
+                  {...form.register("username")} 
+                  placeholder="john.doe48"  
+                  className="pr-9"
+                />
+                
+                {form.watch("username") && (
+                  <button 
+                    onClick={() => form.setValue("username", "", { shouldValidate: true })} 
+                    type="button" 
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted"
+                  >
+                    <X className="h-3.5 w-3.5 stroke-[2]" />
+                  </button>
+                )}
+              </div>
+
+              {form.formState.errors.username && (
+                <span className="text-xs text-destructive">{form.formState.errors.username.message}</span>
+              )}
             </Field>
-            <Field>
-              <FieldLabel>Last Name</FieldLabel>
-              <Input type="text" {...form.register("lastName")} />
-            </Field>
-          </div>
+            <div className="grid grid-cols-2 gap-2">
+              <Field>
+                <FieldLabel>First Name</FieldLabel>
+                <div className="relative w-full">
+                  <Input 
+                    type="text" 
+                    {...form.register("firstName")} 
+                    placeholder="John" 
+                    className="pr-9" 
+                  />
+                  {form.watch("firstName") && (
+                    <button 
+                      onClick={() => form.setValue("firstName", "", { shouldValidate: true })} 
+                      type="button" 
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted"
+                    >
+                      <X className="h-3.5 w-3.5 stroke-[2]" />
+                    </button>
+                  )}
+                </div>
+              </Field>
+
+              <Field>
+                <FieldLabel>Last Name</FieldLabel>
+                <div className="relative w-full">
+                  <Input 
+                    type="text" 
+                    {...form.register("lastName")} 
+                    placeholder="Doe" 
+                    className="pr-9" 
+                  />
+                  {form.watch("lastName") && (
+                    <button 
+                      onClick={() => form.setValue("lastName", "", { shouldValidate: true })} 
+                      type="button" 
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted"
+                    >
+                      <X className="h-3.5 w-3.5 stroke-[2]" />
+                    </button>
+                  )}
+                </div>
+              </Field>
+            </div>
 
           <Field>
             <FieldLabel>Location</FieldLabel>
@@ -453,7 +505,7 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
                 >
                   <span className="truncate flex items-center gap-1.5">
                     <MapPin className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                    {form.watch("location") || "Search city or town globally..."}
+                    {form.watch("location") || "Search city or town..."}
                   </span>
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
@@ -508,7 +560,23 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
 
           <Field>
             <FieldLabel>Bio</FieldLabel>
-            <Textarea {...form.register("bio")} />
+            <div className="relative w-full">
+              <Textarea 
+                {...form.register("bio")} 
+                placeholder="Hi! My name is John Doe and I am a tech professional..."
+                className="pr-9 pt-2.5"
+              />
+              
+              {form.watch("bio") && (
+                <button 
+                  onClick={() => form.setValue("bio", "", { shouldValidate: true })} 
+                  type="button" 
+                  className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted"
+                >
+                  <X className="h-3.5 w-3.5 stroke-[2]" />
+                </button>
+              )}
+            </div>
           </Field>
 
           <Field>
