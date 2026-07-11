@@ -35,7 +35,8 @@ import { Badge } from "@/components/ui/badge";
 import { AVAILABLE_PLATFORMS, ICON_MAP } from "@/lib/socials";
 import { ALLOWED_SKILLS } from "@/lib/skills";
 import { ALLOWED_SUBJECTS, ALLOWED_INSTITUTIONS } from "@/lib/data";
-import { EducationFields } from "./EditFormFields/EducationFields";
+import { EducationFields } from "./EditFormFields/EducationField";
+import { LocationField } from "./EditFormFields/LocationField";
 
 const formatPlatformName = (name: string) => {
   if (name.toLowerCase() === "x") return "Twitter / X";
@@ -153,7 +154,7 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   
   const [locationQuery, setLocationQuery] = useState("");
-  const [locationOptions, setLocationOptions] = useState<string[]>([]);
+  const [locationOptions, setLocationOptions] = useState<{label: string, countryCode?: string}[]>([]);
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -209,8 +210,9 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
   const [editingEduIndex, setEditingEduIndex] = useState<number | -1>(-1);
 
   useEffect(() => {
-    if (locationQuery.trim().length < 3) {
+    if (!locationQuery.trim() || locationQuery.trim().length < 3) {
       setLocationOptions([]);
+      setIsLoadingLocation(false);
       return;
     }
 
@@ -228,10 +230,20 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
           const city = item.address.city || item.address.town || item.address.village || item.display_name.split(",")[0];
           const state = item.address.state;
           const country = item.address.country;
-          return state ? `${city}, ${state}, ${country}` : `${city}, ${country}`;
+          const label = state ? `${city}, ${state}, ${country}` : `${city}, ${country}`;
+          
+          return {
+            label,
+            countryCode: item.address?.country_code
+          };
         });
 
-        setLocationOptions([...new Set(formattedCities)] as string[]);
+        const uniqueCities = formattedCities.filter(
+          (value: any, index: number, self: any[]) =>
+            self.findIndex((t) => t.label === value.label) === index
+        );
+
+        setLocationOptions(uniqueCities);
       } catch (err) {
         console.error("Error collecting global geocode data:", err);
       } finally {
@@ -493,69 +505,14 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
               </Field>
             </div>
 
-          <Field>
-            <FieldLabel>Location</FieldLabel>
-            <Popover open={openDropdown === "location"} onOpenChange={(open) => setOpenDropdown(open ? "location" : null)}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  role="combobox"
-                  className="w-full justify-between font-normal text-xs h-9 bg-white text-left"
-                >
-                  <span className="truncate flex items-center gap-1.5">
-                    <MapPin className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                    {form.watch("location") || "Search city or town..."}
-                  </span>
-                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-[340px] p-0" align="start">
-                <Command shouldFilter={false}>
-                  <CommandInput 
-                    value={locationQuery}
-                    onValueChange={setLocationQuery}
-                    placeholder="Type city name (e.g. Paris, Austin)..." 
-                    className="text-xs" 
-                  />
-                  <CommandList>
-                    {isLoadingLocation && (
-                      <div className="p-4 flex items-center justify-center gap-2 text-xs text-muted-foreground">
-                        <Loader2 className="h-3.5 w-3.5 animate-spin" /> Fetching cities...
-                      </div>
-                    )}
-                    {!isLoadingLocation && locationQuery.trim().length >= 3 && locationOptions.length === 0 && (
-                      <CommandEmpty>No results matching your query.</CommandEmpty>
-                    )}
-                    {locationQuery.trim().length < 3 && !isLoadingLocation && (
-                      <div className="p-3 text-center text-xs text-muted-foreground italic">
-                        Type at least 3 characters to query data
-                      </div>
-                    )}
-                    <CommandGroup>
-                      {locationOptions.map((city) => (
-                        <CommandItem
-                          key={city}
-                          value={city}
-                          onSelect={() => {
-                            form.setValue("location", city, { shouldValidate: true });
-                            setOpenDropdown(null);
-                          }}
-                          className="text-xs cursor-pointer"
-                        >
-                          <Check
-                            className={`mr-2 h-3.5 w-3.5 ${
-                              form.watch("location") === city ? "opacity-100" : "opacity-0"
-                            }`}
-                          />
-                          {city}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
-          </Field>
+          <LocationField
+            openDropdown={openDropdown}
+            setOpenDropdown={setOpenDropdown}
+            locationQuery={locationQuery}
+            setLocationQuery={setLocationQuery}
+            locationOptions={locationOptions}
+            isLoadingLocation={isLoadingLocation}
+          />
 
           <Field>
             <FieldLabel>Bio</FieldLabel>

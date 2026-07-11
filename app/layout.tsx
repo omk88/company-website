@@ -20,7 +20,7 @@ const jetBrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "TaQtiQ | Digital Solutions",
+    default: "TaQtiQ | Building software that pushes boundaries.",
     template: "%s | TaQtiQ",               
   },
   description: "Description"
