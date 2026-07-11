@@ -5,7 +5,7 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { api } from "@/convex/_generated/api";
-import { useMutation, useQuery } from "convex/react";
+import { useConvex, useMutation, useQuery } from "convex/react";
 import { ImagePlus, Pen, Plus, Trash2, Check, ChevronsUpDown, GraduationCap, MapPin, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -145,6 +145,8 @@ interface EditProfileDialogProps {
 
 export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileDialogProps) {
     
+  const convex = useConvex();
+
   const [isOpen, setIsOpen] = useState(false);
   const [comboboxOpen, setComboboxOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -158,6 +160,11 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
   const generateUploadUrl = useMutation(api.profiles.generateUploadUrl);
 
   const runUpdateProfile = useMutation(api.profiles.updateProfile);
+
+  const updateImage = useMutation(api.auth.updateAuthImage);
+
+  const [imageUrl, setImageUrl] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -296,27 +303,54 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
         }
     };
 
+  const updateSessionProfilePicture = async (publicImageUrl: string) => {
+    if (!publicImageUrl) return;
+    try {
+      setIsSubmitting(true);
+      await updateImage({ image: publicImageUrl });
+    } catch (error) {
+      console.error("Failed to update auth session image:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const onSubmit = async (data: ProfileFormValues) => {
-    const storageId = await handleUpload();
+    const storageId = await handleUpload(); 
+    const finalStorageId = storageId || profile.profilePic;
+
+    let publicUrl: string | null = "";
+
+    if (finalStorageId) {
+      try {
+        publicUrl = await convex.query(api.profiles.getImageUrl, { storageId: finalStorageId });
+      } catch (urlError) {
+        console.error("Failed to generate public URL for storage ID:", urlError);
+      }
+    }
+
+    if (publicUrl) {
+      await updateSessionProfilePicture(publicUrl);
+    }
+
     const cleanedSocials = data.socials.map(({ platform, url }) => ({ platform, url }));
     const cleanedEducation = data.education.map(({ degree, subject, institution }) => ({ degree, subject, institution }));
     
     try {
-        await runUpdateProfile({
-            userId: profile.userId, 
-            username: data.username,
-            firstName: data.firstName,
-            lastName: data.lastName,
-            profilePic: storageId || profile.profilePic,
-            location: data.location,
-            bio: data.bio,
-            education: cleanedEducation,
-            skills: data.skills,
-            socials: cleanedSocials,
-        });
-
+      await runUpdateProfile({
+        userId: profile.userId, 
+        username: data.username,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        profilePic: finalStorageId,
+        location: data.location,
+        bio: data.bio,
+        education: cleanedEducation,
+        skills: data.skills,
+        socials: cleanedSocials,
+      });
     } catch (error) {
-
+      console.error("Failed to update profile database record:", error);
     }
     
     setIsOpen(false); 
