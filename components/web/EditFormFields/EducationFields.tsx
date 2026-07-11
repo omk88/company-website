@@ -49,13 +49,15 @@ export const EducationFields: React.FC<EducationFieldsProps> = ({
             size="sm"
             className="h-7 px-2 text-xs"
             onClick={() => {
-                handleStartAddingEducation(); 
-                
-                appendEducation({
-                    degree: "",
-                    subject: "",
-                    institution: "",
-                });
+              const nextIndex = educationFields.length; 
+              
+              appendEducation({
+                degree: "",
+                subject: "",
+                institution: "",
+              });
+              
+              setEditingEduIndex(nextIndex);
             }}
         >
             <Plus className="mr-1 h-3 w-3" /> Add
@@ -63,7 +65,7 @@ export const EducationFields: React.FC<EducationFieldsProps> = ({
         )}
       </div>
 
-      <div className="space-y-3">
+      <div className="flex flex-col-reverse gap-3">
         {educationFields.map((field, index) => {
           const isCommitted = index !== editingEduIndex;
           const selectedDegree = watch(`education.${index}.degree`);
