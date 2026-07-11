@@ -48,6 +48,7 @@ const profileFormSchema = z.object({
   firstName: z.string(),
   lastName: z.string(),
   location: z.string(),
+  locationCountryCode: z.string().optional(), 
   bio: z.string(),
   education: z.array(
     z.object({

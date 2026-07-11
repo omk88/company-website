@@ -1,19 +1,10 @@
 import React from "react";
 import { useFormContext } from "react-hook-form";
-import { MapPin, Check, Loader2, Search } from "lucide-react";
+import { MapPin, Check, Loader2, Search, X } from "lucide-react";
 import { Popover, PopoverContent, PopoverAnchor } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { ProfileFormValues } from "../EditProfileButton";
-
-const getCountryFlag = (countryCode?: string) => {
-  if (!countryCode) return "";
-  const codePoints = countryCode
-    .toUpperCase()
-    .split("")
-    .map((char) => 127397 + char.charCodeAt(0));
-  return String.fromCodePoint(...codePoints);
-};
 
 interface LocationOption {
   label: string;
@@ -39,8 +30,14 @@ export const LocationField: React.FC<LocationFieldProps> = ({
 }) => {
   const { watch, setValue } = useFormContext<ProfileFormValues>();
   const selectedLocation = watch("location");
+  const selectedCountryCode = watch("locationCountryCode");
   
   const isOpen = openDropdown === "location";
+  const hasValue = !!selectedLocation || !!locationQuery;
+
+  const showFlag = selectedCountryCode && !isOpen;
+
+  const inputLeftPadding = showFlag ? "pl-15" : "pl-9";
 
   return (
     <Field>
@@ -54,7 +51,7 @@ export const LocationField: React.FC<LocationFieldProps> = ({
       >
         <PopoverAnchor asChild>
           <div className="relative w-full cursor-text">
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center pointer-events-none">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center pointer-events-none z-10">
               {isOpen ? (
                 <Search className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
               ) : (
@@ -62,24 +59,53 @@ export const LocationField: React.FC<LocationFieldProps> = ({
               )}
             </div>
 
+            {showFlag && (
+              <div className="absolute left-9 top-1/2 -translate-y-[56%] flex items-center pointer-events-none z-10">
+                <img
+                  src={`https://flagcdn.com/${selectedCountryCode.toLowerCase()}.svg`}
+                  width="18"
+                  alt=""
+                  className="shrink-0 object-contain aspect-[3/2]" 
+                />
+              </div>
+            )}
+
             <input
               type="text"
-              className="w-full flex h-9 rounded-md border border-input bg-white pl-9 pr-3 py-2 text-xs ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              className={`w-full flex h-9 rounded-md border border-input bg-white ${inputLeftPadding} pr-9 py-2 text-xs ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50`}
               autoComplete="one-time-code"
-              placeholder={selectedLocation || "Search city or town..."}
-              value={locationQuery}
+              placeholder="Search city or town..."
+              
+              value={isOpen ? locationQuery : (selectedLocation || "")}
+              
               onChange={(e) => {
                 if (!isOpen) setOpenDropdown("location");
                 setLocationQuery(e.target.value);
               }}
-              onFocus={() => {
-                if (!isOpen) setOpenDropdown("location");
-              }}
               onClick={(e) => {
                 e.stopPropagation();
-                if (!isOpen) setOpenDropdown("location");
+                if (!isOpen) {
+                  setOpenDropdown("location");
+                  if (selectedLocation) setLocationQuery(selectedLocation);
+                }
               }}
             />
+
+            {hasValue && (
+              <button 
+                type="button" 
+                onClick={(e) => {
+                  e.stopPropagation(); 
+                  setValue("location", "", { shouldValidate: true }); 
+                  setValue("locationCountryCode", "", { shouldValidate: true }); 
+                  setLocationQuery(""); 
+                  setOpenDropdown(null); 
+                }} 
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted"
+              >
+                <X className="h-3.5 w-3.5 stroke-[2]" />
+              </button>
+            )}
           </div>
         </PopoverAnchor>
 
@@ -87,6 +113,12 @@ export const LocationField: React.FC<LocationFieldProps> = ({
           className="w-[340px] p-0" 
           align="start" 
           onOpenAutoFocus={(e) => e.preventDefault()} 
+          onPointerDownOutside={(e) => {
+            const target = e.target as HTMLElement;
+            if (target.closest("input") || target.closest(".cursor-text")) {
+              e.preventDefault();
+            }
+          }}
         >
           <Command shouldFilter={false}>
             <CommandList>
@@ -103,38 +135,39 @@ export const LocationField: React.FC<LocationFieldProps> = ({
                   Type at least 3 characters to query data
                 </div>
               )}
-            <CommandGroup>
+              <CommandGroup>
                 {locationOptions.map((option) => (
-                    <CommandItem
+                  <CommandItem
                     key={option.label}
                     value={option.label}
                     onSelect={() => {
-                        setValue("location", option.label, { shouldValidate: true });
-                        setOpenDropdown(null);
-                        setLocationQuery("");
+                      setValue("location", option.label, { shouldValidate: true });
+                      setValue("locationCountryCode", option.countryCode || "", { shouldValidate: true });
+                      setOpenDropdown(null);
+                      setLocationQuery("");
                     }}
                     className="text-xs cursor-pointer flex items-center justify-between py-2 px-3 data-[selected=true]:bg-accent"
-                    >
+                  >
                     <div className="flex items-center gap-2.5 overflow-hidden text-ellipsis whitespace-nowrap">
-                        {option.countryCode ? (
+                      {option.countryCode ? (
                         <img
-                            src={`https://flagcdn.com/${option.countryCode.toLowerCase()}.svg`}
-                            width="18"
-                            alt=""
-                            className="shrink-0 object-contain aspect-[3/2]" 
+                          src={`https://flagcdn.com/${option.countryCode.toLowerCase()}.svg`}
+                          width="18"
+                          alt=""
+                          className="shrink-0 object-contain aspect-[3/2]" 
                         />
-                        ) : (
+                      ) : (
                         <MapPin className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                        )}
-                        
-                        <span className="truncate">{option.label}</span>
+                      )}
+                      
+                      <span className="truncate">{option.label}</span>
                     </div>
                     {selectedLocation === option.label && (
-                        <Check className="h-3.5 w-3.5 shrink-0 text-foreground" />
+                      <Check className="h-3.5 w-3.5 shrink-0 text-foreground" />
                     )}
-                    </CommandItem>
+                  </CommandItem>
                 ))}
-                </CommandGroup>
+              </CommandGroup>
             </CommandList>
           </Command>
         </PopoverContent>
