@@ -4,8 +4,9 @@ import { createClient, type GenericCtx } from "@convex-dev/better-auth";
 import { components } from "./_generated/api";
 import { DataModel } from "./_generated/dataModel";
 import authConfig from "./auth.config";
-import { query } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import { username } from "better-auth/plugins";
+import { v } from "convex/values";
 
 export const authComponent = createClient<DataModel>(components.betterAuth);
 
@@ -67,11 +68,27 @@ export const getCurrentUser = query({
     return {
       userId: identity.subject,
       email: identity.email,
-      name: identity.name,
+      username: identity.username,
       profile: profile ? {
         ...profile,
         profilePicUrl
       } : null
     };
+  },
+});
+
+export const updateAuthImage = mutation({
+  args: {
+    image: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const { auth, headers } = await authComponent.getAuth(createAuth, ctx);
+    
+    await auth.api.updateUser({
+      body: {
+        image: args.image,
+      },
+      headers,
+    });
   },
 });

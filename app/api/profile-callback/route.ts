@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { api } from "@/convex/_generated/api";
-import { fetchAuthMutation } from "@/lib/auth-server";
+import { fetchAuthMutation, fetchAuthQuery } from "@/lib/auth-server";
 import { authClient } from "@/lib/auth-client";
 
 const GRADIENT_PALETTES = [
@@ -54,6 +54,7 @@ export async function GET(request: Request) {
     }
 
     let profilePicField = ""; 
+    let publicProfilePicUrl = ""; 
 
     try {
       const svgString = generateRandomGradientSVG();
@@ -68,6 +69,14 @@ export async function GET(request: Request) {
       if (uploadResponse.ok) {
         const { storageId } = await uploadResponse.json();
         profilePicField = storageId; 
+
+        const urlResult = await fetchAuthQuery(api.profiles.getImageUrl, {
+          storageId: profilePicField,
+        });
+        
+        if (urlResult) {
+          publicProfilePicUrl = urlResult;
+        }
       }
     } catch (uploadError) {
       console.error("Failed to upload default gradient to Convex storage:", uploadError);
@@ -81,6 +90,16 @@ export async function GET(request: Request) {
       lastName: lastName || "",
       profilePic: profilePicField, 
     });
+
+    if (publicProfilePicUrl) {
+      try {
+        await fetchAuthMutation(api.auth.updateAuthImage, {
+          image: publicProfilePicUrl,
+        });
+      } catch (authUpdateError) {
+        console.error("Failed to update Better Auth session image inside Convex backend:", authUpdateError);
+      }
+    }
 
     return NextResponse.redirect(new URL("/", request.url));
 

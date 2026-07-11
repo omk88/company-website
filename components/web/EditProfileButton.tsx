@@ -307,7 +307,7 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
             username: data.username,
             firstName: data.firstName,
             lastName: data.lastName,
-            profilePic: storageId || avatarSrc,
+            profilePic: storageId || profile.profilePic,
             location: data.location,
             bio: data.bio,
             education: cleanedEducation,

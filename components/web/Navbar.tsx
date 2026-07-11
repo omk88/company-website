@@ -11,9 +11,10 @@ import { ConvexClientProvider } from "@/app/ConvexClientProvider";
 
 interface NavBarProps {
     isAuth: boolean;
+    initialImage?: string | null;
 }
 
-export function Navbar({ isAuth }: NavBarProps) { 
+export function Navbar({ isAuth, initialImage }: NavBarProps) { 
     const anim = "relative no-underline hover:no-underline after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100";
 
     return (
@@ -54,14 +55,19 @@ export function Navbar({ isAuth }: NavBarProps) {
                     <div className="flex items-center gap-2">
                         <ThemeToggle />
                         <ConvexClientProvider>
-                            <NavbarAuthClient initialIsAuth={isAuth} /> 
+                            <NavbarAuthClient initialIsAuth={isAuth} initialImage={initialImage} /> 
                         </ConvexClientProvider>
                     </div>
                 </div>
 
                 <div className="flex md:hidden items-center gap-4">
                     <ThemeToggle />
-                    <MobileMenu anim={anim} navbarAuth={ <NavbarAuthClient initialIsAuth={isAuth} /> } />
+                    <MobileMenu 
+                        anim={anim} 
+                        navbarAuth={ 
+                            <NavbarAuthClient initialIsAuth={isAuth} initialImage={initialImage} /> 
+                        } 
+                    />
                 </div>
                 
             </nav>

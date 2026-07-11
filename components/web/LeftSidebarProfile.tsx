@@ -1,6 +1,6 @@
 import { Sidebar, SidebarContent, SidebarGroup, SidebarFooter, SidebarGroupLabel } from "../ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { ChartNoAxesColumn, GraduationCap, MessageSquareText, SquareLibrary, Terminal, ThumbsUp } from "lucide-react";
+import { ChartNoAxesColumn, GraduationCap, MapPin, MessageSquareText, SquareLibrary, Terminal, ThumbsUp } from "lucide-react";
 import Link from "next/link";
 import { Doc } from "@/convex/_generated/dataModel";
 import { EditProfileButton } from "./EditProfileButton";
@@ -35,6 +35,16 @@ export function LeftSidebarProfile({ profile, avatarSrc }: profileRouteProps) {
             <span>{displayName}</span>
             <EditProfileButton profile={profile} avatarSrc={avatarSrc} />
           </h1>
+          {profile.location && profile.location.trim() !== "" ? (
+            <p className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
+              <MapPin className="h-3.5 w-3.5 shrink-0" /> 
+              {profile.location}
+            </p>
+          ) : (
+            <p className="text-xs text-muted-foreground italic">
+              No location added.
+            </p>
+          )}
         </div>
         
         <SidebarGroup>
@@ -48,31 +58,22 @@ export function LeftSidebarProfile({ profile, avatarSrc }: profileRouteProps) {
                 No bio added.
               </p>
             )}
-            {profile.location && profile.location.trim() !== "" ? (
-              <p className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
-                {profile.location}
-              </p>
-            ) : (
-              <p className="text-xs text-muted-foreground italic">
-                No location added.
-              </p>
-            )}
             {profile.education && profile.education.length > 0 ? (
               profile.education.map((item, index) => (
-                <div 
-                  key={index} 
-                  className="flex flex-row items-start gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground"
-                >
-                  <GraduationCap className="h-4 w-4 shrink-0 mt-0.5" />
-                  <div className="flex flex-col gap-0.5">
-                    <h2 className="font-semibold text-foreground">
-                      {item.degree} in {item.subject}
-                    </h2>
-                    <p className="text-[11px] lowercase first-letter:uppercase text-muted-foreground">
-                      {item.institution}
-                    </p>
-                  </div>
+              <div 
+                key={index} 
+                className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground"
+              >
+                <GraduationCap className="h-4 w-4 shrink-0" />
+                <div className="flex flex-col gap-0.5 text-muted-foreground">
+                  <h2>
+                    {item.degree} in {item.subject}
+                  </h2>
+                  <p>
+                    {item.institution}
+                  </p>
                 </div>
+              </div>
               ))
             ) : (
               <p className="text-xs text-muted-foreground italic">No education added.</p>
