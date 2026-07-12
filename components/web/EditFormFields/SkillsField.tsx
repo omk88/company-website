@@ -112,7 +112,7 @@ export const SkillsFields: React.FC<SkillsFieldsProps> = ({
       </Popover>
 
       <div className="relative w-full mt-2">
-        <div className="min-h-[110px] max-h-[140px] overflow-y-auto border border-dashed rounded-md p-2 pr-9 bg-muted/10 flex flex-wrap gap-1.5 content-start transition-all">
+        <div className="min-h-[135px] max-h-[165px] overflow-y-auto border border-dashed rounded-md p-2 pr-9 bg-muted/10 flex flex-wrap gap-1.5 content-start transition-all">
           {watchedSkills.map((skill) => (
             <Badge 
               key={skill} 
