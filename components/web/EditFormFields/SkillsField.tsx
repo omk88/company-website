@@ -64,7 +64,7 @@ export const SkillsFields: React.FC<SkillsFieldsProps> = ({
             variant="outline"
             role="combobox"
             aria-expanded={comboboxOpen}
-            className="w-full justify-between font-normal text-xs text-muted-foreground h-9 bg-white"
+            className="w-full justify-between font-normal text-muted-foreground h-9 bg-white"
             disabled={watchedSkills.length >= 10}
           >
             {watchedSkills.length >= 10 
