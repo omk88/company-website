@@ -59,6 +59,7 @@ const schema = defineSchema({
     lastName: v.string(),
     profilePic: v.string(),
     location: v.string(),
+    locationCountryCode: v.string(),
     bio: v.string(),
     education: v.array(
         v.object({

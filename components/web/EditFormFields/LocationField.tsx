@@ -12,6 +12,7 @@ interface LocationOption {
 }
 
 interface LocationFieldProps {
+  locationCountryCode: string | null;
   openDropdown: string | null;
   setOpenDropdown: (id: string | null) => void;
   locationQuery: string;
@@ -21,6 +22,7 @@ interface LocationFieldProps {
 }
 
 export const LocationField: React.FC<LocationFieldProps> = ({
+  locationCountryCode,
   openDropdown,
   setOpenDropdown,
   locationQuery,
@@ -35,9 +37,11 @@ export const LocationField: React.FC<LocationFieldProps> = ({
   const isOpen = openDropdown === "location";
   const hasValue = !!selectedLocation || !!locationQuery;
 
-  const showFlag = selectedCountryCode && !isOpen;
+  const currentCountryCode = selectedCountryCode || (locationCountryCode && !isOpen ? locationCountryCode : null);
 
-  const inputLeftPadding = showFlag ? "pl-15" : "pl-9";
+  const showFlag = !!currentCountryCode && !!selectedLocation;
+
+  const inputLeftPadding = showFlag ? "pl-16" : "pl-9";
 
   return (
     <Field>
@@ -59,10 +63,10 @@ export const LocationField: React.FC<LocationFieldProps> = ({
               )}
             </div>
 
-            {showFlag && (
+            {showFlag && currentCountryCode && (
               <div className="absolute left-9 top-1/2 -translate-y-[56%] flex items-center pointer-events-none z-10">
                 <img
-                  src={`https://flagcdn.com/${selectedCountryCode.toLowerCase()}.svg`}
+                  src={`https://flagcdn.com/${currentCountryCode.toLowerCase()}.svg`}
                   width="18"
                   alt=""
                   className="shrink-0 object-contain aspect-[3/2]" 

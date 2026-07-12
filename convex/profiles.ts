@@ -47,6 +47,7 @@ export const initialiseProfile = mutation({
       lastName: args.lastName,
       profilePic: args.profilePic,
       location: "",
+      locationCountryCode: "",
       bio: "",
       education: [],
       skills: [],
@@ -96,6 +97,7 @@ export const createProfile = mutation({
     lastName: v.string(),
     profilePic: v.string(),
     location: v.string(),
+    locationCountryCode: v.string(),
     bio: v.string(),
     education: v.array(
       v.object({
@@ -139,6 +141,7 @@ export const updateProfile = mutation({
     lastName: v.optional(v.string()),
     profilePic: v.optional(v.string()),
     location: v.optional(v.string()),
+    locationCountryCode: v.optional(v.string()),
     bio: v.optional(v.string()),
     education: v.optional(
       v.array(

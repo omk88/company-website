@@ -40,7 +40,7 @@ const profileFormSchema = z.object({
   firstName: z.string(),
   lastName: z.string(),
   location: z.string(),
-  locationCountryCode: z.string().optional(), 
+  locationCountryCode: z.string(), 
   bio: z.string(),
   education: z.array(
     z.object({
@@ -170,6 +170,7 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
       firstName: profile.firstName || "",
       lastName: profile.lastName || "",
       location: profile.location || "",
+      locationCountryCode: profile.locationCountryCode || "",
       bio: profile.bio || "",
       education: ((profile.education as any) || []).map((edu: any) => ({
         ...edu,
@@ -343,6 +344,7 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
         lastName: data.lastName,
         profilePic: finalStorageId,
         location: data.location,
+        locationCountryCode: data.locationCountryCode,
         bio: data.bio,
         education: cleanedEducation,
         skills: data.skills,
@@ -390,181 +392,134 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+      <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+        <DialogTrigger asChild>{children}</DialogTrigger>
 
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Edit Profile</DialogTitle>
-        </DialogHeader>
+        <DialogContent className="sm:max-w-[425px] max-h-[85vh] flex flex-col p-0 overflow-hidden">
+          <DialogHeader className="p-6 pb-4">
+            <DialogTitle>Edit Profile</DialogTitle>
+          </DialogHeader>
 
-      <FormProvider {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="-mx-4 max-h-[60vh] overflow-y-auto px-4 pb-2 grid gap-4 no-scrollbar">
-            <div className="relative p-2 w-fit">
-                <input
+          <FormProvider {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-1 overflow-hidden">
+              
+              <div className="flex-1 overflow-y-auto px-6 pb-4 grid gap-4 no-scrollbar">
+                <div className="relative p-2 w-fit">
+                  <input
                     type="file"
                     ref={fileInputRef}
                     onChange={handleFileChange}
                     accept="image/*"
                     className="hidden" 
-                />
-
-                <Avatar className="h-16 w-16 border-2 border-muted">
-                    <AvatarImage src={ previewSrc || avatarSrc } />
+                  />
+                  <Avatar className="h-16 w-16 border-2 border-muted">
+                    <AvatarImage src={previewSrc || avatarSrc} />
                     <AvatarFallback>CN</AvatarFallback>
-                </Avatar>
-
-                <button
+                  </Avatar>
+                  <button
                     type="button"
                     onClick={handleButtonClick}
                     className="absolute inset-2 flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 transition-colors cursor-pointer"
                     aria-label="Change avatar"
-                >
-                <ImagePlus className="h-5 w-5" />
-                </button>
-            </div>
-
-            <Field>
-              <FieldLabel>Username</FieldLabel>
-              
-              <div className="relative w-full">
-                <Input 
-                  type="text" 
-                  {...form.register("username")} 
-                  placeholder="john.doe48"  
-                  className="pr-9"
-                />
-                
-                {form.watch("username") && (
-                  <button 
-                    onClick={() => form.setValue("username", "", { shouldValidate: true })} 
-                    type="button" 
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted"
                   >
-                    <X className="h-3.5 w-3.5 stroke-[2]" />
+                    <ImagePlus className="h-5 w-5" />
                   </button>
-                )}
+                </div>
+
+                <Field>
+                  <FieldLabel>Username</FieldLabel>
+                  <div className="relative w-full">
+                    <Input type="text" {...form.register("username")} placeholder="john.doe48" className="pr-9" />
+                    {form.watch("username") && (
+                      <button 
+                        onClick={() => form.setValue("username", "", { shouldValidate: true })} 
+                        type="button" 
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted"
+                      >
+                        <X className="h-3.5 w-3.5 stroke-[2]" />
+                      </button>
+                    )}
+                  </div>
+                  {form.formState.errors.username && (
+                    <span className="text-xs text-destructive">{form.formState.errors.username.message}</span>
+                  )}
+                </Field>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <Field>
+                    <FieldLabel>First Name</FieldLabel>
+                    <div className="relative w-full">
+                      <Input type="text" {...form.register("firstName")} placeholder="John" className="pr-9" />
+                      {form.watch("firstName") && (
+                        <button onClick={() => form.setValue("firstName", "", { shouldValidate: true })} type="button" className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted"><X className="h-3.5 w-3.5 stroke-[2]" /></button>
+                      )}
+                    </div>
+                  </Field>
+                  <Field>
+                    <FieldLabel>Last Name</FieldLabel>
+                    <div className="relative w-full">
+                      <Input type="text" {...form.register("lastName")} placeholder="Doe" className="pr-9" />
+                      {form.watch("lastName") && (
+                        <button onClick={() => form.setValue("lastName", "", { shouldValidate: true })} type="button" className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted"><X className="h-3.5 w-3.5 stroke-[2]" /></button>
+                      )}
+                    </div>
+                  </Field>
+                </div>
+
+                <LocationField
+                  locationCountryCode={profile.locationCountryCode}
+                  openDropdown={openDropdown}
+                  setOpenDropdown={setOpenDropdown}
+                  locationQuery={locationQuery}
+                  setLocationQuery={setLocationQuery}
+                  locationOptions={locationOptions}
+                  isLoadingLocation={isLoadingLocation}
+                />
+
+                <Field>
+                  <FieldLabel>Bio</FieldLabel>
+                  <div className="relative w-full">
+                    <Textarea {...form.register("bio")} placeholder="Hi!..." className="pr-9 pt-2.5" />
+                    {form.watch("bio") && (
+                      <button onClick={() => form.setValue("bio", "", { shouldValidate: true })} type="button" className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted"><X className="h-3.5 w-3.5 stroke-[2]" /></button>
+                    )}
+                  </div>
+                </Field>
+
+                <EducationFields
+                  editingEduIndex={editingEduIndex}
+                  setEditingEduIndex={setEditingEduIndex}
+                  openDropdown={openDropdown}
+                  setOpenDropdown={setOpenDropdown}
+                  handleStartAddingEducation={handleStartAddingEducation}
+                  handleCommitEducation={handleCommitEducation}
+                  ALLOWED_SUBJECTS={majorsData}
+                />
+
+                <SkillsFields comboboxOpen={comboboxOpen} setComboboxOpen={setComboboxOpen} ALLOWED_SKILLS={SKILLS} />
+
+                <SocialLinksFields
+                  fields={fields}
+                  remove={remove}
+                  editingSocialIndex={editingSocialIndex}
+                  setEditingSocialIndex={setEditingSocialIndex}
+                  handleStartAddingSocial={handleStartAddingSocial}
+                  handleCommitSocial={handleCommitSocial}
+                  ICON_MAP={ICON_MAP}
+                  AVAILABLE_PLATFORMS={AVAILABLE_PLATFORMS}
+                  formatPlatformName={formatPlatformName}
+                />
               </div>
 
-              {form.formState.errors.username && (
-                <span className="text-xs text-destructive">{form.formState.errors.username.message}</span>
-              )}
-            </Field>
-            <div className="grid grid-cols-2 gap-2">
-              <Field>
-                <FieldLabel>First Name</FieldLabel>
-                <div className="relative w-full">
-                  <Input 
-                    type="text" 
-                    {...form.register("firstName")} 
-                    placeholder="John" 
-                    className="pr-9" 
-                  />
-                  {form.watch("firstName") && (
-                    <button 
-                      onClick={() => form.setValue("firstName", "", { shouldValidate: true })} 
-                      type="button" 
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted"
-                    >
-                      <X className="h-3.5 w-3.5 stroke-[2]" />
-                    </button>
-                  )}
-                </div>
-              </Field>
-
-              <Field>
-                <FieldLabel>Last Name</FieldLabel>
-                <div className="relative w-full">
-                  <Input 
-                    type="text" 
-                    {...form.register("lastName")} 
-                    placeholder="Doe" 
-                    className="pr-9" 
-                  />
-                  {form.watch("lastName") && (
-                    <button 
-                      onClick={() => form.setValue("lastName", "", { shouldValidate: true })} 
-                      type="button" 
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted"
-                    >
-                      <X className="h-3.5 w-3.5 stroke-[2]" />
-                    </button>
-                  )}
-                </div>
-              </Field>
-            </div>
-
-          <LocationField
-            openDropdown={openDropdown}
-            setOpenDropdown={setOpenDropdown}
-            locationQuery={locationQuery}
-            setLocationQuery={setLocationQuery}
-            locationOptions={locationOptions}
-            isLoadingLocation={isLoadingLocation}
-          />
-
-          <Field>
-            <FieldLabel>Bio</FieldLabel>
-            <div className="relative w-full">
-              <Textarea 
-                {...form.register("bio")} 
-                placeholder="Hi! My name is John Doe and I am a tech professional..."
-                className="pr-9 pt-2.5"
-              />
-              
-              {form.watch("bio") && (
-                <button 
-                  onClick={() => form.setValue("bio", "", { shouldValidate: true })} 
-                  type="button" 
-                  className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted"
-                >
-                  <X className="h-3.5 w-3.5 stroke-[2]" />
-                </button>
-              )}
-            </div>
-          </Field>
-
-          <EducationFields
-                editingEduIndex={editingEduIndex}
-                setEditingEduIndex={setEditingEduIndex}
-                openDropdown={openDropdown}
-                setOpenDropdown={setOpenDropdown}
-                handleStartAddingEducation={handleStartAddingEducation}
-                handleCommitEducation={handleCommitEducation}
-                ALLOWED_SUBJECTS={majorsData}
-          />
-
-          <SkillsFields 
-            comboboxOpen={comboboxOpen}
-            setComboboxOpen={setComboboxOpen}
-            ALLOWED_SKILLS={SKILLS} 
-          />
-
-          <SocialLinksFields
-            fields={fields}
-            remove={remove}
-            editingSocialIndex={editingSocialIndex}
-            setEditingSocialIndex={setEditingSocialIndex}
-            handleStartAddingSocial={handleStartAddingSocial}
-            handleCommitSocial={handleCommitSocial}
-            ICON_MAP={ICON_MAP}
-            AVAILABLE_PLATFORMS={AVAILABLE_PLATFORMS}
-            formatPlatformName={formatPlatformName}
-          />
-
-          <DialogFooter className="gap-2 sm:gap-2 pt-2 col-span-full">
-            <DialogClose asChild>
-              <Button type="button" variant="outline">
-                Cancel
-              </Button>
-            </DialogClose>
-            <Button type="submit">
-              Save Changes
-            </Button>
-          </DialogFooter>
-        </form>
-      </FormProvider>
-      </DialogContent>
-    </Dialog>
+              <DialogFooter className="p-6 pt-2 border-t bg-background gap-2 sm:gap-2">
+                <DialogClose asChild>
+                  <Button type="button" variant="outline">Cancel</Button>
+                </DialogClose>
+                <Button type="submit">Save Changes</Button>
+              </DialogFooter>
+            </form>
+          </FormProvider>
+        </DialogContent>
+      </Dialog>
   );
 }
