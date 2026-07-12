@@ -17,7 +17,6 @@ import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import { Textarea } from "../ui/textarea";
 import { Image, Paperclip, X } from "lucide-react";
-import { authClient } from "@/lib/auth-client";
 
 const AVAILABLE_TAGS = ["Product", "Research", "Design", "Technology", "Opinion", "Tutorials"];
 
