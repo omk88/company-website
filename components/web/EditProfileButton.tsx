@@ -479,7 +479,7 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
                 <Field>
                   <FieldLabel>Bio</FieldLabel>
                   <div className="relative w-full">
-                    <Textarea {...form.register("bio")} placeholder="Hi!..." className="pr-9 pt-2.5" />
+                    <Textarea {...form.register("bio")} placeholder="Hi! My name is John Doe and I am a tech professional..." className="pr-9 pt-2.5" />
                     {form.watch("bio") && (
                       <button onClick={() => form.setValue("bio", "", { shouldValidate: true })} type="button" className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted"><X className="h-3.5 w-3.5 stroke-[2]" /></button>
                     )}

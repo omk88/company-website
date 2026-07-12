@@ -5,6 +5,7 @@ import { Popover, PopoverContent, PopoverAnchor } from "@/components/ui/popover"
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { ProfileFormValues } from "../EditProfileButton";
+import { Input } from "@/components/ui/input";
 
 interface LocationOption {
   label: string;
@@ -74,9 +75,9 @@ export const LocationField: React.FC<LocationFieldProps> = ({
               </div>
             )}
 
-            <input
+            <Input
               type="text"
-              className={`w-full flex h-9 rounded-md border border-input bg-white ${inputLeftPadding} pr-9 py-2 text-xs ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50`}
+              className={`w-full flex h-9 bg-white ${inputLeftPadding} pr-9 py-2`}
               autoComplete="one-time-code"
               placeholder="Search city or town..."
               
