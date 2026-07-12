@@ -1,12 +1,13 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useFormContext, useFieldArray } from "react-hook-form";
-import { GraduationCap, Trash2, Plus, ChevronsUpDown, Check } from "lucide-react";
+import { GraduationCap, Trash2, Plus, ChevronsUpDown, Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { ProfileFormValues } from "../EditProfileButton";
+import { DEGREE_TYPES } from "@/data/degrees";
 
 interface EducationFieldsProps {
   editingEduIndex: number;
@@ -16,7 +17,11 @@ interface EducationFieldsProps {
   handleStartAddingEducation: () => void;
   handleCommitEducation: (index: number) => void;
   ALLOWED_SUBJECTS: string[];
-  ALLOWED_INSTITUTIONS: string[];
+}
+
+interface HipoUniversity {
+  name: string;
+  country: string;
 }
 
 export const EducationFields: React.FC<EducationFieldsProps> = ({
@@ -24,10 +29,8 @@ export const EducationFields: React.FC<EducationFieldsProps> = ({
   setEditingEduIndex,
   openDropdown,
   setOpenDropdown,
-  handleStartAddingEducation,
   handleCommitEducation,
   ALLOWED_SUBJECTS,
-  ALLOWED_INSTITUTIONS,
 }) => {
   const { control, watch, setValue, formState: { errors } } = useFormContext<ProfileFormValues>();
 
@@ -36,32 +39,62 @@ export const EducationFields: React.FC<EducationFieldsProps> = ({
     name: "education",
   });
 
-  
+  const [searchQuery, setSearchQuery] = useState("");
+  const [institutions, setInstitutions] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setInstitutions([]);
+      return;
+    }
+
+    setIsLoading(true);
+    const delayDebounceFn = setTimeout(async () => {
+      try {
+        const response = await fetch(
+          `http://universities.hipolabs.com/search?name=${encodeURIComponent(searchQuery)}`
+        );
+        if (response.ok) {
+          const data: HipoUniversity[] = await response.json();
+          const uniqueNames = Array.from(new Set(data.map((uni) => uni.name))).slice(0, 20);
+          setInstitutions(uniqueNames);
+        }
+      } catch (error) {
+        console.error("Failed fetching universities:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }, 400);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    if (!openDropdown || !openDropdown.startsWith("institution-")) {
+      setSearchQuery("");
+      setInstitutions([]);
+    }
+  }, [openDropdown]);
 
   return (
     <Field>
       <div className="flex items-center justify-between mb-1">
         <FieldLabel>Education</FieldLabel>
         {educationFields.length < 3 && editingEduIndex === -1 && (
-        <Button
+          <Button
             type="button"
             variant="outline"
             size="sm"
             className="h-7 px-2 text-xs"
             onClick={() => {
-              const nextIndex = educationFields.length; 
-              
-              appendEducation({
-                degree: "",
-                subject: "",
-                institution: "",
-              });
-              
+              const nextIndex = educationFields.length;
+              appendEducation({ degree: "", subject: "", institution: "" });
               setEditingEduIndex(nextIndex);
             }}
-        >
+          >
             <Plus className="mr-1 h-3 w-3" /> Add
-        </Button>
+          </Button>
         )}
       </div>
 
@@ -73,12 +106,20 @@ export const EducationFields: React.FC<EducationFieldsProps> = ({
           const selectedInstitution = watch(`education.${index}.institution`);
 
           if (isCommitted) {
-            const displayDegree = selectedDegree ? selectedDegree.charAt(0).toUpperCase() + selectedDegree.slice(1) : "";
+            const matchingDegree = DEGREE_TYPES.find((d) => d.value === selectedDegree);
+            let displayDegree = selectedDegree || "";
+
+            if (matchingDegree) {
+              const shorthandMatch = matchingDegree.label.match(/\(([^)]+)\)/);
+              displayDegree = shorthandMatch ? shorthandMatch[1] : matchingDegree.label;
+            }
+
             return (
               <div key={field.id} className="flex items-center justify-between p-2.5 border rounded-md bg-secondary/20">
-                <div className="flex items-center gap-2.5 overflow-hidden pr-2">
-                  <GraduationCap className="h-4 w-4 text-muted-foreground shrink-0" />
-                  <p className="text-xs text-foreground">
+                <div className="flex items-start gap-2.5 overflow-hidden pr-2">
+                  <GraduationCap className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+                  
+                  <p className="text-xs text-foreground break-words whitespace-normal">
                     {displayDegree} in {selectedSubject} from {selectedInstitution}
                   </p>
                 </div>
@@ -86,7 +127,7 @@ export const EducationFields: React.FC<EducationFieldsProps> = ({
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 shrink-0 hover:bg-destructive/10"
+                  className="h-8 w-8 shrink-0 hover:bg-destructive/10 self-start" /* Added self-start to keep delete button aligned near top */
                   onClick={() => {
                     removeEducation(index);
                     if (editingEduIndex === index) setEditingEduIndex(-1);
@@ -110,11 +151,15 @@ export const EducationFields: React.FC<EducationFieldsProps> = ({
                       <SelectValue placeholder="Degree" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="bachelors" className="text-xs">Bachelors</SelectItem>
-                      <SelectItem value="masters" className="text-xs">Masters</SelectItem>
-                      <SelectItem value="phd" className="text-xs">PhD</SelectItem>
-                      <SelectItem value="associates" className="text-xs">Associates</SelectItem>
-                      <SelectItem value="diploma" className="text-xs">Diploma</SelectItem>
+                      {DEGREE_TYPES.map((degree) => (
+                        <SelectItem 
+                          key={degree.value} 
+                          value={degree.value} 
+                          className="text-xs"
+                        >
+                          {degree.label}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   {errors.education?.[index]?.degree && (
@@ -125,9 +170,12 @@ export const EducationFields: React.FC<EducationFieldsProps> = ({
                 </div>
 
                 <div>
-                  <Popover 
-                    open={openDropdown === `subject-${index}`} 
-                    onOpenChange={(open) => setOpenDropdown(open ? `subject-${index}` : null)}
+                  <Popover
+                    open={openDropdown === `subject-${index}`}
+                    onOpenChange={(open) => {
+                      setOpenDropdown(open ? `subject-${index}` : null);
+                      if (!open) setSearchQuery("");
+                    }}
                   >
                     <PopoverTrigger asChild>
                       <Button
@@ -135,37 +183,52 @@ export const EducationFields: React.FC<EducationFieldsProps> = ({
                         role="combobox"
                         className="w-full justify-between font-normal text-xs h-9 bg-white text-left"
                       >
-                        <span className="truncate">
-                          {selectedSubject || "Search and select subject..."}
-                        </span>
+                        <span className="truncate">{selectedSubject || "Search and select subject..."}</span>
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-[340px] p-0" align="start">
-                      <Command>
-                        <CommandInput placeholder="Search subject..." className="text-xs" />
+                      <Command shouldFilter={false}>
+                        <CommandInput 
+                          placeholder="Search subject..." 
+                          className="text-xs" 
+                          value={searchQuery}
+                          onValueChange={setSearchQuery}
+                        />
                         <CommandList>
-                          <CommandEmpty>No subject found.</CommandEmpty>
-                          <CommandGroup className="max-h-[200px] overflow-y-auto">
-                            {ALLOWED_SUBJECTS.map((subject) => (
-                              <CommandItem
-                                key={subject}
-                                value={subject}
-                                onSelect={() => {
-                                  setValue(`education.${index}.subject`, subject, { shouldValidate: true });
-                                  setOpenDropdown(null);
-                                }}
-                                className="text-xs"
-                              >
-                                <Check
-                                  className={`mr-2 h-3.5 w-3.5 ${
-                                    selectedSubject === subject ? "opacity-100" : "opacity-0"
-                                  }`}
-                                />
-                                {subject}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
+                          {(() => {
+                            const filtered = ALLOWED_SUBJECTS.filter((subject) =>
+                              subject.toLowerCase().includes(searchQuery.toLowerCase())
+                            ).slice(0, 15);
+
+                            if (filtered.length === 0) {
+                              return <CommandEmpty>No subject found.</CommandEmpty>;
+                            }
+
+                            return (
+                              <CommandGroup className="max-h-[200px] overflow-y-auto">
+                                {filtered.map((subject) => (
+                                  <CommandItem
+                                    key={subject}
+                                    value={subject}
+                                    onSelect={() => {
+                                      setValue(`education.${index}.subject`, subject, { shouldValidate: true });
+                                      setOpenDropdown(null);
+                                      setSearchQuery("");
+                                    }}
+                                    className="text-xs"
+                                  >
+                                    <Check 
+                                      className={`mr-2 h-3.5 w-3.5 ${
+                                        selectedSubject === subject ? "opacity-100" : "opacity-0"
+                                      }`} 
+                                    />
+                                    {subject}
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            );
+                          })()}
                         </CommandList>
                       </Command>
                     </PopoverContent>
@@ -178,8 +241,8 @@ export const EducationFields: React.FC<EducationFieldsProps> = ({
                 </div>
 
                 <div>
-                  <Popover 
-                    open={openDropdown === `institution-${index}`} 
+                  <Popover
+                    open={openDropdown === `institution-${index}`}
                     onOpenChange={(open) => setOpenDropdown(open ? `institution-${index}` : null)}
                   >
                     <PopoverTrigger asChild>
@@ -188,19 +251,32 @@ export const EducationFields: React.FC<EducationFieldsProps> = ({
                         role="combobox"
                         className="w-full justify-between font-normal text-xs h-9 bg-white text-left"
                       >
-                        <span className="truncate">
-                          {selectedInstitution || "Search and select institution..."}
-                        </span>
+                        <span className="truncate">{selectedInstitution || "Search and select institution..."}</span>
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-[340px] p-0" align="start">
-                      <Command>
-                        <CommandInput placeholder="Search institution / university..." className="text-xs" />
+                      <Command shouldFilter={false}>
+                        <CommandInput 
+                          placeholder="Type to search global universities..." 
+                          className="text-xs"
+                          value={searchQuery}
+                          onValueChange={setSearchQuery}
+                        />
                         <CommandList>
-                          <CommandEmpty>No institution found.</CommandEmpty>
+                          {isLoading && (
+                            <div className="flex items-center justify-center py-6 text-xs text-muted-foreground gap-2">
+                              <Loader2 className="h-3 w-3 animate-spin" /> Fetching universities...
+                            </div>
+                          )}
+                          {!isLoading && institutions.length === 0 && searchQuery.trim().length > 0 && (
+                            <CommandEmpty>No universities found.</CommandEmpty>
+                          )}
+                          {!isLoading && searchQuery.trim().length === 0 && (
+                            <div className="p-4 text-xs text-muted-foreground text-center">Start typing to search...</div>
+                          )}
                           <CommandGroup className="max-h-[200px] overflow-y-auto">
-                            {ALLOWED_INSTITUTIONS.map((inst) => (
+                            {institutions.map((inst) => (
                               <CommandItem
                                 key={inst}
                                 value={inst}
@@ -210,11 +286,7 @@ export const EducationFields: React.FC<EducationFieldsProps> = ({
                                 }}
                                 className="text-xs"
                               >
-                                <Check
-                                  className={`mr-2 h-3.5 w-3.5 ${
-                                    selectedInstitution === inst ? "opacity-100" : "opacity-0"
-                                  }`}
-                                />
+                                <Check className={`mr-2 h-3.5 w-3.5 ${selectedInstitution === inst ? "opacity-100" : "opacity-0"}`} />
                                 {inst}
                               </CommandItem>
                             ))}
@@ -231,38 +303,33 @@ export const EducationFields: React.FC<EducationFieldsProps> = ({
                 </div>
               </div>
 
-            <div className="flex flex-col gap-1 shrink-0">
+              <div className="flex flex-col gap-1 shrink-0">
                 <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="h-9 w-9 text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700"
-                    onClick={() => {
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="h-9 w-9 text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700"
+                  onClick={() => {
                     const currentValues = watch(`education.${index}`);
-                    
-                    updateEducation(index, {
-                        ...currentValues,
-                    });
-
+                    updateEducation(index, { ...currentValues });
                     handleCommitEducation(index);
-                    }}
+                  }}
                 >
-                    <Check className="h-4 w-4" />
+                  <Check className="h-4 w-4" />
                 </Button>
-                
                 <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="h-9 w-9 hover:bg-destructive/10 text-destructive"
-                    onClick={() => {
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="h-9 w-9 hover:bg-destructive/10 text-destructive"
+                  onClick={() => {
                     removeEducation(index);
                     if (editingEduIndex === index) setEditingEduIndex(-1);
-                    }}
+                  }}
                 >
-                    <Trash2 className="h-4 w-4" />
+                  <Trash2 className="h-4 w-4" />
                 </Button>
-                </div>
+              </div>
             </div>
           );
         })}

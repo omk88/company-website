@@ -34,9 +34,9 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Badge } from "@/components/ui/badge";
 import { AVAILABLE_PLATFORMS, ICON_MAP } from "@/lib/socials";
 import { ALLOWED_SKILLS } from "@/lib/skills";
-import { ALLOWED_SUBJECTS, ALLOWED_INSTITUTIONS } from "@/lib/data";
 import { EducationFields } from "./EditFormFields/EducationField";
 import { LocationField } from "./EditFormFields/LocationField";
+import majorsData from "@/data/majors.json";
 
 const formatPlatformName = (name: string) => {
   if (name.toLowerCase() === "x") return "Twitter / X";
@@ -543,8 +543,7 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
                 setOpenDropdown={setOpenDropdown}
                 handleStartAddingEducation={handleStartAddingEducation}
                 handleCommitEducation={handleCommitEducation}
-                ALLOWED_SUBJECTS={ALLOWED_SUBJECTS}
-                ALLOWED_INSTITUTIONS={ALLOWED_INSTITUTIONS}
+                ALLOWED_SUBJECTS={majorsData}
           />
 
           <Field>
