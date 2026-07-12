@@ -160,6 +160,8 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
 
   const [imageUrl, setImageUrl] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const updateBlog = useMutation(api.blogs.updateAuthorNameForAllPosts)
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -316,6 +318,17 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
   };
 
   const onSubmit = async (data: ProfileFormValues) => {
+
+    try {
+      await updateBlog({
+        author: profile.userId,
+        newAuthorName: (data.firstName && data.lastName) ? `${data.firstName} ${data.lastName}` : data.username
+      });
+    } catch (error) {
+      console.error("Failed to update blogs:", error);
+    }
+
+
     const storageId = await handleUpload(); 
     const finalStorageId = storageId || profile.profilePic;
 

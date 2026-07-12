@@ -9,6 +9,7 @@ export interface BlogPostPreview {
   title: string;
   subtitle: string;
   author: string;
+  authorName: string;
   imageUrl: string;
   tags: string[]; 
   createdAt: number;
@@ -52,7 +53,7 @@ export function BlogCard({ post }: BlogCardProps) {
       <div className="flex flex-col flex-1 justify-between p-6 min-w-0">
         <div className="min-w-0">
           <div className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-2">
-            {post.author} • {formattedDate}
+            {post.authorName} • {formattedDate}
           </div>
 
           <div className="space-y-1.5">

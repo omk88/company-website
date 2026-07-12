@@ -75,6 +75,20 @@ export const getProfileByUsername = query({
   },
 });
 
+export const getProfileById = query({
+  args: {
+    userId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_userId", (q) => q.eq("userId", args.userId))
+      .unique();
+
+    return profile;
+  },
+});
+
 export const generateUploadUrl = mutation({
   args: {},
   handler: async (ctx) => {

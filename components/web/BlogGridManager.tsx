@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { BlogGrid } from "./BlogGrid";
 import { BlogPostPreview } from "./BlogCard";
 import { Frown } from "lucide-react";
@@ -13,6 +13,7 @@ const POSTS_PER_BATCH = 9;
 interface BlogGridManagerProps {
   initialServerPosts: BlogPostPreview[]; 
   disableSearch?: boolean;
+  author?: string;
 }
 
 function useSafeSearch(disableSearch: boolean) {
@@ -27,7 +28,7 @@ function useSafeSearch(disableSearch: boolean) {
   }
 }
 
-export function BlogGridManager({ initialServerPosts, disableSearch = false }: BlogGridManagerProps) {
+export function BlogGridManager({ initialServerPosts, disableSearch = false, author }: BlogGridManagerProps) {
   const { searchTerm, activeTags, sortOrder } = useSafeSearch(disableSearch);
   const observerTarget = useRef<HTMLDivElement>(null);
 
@@ -36,7 +37,8 @@ export function BlogGridManager({ initialServerPosts, disableSearch = false }: B
     { 
       searchTerm: !disableSearch && searchTerm ? searchTerm : undefined, 
       activeTags: !disableSearch && activeTags.length > 0 ? activeTags : undefined,
-      sortOrder: sortOrder
+      sortOrder: sortOrder,
+      author: author
     },
     { initialNumItems: POSTS_PER_BATCH }
   );

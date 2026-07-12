@@ -8,6 +8,8 @@ const schema = defineSchema({
     imageUrl: v.string(),
     content: v.string(),
     author: v.string(),
+    authorName: v.string(),
+    username: v.string(),
     tags: v.array(v.string()), 
     storageId: v.string(),
     createdAt: v.number(),

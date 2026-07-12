@@ -53,7 +53,7 @@ export default async function postIdRoute({ params }: postIdRouteProps) {
                 </Suspense>
             </div>
 
-            <RightSidebarArticles authorName={post.author}  />
+            <RightSidebarArticles author={post.author} authorName={post.authorName} username={post.username}  />
         </SidebarProvider>
     )
 }
@@ -89,7 +89,7 @@ async function PostContent({
                     </h1>
                     <div className="flex flex-col gap-6">
                         <p className="text-lg text-muted-foreground">
-                            Posted by {post.author} on {new Date(post._creationTime).toLocaleDateString("en-US")}
+                            Posted by {post.authorName} on {new Date(post._creationTime).toLocaleDateString("en-US")}
                         </p>
                         <p className="text-lg text-neutral-600 dark:text-neutral-400 font-medium">
                             {post.subtitle}

@@ -54,7 +54,7 @@ export default async function Profile({ params }: profileRouteProps) {
                         <TabsSwitch tabs={tabs} defaultValue="blog-articles" />
                     </div>
                     <div className="pl-4 pr-4">
-                        <ProfileBlogGridContainer authorName={profile?.userId || ""} />
+                        <ProfileBlogGridContainer author={profile?.userId || ""} />
                     </div>
                 </div>
             </SidebarProvider>

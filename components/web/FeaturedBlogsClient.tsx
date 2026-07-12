@@ -67,7 +67,7 @@ export function FeaturedBlogsClient({ initialFeaturedBlogs }: FeaturedBlogsClien
                 
                 <div className="pt-3 px-3 pb-2">
                     <div className="text-xs font-mono uppercase tracking-wider text-muted-foreground flex justify-between">
-                        <span>{currentPost.author}</span>
+                        <span>{currentPost.authorName}</span>
                         <span>•</span>
                         <span>{formattedDate}</span>
                     </div>

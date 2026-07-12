@@ -12,25 +12,28 @@ import { Separator } from "../ui/separator";
 import { MoreFromContainer } from "./MoreFromContainer";
 import { Suspense } from "react";
 import { TrendingBlogsSkeleton } from "./TrendingBlogsSkeleton";
+import Link from "next/link";
 
 interface RightSidebarArticlesProps {
+  author: string;
   authorName: string;
+  username: string;
 }
 
-export function RightSidebarArticles({ authorName }: RightSidebarArticlesProps) {
+export function RightSidebarArticles({ author, authorName, username }: RightSidebarArticlesProps) {
   return (
     <Sidebar side="right" className="!w-75 !top-16 !z-40 h-[calc(100vh-4rem)] flex flex-col overflow-hidden">
       <Separator/>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="w-full justify-center">
-          <h1 className="flex justify-center gap-2 p-4 text-sm font-medium text-foreground whitespace-nowrap">              <Library className="size-4 stroke-[2.3] shrink-0 mt-0.5" />
-              <span>More from <span className="text-blue-600">{ authorName }</span></span>
-          </h1>
+            <h1 className="flex justify-center gap-2 p-4 text-sm font-medium text-foreground whitespace-nowrap">              <Library className="size-4 stroke-[2.3] shrink-0 mt-0.5" />
+                <span>More from <span className="text-blue-600"><Link href={`/${username}`}>{ authorName }</Link></span></span>
+            </h1>
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <Suspense fallback={<TrendingBlogsSkeleton />}>
-                <MoreFromContainer authorName={authorName}  />
+                <MoreFromContainer author={author}  />
             </Suspense>
           </SidebarGroupContent>
         </SidebarGroup>

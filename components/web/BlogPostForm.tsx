@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import { Textarea } from "../ui/textarea";
 import { Image, Paperclip, X } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
 
 const AVAILABLE_TAGS = ["Product", "Research", "Design", "Technology", "Opinion", "Tutorials"];
 
@@ -99,6 +100,8 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
     const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
+    const userData = useQuery(api.auth.getCurrentUser);
+
     const existingPost = useQuery(
         api.blogs.getPostById,
         editingBlogId ? { postId: editingBlogId as Id<"blogs"> } : "skip"
@@ -172,7 +175,9 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                     title: data.title,
                     subtitle: data.subtitle,
                     content: data.content,
-                    author: data.author,
+                    author: userData?.userId || "",
+                    authorName: (userData?.profile?.firstName && userData?.profile?.lastName) ? `${String(userData.profile.firstName)} ${String(userData.profile.lastName)}` : String(userData?.username || ""),
+                    username: String(userData?.username || ""),
                     tags: data.tags,
                     storageId: storageId,
                 });
@@ -182,7 +187,9 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                     title: data.title,
                     subtitle: data.subtitle,
                     content: data.content,
-                    author: data.author,
+                    author: userData?.userId || "",
+                    authorName: (userData?.profile?.firstName && userData?.profile?.lastName) ? `${String(userData.profile.firstName)} ${String(userData.profile.lastName)}` : String(userData?.username || ""),
+                    username: String(userData?.username || ""),
                     tags: data.tags,
                     storageId: storageId,
                 });
@@ -273,18 +280,6 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                             render={({ field, fieldState }) => (
                                 <Field>
                                     <Input aria-invalid={fieldState.invalid} placeholder="Title" type="text" disabled={isLoading} {...field} />
-                                    {fieldState.error && <p className="text-xs text-destructive mt-1">{fieldState.error.message}</p>}
-                                </Field>
-                            )}
-                        />
-
-                        <Controller
-                            name="author"
-                            control={control}
-                            rules={{ required: "Author is required", maxLength: { value: 18, message: "Max 18 characters" } }}
-                            render={({ field, fieldState }) => (
-                                <Field>
-                                    <Input aria-invalid={fieldState.invalid} placeholder="Author Name" type="text" maxLength={18} disabled={isLoading} {...field} />
                                     {fieldState.error && <p className="text-xs text-destructive mt-1">{fieldState.error.message}</p>}
                                 </Field>
                             )}
@@ -387,6 +382,22 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                 </Field>
                             )}
                         />
+
+                        <div className="flex items-center justify-end pt-2">
+                            <button
+                                type="submit"
+                                disabled={isLoading}
+                                className={cn(
+                                    "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-neutral-900 text-neutral-50 hover:bg-neutral-900/90 dark:bg-neutral-50 dark:text-neutral-900 dark:hover:bg-neutral-50/90 h-10 px-4 py-2 w-full sm:w-auto",
+                                    isLoading && "cursor-not-allowed opacity-70"
+                                )}
+                            >
+                                {isLoading 
+                                    ? (editingBlogId ? "Updating..." : "Publishing...") 
+                                    : (editingBlogId ? "Update Post" : "Publish Post")
+                                }
+                            </button>
+                        </div>
                         
                     </FieldGroup>
                 </form>

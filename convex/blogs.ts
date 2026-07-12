@@ -16,6 +16,8 @@ export const createPost = mutation({
     subtitle: v.string(),
     content: v.string(),
     author: v.string(),
+    authorName: v.string(),
+    username: v.string(),
     tags: v.array(v.string()),
     storageId: v.string(), 
   },
@@ -27,6 +29,8 @@ export const createPost = mutation({
       subtitle: args.subtitle,
       content: args.content,
       author: args.author,
+      authorName: args.authorName,
+      username: args.username,
       tags: args.tags,
       storageId: args.storageId,
       imageUrl: generatedImageUrl || "",
@@ -118,6 +122,8 @@ export const deletePost = mutation({
   },
 });
 
+
+
 export const updatePost = mutation({
   args: {
     postId: v.id("blogs"),
@@ -125,6 +131,8 @@ export const updatePost = mutation({
     subtitle: v.string(),
     content: v.string(),
     author: v.string(),
+    authorName: v.string(),
+    username: v.string(),
     tags: v.array(v.string()),
     storageId: v.string(), 
   },
@@ -157,6 +165,31 @@ export const updatePost = mutation({
   },
 });
 
+export const updateAuthorNameForAllPosts = mutation({
+  args: {
+    author: v.string(), 
+    newAuthorName: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const { author, newAuthorName } = args;
+
+    const postsToUpdate = await ctx.db
+      .query("blogs")
+      .filter((q) => q.eq(q.field("author"), author))
+      .collect();
+
+    const updatePromises = postsToUpdate.map((post) =>
+      ctx.db.patch(post._id, {
+        authorName: newAuthorName,
+      })
+    );
+
+    await Promise.all(updatePromises);
+
+    return { updatedCount: postsToUpdate.length };
+  },
+});
+
 export const getPosts = query({
   args: {},
   handler: async (ctx) => {
@@ -176,11 +209,13 @@ export const getPaginatedPosts = query({
     searchTerm: v.optional(v.string()),
     activeTags: v.optional(v.array(v.string())),
     sortOrder: v.optional(v.string()),
+    author: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const search = args.searchTerm?.trim();
     const tags = args.activeTags || [];
     const sort = args.sortOrder || "new";
+    const authorFilter = args.author;
 
     let paginatedResults;
 
@@ -204,6 +239,11 @@ export const getPaginatedPosts = query({
     }
 
     let filteredPage = paginatedResults.page;
+
+    if (authorFilter) {
+      filteredPage = filteredPage.filter(post => post.author === authorFilter);
+    }
+
     if (tags.length > 0) {
       const lowerTags = tags.map(t => t.toLowerCase());
       filteredPage = filteredPage.filter(post => 
@@ -246,7 +286,7 @@ export const getFeaturedState = query({
 });
 
 export const getPostsByAuthor = query({
-  args: { authorName: v.string() },
+  args: { author: v.string() },
   handler: async (ctx, args) => {
     const blogs = await ctx.db
       .query("blogs")
@@ -254,7 +294,7 @@ export const getPostsByAuthor = query({
       .order("desc")
       .collect();
 
-    const matched = blogs.filter(b => b.author.toLowerCase() === args.authorName.toLowerCase()).slice(0, 9);
+    const matched = blogs.filter(b => b.author.toLowerCase() === args.author.toLowerCase()).slice(0, 9);
 
     return matched.map(({ content, ...previewFields }) => previewFields);
   },
