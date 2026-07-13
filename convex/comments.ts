@@ -2,6 +2,7 @@ import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { authComponent } from "./auth";
 import { profile } from "console";
+import { cubeTexture } from "three/src/nodes/accessors/CubeTextureNode.js";
 
 export const getCommentsByPost = query({
   args: {
@@ -80,6 +81,78 @@ export const createComment = mutation({
     });
 
     return commentId;
+  },
+});
+
+export const getCommentVoteState = query({
+  args: { commentId: v.id("comments") },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return "none";
+
+    const vote = await ctx.db
+      .query("commentVotes")
+      .withIndex("by_user_and_comment", (q) =>
+        q.eq("userId", identity.subject).eq("commentId", args.commentId)
+      )
+      .unique();
+
+    return vote ? vote.type : "none";
+  },
+});
+
+export const toggleCommentVote = mutation({
+  args: {
+    commentId: v.id("comments"),
+    targetVote: v.union(v.literal("liked"), v.literal("disliked")),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new ConvexError("You must be logged in to vote.");
+    const userId = identity.subject;
+
+    const comment = await ctx.db.get(args.commentId);
+    if (!comment) throw new ConvexError("Comment not found.");
+
+    const existingVote = await ctx.db
+      .query("commentVotes")
+      .withIndex("by_user_and_comment", (q) =>
+        q.eq("userId", userId).eq("commentId", args.commentId)
+      )
+      .unique();
+
+    let newLikes = comment.likes ?? 0;
+    let newDislikes = comment.dislikes ?? 0;
+
+    if (existingVote) {
+      if (existingVote.type === args.targetVote) {
+        await ctx.db.delete(existingVote._id);
+        if (args.targetVote === "liked") newLikes = Math.max(0, newLikes - 1);
+        if (args.targetVote === "disliked") newDislikes = Math.max(0, newDislikes - 1);
+      } else {
+        await ctx.db.patch(existingVote._id, { type: args.targetVote });
+        if (args.targetVote === "liked") {
+          newLikes += 1;
+          newDislikes = Math.max(0, newDislikes - 1);
+        } else {
+          newDislikes += 1;
+          newLikes = Math.max(0, newLikes - 1);
+        }
+      }
+    } else {
+      await ctx.db.insert("commentVotes", {
+        userId,
+        commentId: args.commentId,
+        type: args.targetVote,
+      });
+      if (args.targetVote === "liked") newLikes += 1;
+      if (args.targetVote === "disliked") newDislikes += 1;
+    }
+
+    await ctx.db.patch(args.commentId, {
+      likes: newLikes,
+      dislikes: newDislikes,
+    });
   },
 });
 

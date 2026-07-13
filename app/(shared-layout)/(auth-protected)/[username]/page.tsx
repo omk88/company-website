@@ -13,6 +13,7 @@ interface profileRouteProps {
 }
 
 export default async function Profile({ params }: profileRouteProps) {
+
     const { username } = await params;
 
     const profile = await fetchQuery(api.profiles.getProfileByUsername, { 
