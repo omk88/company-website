@@ -41,7 +41,9 @@ export const createComment = mutation({
       postId: args.postId,
       body: args.body,
       authorId: user._id,
-      authorName: user.name
+      authorName: user.name,
+      likes: 0,
+      dislikes: 0
     });
 
     const blog = await ctx.db.get(args.postId);
@@ -52,5 +54,36 @@ export const createComment = mutation({
     }
 
     return commentId;
+  }
+});
+
+export const handleVote = mutation({
+  args: {
+    commentId: v.id("comments"), 
+    currentVote: v.union(v.literal("none"), v.literal("liked"), v.literal("disliked")),
+    previousVote: v.union(v.literal("none"), v.literal("liked"), v.literal("disliked")),
+  },
+  handler: async (ctx, args) => {
+    const comment = await ctx.db.get(args.commentId);
+    if (!comment) throw new Error("Comment not found");
+
+    let likesChange = 0;
+    let dislikesChange = 0;
+
+    if (args.previousVote === "liked") likesChange -= 1;
+    if (args.previousVote === "disliked") dislikesChange -= 1;
+
+    if (args.currentVote === "liked") likesChange += 1;
+    if (args.currentVote === "disliked") dislikesChange += 1;
+
+    const currentLikes = comment.likes ?? 0;
+    const currentDislikes = comment.dislikes ?? 0;
+
+    await ctx.db.patch(args.commentId, {
+      likes: Math.max(0, currentLikes + likesChange),
+      dislikes: Math.max(0, currentDislikes + dislikesChange)
+    });
+
+    return { success: true };
   }
 });
