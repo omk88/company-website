@@ -6,9 +6,10 @@ import { CommentsContainer } from "./CommentsContainer";
 
 interface ProfileContentWrapperProps {
   blogGridSlot: React.ReactNode;
+  authorId: string;
 }
 
-export function ProfileContentWrapper({ blogGridSlot }: ProfileContentWrapperProps) {
+export function ProfileContentWrapper({ blogGridSlot, authorId }: ProfileContentWrapperProps) {
   const [activeTab, setActiveTab] = useState("blog-articles");
 
   const tabs: TabItem[] = [
@@ -30,7 +31,7 @@ export function ProfileContentWrapper({ blogGridSlot }: ProfileContentWrapperPro
         
         {activeTab === "comments" && (
           <div className="text-gray-500 py-8 text-center">
-            <CommentsContainer />
+            <CommentsContainer authorId={authorId} />
           </div>
         )}
       </div>

@@ -2,14 +2,18 @@ import { api } from "@/convex/_generated/api"
 import { useQuery } from "convex/react"
 import { CommentCard } from "./CommentCard"
 
-export function CommentsContainer() {
+interface CommentsContainerProps {
+    authorId: string;
+}
 
-    const comments = useQuery(api.comments.getCommentsByAuthor, {authorId: "k17b55bsmjhfrcaz32wmjksvk98adb38"})
+export function CommentsContainer({ authorId }: CommentsContainerProps) {
+
+    const comments = useQuery(api.comments.getCommentsByAuthor, {authorId: authorId})
 
     return (
-        <ul>
+        <ul className="space-y-4">
             {comments?.map((comment, index) => (
-                <CommentCard comment={comment} index={index} />
+                <CommentCard key={comment._id} comment={comment} index={index} />
             ))}
         </ul>
     )
