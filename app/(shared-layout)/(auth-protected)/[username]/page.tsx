@@ -1,7 +1,7 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { LeftSidebarProfile } from "@/components/web/LeftSidebarProfile";
 import { ProfileContentWrapper } from "@/components/web/ProfileContentWrapper";
-import { ProfileBlogGridContainer } from "@/components/web/ProfileBlogGridContainer"; // Imported here on the server!
+import { ProfileBlogGridContainer } from "@/components/web/ProfileBlogGridContainer"; 
 import { SearchProvider } from "@/components/web/SearchContext";
 import { api } from "@/convex/_generated/api";
 import { fetchQuery } from "convex/nextjs";

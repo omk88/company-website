@@ -1,6 +1,7 @@
 import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { authComponent } from "./auth";
+import { profile } from "console";
 
 export const getCommentsByPost = query({
   args: {
@@ -41,33 +42,45 @@ export const getCommentNumber = query({
 export const createComment = mutation({
   args: {
     body: v.string(),
-    postId: v.id("blogs")
+    postId: v.id("blogs"),
   },
   handler: async (ctx, args) => {
     const user = await authComponent.safeGetAuthUser(ctx);
-
     if (!user) {
       throw new ConvexError("Not authenticated");
+    }
+
+    const blog = await ctx.db.get(args.postId);
+    if (!blog) {
+      throw new ConvexError("Blog post not found");
+    }
+
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_userId", (q) => q.eq("userId", user._id))
+      .unique();
+
+    if (!profile) {
+      throw new ConvexError("User profile not found");
     }
 
     const commentId = await ctx.db.insert("comments", {
       postId: args.postId,
       body: args.body,
       authorId: user._id,
-      authorName: user.name,
+      authorName: user.name ?? profile.username, 
+      authorProfilePic: profile.profilePic,  
+      blogTitle: blog.title,                 
       likes: 0,
-      dislikes: 0
+      dislikes: 0,
     });
 
-    const blog = await ctx.db.get(args.postId);
-    if (blog) {
-      await ctx.db.patch(args.postId, {
-        commentCount: (blog.commentCount ?? 0) + 1
-      });
-    }
+    await ctx.db.patch(args.postId, {
+      commentCount: (blog.commentCount ?? 0) + 1,
+    });
 
     return commentId;
-  }
+  },
 });
 
 export const handleVote = mutation({

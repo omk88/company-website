@@ -51,6 +51,8 @@ const schema = defineSchema({
     postId: v.id("blogs"),
     authorId: v.string(),
     authorName: v.string(),
+    authorProfilePic: v.string(),
+    blogTitle: v.string(),
     likes: v.number(),
     dislikes: v.number(),
     body: v.string()
