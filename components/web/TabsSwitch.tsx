@@ -10,17 +10,23 @@ export interface TabItem {
 
 interface TabsSwitchProps {
   tabs: TabItem[];
+  value?: string;         
   defaultValue?: string;
   onTabChange?: (value: string) => void;
 }
 
-export function TabsSwitch({ tabs, defaultValue, onTabChange }: TabsSwitchProps) {
-  const [activeTab, setActiveTab] = useState(defaultValue || tabs[0]?.value || "");
+export function TabsSwitch({ tabs, value, defaultValue, onTabChange }: TabsSwitchProps) {
+  const [internalActiveTab, setInternalActiveTab] = useState(defaultValue || tabs[0]?.value || "");
+  
+  const isControlled = value !== undefined;
+  const activeTab = isControlled ? value : internalActiveTab;
 
-  const handleTabChange = (value: string) => {
-    setActiveTab(value);
+  const handleTabChange = (newValue: string) => {
+    if (!isControlled) {
+      setInternalActiveTab(newValue);
+    }
     if (onTabChange) {
-      onTabChange(value); 
+      onTabChange(newValue); 
     }
   };
 

@@ -1,8 +1,8 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { LeftSidebarProfile } from "@/components/web/LeftSidebarProfile";
-import { ProfileBlogGridContainer } from "@/components/web/ProfileBlogGridContainer";
+import { ProfileContentWrapper } from "@/components/web/ProfileContentWrapper";
+import { ProfileBlogGridContainer } from "@/components/web/ProfileBlogGridContainer"; // Imported here on the server!
 import { SearchProvider } from "@/components/web/SearchContext";
-import { TabItem, TabsSwitch } from "@/components/web/TabsSwitch";
 import { api } from "@/convex/_generated/api";
 import { fetchQuery } from "convex/nextjs";
 
@@ -20,7 +20,6 @@ export default async function Profile({ params }: profileRouteProps) {
     });
 
     let resolvedAvatarUrl = "";
-
     if (profile?.profilePic) {
         if (profile.profilePic.startsWith("http")) {
             resolvedAvatarUrl = profile.profilePic;
@@ -32,10 +31,7 @@ export default async function Profile({ params }: profileRouteProps) {
         }
     }
 
-    const tabs: TabItem[] = [
-        { value: "blog-articles", label: "Blog Articles" },
-        { value: "comments", label: "Comments" },
-    ];
+    const authorId = profile?.userId || "";
 
     return (
         <div>
@@ -50,12 +46,9 @@ export default async function Profile({ params }: profileRouteProps) {
                 </SearchProvider>
 
                 <div className="bg-white w-full pl-[var(--sidebar-width)] ml-2">
-                    <div>
-                        <TabsSwitch tabs={tabs} defaultValue="blog-articles" />
-                    </div>
-                    <div className="pl-4 pr-4">
-                        <ProfileBlogGridContainer author={profile?.userId || ""} />
-                    </div>
+                    <ProfileContentWrapper 
+                        blogGridSlot={<ProfileBlogGridContainer author={authorId} />} 
+                    />
                 </div>
             </SidebarProvider>
         </div>
