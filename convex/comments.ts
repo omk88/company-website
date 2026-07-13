@@ -15,6 +15,19 @@ export const getCommentsByPost = query({
   }
 });
 
+export const getCommentsByAuthor = query({
+  args: {
+    authorId: v.string()
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("comments")
+      .withIndex("by_authorId", (q) => q.eq("authorId", args.authorId))
+      .order("desc")
+      .collect();
+  }
+})
+
 export const getCommentNumber = query({
   args: {
     postId: v.id("blogs")

@@ -54,7 +54,9 @@ const schema = defineSchema({
     likes: v.number(),
     dislikes: v.number(),
     body: v.string()
-  }).index("by_postId", ["postId"]),
+  })
+  .index("by_postId", ["postId"])
+  .index("by_authorId", ["authorId"]),
 
   profiles: defineTable({
     userId: v.string(),

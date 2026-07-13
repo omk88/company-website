@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { TabsSwitch, TabItem } from "@/components/web/TabsSwitch";
+import { CommentsContainer } from "./CommentsContainer";
 
 interface ProfileContentWrapperProps {
   blogGridSlot: React.ReactNode;
@@ -29,7 +30,7 @@ export function ProfileContentWrapper({ blogGridSlot }: ProfileContentWrapperPro
         
         {activeTab === "comments" && (
           <div className="text-gray-500 py-8 text-center">
-            User comments will appear here.
+            <CommentsContainer />
           </div>
         )}
       </div>
