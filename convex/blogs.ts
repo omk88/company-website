@@ -2,7 +2,6 @@ import { Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 import { ConvexError, v } from "convex/values";
 import { paginationOptsValidator } from "convex/server";
-import { cubeTexture } from "three/src/nodes/accessors/CubeTextureNode.js";
 
 export const generateUploadUrl = mutation({
   args: {},
@@ -37,7 +36,6 @@ export const createPost = mutation({
       imageUrl: generatedImageUrl || "",
       totalViews: 0,
       likes: 0,
-      dislikes: 0,
       commentCount: 0,
       featured: false,
       createdAt: Date.now(),
@@ -78,23 +76,33 @@ export const getBlogVoteState = query({
   args: { blogId: v.id("blogs") },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return "none";
+    
+    const blog = await ctx.db.get(args.blogId);
+    if (!blog) {
+      throw new Error("Blog not found");
+    }
 
-    const vote = await ctx.db
-      .query("blogVotes")
-      .withIndex("by_user_and_blog", (q) => 
-        q.eq("userId", identity.subject).eq("blogId", args.blogId)
-      )
-      .unique();
+    let hasVoted = false;
+    if (identity) {
+      const vote = await ctx.db
+        .query("blogVotes")
+        .withIndex("by_user_and_blog", (q) =>
+          q.eq("userId", identity.subject).eq("blogId", args.blogId)
+        )
+        .unique();
+      hasVoted = !!vote;
+    }
 
-    return vote ? vote.type : "none";
+    return {
+      hasVoted,
+      likes: blog.likes,
+    };
   },
-})
+});
 
 export const toggleBlogVote = mutation({
   args: {
     blogId: v.id("blogs"),
-    targetVote: v.union(v.literal("liked"), v.literal("disliked")),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -112,49 +120,23 @@ export const toggleBlogVote = mutation({
       .unique();
 
     let newLikes = blog.likes ?? 0;
-    let newDislikes = blog.dislikes ?? 0;
     let likesChange = 0;
 
     if (existingVote) {
-      if (existingVote.type === args.targetVote) {
-        await ctx.db.delete(existingVote._id);
-        if (args.targetVote === "liked") {
-          newLikes = Math.max(0, newLikes - 1);
-          likesChange = -1;
-        }
-        if (args.targetVote === "disliked") {
-          newDislikes = Math.max(0, newDislikes - 1);
-        }
-      } else {
-        await ctx.db.patch(existingVote._id, { type: args.targetVote });
-        if (args.targetVote === "liked") {
-          newLikes += 1;
-          newDislikes = Math.max(0, newDislikes - 1);
-          likesChange = 1;
-        } else {
-          newDislikes += 1;
-          newLikes = Math.max(0, newLikes - 1);
-          likesChange = -1;
-        }
-      }
+      await ctx.db.delete(existingVote._id);
+      newLikes = Math.max(0, newLikes - 1);
+      likesChange = -1;
     } else {
       await ctx.db.insert("blogVotes", {
         userId,
         blogId: args.blogId,
-        type: args.targetVote,
       });
-      if (args.targetVote === "liked") {
-        newLikes += 1;
-        likesChange = 1;
-      }
-      if (args.targetVote === "disliked") {
-        newDislikes += 1;
-      }
+      newLikes += 1;
+      likesChange = 1;
     }
 
     await ctx.db.patch(args.blogId, {
       likes: newLikes,
-      dislikes: newDislikes,
     });
 
     if (likesChange !== 0) {
@@ -412,11 +394,13 @@ export const getPostById = query({
     const post = await ctx.db.get(args.postId);
     if (!post) return null;
 
-    const resolvedImageUrl = post.storageId !== undefined ? await ctx.storage.getUrl(post.storageId) : null;
+    const resolvedImageUrl = post.storageId !== undefined 
+      ? await ctx.storage.getUrl(post.storageId) 
+      : null;
 
     return {
       ...post,
-      imageUrl: resolvedImageUrl
+      imageUrl: resolvedImageUrl ?? "/noImage.png" 
     };
   }
 });

@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2, MessageSquare, ThumbsDown, ThumbsUp } from "lucide-react";
+import { Loader2, MessageSquare } from "lucide-react";
 import { Card, CardContent, CardHeader } from "../ui/card";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,23 +14,17 @@ import { Preloaded, useMutation, usePreloadedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import z from "zod";
 import { toast } from "sonner";
-import { useEffect, useState, useTransition } from "react";
+import { useTransition } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Separator } from "../ui/separator";
-
-type VoteState = "none" | "liked" | "disliked";
+import { IncrementCommentLikesDislikes } from "./IncrementCommentLikesDislikes"; 
 
 export function CommentSection(props: { preloadedComments: Preloaded<typeof api.comments.getCommentsByPost> }) {
     const params = useParams<{ postId: Id<"blogs"> }>();
     const data = usePreloadedQuery(props.preloadedComments);
     
     const [isCommentPending, startCommentTransition] = useTransition();
-    const [isVotePending, startVoteTransition] = useTransition();
-    
     const createComment = useMutation(api.comments.createComment);
-    const handleVoteMutation = useMutation(api.comments.handleVote);
-
-    const [userVotes, setUserVotes] = useState<Record<Id<"comments">, VoteState>>({});
 
     const form = useForm({ 
         resolver: zodResolver(commentSchema),
@@ -39,18 +33,6 @@ export function CommentSection(props: { preloadedComments: Preloaded<typeof api.
             postId: params.postId
         }
     });
-
-    useEffect(() => {
-        if (!data) return;
-        const savedVotes: Record<string, VoteState> = {};
-        data.forEach((comment) => {
-            const saved = localStorage.getItem(`vote_comment_${comment._id}`) as VoteState;
-            if (saved) {
-                savedVotes[comment._id] = saved;
-            }
-        });
-        setUserVotes(savedVotes);
-    }, [data]);
 
     function onSubmit(formData: z.infer<typeof commentSchema>) {
         startCommentTransition(async () => {
@@ -67,32 +49,6 @@ export function CommentSection(props: { preloadedComments: Preloaded<typeof api.
     if (data === undefined) {
         return <p>Loading...</p>;
     }
-
-    const executeVoteChange = async (targetVote: VoteState, commentId: Id<"comments">) => {
-        if (isVotePending) return;
-
-        const currentCommentVote = userVotes[commentId] || "none";
-        const nextVoteState = currentCommentVote === targetVote ? "none" : targetVote;
-        const previousVoteState = currentCommentVote;
-
-        startVoteTransition(async () => {
-            try {
-                await handleVoteMutation({
-                    commentId,
-                    currentVote: nextVoteState,
-                    previousVote: previousVoteState,
-                });
-
-                localStorage.setItem(`vote_comment_${commentId}`, nextVoteState);
-                setUserVotes((prev) => ({
-                    ...prev,
-                    [commentId]: nextVoteState,
-                }));
-            } catch (error) {
-                console.error("Failed to update vote choice:", error);
-            }
-        });
-    };
 
     return (
         <Card className="rounded-none">
@@ -131,8 +87,6 @@ export function CommentSection(props: { preloadedComments: Preloaded<typeof api.
 
                 <section className="space-y-6"> 
                     {data?.map((comment) => {
-                        const currentVote = userVotes[comment._id] || "none";
-                        
                         return (
                             <div key={comment._id} className="flex gap-4">
                                 <Avatar className="size-10 shrink-0">
@@ -155,37 +109,7 @@ export function CommentSection(props: { preloadedComments: Preloaded<typeof api.
                                     </p>
                                     
                                     <div className="flex flex-row items-center gap-4 text-muted-foreground text-xs">
-                                        <Button 
-                                            variant="ghost" 
-                                            onClick={() => executeVoteChange("liked", comment._id)}
-                                            disabled={isVotePending}
-                                            className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground disabled:opacity-100"
-                                        >
-                                            <ThumbsUp
-                                                className={`!h-5 !w-5 transition-transform active:scale-90 ${
-                                                    currentVote === "liked" ? "text-emerald-500" : ""
-                                                }`}
-                                                fill={currentVote === "liked" ? "currentColor" : "none"}
-                                            />
-                                            <h1>{comment.likes}</h1>
-                                        </Button>
-
-                                        <Button 
-                                            variant="ghost" 
-                                            onClick={() => executeVoteChange("disliked", comment._id)}
-                                            disabled={isVotePending}
-                                            className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground disabled:opacity-100"
-                                        >
-                                            <ThumbsDown
-                                                className={`!h-5 !w-5 transition-transform active:scale-90 ${
-                                                    currentVote === "disliked" ? "text-destructive" : ""
-                                                }`}
-                                                fill={currentVote === "disliked" ? "currentColor" : "none"}
-                                            />
-                                            <h1 className={currentVote === "disliked" ? "text-destructive" : ""}>
-                                                {comment.dislikes}
-                                            </h1>
-                                        </Button>
+                                        <IncrementCommentLikesDislikes comment={comment} />
                                     </div>
                                 </div>
                             </div>

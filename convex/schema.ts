@@ -15,7 +15,6 @@ const schema = defineSchema({
     createdAt: v.number(),
     totalViews: v.number(),
     likes: v.number(),
-    dislikes: v.number(),
     featured: v.boolean(),
     commentCount: v.number(), 
   })
@@ -54,11 +53,10 @@ const schema = defineSchema({
     authorProfilePic: v.string(),
     blogTitle: v.string(),
     likes: v.number(),
-    dislikes: v.number(),
     body: v.string()
   })
-  .index("by_postId", ["postId"])
-  .index("by_authorId", ["authorId"]),
+    .index("by_postId", ["postId"])
+    .index("by_authorId", ["authorId"]),
 
   profiles: defineTable({
     userId: v.string(),
@@ -93,19 +91,16 @@ const schema = defineSchema({
   commentVotes: defineTable({
     userId: v.string(),
     commentId: v.id("comments"),
-    type: v.union(v.literal("liked"), v.literal("disliked")),
   })
-  .index("by_user_and_comment", ["userId", "commentId"])
-  .index("by_comment", ["commentId"]),
+    .index("by_user_and_comment", ["userId", "commentId"])
+    .index("by_comment", ["commentId"]),
 
   blogVotes: defineTable({
     userId: v.string(),
     blogId: v.id("blogs"),
-    type: v.union(v.literal("liked"), v.literal("disliked")),
   })
-  .index("by_user_and_blog", ["userId", "blogId"])
-  .index("by_blog", ["blogId"]),
-
+    .index("by_user_and_blog", ["userId", "blogId"])
+    .index("by_blog", ["blogId"]),
 });
 
 export default schema;

@@ -45,7 +45,7 @@ export default async function postIdRoute({ params }: postIdRouteProps) {
 
     return (
         <SidebarProvider className="bg-white dark:bg-zinc-950 w-full min-h-screen relative block">
-            <LeftSidebarControls postId={postId} storageId={post.storageId} likes={post.likes} dislikes={post.dislikes} comments={post.commentCount} />
+            <LeftSidebarControls post={post} />
             
             <div className="w-full pl-40 pr-75">
                 <Suspense fallback={<MainContentSkeleton />}>

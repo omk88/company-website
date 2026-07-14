@@ -72,7 +72,6 @@ export function BlogCard({ post }: BlogCardProps) {
             <LiveMetrics 
               views={post.totalViews} 
               likes={post.likes} 
-              dislikes={post.dislikes} 
               comments={post.commentCount} 
               showDislikes={true}
             />

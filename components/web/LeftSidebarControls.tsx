@@ -4,17 +4,13 @@ import { Separator } from "../ui/separator";
 import Link from "next/link";
 import { buttonVariants } from "../ui/button";
 import { IncrementBlogLikesDislikes } from "./IncrementBlogLikesDislikes";
-import { Id } from "@/convex/_generated/dataModel";
+import { Doc } from "@/convex/_generated/dataModel";
 
 interface ViewTrackerProps {
-  postId: Id<"blogs">;
-  storageId: string;
-  likes: number;
-  dislikes: number;
-  comments: number;
+  post: Doc<"blogs">;
 }
 
-export function LeftSidebarControls({ postId, storageId, likes, dislikes, comments }: ViewTrackerProps) {
+export function LeftSidebarControls({ post }: ViewTrackerProps) {
   return (
     <Sidebar className="!w-40 !top-16 !z-40">
       <SidebarHeader>
@@ -27,7 +23,7 @@ export function LeftSidebarControls({ postId, storageId, likes, dislikes, commen
         <Separator />
       </div>
       <SidebarContent>
-        <IncrementBlogLikesDislikes postId={postId} storageId={storageId} likes={likes} dislikes={dislikes} comments={comments} />
+        <IncrementBlogLikesDislikes post={post} />
         <SidebarGroup />
         <SidebarGroup />
       </SidebarContent>

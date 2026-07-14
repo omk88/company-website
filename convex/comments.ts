@@ -1,8 +1,6 @@
 import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { authComponent } from "./auth";
-import { profile } from "console";
-import { cubeTexture } from "three/src/nodes/accessors/CubeTextureNode.js";
 
 export const getCommentsByPost = query({
   args: {
@@ -73,7 +71,6 @@ export const createComment = mutation({
       authorProfilePic: profile.profilePic,  
       blogTitle: blog.title,                 
       likes: 0,
-      dislikes: 0,
     });
 
     await ctx.db.patch(args.postId, {
@@ -88,23 +85,31 @@ export const getCommentVoteState = query({
   args: { commentId: v.id("comments") },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return "none";
 
-    const vote = await ctx.db
-      .query("commentVotes")
-      .withIndex("by_user_and_comment", (q) =>
-        q.eq("userId", identity.subject).eq("commentId", args.commentId)
-      )
-      .unique();
+    const comment = await ctx.db.get(args.commentId);
+    if (!comment) return null; 
 
-    return vote ? vote.type : "none";
+    let hasVoted = false;
+    if (identity) {
+      const vote = await ctx.db
+        .query("commentVotes")
+        .withIndex("by_user_and_comment", (q) =>
+          q.eq("userId", identity.subject).eq("commentId", args.commentId)
+        )
+        .unique();
+      hasVoted = !!vote;
+    }
+
+    return {
+      hasVoted,
+      likes: comment.likes ?? 0,
+    };
   },
 });
 
 export const toggleCommentVote = mutation({
   args: {
     commentId: v.id("comments"),
-    targetVote: v.union(v.literal("liked"), v.literal("disliked")),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -122,50 +127,23 @@ export const toggleCommentVote = mutation({
       .unique();
 
     let newLikes = comment.likes ?? 0;
-    let newDislikes = comment.dislikes ?? 0;
-    
     let likesChange = 0;
 
     if (existingVote) {
-      if (existingVote.type === args.targetVote) {
-        await ctx.db.delete(existingVote._id);
-        if (args.targetVote === "liked") {
-          newLikes = Math.max(0, newLikes - 1);
-          likesChange = -1;
-        }
-        if (args.targetVote === "disliked") {
-          newDislikes = Math.max(0, newDislikes - 1);
-        }
-      } else {
-        await ctx.db.patch(existingVote._id, { type: args.targetVote });
-        if (args.targetVote === "liked") {
-          newLikes += 1;
-          newDislikes = Math.max(0, newDislikes - 1);
-          likesChange = 1;
-        } else {
-          newDislikes += 1;
-          newLikes = Math.max(0, newLikes - 1);
-          likesChange = -1;
-        }
-      }
+      await ctx.db.delete(existingVote._id);
+      newLikes = Math.max(0, newLikes - 1);
+      likesChange = -1;
     } else {
       await ctx.db.insert("commentVotes", {
         userId,
         commentId: args.commentId,
-        type: args.targetVote,
       });
-      if (args.targetVote === "liked") {
-        newLikes += 1;
-        likesChange = 1;
-      }
-      if (args.targetVote === "disliked") {
-        newDislikes += 1;
-      }
+      newLikes += 1;
+      likesChange = 1;
     }
 
     await ctx.db.patch(args.commentId, {
       likes: newLikes,
-      dislikes: newDislikes,
     });
 
     if (likesChange !== 0) {
@@ -182,35 +160,4 @@ export const toggleCommentVote = mutation({
       }
     }
   },
-});
-
-export const handleVote = mutation({
-  args: {
-    commentId: v.id("comments"), 
-    currentVote: v.union(v.literal("none"), v.literal("liked"), v.literal("disliked")),
-    previousVote: v.union(v.literal("none"), v.literal("liked"), v.literal("disliked")),
-  },
-  handler: async (ctx, args) => {
-    const comment = await ctx.db.get(args.commentId);
-    if (!comment) throw new Error("Comment not found");
-
-    let likesChange = 0;
-    let dislikesChange = 0;
-
-    if (args.previousVote === "liked") likesChange -= 1;
-    if (args.previousVote === "disliked") dislikesChange -= 1;
-
-    if (args.currentVote === "liked") likesChange += 1;
-    if (args.currentVote === "disliked") dislikesChange += 1;
-
-    const currentLikes = comment.likes ?? 0;
-    const currentDislikes = comment.dislikes ?? 0;
-
-    await ctx.db.patch(args.commentId, {
-      likes: Math.max(0, currentLikes + likesChange),
-      dislikes: Math.max(0, currentDislikes + dislikesChange)
-    });
-
-    return { success: true };
-  }
 });

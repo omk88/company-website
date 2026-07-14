@@ -1,52 +1,59 @@
 "use client";
 
-import { ThumbsUp, ThumbsDown } from "lucide-react";
+import { ThumbsUp } from "lucide-react";
 import { Button } from "../ui/button";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useTransition } from "react";
 import { CommentPreview } from "./CommentCard";
 
-interface IncrementCommentLikesDislikesProps {
+interface IncrementCommentLikesProps {
   comment: CommentPreview; 
 }
 
-export function IncrementCommentLikesDislikes({ comment }: IncrementCommentLikesDislikesProps) {
+export function IncrementCommentLikesDislikes({ comment }: IncrementCommentLikesProps) {
   const user = useQuery(api.auth.getCurrentUser);
   const [isVotePending, startVoteTransition] = useTransition();
 
-  const currentVote = useQuery(api.comments.getCommentVoteState, { commentId: comment._id }) ?? "none";
+  const voteState = useQuery(api.comments.getCommentVoteState, { commentId: comment._id });
+  const hasLiked = voteState?.hasVoted ?? false;
+  const likesCount = voteState?.likes ?? comment.likes;
   
   const toggleVoteMutation = useMutation(api.comments.toggleCommentVote)
     .withOptimisticUpdate((localStore, args) => {
-      const { commentId, targetVote } = args;
-      const previousVote = localStore.getQuery(api.comments.getCommentVoteState, { commentId });
+      const { commentId } = args;
+      
+      const previous = localStore.getQuery(api.comments.getCommentVoteState, { commentId });
+      
+      const currentHasVoted = previous ? previous.hasVoted : false;
+      const currentLikes = previous ? previous.likes : comment.likes;
 
-      let predictedVote: "liked" | "disliked" | "none" = targetVote;
-      if (previousVote === targetVote) {
-        predictedVote = "none";
-      }
+      const nextHasVoted = !currentHasVoted;
+      const nextLikes = nextHasVoted ? currentLikes + 1 : Math.max(0, currentLikes - 1);
 
       localStore.setQuery(
         api.comments.getCommentVoteState,
         { commentId },
-        predictedVote
+        {
+          hasVoted: nextHasVoted,
+          likes: nextLikes,
+        }
       );
     });
 
-  const handleVoteClick = async (target: "liked" | "disliked") => {
+  const handleLikeClick = async () => {
     if (isVotePending) return;
 
     if (!user) {
-      alert("You must be logged in to rate a comment.");
+      alert("You must be logged in to like a comment.");
       return;
     }
 
     startVoteTransition(async () => {
       try {
-        await toggleVoteMutation({ commentId: comment._id, targetVote: target });
+        await toggleVoteMutation({ commentId: comment._id });
       } catch (error) {
-        console.error("Failed to process vote:", error);
+        console.error("Failed to process like:", error);
       }
     });
   };
@@ -55,35 +62,18 @@ export function IncrementCommentLikesDislikes({ comment }: IncrementCommentLikes
     <div className="flex flex-row items-center gap-4 text-muted-foreground text-xs">
       <Button 
         variant="ghost" 
-        onClick={() => handleVoteClick("liked")}
+        onClick={handleLikeClick}
         disabled={!user}
         className="h-12 w-12 rounded-full text-muted-foreground hover:text-foreground"
       >
         <ThumbsUp
           className={`!h-5 !w-5 transition-none ${
-            currentVote === "liked" ? "text-emerald-500" : ""
+            hasLiked ? "text-emerald-500" : ""
           }`}
-          fill={currentVote === "liked" ? "currentColor" : "none"}
+          fill={hasLiked ? "currentColor" : "none"}
         />
-        <h1 className={currentVote === "liked" ? "text-emerald-500 font-bold" : ""}>
-          {comment.likes}
-        </h1>
-      </Button>
-
-      <Button 
-        variant="ghost" 
-        onClick={() => handleVoteClick("disliked")}
-        disabled={!user}
-        className="h-12 w-12 rounded-full text-muted-foreground"
-      >
-        <ThumbsDown
-          className={`!h-5 !w-5 transition-none ${
-            currentVote === "disliked" ? "text-destructive" : ""
-          }`}
-          fill={currentVote === "disliked" ? "currentColor" : "none"}
-        />
-        <h1 className={currentVote === "disliked" ? "text-destructive font-bold" : ""}>
-          {comment.dislikes}
+        <h1 className={hasLiked ? "text-emerald-500 font-bold" : ""}>
+          {likesCount}
         </h1>
       </Button>
     </div>
