@@ -123,20 +123,29 @@ export const toggleCommentVote = mutation({
 
     let newLikes = comment.likes ?? 0;
     let newDislikes = comment.dislikes ?? 0;
+    
+    let likesChange = 0;
 
     if (existingVote) {
       if (existingVote.type === args.targetVote) {
         await ctx.db.delete(existingVote._id);
-        if (args.targetVote === "liked") newLikes = Math.max(0, newLikes - 1);
-        if (args.targetVote === "disliked") newDislikes = Math.max(0, newDislikes - 1);
+        if (args.targetVote === "liked") {
+          newLikes = Math.max(0, newLikes - 1);
+          likesChange = -1;
+        }
+        if (args.targetVote === "disliked") {
+          newDislikes = Math.max(0, newDislikes - 1);
+        }
       } else {
         await ctx.db.patch(existingVote._id, { type: args.targetVote });
         if (args.targetVote === "liked") {
           newLikes += 1;
           newDislikes = Math.max(0, newDislikes - 1);
+          likesChange = 1;
         } else {
           newDislikes += 1;
           newLikes = Math.max(0, newLikes - 1);
+          likesChange = -1;
         }
       }
     } else {
@@ -145,14 +154,33 @@ export const toggleCommentVote = mutation({
         commentId: args.commentId,
         type: args.targetVote,
       });
-      if (args.targetVote === "liked") newLikes += 1;
-      if (args.targetVote === "disliked") newDislikes += 1;
+      if (args.targetVote === "liked") {
+        newLikes += 1;
+        likesChange = 1;
+      }
+      if (args.targetVote === "disliked") {
+        newDislikes += 1;
+      }
     }
 
     await ctx.db.patch(args.commentId, {
       likes: newLikes,
       dislikes: newDislikes,
     });
+
+    if (likesChange !== 0) {
+      const authorProfile = await ctx.db
+        .query("profiles")
+        .withIndex("by_userId", (q) => q.eq("userId", comment.authorId))
+        .unique();
+
+      if (authorProfile) {
+        const currentProfileLikes = authorProfile.totalLikes ?? 0;
+        await ctx.db.patch(authorProfile._id, {
+          totalLikes: Math.max(0, currentProfileLikes + likesChange),
+        });
+      }
+    }
   },
 });
 

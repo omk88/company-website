@@ -1,7 +1,8 @@
 import { Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import { paginationOptsValidator } from "convex/server";
+import { cubeTexture } from "three/src/nodes/accessors/CubeTextureNode.js";
 
 export const generateUploadUrl = mutation({
   args: {},
@@ -73,35 +74,103 @@ export const recordView = mutation({
   },
 });
 
-export const handleVote = mutation({
+export const getBlogVoteState = query({
+  args: { blogId: v.id("blogs") },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return "none";
+
+    const vote = await ctx.db
+      .query("blogVotes")
+      .withIndex("by_user_and_blog", (q) => 
+        q.eq("userId", identity.subject).eq("blogId", args.blogId)
+      )
+      .unique();
+
+    return vote ? vote.type : "none";
+  },
+})
+
+export const toggleBlogVote = mutation({
   args: {
-    postId: v.id("blogs"),
-    currentVote: v.union(v.literal("none"), v.literal("liked"), v.literal("disliked")),
-    previousVote: v.union(v.literal("none"), v.literal("liked"), v.literal("disliked")),
+    blogId: v.id("blogs"),
+    targetVote: v.union(v.literal("liked"), v.literal("disliked")),
   },
   handler: async (ctx, args) => {
-    const post = await ctx.db.get(args.postId);
-    if (!post) throw new Error("Post not found");
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new ConvexError("You must be logged in to vote.");
+    const userId = identity.subject;
 
+    const blog = await ctx.db.get(args.blogId);
+    if (!blog) throw new ConvexError("Blog not found.");
+
+    const existingVote = await ctx.db
+      .query("blogVotes")
+      .withIndex("by_user_and_blog", (q) =>
+        q.eq("userId", userId).eq("blogId", args.blogId)
+      )
+      .unique();
+
+    let newLikes = blog.likes ?? 0;
+    let newDislikes = blog.dislikes ?? 0;
     let likesChange = 0;
-    let dislikesChange = 0;
 
-    if (args.previousVote === "liked") likesChange -= 1;
-    if (args.previousVote === "disliked") dislikesChange -= 1;
+    if (existingVote) {
+      if (existingVote.type === args.targetVote) {
+        await ctx.db.delete(existingVote._id);
+        if (args.targetVote === "liked") {
+          newLikes = Math.max(0, newLikes - 1);
+          likesChange = -1;
+        }
+        if (args.targetVote === "disliked") {
+          newDislikes = Math.max(0, newDislikes - 1);
+        }
+      } else {
+        await ctx.db.patch(existingVote._id, { type: args.targetVote });
+        if (args.targetVote === "liked") {
+          newLikes += 1;
+          newDislikes = Math.max(0, newDislikes - 1);
+          likesChange = 1;
+        } else {
+          newDislikes += 1;
+          newLikes = Math.max(0, newLikes - 1);
+          likesChange = -1;
+        }
+      }
+    } else {
+      await ctx.db.insert("blogVotes", {
+        userId,
+        blogId: args.blogId,
+        type: args.targetVote,
+      });
+      if (args.targetVote === "liked") {
+        newLikes += 1;
+        likesChange = 1;
+      }
+      if (args.targetVote === "disliked") {
+        newDislikes += 1;
+      }
+    }
 
-    if (args.currentVote === "liked") likesChange += 1;
-    if (args.currentVote === "disliked") dislikesChange += 1;
-
-    const currentLikes = post.likes ?? 0;
-    const currentDislikes = post.dislikes ?? 0;
-
-    await ctx.db.patch(args.postId, {
-      likes: Math.max(0, currentLikes + likesChange),
-      dislikes: Math.max(0, currentDislikes + dislikesChange)
+    await ctx.db.patch(args.blogId, {
+      likes: newLikes,
+      dislikes: newDislikes,
     });
 
-    return { success: true };
-  }
+    if (likesChange !== 0) {
+      const authorProfile = await ctx.db
+        .query("profiles")
+        .withIndex("by_userId", (q) => q.eq("userId", blog.author))
+        .unique();
+
+      if (authorProfile) {
+        const currentProfileLikes = authorProfile.totalLikes ?? 0;
+        await ctx.db.patch(authorProfile._id, {
+          totalLikes: Math.max(0, currentProfileLikes + likesChange),
+        });
+      }
+    }
+  },
 });
 
 export const deletePost = mutation({

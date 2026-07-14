@@ -3,7 +3,7 @@ import { Sidebar, SidebarHeader, SidebarContent, SidebarGroup, SidebarFooter } f
 import { Separator } from "../ui/separator";
 import Link from "next/link";
 import { buttonVariants } from "../ui/button";
-import { IncrementLikesDislikes } from "./IncrementLikesDislikes";
+import { IncrementBlogLikesDislikes } from "./IncrementBlogLikesDislikes";
 import { Id } from "@/convex/_generated/dataModel";
 
 interface ViewTrackerProps {
@@ -27,7 +27,7 @@ export function LeftSidebarControls({ postId, storageId, likes, dislikes, commen
         <Separator />
       </div>
       <SidebarContent>
-        <IncrementLikesDislikes postId={postId} storageId={storageId} likes={likes} dislikes={dislikes} comments={comments} />
+        <IncrementBlogLikesDislikes postId={postId} storageId={storageId} likes={likes} dislikes={dislikes} comments={comments} />
         <SidebarGroup />
         <SidebarGroup />
       </SidebarContent>

@@ -1,26 +1,35 @@
 "use client";
 
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+import { useMutation, useQuery } from "convex/react";
 import { ThumbsUp, ThumbsDown } from "lucide-react";
 import { Button } from "../ui/button";
-import { useMutation, useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
 import { useTransition } from "react";
-import { CommentPreview } from "./CommentCard";
+import { toast } from "sonner";
 
-interface IncrementCommentLikesDislikesProps {
-  comment: CommentPreview; 
+interface IncrementBlogLikesDislikesProps {
+  postId: Id<"blogs">;
+  storageId: string;
+  likes: number;
+  dislikes: number;
+  comments: number;
 }
 
-export function IncrementCommentLikesDislikes({ comment }: IncrementCommentLikesDislikesProps) {
+export function IncrementBlogLikesDislikes({ 
+  postId, 
+  likes, 
+  dislikes 
+}: IncrementBlogLikesDislikesProps) {
   const user = useQuery(api.auth.getCurrentUser);
   const [isVotePending, startVoteTransition] = useTransition();
 
-  const currentVote = useQuery(api.comments.getCommentVoteState, { commentId: comment._id }) ?? "none";
+  const currentVote = useQuery(api.blogs.getBlogVoteState, { blogId: postId }) ?? "none";
   
-  const toggleVoteMutation = useMutation(api.comments.toggleCommentVote)
+  const toggleBlogVoteMutation = useMutation(api.blogs.toggleBlogVote)
     .withOptimisticUpdate((localStore, args) => {
-      const { commentId, targetVote } = args;
-      const previousVote = localStore.getQuery(api.comments.getCommentVoteState, { commentId });
+      const { blogId, targetVote } = args;
+      const previousVote = localStore.getQuery(api.blogs.getBlogVoteState, { blogId });
 
       let predictedVote: "liked" | "disliked" | "none" = targetVote;
       if (previousVote === targetVote) {
@@ -28,8 +37,8 @@ export function IncrementCommentLikesDislikes({ comment }: IncrementCommentLikes
       }
 
       localStore.setQuery(
-        api.comments.getCommentVoteState,
-        { commentId },
+        api.blogs.getBlogVoteState,
+        { blogId },
         predictedVote
       );
     });
@@ -38,21 +47,22 @@ export function IncrementCommentLikesDislikes({ comment }: IncrementCommentLikes
     if (isVotePending) return;
 
     if (!user) {
-      alert("You must be logged in to rate a comment.");
+      toast.error("You must be logged in to rate an article.");
       return;
     }
 
     startVoteTransition(async () => {
       try {
-        await toggleVoteMutation({ commentId: comment._id, targetVote: target });
+        await toggleBlogVoteMutation({ blogId: postId, targetVote: target });
       } catch (error) {
         console.error("Failed to process vote:", error);
+        toast.error("Failed to submit your vote.");
       }
     });
   };
 
   return (
-    <div className="flex flex-row items-center gap-4 text-muted-foreground text-xs">
+    <div className="flex flex-col items-center gap-4 p-6 text-muted-foreground text-xs">
       <Button 
         variant="ghost" 
         onClick={() => handleVoteClick("liked")}
@@ -66,10 +76,10 @@ export function IncrementCommentLikesDislikes({ comment }: IncrementCommentLikes
           fill={currentVote === "liked" ? "currentColor" : "none"}
         />
         <h1 className={currentVote === "liked" ? "text-emerald-500 font-bold" : ""}>
-          {comment.likes}
+          {likes}
         </h1>
       </Button>
-
+      
       <Button 
         variant="ghost" 
         onClick={() => handleVoteClick("disliked")}
@@ -83,7 +93,7 @@ export function IncrementCommentLikesDislikes({ comment }: IncrementCommentLikes
           fill={currentVote === "disliked" ? "currentColor" : "none"}
         />
         <h1 className={currentVote === "disliked" ? "text-destructive font-bold" : ""}>
-          {comment.dislikes}
+          {dislikes}
         </h1>
       </Button>
     </div>

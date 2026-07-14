@@ -37,7 +37,7 @@ export const SkillsFields: React.FC<SkillsFieldsProps> = ({
     if (isSelected) {
       updatedSkills = watchedSkills.filter((s) => s !== skill);
     } else {
-      if (watchedSkills.length >= 10) return;
+      if (watchedSkills.length >= 6) return;
       updatedSkills = [...watchedSkills, skill];
     }
 
@@ -55,7 +55,7 @@ export const SkillsFields: React.FC<SkillsFieldsProps> = ({
   return (
     <Field>
       <div className="flex items-center justify-between mb-1">
-        <FieldLabel>Skills ({watchedSkills.length}/10)</FieldLabel>
+        <FieldLabel>Skills ({watchedSkills.length}/6)</FieldLabel>
       </div>
       
       <Popover open={comboboxOpen} onOpenChange={setComboboxOpen}>
@@ -65,9 +65,9 @@ export const SkillsFields: React.FC<SkillsFieldsProps> = ({
             role="combobox"
             aria-expanded={comboboxOpen}
             className="w-full justify-between font-normal text-muted-foreground h-9 bg-white"
-            disabled={watchedSkills.length >= 10}
+            disabled={watchedSkills.length >= 6}
           >
-            {watchedSkills.length >= 10 
+            {watchedSkills.length >= 6 
               ? "Max skills reached" 
               : "Search and add tech skills..."}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />

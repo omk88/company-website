@@ -33,7 +33,17 @@ export function FeaturedBlogsClient({ initialFeaturedBlogs }: FeaturedBlogsClien
     }, [initialFeaturedBlogs.length]);
 
     if (initialFeaturedBlogs.length === 0) {
-        return <div className="p-4 text-muted-foreground">No featured posts found.</div>;
+        return (
+            <div className="flex flex-col gap-0 w-full bg-muted rounded-sm overflow-hidden transition-all duration-200 hover:bg-zinc-200 dark:hover:bg-zinc-900">
+                <div className="relative aspect-video w-full flex items-center justify-center p-6">
+                    <span className="text-muted-foreground text-sm font-medium text-center max-w-[250px] break-words whitespace-normal">
+                        No featured posts found.
+                    </span>
+                </div>
+                <div className="pt-3 px-3 pb-2 h-[3.25rem] opacity-0 pointer-events-none" aria-hidden="true" />
+                <div className="h-10 opacity-0 pointer-events-none" aria-hidden="true" />
+            </div>
+        );
     }
 
     const currentPost = initialFeaturedBlogs[currentIndex];
@@ -68,7 +78,6 @@ export function FeaturedBlogsClient({ initialFeaturedBlogs }: FeaturedBlogsClien
                 <div className="pt-3 px-3 pb-2">
                     <div className="text-xs font-mono uppercase tracking-wider text-muted-foreground flex justify-between">
                         <span>{currentPost.authorName}</span>
-                        <span>•</span>
                         <span>{formattedDate}</span>
                     </div>
 

@@ -98,6 +98,14 @@ const schema = defineSchema({
   .index("by_user_and_comment", ["userId", "commentId"])
   .index("by_comment", ["commentId"]),
 
+  blogVotes: defineTable({
+    userId: v.string(),
+    blogId: v.id("blogs"),
+    type: v.union(v.literal("liked"), v.literal("disliked")),
+  })
+  .index("by_user_and_blog", ["userId", "blogId"])
+  .index("by_blog", ["blogId"]),
+
 });
 
 export default schema;

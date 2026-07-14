@@ -30,7 +30,7 @@ export function ProfileContentWrapper({ blogGridSlot, authorId }: ProfileContent
         {activeTab === "blog-articles" && blogGridSlot}
         
         {activeTab === "comments" && (
-          <div className="text-gray-500 py-8 text-center">
+          <div className="text-gray-500 text-center">
             <CommentsContainer authorId={authorId} />
           </div>
         )}
