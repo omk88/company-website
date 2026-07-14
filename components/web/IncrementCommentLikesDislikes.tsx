@@ -42,9 +42,9 @@ export function IncrementCommentLikesDislikes({ comment }: IncrementCommentLikes
     });
 
   const handleLikeClick = async () => {
-    if (isVotePending) return;
+    if (isVotePending || user === undefined) return;
 
-    if (!user) {
+    if (user === null) {
       alert("You must be logged in to like a comment.");
       return;
     }
@@ -63,7 +63,7 @@ export function IncrementCommentLikesDislikes({ comment }: IncrementCommentLikes
       <Button 
         variant="ghost" 
         onClick={handleLikeClick}
-        disabled={!user}
+        disabled={user === null}
         className="h-12 w-12 rounded-full text-muted-foreground hover:text-foreground"
       >
         <ThumbsUp

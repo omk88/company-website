@@ -3,22 +3,45 @@
 import { api } from "@/convex/_generated/api";
 import { Doc } from "@/convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
-import { ThumbsUp } from "lucide-react";
+import { MessageSquare, ThumbsUp } from "lucide-react";
 import { Button } from "../ui/button";
 import { useTransition } from "react";
 import { toast } from "sonner";
+import { FunctionReturnType } from "convex/server";
 
 interface IncrementBlogLikesProps {
   post: Doc<"blogs">;
+  preloadedUserData: FunctionReturnType<typeof api.auth.getCurrentUser>;
+  preloadedVoteStateData: FunctionReturnType<typeof api.blogs.getBlogVoteState>;
+  preloadedCommentCountData: FunctionReturnType<typeof api.comments.getCommentNumber>;
 }
 
-export function IncrementBlogLikesDislikes({ post }: IncrementBlogLikesProps) {
+export function IncrementBlogLikesDislikes({ 
+  post, 
+  preloadedUserData,
+  preloadedVoteStateData, 
+  preloadedCommentCountData 
+}: IncrementBlogLikesProps) {
   const user = useQuery(api.auth.getCurrentUser);
   const [isVotePending, startVoteTransition] = useTransition();
 
+  const currentUser = user !== undefined ? user : preloadedUserData;
+
   const voteState = useQuery(api.blogs.getBlogVoteState, { blogId: post._id });
-  const hasLiked = voteState?.hasVoted ?? false;
-  const likesCount = voteState?.likes ?? post.likes; 
+  
+  const hasLiked = voteState !== undefined 
+    ? voteState.hasVoted 
+    : preloadedVoteStateData.hasVoted;
+
+  const likesCount = voteState !== undefined 
+    ? voteState.likes 
+    : preloadedVoteStateData.likes; 
+
+  const liveCommentCount = useQuery(api.comments.getCommentNumber, { postId: post._id });
+  
+  const displayComments = liveCommentCount !== undefined 
+    ? liveCommentCount 
+    : preloadedCommentCountData;
   
   const toggleBlogVoteMutation = useMutation(api.blogs.toggleBlogVote)
     .withOptimisticUpdate((localStore, args) => {
@@ -26,8 +49,8 @@ export function IncrementBlogLikesDislikes({ post }: IncrementBlogLikesProps) {
       
       const previous = localStore.getQuery(api.blogs.getBlogVoteState, { blogId });
       
-      const currentHasVoted = previous ? previous.hasVoted : false;
-      const currentLikes = previous ? previous.likes : post.likes;
+      const currentHasVoted = previous?.hasVoted ?? false;
+      const currentLikes = previous?.likes ?? post.likes;
 
       const nextHasVoted = !currentHasVoted;
       const nextLikes = nextHasVoted ? currentLikes + 1 : currentLikes - 1;
@@ -45,7 +68,7 @@ export function IncrementBlogLikesDislikes({ post }: IncrementBlogLikesProps) {
   const handleLikeClick = async () => {
     if (isVotePending) return;
 
-    if (!user) {
+    if (currentUser === null) {
       toast.error("You must be logged in to like an article.");
       return;
     }
@@ -60,12 +83,16 @@ export function IncrementBlogLikesDislikes({ post }: IncrementBlogLikesProps) {
     });
   };
 
+  const scrollToView = () => {
+    document.getElementById("comments")?.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
     <div className="flex flex-col items-center gap-2 p-6 text-muted-foreground text-xs">
       <Button 
         variant="ghost" 
         onClick={handleLikeClick}
-        disabled={!user}
+        disabled={currentUser === null}
         className="h-12 w-12 rounded-full text-muted-foreground hover:text-foreground"
       >
         <ThumbsUp
@@ -74,9 +101,18 @@ export function IncrementBlogLikesDislikes({ post }: IncrementBlogLikesProps) {
           }`}
           fill={hasLiked ? "currentColor" : "none"}
         />
-        <h1 className={hasLiked ? "text-emerald-500 font-bold" : ""}>
+        <span className={hasLiked ? "text-emerald-500 font-bold" : ""}>
           {likesCount}
-        </h1>
+        </span>
+      </Button>
+
+      <Button 
+        variant="ghost" 
+        className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground"
+        onClick={scrollToView}
+      >
+        <MessageSquare className="!h-5 !w-5 transition-transform active:scale-90" />
+        <span>{displayComments}</span>
       </Button>
     </div>
   );
