@@ -101,6 +101,13 @@ const schema = defineSchema({
   })
     .index("by_user_and_blog", ["userId", "blogId"])
     .index("by_blog", ["blogId"]),
+
+  featuredBlogs: defineTable({
+    userId: v.string(),
+    blogId: v.id("blogs"),
+  })
+    .index("by_user_and_blog", ["userId", "blogId"])
+    .index("by_blog", ["blogId"]),
 });
 
 export default schema;

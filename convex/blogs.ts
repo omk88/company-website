@@ -43,18 +43,6 @@ export const createPost = mutation({
   },
 });
 
-export const toggleFeatured = mutation({
-  args: { postId: v.id("blogs") },
-  handler: async (ctx, args) => {
-    const post = await ctx.db.get(args.postId);
-    if (!post) throw new Error("Post not found");
-
-    const currentFeatured = post.featured ?? false; 
-    await ctx.db.patch(args.postId, { featured: !currentFeatured });
-    return !currentFeatured;
-  },
-});
-
 export const recordView = mutation({
   args: { blogId: v.id("blogs") },
   handler: async (ctx, args) => {
@@ -97,6 +85,68 @@ export const getBlogVoteState = query({
       hasVoted,
       likes: blog.likes,
     };
+  },
+});
+
+export const getBlogFeaturedState = query({
+  args: { blogId: v.id("blogs") },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    
+    const blog = await ctx.db.get(args.blogId);
+    if (!blog) {
+      throw new Error("Blog not found");
+    }
+
+    let isFeatured = false;
+    if (identity) {
+      const vote = await ctx.db
+        .query("featuredBlogs")
+        .withIndex("by_user_and_blog", (q) =>
+          q.eq("userId", identity.subject).eq("blogId", args.blogId)
+        )
+        .unique();
+      isFeatured = !!vote;
+    }
+
+    return {
+      isFeatured
+    };
+  },
+});
+
+export const toggleFeatured = mutation({
+  args: { 
+    blogId: v.id("blogs")
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new ConvexError("You must be logged in to feature an article.");
+    const userId = identity.subject;
+
+    const blog = await ctx.db.get(args.blogId);
+    if (!blog) throw new ConvexError("Post not found");
+
+    const existingFeatured = await ctx.db
+      .query("featuredBlogs")
+      .withIndex("by_user_and_blog", (q) =>
+        q.eq("userId", userId).eq("blogId", args.blogId)
+      )
+      .unique();
+
+    if (existingFeatured) {
+      await ctx.db.delete(existingFeatured._id);
+    } else {
+      await ctx.db.insert("featuredBlogs", {
+        userId: userId,
+        blogId: blog._id,
+      })
+    }
+
+    const currentFeatured = blog.featured ?? false; 
+    await ctx.db.patch(args.blogId, { featured: !currentFeatured });
+    
+    return { feature: !currentFeatured };
   },
 });
 

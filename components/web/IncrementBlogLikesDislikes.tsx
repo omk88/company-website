@@ -3,46 +3,59 @@
 import { api } from "@/convex/_generated/api";
 import { Doc } from "@/convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
-import { MessageSquare, ThumbsUp } from "lucide-react";
+import { usePreloadedQuery } from "convex/react"; 
+import { usePreloadedAuthQuery } from "@convex-dev/better-auth/nextjs/client";
+import { Preloaded } from "convex/react";
+import { Copy, Ellipsis, Loader2, MessageSquare, SquarePen, Star, ThumbsUp, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
-import { FunctionReturnType } from "convex/server";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { FaFacebook } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
+import { RxLinkedinLogo } from "react-icons/rx";
+import { Separator } from "../ui/separator";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface IncrementBlogLikesProps {
   post: Doc<"blogs">;
-  preloadedUserData: FunctionReturnType<typeof api.auth.getCurrentUser>;
-  preloadedVoteStateData: FunctionReturnType<typeof api.blogs.getBlogVoteState>;
-  preloadedCommentCountData: FunctionReturnType<typeof api.comments.getCommentNumber>;
+  preloadedUser: Preloaded<typeof api.auth.getCurrentUser>;
+  preloadedVoteState: Preloaded<typeof api.blogs.getBlogVoteState>;
+  preloadedCommentCount: Preloaded<typeof api.comments.getCommentNumber>;
+  preloadedFeaturedState: Preloaded<typeof api.blogs.getBlogFeaturedState>
 }
 
 export function IncrementBlogLikesDislikes({ 
   post, 
-  preloadedUserData,
-  preloadedVoteStateData, 
-  preloadedCommentCountData 
+  preloadedUser, 
+  preloadedVoteState, 
+  preloadedCommentCount,
+  preloadedFeaturedState 
 }: IncrementBlogLikesProps) {
-  const user = useQuery(api.auth.getCurrentUser);
+  
+  const currentUser = usePreloadedAuthQuery(preloadedUser);
+  const voteState = usePreloadedQuery(preloadedVoteState);
+  const displayComments = usePreloadedQuery(preloadedCommentCount);
+
+  const featuredState = usePreloadedQuery(preloadedFeaturedState);
+
   const [isVotePending, startVoteTransition] = useTransition();
+  const [isFeaturedPending, startFeaturedTransition] = useTransition();
 
-  const currentUser = user !== undefined ? user : preloadedUserData;
+  const userEmail = currentUser?.email;
+  const isCompanyUser = userEmail?.endsWith("@taqtiq.tech");
 
-  const voteState = useQuery(api.blogs.getBlogVoteState, { blogId: post._id });
+  const deleteBlog = useMutation(api.blogs.deletePost);
+
+  const router = useRouter(); 
+  const [isDeleting, setIsDeleting] = useState(false);
   
-  const hasLiked = voteState !== undefined 
-    ? voteState.hasVoted 
-    : preloadedVoteStateData.hasVoted;
+  const hasLiked = voteState.hasVoted;
+  const likesCount = voteState.likes; 
 
-  const likesCount = voteState !== undefined 
-    ? voteState.likes 
-    : preloadedVoteStateData.likes; 
+  const isFeatured = featuredState?.isFeatured;
 
-  const liveCommentCount = useQuery(api.comments.getCommentNumber, { postId: post._id });
-  
-  const displayComments = liveCommentCount !== undefined 
-    ? liveCommentCount 
-    : preloadedCommentCountData;
-  
   const toggleBlogVoteMutation = useMutation(api.blogs.toggleBlogVote)
     .withOptimisticUpdate((localStore, args) => {
       const { blogId } = args;
@@ -63,7 +76,26 @@ export function IncrementBlogLikesDislikes({
           likes: nextLikes,
         }
       );
-    });
+  });
+
+  
+  const toggleFeaturedMutation = useMutation(api.blogs.toggleFeatured)
+    .withOptimisticUpdate((localStore, args) => {
+      const { blogId } = args;
+      
+      const previous = localStore.getQuery(api.blogs.getBlogFeaturedState, { blogId });
+      
+      const currentIsFeatured = previous?.isFeatured ?? false;
+      const nextHasVoted = !currentIsFeatured;
+
+      localStore.setQuery(
+        api.blogs.getBlogFeaturedState,
+        { blogId },
+        {
+          isFeatured: nextHasVoted,
+        }
+      );
+  });
 
   const handleLikeClick = async () => {
     if (isVotePending) return;
@@ -83,16 +115,35 @@ export function IncrementBlogLikesDislikes({
     });
   };
 
+  const handleFeaturedClick = async () => {
+    if (isFeaturedPending) return;
+
+    if (currentUser === null) {
+      toast.error("You must be logged in to feature an article.");
+      return;
+    }
+
+    startFeaturedTransition(async () => {
+      try {
+        await toggleFeaturedMutation({ blogId: post._id });
+      } catch (error) {
+        console.error("Failed to process featured:", error);
+        toast.error("Failed to update your feature.");
+      }
+    });
+  };
+
   const scrollToView = () => {
     document.getElementById("comments")?.scrollIntoView({ behavior: "smooth" });
   };
+
+  const handleDelete = async () => {};
 
   return (
     <div className="flex flex-col items-center gap-2 p-6 text-muted-foreground text-xs">
       <Button 
         variant="ghost" 
         onClick={handleLikeClick}
-        disabled={currentUser === null}
         className="h-12 w-12 rounded-full text-muted-foreground hover:text-foreground"
       >
         <ThumbsUp
@@ -114,6 +165,107 @@ export function IncrementBlogLikesDislikes({
         <MessageSquare className="!h-5 !w-5 transition-transform active:scale-90" />
         <span>{displayComments}</span>
       </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+            <Button 
+                variant="ghost" 
+                className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground disabled:opacity-100"
+            >
+                <Ellipsis
+                    className="!h-5 !w-5 transition-transform active:scale-90"
+                />
+            </Button>
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent className="w-48">
+            <DropdownMenuLabel>Share</DropdownMenuLabel>
+            
+            <DropdownMenuItem 
+                className="font-bold cursor-pointer flex items-center gap-2 whitespace-nowrap"
+                onClick={() => {
+                    navigator.clipboard.writeText(window.location.href);
+                    toast.success("Link copied to clipboard!");
+                }}
+            >
+                <Copy className="h-4 w-4 shrink-0" strokeWidth={3} />
+                <span>Copy link</span>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem 
+                className="cursor-pointer flex items-center gap-2 whitespace-nowrap"
+                onClick={() => {
+                    const shareUrl = `https://x.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent("Check out this article!")}`;
+                    window.open(shareUrl, "_blank", "noopener,noreferrer");
+                }}
+            >
+                <FaXTwitter className="h-4 w-4 shrink-0" />
+                <span>X (Twitter)</span>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem 
+                className="cursor-pointer flex items-center gap-2 whitespace-nowrap"
+                onClick={() => {
+                    const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`;
+                    window.open(shareUrl, "_blank", "noopener,noreferrer");
+                }}
+            >
+                <RxLinkedinLogo className="h-4 w-4 shrink-0" />
+                <span>LinkedIn</span>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem 
+                className="cursor-pointer flex items-center gap-2 whitespace-nowrap"
+                onClick={() => {
+                    const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`;
+                    window.open(shareUrl, "_blank", "noopener,noreferrer");
+                }}
+            >
+                <FaFacebook className="h-4 w-4 shrink-0" />
+                <span>Facebook</span>
+            </DropdownMenuItem>
+        </DropdownMenuContent>
+    </DropdownMenu>
+    {isCompanyUser && (
+        <>
+            <div className="w-1/2 mx-auto">
+                <Separator />
+            </div>
+
+            <Button 
+                variant="ghost" 
+                onClick={handleFeaturedClick} 
+                className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground disabled:opacity-100"
+            >
+                <Star
+                    className={`!h-5 !w-5 transition-all active:scale-90 ${
+                        isFeatured ? "text-amber-500 fill-amber-500" : ""
+                    }`}
+                />
+            </Button>
+
+            <Button 
+                variant="ghost" 
+                className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground disabled:opacity-100"
+                asChild
+            >
+                <Link href={`/company/blog?id=${post._id}`}>
+                    <SquarePen className="!h-5 !w-5 transition-transform active:scale-90" />
+                </Link>
+            </Button>
+
+            <Button 
+                variant="ghost" 
+                className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-destructive disabled:opacity-100"
+                onClick={handleDelete}
+            >
+                {isDeleting ? (
+                    <Loader2 className="!h-5 !w-5 animate-spin text-destructive" />
+                ) : (
+                    <Trash2 className="!h-5 !w-5 transition-transform active:scale-90" />
+                )}
+            </Button>
+        </>
+      )}
     </div>
   );
 }

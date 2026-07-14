@@ -5,7 +5,7 @@ import Link from "next/link";
 import { buttonVariants } from "../ui/button";
 import { IncrementBlogLikesDislikes } from "./IncrementBlogLikesDislikes";
 import { Doc } from "@/convex/_generated/dataModel";
-import { preloadedQueryResult, preloadQuery } from "convex/nextjs";
+import { preloadQuery } from "convex/nextjs";
 import { api } from "@/convex/_generated/api";
 import { preloadAuthQuery } from "@/lib/auth-server";
 
@@ -15,19 +15,17 @@ interface ViewTrackerProps {
 
 export async function LeftSidebarControls({ post }: ViewTrackerProps) {
 
-  const preloadedCommentCount = await preloadQuery(api.comments.getCommentNumber, { postId: post._id });
-  const preloadedCommentCountData = preloadedQueryResult(preloadedCommentCount);
-
+  const preloadedCommentCountPromise = preloadQuery(api.comments.getCommentNumber, { postId: post._id });
   const preloadedUserPromise = preloadAuthQuery(api.auth.getCurrentUser);
   const preloadedVoteStatePromise = preloadAuthQuery(api.blogs.getBlogVoteState, { blogId: post._id });
+  const preloadedFeaturedStatePromise = preloadAuthQuery(api.blogs.getBlogFeaturedState, { blogId: post._id });
 
-  const [preloadedUser, preloadedVoteState] = await Promise.all([
+  const [preloadedCommentCount, preloadedUser, preloadedVoteState, preloadedFeaturedState] = await Promise.all([
+    preloadedCommentCountPromise,
     preloadedUserPromise,
     preloadedVoteStatePromise,
+    preloadedFeaturedStatePromise
   ]);
-
-  const preloadedUserData = preloadedQueryResult(preloadedUser);
-  const preloadedVoteStateData = preloadedQueryResult(preloadedVoteState);
 
 
   return (
@@ -42,8 +40,13 @@ export async function LeftSidebarControls({ post }: ViewTrackerProps) {
         <Separator />
       </div>
       <SidebarContent>
-        <IncrementBlogLikesDislikes post={post} preloadedVoteStateData={preloadedVoteStateData} preloadedCommentCountData={preloadedCommentCountData} preloadedUserData={preloadedUserData} />
-        <SidebarGroup />
+        <IncrementBlogLikesDislikes 
+          post={post}
+          preloadedUser={preloadedUser}
+          preloadedVoteState={preloadedVoteState}
+          preloadedCommentCount={preloadedCommentCount}
+          preloadedFeaturedState={preloadedFeaturedState} 
+        />
         <SidebarGroup />
       </SidebarContent>
       <SidebarFooter />
