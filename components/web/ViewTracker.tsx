@@ -6,15 +6,15 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 
 interface ViewTrackerProps {
-  postId: Id<"blogs">;
+  blogId: Id<"blogs">;
 }
 
-export function ViewTracker({ postId }: ViewTrackerProps) {
+export function ViewTracker({ blogId }: ViewTrackerProps) {
   const recordView = useMutation(api.blogs.recordView);
   const hasIncremented = useRef(false);
 
   useEffect(() => {
-    const viewedKey = `viewed_${postId}`;
+    const viewedKey = `viewed_${blogId}`;
     if (sessionStorage.getItem(viewedKey)) return;
 
     if (!hasIncremented.current) {
@@ -22,11 +22,11 @@ export function ViewTracker({ postId }: ViewTrackerProps) {
       
       sessionStorage.setItem(viewedKey, "true");
       
-      recordView({ blogId: postId }).catch((err) =>
+      recordView({ blogId: blogId }).catch((err) =>
         console.error("Failed to record view event:", err)
       );
     }
-  }, [postId, recordView]);
+  }, [blogId, recordView]);
 
   return null;
 }

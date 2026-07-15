@@ -2,14 +2,14 @@ import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { authComponent } from "./auth";
 
-export const getCommentsByPost = query({
+export const getCommentsByBlog = query({
   args: {
-    postId: v.id("blogs")
+    blogId: v.id("blogs")
   },
   handler: async (ctx, args) => {
     return await ctx.db
       .query("comments")
-      .withIndex("by_postId", (q) => q.eq("postId", args.postId))
+      .withIndex("by_blog", (q) => q.eq("blogId", args.blogId))
       .order("desc")
       .collect();
   }
@@ -30,10 +30,10 @@ export const getCommentsByAuthor = query({
 
 export const getCommentNumber = query({
   args: {
-    postId: v.id("blogs")
+    blogId: v.id("blogs")
   },
   handler: async (ctx, args) => {
-    const blog = await ctx.db.get(args.postId);
+    const blog = await ctx.db.get(args.blogId);
     return blog?.commentCount ?? 0;
   }
 });
@@ -41,7 +41,7 @@ export const getCommentNumber = query({
 export const createComment = mutation({
   args: {
     body: v.string(),
-    postId: v.id("blogs"),
+    blogId: v.id("blogs"),
   },
   handler: async (ctx, args) => {
     const user = await authComponent.safeGetAuthUser(ctx);
@@ -49,10 +49,8 @@ export const createComment = mutation({
       throw new ConvexError("Not authenticated");
     }
 
-    const blog = await ctx.db.get(args.postId);
-    if (!blog) {
-      throw new ConvexError("Blog post not found");
-    }
+    const blog = await ctx.db.get(args.blogId);
+    if (!blog) { return null; }
 
     const profile = await ctx.db
       .query("profiles")
@@ -64,7 +62,7 @@ export const createComment = mutation({
     }
 
     const commentId = await ctx.db.insert("comments", {
-      postId: args.postId,
+      blogId: args.blogId,
       body: args.body,
       authorId: user._id,
       authorName: user.name ?? profile.username, 
@@ -73,7 +71,7 @@ export const createComment = mutation({
       likes: 0,
     });
 
-    await ctx.db.patch(args.postId, {
+    await ctx.db.patch(args.blogId, {
       commentCount: (blog.commentCount ?? 0) + 1,
     });
 

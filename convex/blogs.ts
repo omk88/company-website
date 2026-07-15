@@ -1,6 +1,6 @@
 import { Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
-import { ConvexError, v } from "convex/values";
+import { v } from "convex/values";
 import { paginationOptsValidator } from "convex/server";
 
 export const generateUploadUrl = mutation({
@@ -67,7 +67,7 @@ export const getBlogVoteState = query({
     
     const blog = await ctx.db.get(args.blogId);
     if (!blog) {
-      throw new Error("Blog not found");
+      return null;
     }
 
     let hasVoted = false;
@@ -95,7 +95,7 @@ export const getBlogFeaturedState = query({
     
     const blog = await ctx.db.get(args.blogId);
     if (!blog) {
-      throw new Error("Blog not found");
+      return null;
     }
 
     let isFeatured = false;
@@ -121,11 +121,11 @@ export const toggleFeatured = mutation({
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new ConvexError("You must be logged in to feature an article.");
+    if (!identity) return null;
     const userId = identity.subject;
 
     const blog = await ctx.db.get(args.blogId);
-    if (!blog) throw new ConvexError("Post not found");
+    if (!blog) return null;
 
     const existingFeatured = await ctx.db
       .query("featuredBlogs")
@@ -156,11 +156,11 @@ export const toggleBlogVote = mutation({
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new ConvexError("You must be logged in to vote.");
+    if (!identity) return null;
     const userId = identity.subject;
 
     const blog = await ctx.db.get(args.blogId);
-    if (!blog) throw new ConvexError("Blog not found.");
+    if (!blog) return null;
 
     const existingVote = await ctx.db
       .query("blogVotes")
@@ -210,16 +210,49 @@ export const deleteBlog = mutation({
     blogId: v.id("blogs"), 
   },
   handler: async (ctx, args) => {
-    await ctx.db.delete(args.blogId);
+
+    const [featuredBlogs, blogVotes, comments, viewLogs] = await Promise.all([
+      ctx.db
+        .query("featuredBlogs")
+        .withIndex("by_blog", (q) => q.eq("blogId", args.blogId))
+        .collect(),
+      ctx.db
+        .query("blogVotes")
+        .withIndex("by_blog", (q) => q.eq("blogId", args.blogId))
+        .collect(),
+      ctx.db
+        .query("comments")
+        .withIndex("by_blog", (q) => q.eq("blogId", args.blogId))
+        .collect(),
+      ctx.db
+        .query("viewLogs")
+        .withIndex("by_blog", (q) => q.eq("blogId", args.blogId))
+        .collect(),
+    ]);
+
+    const deleteFeaturedPromises = featuredBlogs.map((fb) => ctx.db.delete(fb._id));
+    const deleteVotesPromises = blogVotes.map((bv) => ctx.db.delete(bv._id));
+    const deleteCommentsPromises = comments.map((c) => ctx.db.delete(c._id));
+    const deleteLogsPromises = viewLogs.map((vl) => ctx.db.delete(vl._id));
+
+    const allDeletes = [
+      ctx.db.delete(args.blogId),
+      ...deleteFeaturedPromises,
+      ...deleteVotesPromises,
+      ...deleteCommentsPromises,
+      ...deleteLogsPromises,
+    ];
+
+    await Promise.all(allDeletes);
+
     return { success: true };
   },
 });
 
 
-
 export const updatePost = mutation({
   args: {
-    postId: v.id("blogs"),
+    blogId: v.id("blogs"),
     title: v.string(),
     subtitle: v.string(),
     content: v.string(),
@@ -230,9 +263,9 @@ export const updatePost = mutation({
     storageId: v.string(), 
   },
   handler: async (ctx, args) => {
-    const { postId, ...fieldsToUpdate } = args;
-    const currentPost = await ctx.db.get(postId);
-    if (!currentPost) throw new Error("Post no longer exists.");
+    const { blogId, ...fieldsToUpdate } = args;
+    const currentPost = await ctx.db.get(blogId);
+    if (!currentPost) return null;
 
     let finalImageUrl = currentPost.imageUrl;
 
@@ -249,12 +282,12 @@ export const updatePost = mutation({
       }
     }
 
-    await ctx.db.patch(postId, {
+    await ctx.db.patch(blogId, {
       ...fieldsToUpdate,
       imageUrl: finalImageUrl,
     });
 
-    return postId;
+    return blogId;
   },
 });
 
@@ -370,9 +403,9 @@ export const getFeaturedPosts = query({
 });
 
 export const getFeaturedState = query({
-  args: { postId: v.id("blogs") },
+  args: { blogId: v.id("blogs") },
   handler: async (ctx, args) => {
-    const blog = await ctx.db.get(args.postId);
+    const blog = await ctx.db.get(args.blogId);
     if (!blog) return null;
     return { isFeatured: blog.featured ?? false };
   },
@@ -430,18 +463,18 @@ export const getTrendingPosts = query({
   },
 });
 
-export const getPostById = query({
-  args: { postId: v.id("blogs") },
+export const getBlogById = query({
+  args: { blogId: v.id("blogs") },
   handler: async (ctx, args) => {
-    const post = await ctx.db.get(args.postId);
-    if (!post) return null;
+    const blog = await ctx.db.get(args.blogId);
+    if (!blog) return null;
 
-    const resolvedImageUrl = post.storageId !== undefined 
-      ? await ctx.storage.getUrl(post.storageId) 
+    const resolvedImageUrl = blog.storageId !== undefined 
+      ? await ctx.storage.getUrl(blog.storageId) 
       : null;
 
     return {
-      ...post,
+      ...blog,
       imageUrl: resolvedImageUrl ?? "/noImage.png" 
     };
   }

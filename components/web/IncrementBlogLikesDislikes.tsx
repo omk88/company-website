@@ -5,7 +5,7 @@ import { Doc } from "@/convex/_generated/dataModel";
 import { useConvex, useMutation, useQuery, usePreloadedQuery } from "convex/react";
 import { usePreloadedAuthQuery } from "@convex-dev/better-auth/nextjs/client";
 import { Preloaded } from "convex/react";
-import { Copy, Ellipsis, Loader2, MessageSquare, SquarePen, Star, ThumbsUp, Trash2 } from "lucide-react";
+import { Copy, Ellipsis, Loader2, MessageSquare, SquarePen, Star, ThumbsUp, Trash2, TriangleAlert } from "lucide-react";
 import { Button } from "../ui/button";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -20,7 +20,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 
 
 interface IncrementBlogLikesProps {
-  post: Doc<"blogs">;
+  blog: Doc<"blogs">;
   preloadedUser: Preloaded<typeof api.auth.getCurrentUser>;
   preloadedVoteState: Preloaded<typeof api.blogs.getBlogVoteState>;
   preloadedCommentCount: Preloaded<typeof api.comments.getCommentNumber>;
@@ -28,7 +28,7 @@ interface IncrementBlogLikesProps {
 }
 
 export function IncrementBlogLikesDislikes({ 
-  post, 
+  blog, 
   preloadedUser, 
   preloadedVoteState, 
   preloadedCommentCount,
@@ -47,6 +47,7 @@ export function IncrementBlogLikesDislikes({
 
   const [isVotePending, startVoteTransition] = useTransition();
   const [isFeaturedPending, startFeaturedTransition] = useTransition();
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const userEmail = currentUser?.email;
   const isCompanyUser = userEmail?.endsWith("@taqtiq.tech");
@@ -54,15 +55,14 @@ export function IncrementBlogLikesDislikes({
   const deleteBlogMutation = useMutation(api.blogs.deleteBlog);
 
   const router = useRouter(); 
-  const [isDeleting, setIsDeleting] = useState(false);
   
-  const hasLiked = voteState.hasVoted;
-  const likesCount = voteState.likes; 
+  const hasLiked = voteState?.hasVoted;
+  const likesCount = voteState?.likes; 
 
   const isFeatured = featuredState?.isFeatured;
 
-  const prefetchBlogPost = () => {
-    convex.query(api.blogs.getPostById, { postId: post._id }).catch((err) => {
+  const prefetchBlog = () => {
+    convex.query(api.blogs.getBlogById, { blogId: blog._id }).catch((err) => {
       console.error("Prefetch failed:", err);
     });
   };
@@ -74,7 +74,7 @@ export function IncrementBlogLikesDislikes({
       const previous = localStore.getQuery(api.blogs.getBlogVoteState, { blogId });
       
       const currentHasVoted = previous?.hasVoted ?? false;
-      const currentLikes = previous?.likes ?? post.likes;
+      const currentLikes = previous?.likes ?? blog.likes;
 
       const nextHasVoted = !currentHasVoted;
       const nextLikes = nextHasVoted ? currentLikes + 1 : currentLikes - 1;
@@ -117,7 +117,7 @@ export function IncrementBlogLikesDislikes({
 
     startVoteTransition(async () => {
       try {
-        await toggleBlogVoteMutation({ blogId: post._id });
+        await toggleBlogVoteMutation({ blogId: blog._id });
       } catch (error) {
         console.error("Failed to process like:", error);
         toast.error("Failed to update your like.");
@@ -135,7 +135,7 @@ export function IncrementBlogLikesDislikes({
 
     startFeaturedTransition(async () => {
       try {
-        await toggleFeaturedMutation({ blogId: post._id });
+        await toggleFeaturedMutation({ blogId: blog._id });
       } catch (error) {
         console.error("Failed to process featured:", error);
         toast.error("Failed to update your feature.");
@@ -148,12 +148,19 @@ export function IncrementBlogLikesDislikes({
   };
 
   const handleDelete = async () => {
-      try {
-        await deleteBlogMutation({ blogId: post._id });
-      } catch (error) {
-        console.error("Failed to delete blog:", error);
-        toast.error("Failed to delete blog.");
-      }
+    setIsDeleting(true);
+
+    try {
+      await deleteBlogMutation({ blogId: blog._id });
+      toast.success("Blog successfully deleted.");
+      setIsOpen(false);
+      router.push("/insights");
+
+    } catch (error) {
+      toast.error("Failed to delete blog.");
+      setIsDeleting(false);
+
+    }
   };
 
   const handleOpenChange = (open: boolean) => {
@@ -165,29 +172,27 @@ export function IncrementBlogLikesDislikes({
       <Dialog open={isOpen} onOpenChange={handleOpenChange}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader className="gap-1">
-            <DialogTitle className="text-xl font-semibold text-foreground">
+            <DialogTitle>
               Delete blog post?
             </DialogTitle>
-            <DialogDescription className="text-muted-foreground text-sm leading-relaxed">
-              Are you sure you want to delete this blog? This action cannot be undone and will permanently remove this post and all of its comments.
+            <DialogDescription className="flex flex-cols gap-4 p-4">
+                <TriangleAlert className="w-20 h-20 text-yellow-500" />
+                <span>
+                  Are you sure you want to delete this blog? This action cannot be undone and will permanently remove this post and all of its comments.
+                </span>
             </DialogDescription>
           </DialogHeader>
 
           <DialogFooter className="gap-4">
             <Button
               type="button"
-              variant="outline"
-              onClick={() => handleOpenChange(false)}
               disabled={isDeleting}
-              className="w-full sm:w-auto"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="button"
-              variant="destructive"
-              disabled={isDeleting}
-              className="w-full sm:w-auto gap-2"
+              onClick={() => handleDelete()}
+              className={`w-full sm:w-auto gap-2 transition-colors hover:bg-red-700 hover:text-white ${
+                isDeleting 
+                  ? "bg-red-700 text-white" 
+                  : ""
+              }`}
             >
               {isDeleting ? (
                 <>
@@ -197,6 +202,15 @@ export function IncrementBlogLikesDislikes({
               ) : (
                 "Delete blog"
               )}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => handleOpenChange(false)}
+              disabled={isDeleting}
+              className="w-full sm:w-auto"
+            >
+              Cancel
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -309,8 +323,8 @@ export function IncrementBlogLikesDislikes({
                 asChild
             >
                 <Link
-                  href={`/company/blog?id=${post._id}`}
-                  onMouseEnter={prefetchBlogPost}
+                  href={`/company/blog?id=${blog._id}`}
+                  onMouseEnter={prefetchBlog}
                 >
                     <SquarePen className="!h-5 !w-5 transition-transform active:scale-90" />
                 </Link>
@@ -321,11 +335,7 @@ export function IncrementBlogLikesDislikes({
                 className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-destructive disabled:opacity-100"
                 onClick={() => handleOpenChange(true)}
             >
-                {isDeleting ? (
-                    <Loader2 className="!h-5 !w-5 animate-spin text-destructive" />
-                ) : (
-                    <Trash2 className="!h-5 !w-5 transition-transform active:scale-90" />
-                )}
+              <Trash2 className="!h-5 !w-5 transition-transform active:scale-90" />
             </Button>
         </>
       )}

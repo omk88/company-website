@@ -14,28 +14,28 @@ import { RightSidebarArticles } from "@/components/web/RightSidebarArticles";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 
-interface postIdRouteProps {
+interface blogIdRouteProps {
     params: Promise<{
-        postId: Id<"blogs">;
+        blogId: Id<"blogs">;
     }>
 }
 
-export async function generateMetadata({ params }: postIdRouteProps): Promise<Metadata> {
-    const { postId } = await params;
-    const post = await fetchQuery(api.blogs.getPostById, { postId: postId });
-    if (!post) return { title: "Post not found" };
-    return { title: post.title, description: post.subtitle }
+export async function generateMetadata({ params }: blogIdRouteProps): Promise<Metadata> {
+    const { blogId } = await params;
+    const blog = await fetchQuery(api.blogs.getBlogById, { blogId: blogId });
+    if (!blog) return { title: "Post not found" };
+    return { title: blog.title, description: blog.subtitle }
 }
 
-export default async function postIdRoute({ params }: postIdRouteProps) {
-    const { postId } = await params;
+export default async function blogIdRoute({ params }: blogIdRouteProps) {
+    const { blogId } = await params;
 
-    const postPromise = fetchQuery(api.blogs.getPostById, { postId: postId });
-    const preloadedCommentsPromise = preloadQuery(api.comments.getCommentsByPost, { postId: postId });
+    const blogPromise = fetchQuery(api.blogs.getBlogById, { blogId: blogId });
+    const preloadedCommentsPromise = preloadQuery(api.comments.getCommentsByBlog, { blogId: blogId });
 
-    const post = await postPromise;
+    const blog = await blogPromise;
 
-    if (!post) {   
+    if (!blog) {   
         return (
             <div className="flex items-center justify-center min-h-screen">
                 <h1 className="text-4xl font-extrabold text-red-500">No post found</h1>
@@ -45,37 +45,37 @@ export default async function postIdRoute({ params }: postIdRouteProps) {
 
     return (
         <SidebarProvider className="bg-white dark:bg-zinc-950 w-full min-h-screen relative block">
-            <LeftSidebarControls post={post} />
+            <LeftSidebarControls blog={blog} />
             
             <div className="w-full pl-40 pr-75">
                 <Suspense fallback={<MainContentSkeleton />}>
-                    <PostContent postPromise={postPromise} preloadedCommentsPromise={preloadedCommentsPromise} />
+                    <BlogContent blogPromise={blogPromise} preloadedCommentsPromise={preloadedCommentsPromise} />
                 </Suspense>
             </div>
 
-            <RightSidebarArticles author={post.author} authorName={post.authorName} username={post.username}  />
+            <RightSidebarArticles author={blog.author} authorName={blog.authorName} username={blog.username}  />
         </SidebarProvider>
     )
 }
 
-async function PostContent({ 
-    postPromise, 
+async function BlogContent({ 
+    blogPromise, 
     preloadedCommentsPromise 
 }: { 
-    postPromise: Promise<any>; 
+    blogPromise: Promise<any>; 
     preloadedCommentsPromise: Promise<any> 
 }) {
-    const post = await postPromise;
+    const blog = await blogPromise;
     const preloadedComments = await preloadedCommentsPromise;
 
     return (
         <main className="w-full max-w-4xl mx-auto py-3 px-3 animate-in fade-in duration-500">
-            <ViewTracker postId={post._id} />
+            <ViewTracker blogId={blog._id} />
 
             <div className="relative w-full h-[400px] mb-3 overflow-hidden rounded-lg">
                 <Image 
-                    src={post.imageUrl || "/brain.png"} 
-                    alt={post.title} 
+                    src={blog.imageUrl || "/brain.png"} 
+                    alt={blog.title} 
                     fill 
                     priority 
                     className="object-cover transition duration-500"
@@ -85,14 +85,14 @@ async function PostContent({
             <div className="px-1 sm:px-6 md:px-2">
                 <div className="flex flex-col">
                     <h1 className="uppercase text-4xl font-bold tracking-tight text-neutral-950 dark:text-neutral-50">
-                        {post.title}
+                        {blog.title}
                     </h1>
                     <div className="flex flex-col gap-6">
                         <p className="text-lg text-muted-foreground">
-                            Posted by {post.authorName} on {new Date(post._creationTime).toLocaleDateString("en-US")}
+                            Posted by {blog.authorName} on {new Date(blog._creationTime).toLocaleDateString("en-US")}
                         </p>
                         <p className="text-lg text-neutral-600 dark:text-neutral-400 font-medium">
-                            {post.subtitle}
+                            {blog.subtitle}
                         </p>
                     </div>
                 </div>
@@ -100,7 +100,7 @@ async function PostContent({
                 <Separator className="my-8" />
 
                 <div className="prose prose-neutral dark:prose-invert max-w-none text-lg leading-relaxed text-neutral-800 dark:text-neutral-200">
-                    <ReactMarkdown>{post.content}</ReactMarkdown>
+                    <ReactMarkdown>{blog.content}</ReactMarkdown>
                 </div>
 
                 <Separator className="my-10" />

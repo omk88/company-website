@@ -10,15 +10,15 @@ import { api } from "@/convex/_generated/api";
 import { preloadAuthQuery } from "@/lib/auth-server";
 
 interface ViewTrackerProps {
-  post: Doc<"blogs">;
+  blog: Doc<"blogs">;
 }
 
-export async function LeftSidebarControls({ post }: ViewTrackerProps) {
+export async function LeftSidebarControls({ blog }: ViewTrackerProps) {
 
-  const preloadedCommentCountPromise = preloadQuery(api.comments.getCommentNumber, { postId: post._id });
+  const preloadedCommentCountPromise = preloadQuery(api.comments.getCommentNumber, { blogId: blog._id });
   const preloadedUserPromise = preloadAuthQuery(api.auth.getCurrentUser);
-  const preloadedVoteStatePromise = preloadAuthQuery(api.blogs.getBlogVoteState, { blogId: post._id });
-  const preloadedFeaturedStatePromise = preloadAuthQuery(api.blogs.getBlogFeaturedState, { blogId: post._id });
+  const preloadedVoteStatePromise = preloadAuthQuery(api.blogs.getBlogVoteState, { blogId: blog._id });
+  const preloadedFeaturedStatePromise = preloadAuthQuery(api.blogs.getBlogFeaturedState, { blogId: blog._id });
 
   const [preloadedCommentCount, preloadedUser, preloadedVoteState, preloadedFeaturedState] = await Promise.all([
     preloadedCommentCountPromise,
@@ -41,7 +41,7 @@ export async function LeftSidebarControls({ post }: ViewTrackerProps) {
       </div>
       <SidebarContent>
         <IncrementBlogLikesDislikes 
-          post={post}
+          blog={blog}
           preloadedUser={preloadedUser}
           preloadedVoteState={preloadedVoteState}
           preloadedCommentCount={preloadedCommentCount}

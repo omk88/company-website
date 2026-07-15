@@ -19,8 +19,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Separator } from "../ui/separator";
 import { IncrementCommentLikesDislikes } from "./IncrementCommentLikesDislikes"; 
 
-export function CommentSection(props: { preloadedComments: Preloaded<typeof api.comments.getCommentsByPost> }) {
-    const params = useParams<{ postId: Id<"blogs"> }>();
+export function CommentSection(props: { preloadedComments: Preloaded<typeof api.comments.getCommentsByBlog> }) {
+    const params = useParams<{ blogId: Id<"blogs"> }>();
     const data = usePreloadedQuery(props.preloadedComments);
     
     const [isCommentPending, startCommentTransition] = useTransition();
@@ -30,7 +30,7 @@ export function CommentSection(props: { preloadedComments: Preloaded<typeof api.
         resolver: zodResolver(commentSchema),
         defaultValues: {
             body: "",
-            postId: params.postId
+            blogId: params.blogId
         }
     });
 

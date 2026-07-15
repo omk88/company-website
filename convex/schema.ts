@@ -31,7 +31,9 @@ const schema = defineSchema({
   viewLogs: defineTable({
     blogId: v.id("blogs"),
     viewedAt: v.number(),
-  }).index("by_viewedAt", ["viewedAt"]),
+  })
+  .index("by_viewedAt", ["viewedAt"])
+  .index("by_blog", ["blogId"]),
 
   subscribers: defineTable({
     email: v.string(),
@@ -47,7 +49,7 @@ const schema = defineSchema({
   }),
 
   comments: defineTable({
-    postId: v.id("blogs"),
+    blogId: v.id("blogs"),
     authorId: v.string(),
     authorName: v.string(),
     authorProfilePic: v.string(),
@@ -55,7 +57,7 @@ const schema = defineSchema({
     likes: v.number(),
     body: v.string()
   })
-    .index("by_postId", ["postId"])
+    .index("by_blog", ["blogId"])
     .index("by_authorId", ["authorId"]),
 
   profiles: defineTable({
