@@ -15,9 +15,10 @@ interface profileProps {
 
 export function LeftSidebarProfile({ preloadedProfile }: profileProps) {
 
-  const profile = usePreloadedQuery(preloadedProfile);
+  const profileData = usePreloadedQuery(preloadedProfile);
 
-  const avatarSrc = "";
+  const profile = profileData.profile;
+  const avatarSrc = profileData.profilePicture;
   
   if (!profile) {
     return <div className="p-4 text-gray-500">Profile not found</div>;

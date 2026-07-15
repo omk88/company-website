@@ -65,7 +65,7 @@ const schema = defineSchema({
     username: v.string(),
     firstName: v.string(),
     lastName: v.string(),
-    profilePic: v.string(),
+    profilePic: v.id("_storage"),
     location: v.string(),
     locationCountryCode: v.string(),
     bio: v.string(),

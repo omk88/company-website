@@ -1,13 +1,15 @@
 import { mutation, MutationCtx, query } from "./_generated/server";
 import { v } from "convex/values";
 
+const DEFAULT_AVATAR = "/default.svg";
+
 export const initialiseProfile = mutation({
   args: {
     userId: v.string(),
     email: v.string(),
     firstName: v.string(),
     lastName: v.string(),
-    profilePic: v.string(),
+    profilePic: v.id("_storage"),
   },
   handler: async (ctx, args) => {
     const existingProfile = await ctx.db
@@ -71,7 +73,20 @@ export const getProfileByUsername = query({
       .withIndex("by_username", (q) => q.eq("username", args.username))
       .unique();
 
-    return profile;
+    if (!profile) {
+      return { 
+        profilePicture: DEFAULT_AVATAR, 
+        profile: null 
+      };
+    }
+
+    const storageUrl = profile.profilePic 
+      ? await ctx.storage.getUrl(profile.profilePic) 
+      : null;
+
+    const profilePicture = storageUrl ?? DEFAULT_AVATAR;
+
+    return { profilePicture, profile };
   },
 });
 
@@ -96,20 +111,13 @@ export const generateUploadUrl = mutation({
   },
 });
 
-export const getImageUrl = query({
-  args: { storageId: v.string() },
-  handler: async (ctx, args) => {
-    return await ctx.storage.getUrl(args.storageId);
-  },
-});
-
 export const createProfile = mutation({
   args: {
     userId: v.string(),
     username: v.string(),
     firstName: v.string(),
     lastName: v.string(),
-    profilePic: v.string(),
+    profilePic: v.id("_storage"),
     location: v.string(),
     locationCountryCode: v.string(),
     bio: v.string(),
@@ -153,7 +161,7 @@ export const updateProfile = mutation({
     username: v.optional(v.string()),
     firstName: v.optional(v.string()),
     lastName: v.optional(v.string()),
-    profilePic: v.optional(v.string()),
+    profilePic: v.optional(v.id("_storage")),
     location: v.optional(v.string()),
     locationCountryCode: v.optional(v.string()),
     bio: v.optional(v.string()),

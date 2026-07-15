@@ -18,7 +18,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { Doc } from "@/convex/_generated/dataModel";
+import { Doc, Id } from "@/convex/_generated/dataModel";
 import { Input } from "../ui/input";
 import { Field, FieldLabel } from "../ui/field";
 import { Textarea } from "../ui/textarea";
@@ -178,15 +178,15 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
         const updatedProfile = {
           ...currentProfile,
           username: newUsername,
-          firstName: args.firstName ?? currentProfile.firstName,
-          lastName: args.lastName ?? currentProfile.lastName,
-          profilePic: args.profilePic ?? currentProfile.profilePic,
-          location: args.location ?? currentProfile.location,
-          locationCountryCode: args.locationCountryCode ?? currentProfile.locationCountryCode,
-          bio: args.bio ?? currentProfile.bio,
-          education: args.education ?? currentProfile.education,
-          skills: args.skills ?? currentProfile.skills,
-          socials: args.socials ?? currentProfile.socials,
+          firstName: args.firstName ?? currentProfile.profile?.firstName,
+          lastName: args.lastName ?? currentProfile.profile?.lastName,
+          profilePic: args.profilePic ?? currentProfile.profile?.profilePic,
+          location: args.location ?? currentProfile.profile?.location,
+          locationCountryCode: args.locationCountryCode ?? currentProfile.profile?.locationCountryCode,
+          bio: args.bio ?? currentProfile.profile?.bio,
+          education: args.education ?? currentProfile.profile?.education,
+          skills: args.skills ?? currentProfile.profile?.skills,
+          socials: args.socials ?? currentProfile.profile?.socials,
         };
 
         localStore.setQuery(
@@ -370,7 +370,8 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
     const uploadPromise = handleUpload();
 
     const profilePromise = (async () => {
-      const storageId = await uploadPromise;
+      const storageId = await uploadPromise; 
+      
       const finalStorageId = storageId || profile.profilePic;
 
       await runUpdateProfile({
@@ -386,17 +387,6 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
         skills: data.skills,
         socials: data.socials.map(({ platform, url }) => ({ platform, url })),
       });
-
-      if (finalStorageId) {
-        try {
-          const publicUrl = await convex.query(api.profiles.getImageUrl, { storageId: finalStorageId });
-          if (publicUrl) {
-            await updateSessionProfilePicture(publicUrl);
-          }
-        } catch (urlError) {
-          console.error("Failed to update session avatar:", urlError);
-        }
-      }
 
       if (profile.username !== data.username) {
         startTransition(() => {
@@ -422,25 +412,27 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
     }
   };
 
-  const handleUpload = async (): Promise<string | null> => {
-    if (!selectedFile) return null;
+  const handleUpload = async (): Promise<Id<"_storage"> | undefined> => {
+    if (!selectedFile) return undefined;
 
     try {
-        const uploadUrl = await generateUploadUrl();
+      const uploadUrl = await generateUploadUrl();
 
-        const result = await fetch(uploadUrl, {
-            method: "POST",
-            headers: { "Content-Type": selectedFile.type },
-            body: selectedFile,
-        });
+      const result = await fetch(uploadUrl, {
+        method: "POST",
+        headers: { "Content-Type": selectedFile.type },
+        body: selectedFile,
+      });
 
-        if (!result.ok) throw new Error("Upload failed");
+      if (!result.ok) throw new Error("Upload failed");
 
-        const { storageId } = await result.json();
-        return storageId;
+      const data = (await result.json()) as { storageId: Id<"_storage"> };
+      
+      return data.storageId;
         
     } catch (error) {
-        return null;
+      console.error("Upload failed:", error);
+      return undefined;
     }
   };
 
