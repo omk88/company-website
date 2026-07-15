@@ -210,41 +210,71 @@ export const deleteBlog = mutation({
     blogId: v.id("blogs"), 
   },
   handler: async (ctx, args) => {
+    const blog = await ctx.db.get(args.blogId);
+    if (!blog) return null;
 
     const [featuredBlogs, blogVotes, comments, viewLogs] = await Promise.all([
-      ctx.db
-        .query("featuredBlogs")
-        .withIndex("by_blog", (q) => q.eq("blogId", args.blogId))
-        .collect(),
-      ctx.db
-        .query("blogVotes")
-        .withIndex("by_blog", (q) => q.eq("blogId", args.blogId))
-        .collect(),
-      ctx.db
-        .query("comments")
-        .withIndex("by_blog", (q) => q.eq("blogId", args.blogId))
-        .collect(),
-      ctx.db
-        .query("viewLogs")
-        .withIndex("by_blog", (q) => q.eq("blogId", args.blogId))
-        .collect(),
+      ctx.db.query("featuredBlogs").withIndex("by_blog", (q) => q.eq("blogId", args.blogId)).collect(),
+      ctx.db.query("blogVotes").withIndex("by_blog", (q) => q.eq("blogId", args.blogId)).collect(),
+      ctx.db.query("comments").withIndex("by_blog", (q) => q.eq("blogId", args.blogId)).collect(),
+      ctx.db.query("viewLogs").withIndex("by_blog", (q) => q.eq("blogId", args.blogId)).collect(),
     ]);
 
-    const deleteFeaturedPromises = featuredBlogs.map((fb) => ctx.db.delete(fb._id));
-    const deleteVotesPromises = blogVotes.map((bv) => ctx.db.delete(bv._id));
-    const deleteCommentsPromises = comments.map((c) => ctx.db.delete(c._id));
-    const deleteLogsPromises = viewLogs.map((vl) => ctx.db.delete(vl._id));
+    const commentVotesNested = await Promise.all(
+      comments.map((comment) =>
+        ctx.db.query("commentVotes").withIndex("by_comment", (q) => q.eq("commentId", comment._id)).collect()
+      )
+    );
+    const commentVotes = commentVotesNested.flat();
+
+    const blogAuthorProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_userId", (q) => q.eq("userId", blog.author))
+      .unique();
+
+    if (blogAuthorProfile) {
+      await ctx.db.patch(blogAuthorProfile._id, {
+        totalLikes: Math.max(0, (blogAuthorProfile.totalLikes || 0) - blogVotes.length),
+        articlesPublished: Math.max(0, (blogAuthorProfile.articlesPublished || 1) - 1),
+      });
+    }
+
+    const commentAuthorMap = new Map(comments.map(c => [c._id, c.authorId]));
+
+    const commentLikesPerUser: Record<string, number> = {};
+    for (const vote of commentVotes) {
+      const commentAuthorId = commentAuthorMap.get(vote.commentId);
+      if (commentAuthorId) {
+        commentLikesPerUser[commentAuthorId] = (commentLikesPerUser[commentAuthorId] || 0) + 1;
+      }
+    }
+
+    for (const [commenterUserId, likesToRemove] of Object.entries(commentLikesPerUser)) {
+      const commenterProfile = await ctx.db
+        .query("profiles")
+        .withIndex("by_userId", (q) => q.eq("userId", commenterUserId))
+        .unique();
+
+      if (commenterProfile) {
+        const commentsByThisUser = comments.filter(c => c.authorId === commenterUserId).length;
+
+        await ctx.db.patch(commenterProfile._id, {
+          totalLikes: Math.max(0, (commenterProfile.totalLikes || 0) - likesToRemove),
+          commentsPublished: Math.max(0, (commenterProfile.commentsPublished || 0) - commentsByThisUser),
+        });
+      }
+    }
 
     const allDeletes = [
       ctx.db.delete(args.blogId),
-      ...deleteFeaturedPromises,
-      ...deleteVotesPromises,
-      ...deleteCommentsPromises,
-      ...deleteLogsPromises,
+      ...featuredBlogs.map((fb) => ctx.db.delete(fb._id)),
+      ...blogVotes.map((bv) => ctx.db.delete(bv._id)),
+      ...comments.map((c) => ctx.db.delete(c._id)),
+      ...viewLogs.map((vl) => ctx.db.delete(vl._id)),
+      ...commentVotes.map((cv) => ctx.db.delete(cv._id)),
     ];
 
     await Promise.all(allDeletes);
-
     return { success: true };
   },
 });
