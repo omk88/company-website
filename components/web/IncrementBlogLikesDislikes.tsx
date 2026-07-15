@@ -16,6 +16,7 @@ import { RxLinkedinLogo } from "react-icons/rx";
 import { Separator } from "../ui/separator";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 
 
 interface IncrementBlogLikesProps {
@@ -35,6 +36,8 @@ export function IncrementBlogLikesDislikes({
 }: IncrementBlogLikesProps) {
 
   const convex = useConvex();
+
+  const [isOpen, setIsOpen] = useState(false);
   
   const currentUser = usePreloadedAuthQuery(preloadedUser);
   const voteState = usePreloadedQuery(preloadedVoteState);
@@ -48,7 +51,7 @@ export function IncrementBlogLikesDislikes({
   const userEmail = currentUser?.email;
   const isCompanyUser = userEmail?.endsWith("@taqtiq.tech");
 
-  const deleteBlog = useMutation(api.blogs.deletePost);
+  const deleteBlogMutation = useMutation(api.blogs.deleteBlog);
 
   const router = useRouter(); 
   const [isDeleting, setIsDeleting] = useState(false);
@@ -86,7 +89,6 @@ export function IncrementBlogLikesDislikes({
       );
   });
 
-  
   const toggleFeaturedMutation = useMutation(api.blogs.toggleFeatured)
     .withOptimisticUpdate((localStore, args) => {
       const { blogId } = args;
@@ -145,10 +147,60 @@ export function IncrementBlogLikesDislikes({
     document.getElementById("comments")?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handleDelete = async () => {};
+  const handleDelete = async () => {
+      try {
+        await deleteBlogMutation({ blogId: post._id });
+      } catch (error) {
+        console.error("Failed to delete blog:", error);
+        toast.error("Failed to delete blog.");
+      }
+  };
+
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+  };
 
   return (
     <div className="flex flex-col items-center gap-2 p-6 text-muted-foreground text-xs">
+      <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader className="gap-1">
+            <DialogTitle className="text-xl font-semibold text-foreground">
+              Delete blog post?
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground text-sm leading-relaxed">
+              Are you sure you want to delete this blog? This action cannot be undone and will permanently remove this post and all of its comments.
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter className="gap-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => handleOpenChange(false)}
+              disabled={isDeleting}
+              className="w-full sm:w-auto"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={isDeleting}
+              className="w-full sm:w-auto gap-2"
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete blog"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <Button 
         variant="ghost" 
         onClick={handleLikeClick}
@@ -267,7 +319,7 @@ export function IncrementBlogLikesDislikes({
             <Button 
                 variant="ghost" 
                 className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-destructive disabled:opacity-100"
-                onClick={handleDelete}
+                onClick={() => handleOpenChange(true)}
             >
                 {isDeleting ? (
                     <Loader2 className="!h-5 !w-5 animate-spin text-destructive" />

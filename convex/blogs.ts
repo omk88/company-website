@@ -205,20 +205,12 @@ export const toggleBlogVote = mutation({
   },
 });
 
-export const deletePost = mutation({
+export const deleteBlog = mutation({
   args: {
-    id: v.id("blogs"), 
-    storageId: v.optional(v.string())
+    blogId: v.id("blogs"), 
   },
   handler: async (ctx, args) => {
-    if (args.storageId) {
-      try {
-        await ctx.storage.delete(args.storageId);
-      } catch (error) {
-        console.error("Failed to delete asset:", error);
-      }
-    }
-    await ctx.db.delete(args.id);
+    await ctx.db.delete(args.blogId);
     return { success: true };
   },
 });
