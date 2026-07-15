@@ -1,4 +1,4 @@
-import { mutation, query } from "./_generated/server";
+import { mutation, MutationCtx, query } from "./_generated/server";
 import { v } from "convex/values";
 
 export const initialiseProfile = mutation({
@@ -149,7 +149,7 @@ export const createProfile = mutation({
 
 export const updateProfile = mutation({
   args: {
-    userId: v.string(), 
+    id: v.id("profiles"), 
     username: v.optional(v.string()),
     firstName: v.optional(v.string()),
     lastName: v.optional(v.string()),
@@ -175,24 +175,48 @@ export const updateProfile = mutation({
         })
       )
     ),
-    totalLikes: v.optional(v.number()),
-    articlesPublished: v.optional(v.number()),
-    commentsPublished: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const existingUser = await ctx.db
-      .query("profiles")
-      .withIndex("by_userId", (q) => q.eq("userId", args.userId))
-      .unique();
-
+    const existingUser = await ctx.db.get(args.id);
     if (!existingUser) {
       throw new Error("Profile not found");
     }
 
-    const { userId, ...fieldsToUpdate } = args;
+    const { id, ...fieldsToUpdate } = args;
 
     await ctx.db.patch(existingUser._id, fieldsToUpdate);
+
+    const oldName = (existingUser.firstName && existingUser.lastName) 
+      ? `${existingUser.firstName} ${existingUser.lastName}` 
+      : existingUser.username;
+
+    const newName = (args.firstName && args.lastName) 
+      ? `${args.firstName} ${args.lastName}` 
+      : (args.username ?? oldName);
+
+    if (oldName !== newName) {
+      await updateAuthorNameForAllPostsHelper(ctx, existingUser.userId, newName);
+    }
 
     return existingUser._id;
   },
 });
+
+async function updateAuthorNameForAllPostsHelper(
+  ctx: MutationCtx, 
+  authorId: string, 
+  newAuthorName: string
+) {
+  const postsToUpdate = await ctx.db
+    .query("blogs")
+    .withIndex("by_author", (q) => q.eq("author", authorId))
+    .collect();
+
+  const updatePromises = postsToUpdate.map((post) =>
+    ctx.db.patch(post._id, {
+      authorName: newAuthorName,
+    })
+  );
+
+  await Promise.all(updatePromises);
+}

@@ -348,44 +348,6 @@ export const updatePost = mutation({
   },
 });
 
-export const updateAuthorNameForAllPosts = mutation({
-  args: {
-    author: v.string(), 
-    newAuthorName: v.string(),
-  },
-  handler: async (ctx, args) => {
-    const { author, newAuthorName } = args;
-
-    const postsToUpdate = await ctx.db
-      .query("blogs")
-      .filter((q) => q.eq(q.field("author"), author))
-      .collect();
-
-    const updatePromises = postsToUpdate.map((post) =>
-      ctx.db.patch(post._id, {
-        authorName: newAuthorName,
-      })
-    );
-
-    await Promise.all(updatePromises);
-
-    return { updatedCount: postsToUpdate.length };
-  },
-});
-
-export const getPosts = query({
-  args: {},
-  handler: async (ctx) => {
-    const posts = await ctx.db
-      .query("blogs")
-      .withIndex("by_createdAt")
-      .order("desc")
-      .collect();
-
-    return posts.map(({ content, ...previewFields }) => previewFields);
-  },
-});
-
 export const getPaginatedPosts = query({
   args: {
     paginationOpts: paginationOptsValidator,

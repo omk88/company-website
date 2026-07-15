@@ -4,7 +4,7 @@ import { ProfileContentWrapper } from "@/components/web/ProfileContentWrapper";
 import { ProfileBlogGridContainer } from "@/components/web/ProfileBlogGridContainer"; 
 import { SearchProvider } from "@/components/web/SearchContext";
 import { api } from "@/convex/_generated/api";
-import { fetchQuery } from "convex/nextjs";
+import { preloadQuery } from "convex/nextjs";
 
 interface profileRouteProps {
     params: Promise<{
@@ -16,23 +16,11 @@ export default async function Profile({ params }: profileRouteProps) {
 
     const { username } = await params;
 
-    const profile = await fetchQuery(api.profiles.getProfileByUsername, { 
-        username: username 
-    });
+    const preloadedProfilePromise = await preloadQuery(api.profiles.getProfileByUsername, { username: username });
 
-    let resolvedAvatarUrl = "";
-    if (profile?.profilePic) {
-        if (profile.profilePic.startsWith("http")) {
-            resolvedAvatarUrl = profile.profilePic;
-        } else {
-            const storageUrl = await fetchQuery(api.profiles.getImageUrl, {
-                storageId: profile.profilePic,
-            });
-            resolvedAvatarUrl = storageUrl || "";
-        }
-    }
-
-    const authorId = profile?.userId || "";
+    const [preloadedProfile] = await Promise.all([
+        preloadedProfilePromise
+    ]);
 
     return (
         <div>
@@ -40,15 +28,15 @@ export default async function Profile({ params }: profileRouteProps) {
                 <SearchProvider>
                     <aside>
                         <LeftSidebarProfile 
-                            profile={profile} 
-                            avatarSrc={resolvedAvatarUrl} 
+                            preloadedProfile={preloadedProfile} 
                         />
                     </aside>
                 </SearchProvider>
 
+                { /*
                 <div className="bg-white w-full pl-[var(--sidebar-width)] ml-2">
                     <ProfileContentWrapper authorId={authorId} blogGridSlot={<ProfileBlogGridContainer author={authorId} />} />
-                </div>
+                </div> */}
             </SidebarProvider>
         </div>
     );

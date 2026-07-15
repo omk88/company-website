@@ -1,17 +1,23 @@
+"use client";
+
 import { Sidebar, SidebarContent, SidebarGroup, SidebarFooter, SidebarGroupLabel } from "../ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { ChartNoAxesColumn, GraduationCap, MapPin, MessageSquareText, SquareLibrary, Terminal, ThumbsUp } from "lucide-react";
 import Link from "next/link";
-import { Doc } from "@/convex/_generated/dataModel";
 import { EditProfileButton } from "./EditProfileButton";
 import { ICON_MAP } from "@/lib/socials";
+import { Preloaded, usePreloadedQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
-interface profileRouteProps {
-  profile: Doc<"profiles"> | null;
-  avatarSrc: string;
+interface profileProps {
+  preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
 }
 
-export function LeftSidebarProfile({ profile, avatarSrc }: profileRouteProps) {
+export function LeftSidebarProfile({ preloadedProfile }: profileProps) {
+
+  const profile = usePreloadedQuery(preloadedProfile);
+
+  const avatarSrc = "";
   
   if (!profile) {
     return <div className="p-4 text-gray-500">Profile not found</div>;

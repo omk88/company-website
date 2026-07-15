@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useTransition } from "react";
 import { useForm, useFieldArray, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -29,6 +29,7 @@ import { LocationField } from "./EditFormFields/LocationField";
 import majorsData from "@/data/majors.json";
 import { SkillsFields } from "./EditFormFields/SkillsField";
 import { SocialLinksFields } from "./EditFormFields/SocialLinksField";
+import { useRouter } from "next/navigation";
 
 const formatPlatformName = (name: string) => {
   if (name.toLowerCase() === "x") return "Twitter / X";
@@ -123,8 +124,14 @@ export function EditProfileButton({ profile, avatarSrc }: EditProfileButtonProps
 
   if (user?.username !== username) return null;
 
+  const profileStateKey = `${profile.username}-${profile.firstName}-${profile.lastName}-${profile.bio}-${profile.profilePic}-${profile.location}`;
+
   return (
-    <EditProfileDialog profile={profile} avatarSrc={avatarSrc}>
+    <EditProfileDialog
+      key={profileStateKey}
+      profile={profile}
+      avatarSrc={avatarSrc}
+    >
       <Button variant="ghost" size="icon">
         <Pen className="h-4 w-4" />
       </Button>
@@ -142,6 +149,9 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
     
   const convex = useConvex();
 
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+
   const [isOpen, setIsOpen] = useState(false);
   const [comboboxOpen, setComboboxOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -154,14 +164,51 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
   const [previewSrc, setPreviewSrc] = useState<string>("");
   const generateUploadUrl = useMutation(api.profiles.generateUploadUrl);
 
-  const runUpdateProfile = useMutation(api.profiles.updateProfile);
+  const runUpdateProfile = useMutation(api.profiles.updateProfile)
+    .withOptimisticUpdate((localStore, args) => {
+      const oldUsername = profile.username;
+      const newUsername = args.username ?? oldUsername;
+
+      const currentProfile = localStore.getQuery(
+        api.profiles.getProfileByUsername, 
+        { username: oldUsername }
+      );
+
+      if (currentProfile) {
+        const updatedProfile = {
+          ...currentProfile,
+          username: newUsername,
+          firstName: args.firstName ?? currentProfile.firstName,
+          lastName: args.lastName ?? currentProfile.lastName,
+          profilePic: args.profilePic ?? currentProfile.profilePic,
+          location: args.location ?? currentProfile.location,
+          locationCountryCode: args.locationCountryCode ?? currentProfile.locationCountryCode,
+          bio: args.bio ?? currentProfile.bio,
+          education: args.education ?? currentProfile.education,
+          skills: args.skills ?? currentProfile.skills,
+          socials: args.socials ?? currentProfile.socials,
+        };
+
+        localStore.setQuery(
+          api.profiles.getProfileByUsername, 
+          { username: oldUsername }, 
+          updatedProfile
+        );
+
+        if (oldUsername !== newUsername) {
+          localStore.setQuery(
+            api.profiles.getProfileByUsername, 
+            { username: newUsername }, 
+            updatedProfile
+          );
+        }
+      }
+  });
 
   const updateImage = useMutation(api.auth.updateAuthImage);
 
   const [imageUrl, setImageUrl] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const updateBlog = useMutation(api.blogs.updateAuthorNameForAllPosts)
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -318,40 +365,16 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
   };
 
   const onSubmit = async (data: ProfileFormValues) => {
+    setIsOpen(false); 
 
-    try {
-      await updateBlog({
-        author: profile.userId,
-        newAuthorName: (data.firstName && data.lastName) ? `${data.firstName} ${data.lastName}` : data.username
-      });
-    } catch (error) {
-      console.error("Failed to update blogs:", error);
-    }
+    const uploadPromise = handleUpload();
 
+    const profilePromise = (async () => {
+      const storageId = await uploadPromise;
+      const finalStorageId = storageId || profile.profilePic;
 
-    const storageId = await handleUpload(); 
-    const finalStorageId = storageId || profile.profilePic;
-
-    let publicUrl: string | null = "";
-
-    if (finalStorageId) {
-      try {
-        publicUrl = await convex.query(api.profiles.getImageUrl, { storageId: finalStorageId });
-      } catch (urlError) {
-        console.error("Failed to generate public URL for storage ID:", urlError);
-      }
-    }
-
-    if (publicUrl) {
-      await updateSessionProfilePicture(publicUrl);
-    }
-
-    const cleanedSocials = data.socials.map(({ platform, url }) => ({ platform, url }));
-    const cleanedEducation = data.education.map(({ degree, subject, institution }) => ({ degree, subject, institution }));
-    
-    try {
       await runUpdateProfile({
-        userId: profile.userId, 
+        id: profile._id,
         username: data.username,
         firstName: data.firstName,
         lastName: data.lastName,
@@ -359,15 +382,32 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
         location: data.location,
         locationCountryCode: data.locationCountryCode,
         bio: data.bio,
-        education: cleanedEducation,
+        education: data.education.map(({ degree, subject, institution }) => ({ degree, subject, institution })),
         skills: data.skills,
-        socials: cleanedSocials,
+        socials: data.socials.map(({ platform, url }) => ({ platform, url })),
       });
-    } catch (error) {
-      console.error("Failed to update profile database record:", error);
-    }
-    
-    setIsOpen(false); 
+
+      if (finalStorageId) {
+        try {
+          const publicUrl = await convex.query(api.profiles.getImageUrl, { storageId: finalStorageId });
+          if (publicUrl) {
+            await updateSessionProfilePicture(publicUrl);
+          }
+        } catch (urlError) {
+          console.error("Failed to update session avatar:", urlError);
+        }
+      }
+
+      if (profile.username !== data.username) {
+        startTransition(() => {
+          router.push(`/${data.username}`);
+        });
+      }
+    })();
+
+    profilePromise.catch((error) => {
+      console.error("Background profile sync failed:", error);
+    });
   };
 
   const handleButtonClick = () => {
