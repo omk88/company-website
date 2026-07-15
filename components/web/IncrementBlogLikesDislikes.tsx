@@ -2,8 +2,7 @@
 
 import { api } from "@/convex/_generated/api";
 import { Doc } from "@/convex/_generated/dataModel";
-import { useMutation, useQuery } from "convex/react";
-import { usePreloadedQuery } from "convex/react"; 
+import { useConvex, useMutation, useQuery, usePreloadedQuery } from "convex/react";
 import { usePreloadedAuthQuery } from "@convex-dev/better-auth/nextjs/client";
 import { Preloaded } from "convex/react";
 import { Copy, Ellipsis, Loader2, MessageSquare, SquarePen, Star, ThumbsUp, Trash2 } from "lucide-react";
@@ -17,6 +16,7 @@ import { RxLinkedinLogo } from "react-icons/rx";
 import { Separator } from "../ui/separator";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+
 
 interface IncrementBlogLikesProps {
   post: Doc<"blogs">;
@@ -33,6 +33,8 @@ export function IncrementBlogLikesDislikes({
   preloadedCommentCount,
   preloadedFeaturedState 
 }: IncrementBlogLikesProps) {
+
+  const convex = useConvex();
   
   const currentUser = usePreloadedAuthQuery(preloadedUser);
   const voteState = usePreloadedQuery(preloadedVoteState);
@@ -55,6 +57,12 @@ export function IncrementBlogLikesDislikes({
   const likesCount = voteState.likes; 
 
   const isFeatured = featuredState?.isFeatured;
+
+  const prefetchBlogPost = () => {
+    convex.query(api.blogs.getPostById, { postId: post._id }).catch((err) => {
+      console.error("Prefetch failed:", err);
+    });
+  };
 
   const toggleBlogVoteMutation = useMutation(api.blogs.toggleBlogVote)
     .withOptimisticUpdate((localStore, args) => {
@@ -248,7 +256,10 @@ export function IncrementBlogLikesDislikes({
                 className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground disabled:opacity-100"
                 asChild
             >
-                <Link href={`/company/blog?id=${post._id}`}>
+                <Link
+                  href={`/company/blog?id=${post._id}`}
+                  onMouseEnter={prefetchBlogPost}
+                >
                     <SquarePen className="!h-5 !w-5 transition-transform active:scale-90" />
                 </Link>
             </Button>
