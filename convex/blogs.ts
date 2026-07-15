@@ -15,7 +15,7 @@ export const createPost = mutation({
     title: v.string(),
     subtitle: v.string(),
     content: v.string(),
-    author: v.string(),
+    author: v.string(), 
     authorName: v.string(),
     username: v.string(),
     tags: v.array(v.string()),
@@ -24,22 +24,34 @@ export const createPost = mutation({
   handler: async (ctx, args) => {
     const generatedImageUrl = await ctx.storage.getUrl(args.storageId);
 
-    return await ctx.db.insert("blogs", {
-      title: args.title,
-      subtitle: args.subtitle,
-      content: args.content,
-      author: args.author,
-      authorName: args.authorName,
-      username: args.username,
-      tags: args.tags,
-      storageId: args.storageId,
-      imageUrl: generatedImageUrl || "",
-      totalViews: 0,
-      likes: 0,
-      commentCount: 0,
-      featured: false,
-      createdAt: Date.now(),
-    });
+    const [_, profile] = await Promise.all([
+      ctx.db.insert("blogs", {
+        title: args.title,
+        subtitle: args.subtitle,
+        content: args.content,
+        author: args.author,
+        authorName: args.authorName,
+        username: args.username,
+        tags: args.tags,
+        storageId: args.storageId,
+        imageUrl: generatedImageUrl || "",
+        totalViews: 0,
+        likes: 0,
+        commentCount: 0,
+        featured: false,
+        createdAt: Date.now(),
+      }),
+      ctx.db
+        .query("profiles")
+        .withIndex("by_userId", (q) => q.eq("userId", args.author))
+        .unique()
+    ]);
+
+    if (profile) {
+      await ctx.db.patch(profile._id, {
+        articlesPublished: (profile.articlesPublished || 0) + 1,
+      });
+    }
   },
 });
 
@@ -213,11 +225,12 @@ export const deleteBlog = mutation({
     const blog = await ctx.db.get(args.blogId);
     if (!blog) return null;
 
-    const [featuredBlogs, blogVotes, comments, viewLogs] = await Promise.all([
+    const [featuredBlogs, blogVotes, comments, viewLogs, blogAuthorProfile] = await Promise.all([
       ctx.db.query("featuredBlogs").withIndex("by_blog", (q) => q.eq("blogId", args.blogId)).collect(),
       ctx.db.query("blogVotes").withIndex("by_blog", (q) => q.eq("blogId", args.blogId)).collect(),
       ctx.db.query("comments").withIndex("by_blog", (q) => q.eq("blogId", args.blogId)).collect(),
       ctx.db.query("viewLogs").withIndex("by_blog", (q) => q.eq("blogId", args.blogId)).collect(),
+      ctx.db.query("profiles").withIndex("by_userId", (q) => q.eq("userId", blog.author)).unique(),
     ]);
 
     const commentVotesNested = await Promise.all(
@@ -227,19 +240,32 @@ export const deleteBlog = mutation({
     );
     const commentVotes = commentVotesNested.flat();
 
-    const blogAuthorProfile = await ctx.db
-      .query("profiles")
-      .withIndex("by_userId", (q) => q.eq("userId", blog.author))
-      .unique();
+    const commentAuthorMap = new Map(comments.map(c => [c._id, c.authorId]));
+    const uniqueCommenterIds = Array.from(new Set(comments.map(c => c.authorId)));
+
+    const commenterProfiles = await Promise.all(
+      uniqueCommenterIds.map(userId => 
+        ctx.db
+          .query("profiles")
+          .withIndex("by_userId", (q) => q.eq("userId", userId))
+          .unique()
+      )
+    );
+
+    const commenterProfileMap = new Map(
+      commenterProfiles.filter((p): p is NonNullable<typeof p> => p !== null).map(p => [p.userId, p])
+    );
+
+    const databaseWrites: Promise<any>[] = [];
 
     if (blogAuthorProfile) {
-      await ctx.db.patch(blogAuthorProfile._id, {
-        totalLikes: Math.max(0, (blogAuthorProfile.totalLikes || 0) - blogVotes.length),
-        articlesPublished: Math.max(0, (blogAuthorProfile.articlesPublished || 1) - 1),
-      });
+      databaseWrites.push(
+        ctx.db.patch(blogAuthorProfile._id, {
+          totalLikes: Math.max(0, (blogAuthorProfile.totalLikes || 0) - blogVotes.length),
+          articlesPublished: Math.max(0, (blogAuthorProfile.articlesPublished || 1) - 1),
+        })
+      );
     }
-
-    const commentAuthorMap = new Map(comments.map(c => [c._id, c.authorId]));
 
     const commentLikesPerUser: Record<string, number> = {};
     for (const vote of commentVotes) {
@@ -249,32 +275,33 @@ export const deleteBlog = mutation({
       }
     }
 
-    for (const [commenterUserId, likesToRemove] of Object.entries(commentLikesPerUser)) {
-      const commenterProfile = await ctx.db
-        .query("profiles")
-        .withIndex("by_userId", (q) => q.eq("userId", commenterUserId))
-        .unique();
+    for (const commenterUserId of uniqueCommenterIds) {
+      const commenterProfile = commenterProfileMap.get(commenterUserId);
 
       if (commenterProfile) {
+        const likesToRemove = commentLikesPerUser[commenterUserId] || 0;
         const commentsByThisUser = comments.filter(c => c.authorId === commenterUserId).length;
 
-        await ctx.db.patch(commenterProfile._id, {
-          totalLikes: Math.max(0, (commenterProfile.totalLikes || 0) - likesToRemove),
-          commentsPublished: Math.max(0, (commenterProfile.commentsPublished || 0) - commentsByThisUser),
-        });
+        databaseWrites.push(
+          ctx.db.patch(commenterProfile._id, {
+            totalLikes: Math.max(0, (commenterProfile.totalLikes || 0) - likesToRemove),
+            commentsPublished: Math.max(0, (commenterProfile.commentsPublished || 0) - commentsByThisUser), // 👈 Decrements comments safely
+          })
+        );
       }
     }
 
-    const allDeletes = [
+    databaseWrites.push(
       ctx.db.delete(args.blogId),
       ...featuredBlogs.map((fb) => ctx.db.delete(fb._id)),
       ...blogVotes.map((bv) => ctx.db.delete(bv._id)),
       ...comments.map((c) => ctx.db.delete(c._id)),
       ...viewLogs.map((vl) => ctx.db.delete(vl._id)),
-      ...commentVotes.map((cv) => ctx.db.delete(cv._id)),
-    ];
+      ...commentVotes.map((cv) => ctx.db.delete(cv._id))
+    );
 
-    await Promise.all(allDeletes);
+    await Promise.all(databaseWrites);
+
     return { success: true };
   },
 });

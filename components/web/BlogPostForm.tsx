@@ -102,8 +102,8 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
     const userData = useQuery(api.auth.getCurrentUser);
 
     const existingPost = useQuery(
-        api.blogs.getPostById,
-        editingBlogId ? { postId: editingBlogId as Id<"blogs"> } : "skip"
+        api.blogs.getBlogById,
+        editingBlogId ? { blogId: editingBlogId as Id<"blogs"> } : "skip"
     );
 
     useEffect(() => {
@@ -170,7 +170,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
 
             if (editingBlogId) {
                 await updateBlog({
-                    postId: editingBlogId as Id<"blogs">,
+                    blogId: editingBlogId as Id<"blogs">,
                     title: data.title,
                     subtitle: data.subtitle,
                     content: data.content,

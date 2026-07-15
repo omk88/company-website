@@ -61,19 +61,23 @@ export const createComment = mutation({
       throw new ConvexError("User profile not found");
     }
 
-    const commentId = await ctx.db.insert("comments", {
-      blogId: args.blogId,
-      body: args.body,
-      authorId: user._id,
-      authorName: user.name ?? profile.username, 
-      authorProfilePic: profile.profilePic,  
-      blogTitle: blog.title,                 
-      likes: 0,
-    });
-
-    await ctx.db.patch(args.blogId, {
-      commentCount: (blog.commentCount ?? 0) + 1,
-    });
+    const [commentId] = await Promise.all([
+      ctx.db.insert("comments", {
+        blogId: args.blogId,
+        body: args.body,
+        authorId: user._id,
+        authorName: user.name ?? profile.username, 
+        authorProfilePic: profile.profilePic,  
+        blogTitle: blog.title,                 
+        likes: 0,
+      }),
+      ctx.db.patch(args.blogId, {
+        commentCount: (blog.commentCount ?? 0) + 1,
+      }),
+      ctx.db.patch(profile._id, {
+        commentsPublished: (profile.commentsPublished || 0) + 1,
+      })
+    ]);
 
     return commentId;
   },
