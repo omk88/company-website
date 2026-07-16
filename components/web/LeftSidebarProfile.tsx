@@ -8,6 +8,8 @@ import { EditProfileButton } from "./EditProfileButton";
 import { ICON_MAP } from "@/lib/socials";
 import { Preloaded, usePreloadedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { Spinner } from "../ui/spinner";
+import Image from "next/image"
 
 interface profileProps {
   preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
@@ -35,14 +37,26 @@ export function LeftSidebarProfile({ preloadedProfile }: profileProps) {
     >
       <SidebarContent className="!p-0">
         <div className="p-2 pb-0">
-          <Avatar className="h-16 w-16 border-2 border-muted">
-            <AvatarImage src={avatarSrc} />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
-          <h1 className="flex w-full items-center justify-between gap-2 text-lg font-medium text-foreground">
+          <div className="h-16 w-16 border-2 border-muted rounded-full overflow-hidden bg-muted relative shrink-0">
+            {avatarSrc ? (
+              <img
+                src={avatarSrc}
+                alt="profile"
+                className="h-full w-full object-cover rounded-full"
+                decoding="async" 
+              />
+            ) : (
+              <div className="h-full w-full bg-muted flex items-center justify-center text-muted-foreground">
+                <span className="text-xs font-mono">CN</span>
+              </div>
+            )}
+          </div>
+
+          <h1 className="flex w-full items-center justify-between gap-2 text-lg font-medium text-foreground mt-2">
             <span>{displayName}</span>
             <EditProfileButton profile={profile} avatarSrc={avatarSrc} />
           </h1>
+          
           {profile.location?.trim() && (
             <p className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground pb-2">
               <MapPin className="h-3.5 w-3.5 shrink-0" /> 

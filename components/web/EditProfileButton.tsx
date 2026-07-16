@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { api } from "@/convex/_generated/api";
 import { useConvex, useMutation, useQuery } from "convex/react";
-import { ImagePlus, Pen, Plus, Trash2, Check, ChevronsUpDown, GraduationCap, MapPin, Loader2, X } from "lucide-react";
+import { ImagePlus, Pen, Plus, Trash2, Check, ChevronsUpDown, GraduationCap, MapPin, Loader2, X, CircleX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -17,7 +17,7 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Avatar, AvatarBadge, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Doc, Id } from "@/convex/_generated/dataModel";
 import { Input } from "../ui/input";
 import { Field, FieldLabel } from "../ui/field";
@@ -30,6 +30,8 @@ import majorsData from "@/data/majors.json";
 import { SkillsFields } from "./EditFormFields/SkillsField";
 import { SocialLinksFields } from "./EditFormFields/SocialLinksField";
 import { useRouter } from "next/navigation";
+import imageCompression from 'browser-image-compression';
+import { Spinner } from "../ui/spinner";
 
 const formatPlatformName = (name: string) => {
   if (name.toLowerCase() === "x") return "Twitter / X";
@@ -151,6 +153,7 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
 
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [preFetchedUploadUrl, setPreFetchedUploadUrl] = useState<string | null>(null);
 
   const [isOpen, setIsOpen] = useState(false);
   const [comboboxOpen, setComboboxOpen] = useState(false);
@@ -251,6 +254,11 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
   const watchedSkills = form.watch("skills") || [];
   const [editingSocialIndex, setEditingSocialIndex] = useState<number | -1>(-1);
   const [editingEduIndex, setEditingEduIndex] = useState<number | -1>(-1);
+
+  const [uploading, setUploading] = useState(false);
+  const [pendingStorageId, setPendingStorageId] = useState<Id<"_storage"> | null>(null);
+
+  const uploadPromiseRef = useRef<Promise<Id<"_storage"> | undefined> | null>(null);
 
   useEffect(() => {
     if (!locationQuery.trim() || locationQuery.trim().length < 3) {
@@ -367,73 +375,94 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
   const onSubmit = async (data: ProfileFormValues) => {
     setIsOpen(false); 
 
-    const uploadPromise = handleUpload();
-
-    const profilePromise = (async () => {
-      const storageId = await uploadPromise; 
-      
-      const finalStorageId = storageId || profile.profilePic;
-
-      await runUpdateProfile({
-        id: profile._id,
-        username: data.username,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        profilePic: finalStorageId,
-        location: data.location,
-        locationCountryCode: data.locationCountryCode,
-        bio: data.bio,
-        education: data.education.map(({ degree, subject, institution }) => ({ degree, subject, institution })),
-        skills: data.skills,
-        socials: data.socials.map(({ platform, url }) => ({ platform, url })),
-      });
-
-      if (profile.username !== data.username) {
-        startTransition(() => {
-          router.push(`/${data.username}`);
-        });
+    let finalStorageId = profile.profilePic;
+    
+    if (selectedFile) {
+      if (pendingStorageId) {
+        finalStorageId = pendingStorageId;
+      } else if (uploading) {
+        const storageId = await waitForBackgroundUploadToFinish(); 
+        finalStorageId = storageId || profile.profilePic;
       }
-    })();
+    }
 
-    profilePromise.catch((error) => {
-      console.error("Background profile sync failed:", error);
+    const updateResult = await runUpdateProfile({
+      id: profile._id,
+      username: data.username,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      profilePic: finalStorageId,
+      location: data.location,
+      locationCountryCode: data.locationCountryCode,
+      bio: data.bio,
+      education: data.education.map(({ degree, subject, institution }) => ({ degree, subject, institution })),
+      skills: data.skills,
+      socials: data.socials.map(({ platform, url }) => ({ platform, url })),
     });
+
+    if (selectedFile && updateResult.publicImageUrl) {
+      await updateSessionProfilePicture(updateResult.publicImageUrl);
+    }
+
+    if (profile.username !== data.username) {
+      startTransition(() => {
+        router.push(`/${data.username}`);
+      });
+    }
   };
 
   const handleButtonClick = () => {
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
-      setPreviewSrc(URL.createObjectURL(file));
-    }
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (previewSrc) URL.revokeObjectURL(previewSrc);
+    const localUrl = URL.createObjectURL(file);
+    setPreviewSrc(localUrl);
+    setSelectedFile(file);
+
+    setUploading(true);
+
+    const uploadPromise = (async (): Promise<Id<"_storage"> | undefined> => {
+      try {
+        const options = {
+          maxSizeMB: 0.15,
+          maxWidthOrHeight: 500,
+          useWebWorker: true,
+          fileType: 'image/jpeg' as const
+        };
+        const compressedFile = (await imageCompression(file, options)) as File;
+        const uploadUrl = preFetchedUploadUrl || await generateUploadUrl();
+
+        const result = await fetch(uploadUrl, {
+          method: "POST",
+          headers: { "Content-Type": compressedFile.type },
+          body: compressedFile,
+        });
+
+        if (!result.ok) throw new Error("Upload failed");
+
+        const data = (await result.json()) as { storageId: Id<"_storage"> };
+        setPendingStorageId(data.storageId);
+        return data.storageId;
+      } catch (err) {
+        console.error("Background upload failed:", err);
+        return undefined;
+      } finally {
+        setUploading(false);
+      }
+    })();
+
+    uploadPromiseRef.current = uploadPromise;
   };
 
-  const handleUpload = async (): Promise<Id<"_storage"> | undefined> => {
-    if (!selectedFile) return undefined;
-
-    try {
-      const uploadUrl = await generateUploadUrl();
-
-      const result = await fetch(uploadUrl, {
-        method: "POST",
-        headers: { "Content-Type": selectedFile.type },
-        body: selectedFile,
-      });
-
-      if (!result.ok) throw new Error("Upload failed");
-
-      const data = (await result.json()) as { storageId: Id<"_storage"> };
-      
-      return data.storageId;
-        
-    } catch (error) {
-      console.error("Upload failed:", error);
-      return undefined;
-    }
+  const waitForBackgroundUploadToFinish = async (): Promise<Id<"_storage"> | undefined> => {
+    if (!uploadPromiseRef.current) return undefined;
+    
+    return await uploadPromiseRef.current;
   };
 
   return (
@@ -457,17 +486,32 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
                     accept="image/*"
                     className="hidden" 
                   />
+                  
                   <Avatar className="h-16 w-16 border-2 border-muted">
                     <AvatarImage src={previewSrc || avatarSrc} />
-                    <AvatarFallback>CN</AvatarFallback>
+                    <AvatarFallback><Spinner className="h-6 w-6 animate-spin" /></AvatarFallback>
+                    <AvatarBadge className="p-0 border-none bg-transparent">
+                      <button 
+                        type="button"
+                        className="flex h-5 w-5 shrink-0 aspect-square items-center justify-center rounded-full bg-zinc-50 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                      >
+                        <X className="h-3 w-3 stroke-[2.5]" />
+                      </button>
+                    </AvatarBadge>
                   </Avatar>
+                  
                   <button
                     type="button"
                     onClick={handleButtonClick}
-                    className="absolute inset-2 flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 transition-colors cursor-pointer"
+                    disabled={uploading}
+                    className="absolute inset-2 flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 transition-colors cursor-pointer disabled:cursor-not-allowed"
                     aria-label="Change avatar"
                   >
-                    <ImagePlus className="h-5 w-5" />
+                    {uploading ? (
+                      <Spinner className="h-6 w-6 animate-spin" />
+                    ) : (
+                      <ImagePlus className="h-5 w-5" />
+                    )}
                   </button>
                 </div>
 

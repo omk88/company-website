@@ -206,7 +206,12 @@ export const updateProfile = mutation({
       await updateAuthorNameForAllPostsHelper(ctx, existingUser.userId, newName);
     }
 
-    return existingUser._id;
+    if (args.profilePic) {
+      const publicUrl = await ctx.storage.getUrl(args.profilePic);
+      return { publicImageUrl: publicUrl };
+    }
+
+    return { existingUser: existingUser._id, publicImageUrl: null };
   },
 });
 
