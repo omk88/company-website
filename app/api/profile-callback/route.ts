@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { api } from "@/convex/_generated/api";
 import { fetchAuthMutation, fetchAuthQuery } from "@/lib/auth-server";
 import { authClient } from "@/lib/auth-client";
+import { Id } from "@/convex/_generated/dataModel";
 
 const GRADIENT_PALETTES = [
   { color1: "#FF512F", color2: "#DD2476" },
@@ -53,7 +54,7 @@ export async function GET(request: Request) {
       lastName = nameParts.slice(1).join(" ");
     }
 
-    let profilePicField = ""; 
+    let profilePicField: Id<"_storage">; 
     let publicProfilePicUrl = ""; 
 
     try {
@@ -66,21 +67,24 @@ export async function GET(request: Request) {
         body: svgString,
       });
 
-      if (uploadResponse.ok) {
-        const { storageId } = await uploadResponse.json();
-        profilePicField = storageId; 
+      if (!uploadResponse.ok) {
+        throw new Error(`Upload failed with status: ${uploadResponse.status}`);
+      }
 
-        const urlResult = await fetchAuthQuery(api.profiles.getImageUrl, {
-          storageId: profilePicField,
-        });
-        
-        if (urlResult) {
-          publicProfilePicUrl = urlResult;
-        }
+      const { storageId } = await uploadResponse.json();
+      
+      profilePicField = storageId as Id<"_storage">; 
+
+      const urlResult = await fetchAuthQuery(api.profiles.getImageUrl, {
+        storageId: profilePicField,
+      });
+      
+      if (urlResult) {
+        publicProfilePicUrl = urlResult;
       }
     } catch (uploadError) {
       console.error("Failed to upload default gradient to Convex storage:", uploadError);
-      profilePicField = "";
+      throw new Error("Onboarding failed: Could not generate required profile picture.");
     }
 
     await fetchAuthMutation(api.profiles.initialiseProfile, {
