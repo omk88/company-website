@@ -8,8 +8,6 @@ import { EditProfileButton } from "./EditProfileButton";
 import { ICON_MAP } from "@/lib/socials";
 import { Preloaded, usePreloadedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { Spinner } from "../ui/spinner";
-import Image from "next/image"
 
 interface profileProps {
   preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
@@ -21,6 +19,7 @@ export function LeftSidebarProfile({ preloadedProfile }: profileProps) {
 
   const profile = profileData.profile;
   const avatarSrc = profileData.profilePicture;
+  const defaultAvatarSrc = profileData.defaultProfilePicture;
   
   if (!profile) {
     return <div className="p-4 text-gray-500">Profile not found</div>;
@@ -28,7 +27,7 @@ export function LeftSidebarProfile({ preloadedProfile }: profileProps) {
 
   const { username, firstName, lastName } = profile;
   const displayName = (firstName && lastName) ? `${firstName} ${lastName}` : username;
-  const hasContent = profile.bio?.trim() || profile.education?.length > 0 || profile.socials?.length > 0;
+  const hasContent = profile.bio.trim() || profile.education.length > 0 || profile.socials.length > 0;
 
   return (
     <Sidebar 
@@ -54,7 +53,7 @@ export function LeftSidebarProfile({ preloadedProfile }: profileProps) {
 
           <h1 className="flex w-full items-center justify-between gap-2 text-lg font-medium text-foreground mt-2">
             <span>{displayName}</span>
-            <EditProfileButton profile={profile} avatarSrc={avatarSrc} />
+            <EditProfileButton profile={profile} avatarSrc={avatarSrc} defaultAvatarSrc={defaultAvatarSrc} />
           </h1>
           
           {profile.location?.trim() && (

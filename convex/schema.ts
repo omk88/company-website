@@ -63,26 +63,27 @@ const schema = defineSchema({
   profiles: defineTable({
     userId: v.string(),
     username: v.string(),
-    firstName: v.string(),
-    lastName: v.string(),
-    profilePic: v.id("_storage"),
-    location: v.string(),
-    locationCountryCode: v.string(),
-    bio: v.string(),
-    education: v.array(
+    firstName: v.optional(v.string()),
+    lastName: v.optional(v.string()),
+    profilePic: v.optional(v.id("_storage")),
+    defaultProfilePic: v.id("_storage"),
+    location: v.optional(v.string()),
+    locationCountryCode: v.optional(v.string()),
+    bio: v.optional(v.string()),
+    education: v.optional(v.array(
         v.object({
           degree: v.string(),
           subject: v.string(),
           institution: v.string(),
         })
-      ),
-    skills: v.array(v.string()),
-    socials: v.array(
+      )),
+    skills: v.optional(v.array(v.string())),
+    socials: v.optional(v.array(
       v.object({
         platform: v.string(),
         url: v.string()
       })
-    ),
+    )),
     totalLikes: v.number(),
     articlesPublished: v.number(),
     commentsPublished: v.number(),

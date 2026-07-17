@@ -7,9 +7,10 @@ export const initialiseProfile = mutation({
   args: {
     userId: v.string(),
     email: v.string(),
-    firstName: v.string(),
-    lastName: v.string(),
-    profilePic: v.id("_storage"),
+    firstName: v.optional(v.string()),
+    lastName: v.optional(v.string()),
+    profilePic: v.optional(v.id("_storage")),
+    defaultProfilePic: v.id("_storage"),
   },
   handler: async (ctx, args) => {
     const existingProfile = await ctx.db
@@ -48,18 +49,34 @@ export const initialiseProfile = mutation({
       firstName: args.firstName,
       lastName: args.lastName,
       profilePic: args.profilePic,
-      location: "",
-      locationCountryCode: "",
-      bio: "",
-      education: [],
-      skills: [],
-      socials: [], 
+      defaultProfilePic: args.defaultProfilePic,
       totalLikes: 0,
       articlesPublished: 0,
       commentsPublished: 0,
     });
 
     return newProfileId;
+  },
+});
+
+export const removeProfilePic = mutation({
+  args: { 
+    userId: v.id("profiles") 
+  },
+  handler: async (ctx, args) => {
+    const profile = await ctx.db.get(args.userId);
+    
+    if (!profile) {
+      throw new Error("Profile not found");
+    }
+
+    if (profile.profilePic) {
+      await ctx.storage.delete(profile.profilePic);
+    }
+
+    await ctx.db.patch(args.userId, {
+      profilePic: undefined,
+    });
   },
 });
 
@@ -74,19 +91,36 @@ export const getProfileByUsername = query({
       .unique();
 
     if (!profile) {
-      return { 
-        profilePicture: DEFAULT_AVATAR, 
+      return {
+        profilePicture: DEFAULT_AVATAR,
+        defaultProfilePicture: DEFAULT_AVATAR,  
         profile: null 
       };
     }
 
-    const storageUrl = profile.profilePic 
-      ? await ctx.storage.getUrl(profile.profilePic) 
-      : null;
+    const picStorageId = profile.profilePic;
+    const defaultPicStorageId = profile.defaultProfilePic;
 
-    const profilePicture = storageUrl ?? DEFAULT_AVATAR;
+    const picStorageUrl = picStorageId ? await ctx.storage.getUrl(picStorageId) : null;
+    const defaultPicStorageUrl = defaultPicStorageId ? await ctx.storage.getUrl(defaultPicStorageId) : null;
 
-    return { profilePicture, profile };
+    const profilePicture = picStorageUrl ?? DEFAULT_AVATAR;
+    const defaultProfilePicture = defaultPicStorageUrl ?? DEFAULT_AVATAR;
+
+    const sanitizedProfile = {
+      ...profile,
+      firstName: profile.firstName ?? "",
+      lastName: profile.lastName ?? "",
+      location: profile.location ?? "",
+      locationCountryCode: profile.locationCountryCode ?? "",
+      bio: profile.bio ?? "",
+      
+      education: profile.education ?? [],
+      skills: profile.skills ?? [],
+      socials: profile.socials ?? [],
+    };
+
+    return { profilePicture, defaultProfilePicture, profile: sanitizedProfile };
   },
 });
 
@@ -125,6 +159,7 @@ export const createProfile = mutation({
     firstName: v.string(),
     lastName: v.string(),
     profilePic: v.id("_storage"),
+    defaultProfilePic: v.id("_storage"),
     location: v.string(),
     locationCountryCode: v.string(),
     bio: v.string(),
@@ -169,6 +204,7 @@ export const updateProfile = mutation({
     firstName: v.optional(v.string()),
     lastName: v.optional(v.string()),
     profilePic: v.optional(v.id("_storage")),
+    defaultProfilePic: v.optional(v.id("_storage")),
     location: v.optional(v.string()),
     locationCountryCode: v.optional(v.string()),
     bio: v.optional(v.string()),

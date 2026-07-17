@@ -118,9 +118,10 @@ export type ProfileFormValues = z.infer<typeof profileFormSchema>;
 interface EditProfileButtonProps {
   profile: Doc<"profiles">;
   avatarSrc: string;
+  defaultAvatarSrc: string;
 }
 
-export function EditProfileButton({ profile, avatarSrc }: EditProfileButtonProps) {
+export function EditProfileButton({ profile, avatarSrc, defaultAvatarSrc }: EditProfileButtonProps) {
   const user = useQuery(api.auth.getCurrentUser);
   const { username } = profile;
 
@@ -133,6 +134,7 @@ export function EditProfileButton({ profile, avatarSrc }: EditProfileButtonProps
       key={profileStateKey}
       profile={profile}
       avatarSrc={avatarSrc}
+      defaultAvatarSrc={defaultAvatarSrc}
     >
       <Button variant="ghost" size="icon">
         <Pen className="h-4 w-4" />
@@ -144,10 +146,11 @@ export function EditProfileButton({ profile, avatarSrc }: EditProfileButtonProps
 interface EditProfileDialogProps {
   profile: Doc<"profiles">;
   avatarSrc: string;
+  defaultAvatarSrc: string;
   children: React.ReactNode;
 }
 
-export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileDialogProps) {
+export function EditProfileDialog({ profile, avatarSrc, defaultAvatarSrc, children }: EditProfileDialogProps) {
     
   const convex = useConvex();
 
@@ -166,6 +169,8 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewSrc, setPreviewSrc] = useState<string>("");
   const generateUploadUrl = useMutation(api.profiles.generateUploadUrl);
+
+  const removeProfilePicMutation = useMutation(api.profiles.removeProfilePic);
 
   const runUpdateProfile = useMutation(api.profiles.updateProfile)
     .withOptimisticUpdate((localStore, args) => {
@@ -465,6 +470,10 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
     return await uploadPromiseRef.current;
   };
 
+  const handleRemoveProfilePic = async (e: React.MouseEvent) => {
+    setPreviewSrc(defaultAvatarSrc); 
+  };
+
   return (
       <Dialog open={isOpen} onOpenChange={handleOpenChange}>
         <DialogTrigger asChild>{children}</DialogTrigger>
@@ -493,6 +502,7 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
                     <AvatarBadge className="p-0 border-none bg-transparent">
                       <button 
                         type="button"
+                        onClick={handleRemoveProfilePic}
                         className="flex h-5 w-5 shrink-0 aspect-square items-center justify-center rounded-full bg-zinc-50 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                       >
                         <X className="h-3 w-3 stroke-[2.5]" />
@@ -556,7 +566,7 @@ export function EditProfileDialog({ profile, avatarSrc, children }: EditProfileD
                 </div>
 
                 <LocationField
-                  locationCountryCode={profile.locationCountryCode}
+                  locationCountryCode={profile.locationCountryCode || ""}
                   openDropdown={openDropdown}
                   setOpenDropdown={setOpenDropdown}
                   locationQuery={locationQuery}

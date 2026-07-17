@@ -89,10 +89,10 @@ export async function GET(request: Request) {
 
     await fetchAuthMutation(api.profiles.initialiseProfile, {
       userId: id,
-      email: email || "",
-      firstName: firstName || "", 
-      lastName: lastName || "",
-      profilePic: profilePicField, 
+      email: email,
+      firstName: firstName, 
+      lastName: lastName,
+      defaultProfilePic: profilePicField, 
     });
 
     if (publicProfilePicUrl) {
