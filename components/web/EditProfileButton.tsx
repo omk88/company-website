@@ -32,6 +32,7 @@ import { SocialLinksFields } from "./EditFormFields/SocialLinksField";
 import { useRouter } from "next/navigation";
 import imageCompression from 'browser-image-compression';
 import { Spinner } from "../ui/spinner";
+import { UploadAvatar } from "./UploadAvatar";
 
 const formatPlatformName = (name: string) => {
   if (name.toLowerCase() === "x") return "Twitter / X";
@@ -156,7 +157,6 @@ export function EditProfileDialog({ profile, avatarSrc, defaultAvatarSrc, childr
 
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [preFetchedUploadUrl, setPreFetchedUploadUrl] = useState<string | null>(null);
 
   const [isOpen, setIsOpen] = useState(false);
   const [comboboxOpen, setComboboxOpen] = useState(false);
@@ -166,11 +166,10 @@ export function EditProfileDialog({ profile, avatarSrc, defaultAvatarSrc, childr
   const [locationOptions, setLocationOptions] = useState<{label: string, countryCode?: string}[]>([]);
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
 
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewSrc, setPreviewSrc] = useState<string>("");
-  const generateUploadUrl = useMutation(api.profiles.generateUploadUrl);
-
-  const removeProfilePicMutation = useMutation(api.profiles.removeProfilePic);
+  const [isAvatarChanged, setIsAvatarChanged] = useState(false);
+  const [pendingStorageId, setPendingStorageId] = useState<Id<"_storage"> | null>(null);
+  const [isAvatarUploading, setIsAvatarUploading] = useState(false);
+  const uploadPromiseRef = useRef<Promise<Id<"_storage"> | undefined> | null>(null);
 
   const runUpdateProfile = useMutation(api.profiles.updateProfile)
     .withOptimisticUpdate((localStore, args) => {
@@ -217,8 +216,6 @@ export function EditProfileDialog({ profile, avatarSrc, defaultAvatarSrc, childr
 
   const [imageUrl, setImageUrl] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -259,11 +256,6 @@ export function EditProfileDialog({ profile, avatarSrc, defaultAvatarSrc, childr
   const watchedSkills = form.watch("skills") || [];
   const [editingSocialIndex, setEditingSocialIndex] = useState<number | -1>(-1);
   const [editingEduIndex, setEditingEduIndex] = useState<number | -1>(-1);
-
-  const [uploading, setUploading] = useState(false);
-  const [pendingStorageId, setPendingStorageId] = useState<Id<"_storage"> | null>(null);
-
-  const uploadPromiseRef = useRef<Promise<Id<"_storage"> | undefined> | null>(null);
 
   useEffect(() => {
     if (!locationQuery.trim() || locationQuery.trim().length < 3) {
@@ -382,12 +374,14 @@ export function EditProfileDialog({ profile, avatarSrc, defaultAvatarSrc, childr
 
     let finalStorageId = profile.profilePic;
     
-    if (selectedFile) {
+    if (isAvatarChanged) {
       if (pendingStorageId) {
         finalStorageId = pendingStorageId;
-      } else if (uploading) {
+      } else if (isAvatarUploading) {
         const storageId = await waitForBackgroundUploadToFinish(); 
         finalStorageId = storageId || profile.profilePic;
+      } else {
+        finalStorageId = undefined;
       }
     }
 
@@ -405,7 +399,7 @@ export function EditProfileDialog({ profile, avatarSrc, defaultAvatarSrc, childr
       socials: data.socials.map(({ platform, url }) => ({ platform, url })),
     });
 
-    if (selectedFile && updateResult.publicImageUrl) {
+    if (isAvatarChanged && updateResult.publicImageUrl) {
       await updateSessionProfilePicture(updateResult.publicImageUrl);
     }
 
@@ -416,62 +410,9 @@ export function EditProfileDialog({ profile, avatarSrc, defaultAvatarSrc, childr
     }
   };
 
-  const handleButtonClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (previewSrc) URL.revokeObjectURL(previewSrc);
-    const localUrl = URL.createObjectURL(file);
-    setPreviewSrc(localUrl);
-    setSelectedFile(file);
-
-    setUploading(true);
-
-    const uploadPromise = (async (): Promise<Id<"_storage"> | undefined> => {
-      try {
-        const options = {
-          maxSizeMB: 0.15,
-          maxWidthOrHeight: 500,
-          useWebWorker: true,
-          fileType: 'image/jpeg' as const
-        };
-        const compressedFile = (await imageCompression(file, options)) as File;
-        const uploadUrl = preFetchedUploadUrl || await generateUploadUrl();
-
-        const result = await fetch(uploadUrl, {
-          method: "POST",
-          headers: { "Content-Type": compressedFile.type },
-          body: compressedFile,
-        });
-
-        if (!result.ok) throw new Error("Upload failed");
-
-        const data = (await result.json()) as { storageId: Id<"_storage"> };
-        setPendingStorageId(data.storageId);
-        return data.storageId;
-      } catch (err) {
-        console.error("Background upload failed:", err);
-        return undefined;
-      } finally {
-        setUploading(false);
-      }
-    })();
-
-    uploadPromiseRef.current = uploadPromise;
-  };
-
   const waitForBackgroundUploadToFinish = async (): Promise<Id<"_storage"> | undefined> => {
     if (!uploadPromiseRef.current) return undefined;
-    
     return await uploadPromiseRef.current;
-  };
-
-  const handleRemoveProfilePic = async (e: React.MouseEvent) => {
-    setPreviewSrc(defaultAvatarSrc); 
   };
 
   return (
@@ -485,45 +426,20 @@ export function EditProfileDialog({ profile, avatarSrc, defaultAvatarSrc, childr
 
           <FormProvider {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-1 overflow-hidden">
-              
               <div className="flex-1 overflow-y-auto px-6 pb-4 grid gap-4 no-scrollbar">
-                <div className="relative p-2 w-fit">
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    accept="image/*"
-                    className="hidden" 
-                  />
-                  
-                  <Avatar className="h-16 w-16 border-2 border-muted">
-                    <AvatarImage src={previewSrc || avatarSrc} />
-                    <AvatarFallback><Spinner className="h-6 w-6 animate-spin" /></AvatarFallback>
-                    <AvatarBadge className="p-0 border-none bg-transparent">
-                      <button 
-                        type="button"
-                        onClick={handleRemoveProfilePic}
-                        className="flex h-5 w-5 shrink-0 aspect-square items-center justify-center rounded-full bg-zinc-50 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                      >
-                        <X className="h-3 w-3 stroke-[2.5]" />
-                      </button>
-                    </AvatarBadge>
-                  </Avatar>
-                  
-                  <button
-                    type="button"
-                    onClick={handleButtonClick}
-                    disabled={uploading}
-                    className="absolute inset-2 flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 transition-colors cursor-pointer disabled:cursor-not-allowed"
-                    aria-label="Change avatar"
-                  >
-                    {uploading ? (
-                      <Spinner className="h-6 w-6 animate-spin" />
-                    ) : (
-                      <ImagePlus className="h-5 w-5" />
-                    )}
-                  </button>
-                </div>
+                
+                <UploadAvatar 
+                  avatarSrc={avatarSrc}
+                  defaultAvatarSrc={defaultAvatarSrc}
+                  onPendingIdChange={(id) => {
+                    setPendingStorageId(id);
+                    setIsAvatarChanged(true);
+                  }}
+                  onUploadingStatusChange={setIsAvatarUploading}
+                  onPromiseCreated={(promise) => {
+                    uploadPromiseRef.current = promise;
+                  }}
+                />
 
                 <Field>
                   <FieldLabel>Username</FieldLabel>

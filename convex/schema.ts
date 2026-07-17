@@ -111,6 +111,10 @@ const schema = defineSchema({
   })
     .index("by_user_and_blog", ["userId", "blogId"])
     .index("by_blog", ["blogId"]),
+
+  uploadedAvatar: defineTable({
+    storageId: v.id("_storage"),
+  })
 });
 
 export default schema;
