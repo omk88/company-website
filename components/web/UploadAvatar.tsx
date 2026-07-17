@@ -1,3 +1,5 @@
+"use client";
+
 import { ImagePlus, X } from "lucide-react";
 import { Avatar, AvatarBadge, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Spinner } from "../ui/spinner";
@@ -101,6 +103,10 @@ export function UploadAvatar({
         onPromiseCreated(uploadPromise);
     };
 
+    const hasCustomAvatar = previewSrc 
+        ? previewSrc !== defaultAvatarSrc 
+        : !!avatarSrc && avatarSrc !== defaultAvatarSrc;
+
     return (
         <div className="relative p-2 w-fit">
             <input
@@ -113,15 +119,18 @@ export function UploadAvatar({
             
             <Avatar className="h-16 w-16 border-2 border-muted">
                 <AvatarImage src={previewSrc || avatarSrc || defaultAvatarSrc} />
-                <AvatarBadge className="p-0 border-none bg-transparent">
-                    <button 
-                        type="button"
-                        onClick={handleRemoveProfilePic}
-                        className="flex h-5 w-5 shrink-0 aspect-square items-center justify-center rounded-full bg-zinc-50 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                    >
-                        <X className="h-3 w-3 stroke-[2.5]" />
-                    </button>
-                </AvatarBadge>
+                
+                {hasCustomAvatar && (
+                    <AvatarBadge className="p-0 border-none bg-transparent">
+                        <button 
+                            type="button"
+                            onClick={handleRemoveProfilePic}
+                            className="flex h-5 w-5 shrink-0 aspect-square items-center justify-center rounded-full bg-zinc-50 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                        >
+                            <X className="h-3 w-3 stroke-[2.5]" />
+                        </button>
+                    </AvatarBadge>
+                )}
             </Avatar>
             
             <button
