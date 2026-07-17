@@ -169,6 +169,8 @@ export function EditProfileDialog({ profile, avatarSrc, defaultAvatarSrc, childr
   const [isAvatarChanged, setIsAvatarChanged] = useState(false);
   const [pendingStorageId, setPendingStorageId] = useState<Id<"_storage"> | null>(null);
   const [isAvatarUploading, setIsAvatarUploading] = useState(false);
+  const [fallbacktoDefaultAvatar, setfallbacktoDefaultAvatar] = useState(false);
+
   const uploadPromiseRef = useRef<Promise<Id<"_storage"> | undefined> | null>(null);
 
   const runUpdateProfile = useMutation(api.profiles.updateProfile)
@@ -379,9 +381,9 @@ export function EditProfileDialog({ profile, avatarSrc, defaultAvatarSrc, childr
         finalStorageId = pendingStorageId;
       } else if (isAvatarUploading) {
         const storageId = await waitForBackgroundUploadToFinish(); 
-        finalStorageId = storageId || profile.profilePic;
+        finalStorageId = storageId;
       } else {
-        finalStorageId = undefined;
+        finalStorageId = undefined; 
       }
     }
 
@@ -399,8 +401,10 @@ export function EditProfileDialog({ profile, avatarSrc, defaultAvatarSrc, childr
       socials: data.socials.map(({ platform, url }) => ({ platform, url })),
     });
 
-    if (isAvatarChanged && updateResult.publicImageUrl) {
+    if (isAvatarChanged && finalStorageId && updateResult.publicImageUrl) {
       await updateSessionProfilePicture(updateResult.publicImageUrl);
+    } else if (isAvatarChanged && !finalStorageId) {
+      await updateSessionProfilePicture(defaultAvatarSrc);
     }
 
     if (profile.username !== data.username) {

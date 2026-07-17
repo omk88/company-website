@@ -112,8 +112,7 @@ export function UploadAvatar({
             />
             
             <Avatar className="h-16 w-16 border-2 border-muted">
-                <AvatarImage src={previewSrc || avatarSrc} />
-                <AvatarFallback><Spinner className="h-6 w-6 animate-spin" /></AvatarFallback>
+                <AvatarImage src={previewSrc || avatarSrc || defaultAvatarSrc} />
                 <AvatarBadge className="p-0 border-none bg-transparent">
                     <button 
                         type="button"

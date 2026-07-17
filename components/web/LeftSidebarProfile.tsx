@@ -37,23 +37,17 @@ export function LeftSidebarProfile({ preloadedProfile }: profileProps) {
       <SidebarContent className="!p-0">
         <div className="p-2 pb-0">
           <div className="h-16 w-16 border-2 border-muted rounded-full overflow-hidden bg-muted relative shrink-0">
-            {avatarSrc ? (
-              <img
-                src={avatarSrc}
-                alt="profile"
-                className="h-full w-full object-cover rounded-full"
-                decoding="async" 
-              />
-            ) : (
-              <div className="h-full w-full bg-muted flex items-center justify-center text-muted-foreground">
-                <span className="text-xs font-mono">CN</span>
-              </div>
-            )}
+            <img
+              src={avatarSrc || defaultAvatarSrc || ""}
+              alt="profile"
+              className="h-full w-full object-cover rounded-full"
+              decoding="async" 
+            />
           </div>
 
           <h1 className="flex w-full items-center justify-between gap-2 text-lg font-medium text-foreground mt-2">
             <span>{displayName}</span>
-            <EditProfileButton profile={profile} avatarSrc={avatarSrc} defaultAvatarSrc={defaultAvatarSrc} />
+            <EditProfileButton profile={profile} avatarSrc={avatarSrc || ""} defaultAvatarSrc={defaultAvatarSrc || ""} />
           </h1>
           
           {profile.location?.trim() && (

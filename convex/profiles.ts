@@ -1,8 +1,6 @@
 import { mutation, MutationCtx, query } from "./_generated/server";
 import { v } from "convex/values";
 
-const DEFAULT_AVATAR = "/default.svg";
-
 export const initialiseProfile = mutation({
   args: {
     userId: v.string(),
@@ -92,8 +90,8 @@ export const getProfileByUsername = query({
 
     if (!profile) {
       return {
-        profilePicture: DEFAULT_AVATAR,
-        defaultProfilePicture: DEFAULT_AVATAR,  
+        profilePicture: null,
+        defaultProfilePicture: null,  
         profile: null 
       };
     }
@@ -104,8 +102,8 @@ export const getProfileByUsername = query({
     const picStorageUrl = picStorageId ? await ctx.storage.getUrl(picStorageId) : null;
     const defaultPicStorageUrl = defaultPicStorageId ? await ctx.storage.getUrl(defaultPicStorageId) : null;
 
-    const profilePicture = picStorageUrl ?? DEFAULT_AVATAR;
-    const defaultProfilePicture = defaultPicStorageUrl ?? DEFAULT_AVATAR;
+    const profilePicture = picStorageUrl;
+    const defaultProfilePicture = defaultPicStorageUrl;
 
     const sanitizedProfile = {
       ...profile,
@@ -235,6 +233,10 @@ export const updateProfile = mutation({
 
     const { id, ...fieldsToUpdate } = args;
 
+    if (!("profilePic" in args)) {
+      fieldsToUpdate.profilePic = undefined;
+    }
+
     await ctx.db.patch(existingUser._id, fieldsToUpdate);
 
     const oldName = (existingUser.firstName && existingUser.lastName) 
@@ -252,6 +254,11 @@ export const updateProfile = mutation({
     if (args.profilePic) {
       const publicUrl = await ctx.storage.getUrl(args.profilePic);
       return { publicImageUrl: publicUrl };
+    }
+
+    if (!args.profilePic && existingUser.defaultProfilePic) {
+      const defaultUrl = await ctx.storage.getUrl(existingUser.defaultProfilePic);
+      return { publicImageUrl: defaultUrl };
     }
 
     return { existingUser: existingUser._id, publicImageUrl: null };
