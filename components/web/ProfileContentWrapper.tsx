@@ -5,11 +5,10 @@ import { TabsSwitch, TabItem } from "@/components/web/TabsSwitch";
 import { CommentsContainer } from "./CommentsContainer";
 
 interface ProfileContentWrapperProps {
-  blogGridSlot: React.ReactNode;
-  authorId: string;
+  
 }
 
-export function ProfileContentWrapper({ blogGridSlot, authorId }: ProfileContentWrapperProps) {
+export function ProfileContentWrapper({  }: ProfileContentWrapperProps) {
   const [activeTab, setActiveTab] = useState("blog-articles");
 
   const tabs: TabItem[] = [
@@ -27,11 +26,10 @@ export function ProfileContentWrapper({ blogGridSlot, authorId }: ProfileContent
         />
       </div>
       <div className="pl-4 pr-4">
-        {activeTab === "blog-articles" && blogGridSlot}
+        {activeTab === "blog-articles" && ""}
         
         {activeTab === "comments" && (
           <div className="text-gray-500 text-center">
-            <CommentsContainer authorId={authorId} />
           </div>
         )}
       </div>

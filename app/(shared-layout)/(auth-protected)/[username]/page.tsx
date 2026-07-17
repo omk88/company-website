@@ -5,6 +5,7 @@ import { ProfileBlogGridContainer } from "@/components/web/ProfileBlogGridContai
 import { SearchProvider } from "@/components/web/SearchContext";
 import { api } from "@/convex/_generated/api";
 import { preloadQuery } from "convex/nextjs";
+import { preloadAuthQuery } from "@/lib/auth-server";
 
 interface profileRouteProps {
     params: Promise<{
@@ -17,9 +18,11 @@ export default async function Profile({ params }: profileRouteProps) {
     const { username } = await params;
 
     const preloadedProfilePromise = await preloadQuery(api.profiles.getProfileByUsername, { username: username });
+    const preloadedCurrentUserPromise = await preloadAuthQuery(api.auth.getCurrentUser);
 
-    const [preloadedProfile] = await Promise.all([
-        preloadedProfilePromise
+    const [preloadedProfile, preloadedCurrentUser] = await Promise.all([
+        preloadedProfilePromise,
+        preloadedCurrentUserPromise
     ]);
 
     return (
@@ -27,16 +30,14 @@ export default async function Profile({ params }: profileRouteProps) {
             <SidebarProvider style={{ "--sidebar-width": "24rem" } as React.CSSProperties}>
                 <SearchProvider>
                     <aside>
-                        <LeftSidebarProfile 
-                            preloadedProfile={preloadedProfile} 
-                        />
+                        <LeftSidebarProfile preloadedProfile={preloadedProfile} preloadedCurrentUser={preloadedCurrentUser} />
                     </aside>
                 </SearchProvider>
 
-                { /*
+                
                 <div className="bg-white w-full pl-[var(--sidebar-width)] ml-2">
-                    <ProfileContentWrapper authorId={authorId} blogGridSlot={<ProfileBlogGridContainer author={authorId} />} />
-                </div> */}
+                    <ProfileContentWrapper />
+                </div>
             </SidebarProvider>
         </div>
     );

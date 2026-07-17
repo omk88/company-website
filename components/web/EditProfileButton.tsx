@@ -123,10 +123,6 @@ interface EditProfileButtonProps {
 }
 
 export function EditProfileButton({ profile, avatarSrc, defaultAvatarSrc }: EditProfileButtonProps) {
-  const user = useQuery(api.auth.getCurrentUser);
-  const { username } = profile;
-
-  if (user?.username !== username) return null;
 
   const profileStateKey = `${profile.username}-${profile.firstName}-${profile.lastName}-${profile.bio}-${profile.profilePic}-${profile.location}`;
 

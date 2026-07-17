@@ -11,11 +11,13 @@ import { api } from "@/convex/_generated/api";
 
 interface profileProps {
   preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
+  preloadedCurrentUser: Preloaded<typeof api.auth.getCurrentUser>;
 }
 
-export function LeftSidebarProfile({ preloadedProfile }: profileProps) {
+export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: profileProps) {
 
   const profileData = usePreloadedQuery(preloadedProfile);
+  const currentUser = usePreloadedQuery(preloadedCurrentUser);
 
   const profile = profileData.profile;
   const avatarSrc = profileData.profilePicture;
@@ -28,6 +30,11 @@ export function LeftSidebarProfile({ preloadedProfile }: profileProps) {
   const { username, firstName, lastName } = profile;
   const displayName = (firstName && lastName) ? `${firstName} ${lastName}` : username;
   const hasContent = profile.bio.trim() || profile.education.length > 0 || profile.socials.length > 0;
+
+  const isOwnProfile = 
+    currentUser?.userId && 
+    profile?.userId && 
+    currentUser.userId === profile.userId;
 
   return (
     <Sidebar 
@@ -47,7 +54,9 @@ export function LeftSidebarProfile({ preloadedProfile }: profileProps) {
 
           <h1 className="flex w-full items-center justify-between gap-2 text-lg font-medium text-foreground mt-2">
             <span>{displayName}</span>
-            <EditProfileButton profile={profile} avatarSrc={avatarSrc || ""} defaultAvatarSrc={defaultAvatarSrc || ""} />
+            {isOwnProfile && 
+              <EditProfileButton profile={profile} avatarSrc={avatarSrc || ""} defaultAvatarSrc={defaultAvatarSrc || ""} />
+            }
           </h1>
           
           {profile.location?.trim() && (
