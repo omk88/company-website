@@ -15,7 +15,7 @@ import { api } from "@/convex/_generated/api";
 import z from "zod";
 import { toast } from "sonner";
 import { useTransition } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Avatar, AvatarImage } from "../ui/avatar";
 import { Separator } from "../ui/separator";
 import { IncrementCommentLikesDislikes } from "./IncrementCommentLikesDislikes"; 
 
@@ -90,10 +90,7 @@ export function CommentSection(props: { preloadedComments: Preloaded<typeof api.
                         return (
                             <div key={comment._id} className="flex gap-4">
                                 <Avatar className="size-10 shrink-0">
-                                    <AvatarImage src={`https://avatar.vercel.sh/${comment.authorName}`} alt={comment.authorName} />
-                                    <AvatarFallback>
-                                        {comment.authorName.slice(0, 2).toUpperCase()}
-                                    </AvatarFallback>
+                                    <AvatarImage src={comment.authorProfilePicUrl || comment.defaultAuthorProfilePicUrl || undefined} />
                                 </Avatar>
                                 
                                 <div className="flex-1 space-y-2">

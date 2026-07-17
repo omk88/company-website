@@ -7,11 +7,34 @@ export const getCommentsByBlog = query({
     blogId: v.id("blogs")
   },
   handler: async (ctx, args) => {
-    return await ctx.db
+    const comments = await ctx.db
       .query("comments")
       .withIndex("by_blog", (q) => q.eq("blogId", args.blogId))
       .order("desc")
       .collect();
+
+    return await Promise.all(
+      comments.map(async (comment) => {
+        const profile = await ctx.db
+          .query("profiles")
+          .withIndex("by_userId", (q) => q.eq("userId", comment.authorId))
+          .unique();
+
+        const authorProfilePicUrl = profile?.profilePic 
+          ? (await ctx.storage.getUrl(profile.profilePic)) ?? undefined
+          : undefined;
+
+        const defaultAuthorProfilePicUrl = profile?.defaultProfilePic 
+          ? (await ctx.storage.getUrl(profile.defaultProfilePic)) ?? undefined
+          : undefined;
+
+        return {
+          ...comment,
+          authorProfilePicUrl,
+          defaultAuthorProfilePicUrl,
+        };
+      })
+    );
   }
 });
 
@@ -67,7 +90,6 @@ export const createComment = mutation({
         body: args.body,
         authorId: user._id,
         authorName: user.name ?? profile.username, 
-        authorProfilePic: profile.profilePic,  
         blogTitle: blog.title,                 
         likes: 0,
       }),

@@ -360,10 +360,11 @@ export function EditProfileDialog({ profile, avatarSrc, defaultAvatarSrc, childr
     };
 
   const updateSessionProfilePicture = async (publicImageUrl: string) => {
-    if (!publicImageUrl) return;
+    if (!publicImageUrl && publicImageUrl !== defaultAvatarSrc) return;
+    
     try {
       setIsSubmitting(true);
-      await updateImage({ image: publicImageUrl });
+      await updateImage({ image: publicImageUrl || defaultAvatarSrc });
     } catch (error) {
       console.error("Failed to update auth session image:", error);
     } finally {
@@ -404,7 +405,7 @@ export function EditProfileDialog({ profile, avatarSrc, defaultAvatarSrc, childr
     if (isAvatarChanged && finalStorageId && updateResult.publicImageUrl) {
       await updateSessionProfilePicture(updateResult.publicImageUrl);
     } else if (isAvatarChanged && !finalStorageId) {
-      await updateSessionProfilePicture(defaultAvatarSrc);
+      await updateSessionProfilePicture(defaultAvatarSrc); 
     }
 
     if (profile.username !== data.username) {
