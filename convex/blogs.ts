@@ -2,6 +2,7 @@ import { Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { paginationOptsValidator } from "convex/server";
+import { cubeTexture } from "three/src/nodes/accessors/CubeTextureNode.js";
 
 export const generateUploadUrl = mutation({
   args: {},
@@ -436,6 +437,20 @@ export const getFeaturedState = query({
     return { isFeatured: blog.featured ?? false };
   },
 });
+
+export const getPaginatedPostsByAuthor = query({
+  args: {
+    authorId: v.string(),
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("blogs")
+      .withIndex("by_author", (q) => q.eq("author", args.authorId))
+      .order("desc")
+      .paginate(args.paginationOpts);
+  }
+})
 
 export const getPostsByAuthor = query({
   args: { author: v.string() },
