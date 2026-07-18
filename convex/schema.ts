@@ -53,12 +53,14 @@ const schema = defineSchema({
     blogId: v.string(),
     authorId: v.string(),
     authorName: v.string(),
+    username: v.string(),
     blogTitle: v.string(),
     likes: v.number(),
     body: v.string()
   })
     .index("by_blog", ["blogId"])
-    .index("by_authorId", ["authorId"]),
+    .index("by_authorId", ["authorId"])
+    .index("by_username", ["username"]),
 
   profiles: defineTable({
     userId: v.string(),

@@ -7,11 +7,12 @@ import { Preloaded, usePreloadedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 
 interface ProfileContentWrapperProps {
-  blogGridSlot: React.ReactNode;
+  blogsSlot: React.ReactNode;
+  commentsSlot: React.ReactNode;
   preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
 }
 
-export function ProfileContentWrapper({ blogGridSlot, preloadedProfile }: ProfileContentWrapperProps) {
+export function ProfileContentWrapper({ commentsSlot, blogsSlot, preloadedProfile }: ProfileContentWrapperProps) {
   const [activeTab, setActiveTab] = useState("blog-articles");
 
   const profileData = usePreloadedQuery(preloadedProfile);
@@ -31,13 +32,9 @@ export function ProfileContentWrapper({ blogGridSlot, preloadedProfile }: Profil
         />
       </div>
       <div className="pl-4 pr-4">
-        {activeTab === "blog-articles" && blogGridSlot}
+        {activeTab === "blog-articles" && blogsSlot}
         
-        {activeTab === "comments" && profileData.profile?._id && (
-          <div className="text-gray-500 text-center">
-            <CommentsContainer authorId={profileData.profile?._id} />
-          </div>
-        )}
+        {activeTab === "comments" && commentsSlot}
       </div>
     </>
   );

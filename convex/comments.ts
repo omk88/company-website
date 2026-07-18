@@ -2,6 +2,7 @@ import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { authComponent } from "./auth";
 import { Id } from "./_generated/dataModel";
+import { paginationOptsValidator } from "convex/server";
 
 export const getCommentsByBlog = query({
   args: {
@@ -91,6 +92,7 @@ export const createComment = mutation({
         body: args.body,
         authorId: user._id,
         authorName: user.name ?? profile.username, 
+        username: profile.username,
         blogTitle: blog.title,                 
         likes: 0,
       }),
@@ -185,4 +187,18 @@ export const toggleCommentVote = mutation({
       }
     }
   },
+});
+
+export const getPaginatedCommentsByUsername = query({
+  args: {
+    username: v.string(),
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("comments")
+      .withIndex("by_username", (q) => q.eq("username", args.username))
+      .order("desc")
+      .paginate(args.paginationOpts);
+  }
 });

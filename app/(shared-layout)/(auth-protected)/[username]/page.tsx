@@ -1,4 +1,4 @@
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { LeftSidebarProfile } from "@/components/web/LeftSidebarProfile";
 import { ProfileContentWrapper } from "@/components/web/ProfileContentWrapper";
 import { SearchProvider } from "@/components/web/SearchContext";
@@ -6,6 +6,7 @@ import { api } from "@/convex/_generated/api";
 import { preloadQuery } from "convex/nextjs";
 import { preloadAuthQuery } from "@/lib/auth-server";
 import { ProfileBlogPosts } from "@/components/web/ProfileBlogPosts";
+import { ProfileComments } from "@/components/web/ProfileComments";
 
 interface profileRouteProps {
     params: Promise<{
@@ -19,7 +20,7 @@ export default async function Profile({ params }: profileRouteProps) {
     const preloadedProfilePromise = preloadQuery(api.profiles.getProfileByUsername, { username });
     const preloadedCurrentUserPromise = preloadAuthQuery(api.auth.getCurrentUser);
     
-    const preloadedInitialBlogsPromise = preloadQuery(api.blogs.getPaginatedPostsByAuthor, {
+    const preloadedInitialBlogsPromise = preloadQuery(api.blogs.getPaginatedPostsByUsername, {
         username: username,
         paginationOpts: {
             numItems: 6,    
@@ -28,23 +29,31 @@ export default async function Profile({ params }: profileRouteProps) {
         }
     });
 
-    const [preloadedProfile, preloadedCurrentUser, preloadedInitialBlogs] = await Promise.all([
+    const preloadedInitialCommentsPromise = preloadQuery(api.comments.getPaginatedCommentsByUsername, {
+        username: username,
+        paginationOpts: {
+            numItems: 6,    
+            cursor: null,   
+            id: 0,
+        }
+    });
+
+    const [preloadedProfile, preloadedCurrentUser, preloadedInitialBlogs, preloadedInitialComments] = await Promise.all([
         preloadedProfilePromise,
         preloadedCurrentUserPromise,
-        preloadedInitialBlogsPromise
+        preloadedInitialBlogsPromise,
+        preloadedInitialCommentsPromise
     ]);
 
     return (
         <div>
             <SidebarProvider style={{ "--sidebar-width": "24rem" } as React.CSSProperties}>
-                <SearchProvider>
-                    <aside>
-                        <LeftSidebarProfile preloadedProfile={preloadedProfile} preloadedCurrentUser={preloadedCurrentUser} />
-                    </aside>
-                </SearchProvider>
+                <aside>
+                    <LeftSidebarProfile preloadedProfile={preloadedProfile} preloadedCurrentUser={preloadedCurrentUser} />
+                </aside>
 
-                <div className="bg-white w-full pl-[var(--sidebar-width)] ml-2">
-                    <ProfileContentWrapper preloadedProfile={preloadedProfile} blogGridSlot={<ProfileBlogPosts preloadedInitialBlogs={preloadedInitialBlogs} username={username} />} />
+                <div className="ml-[24rem] bg-white">
+                    <ProfileContentWrapper preloadedProfile={preloadedProfile} commentsSlot={<ProfileComments preloadedInitialComments={preloadedInitialComments} username={username} />} blogsSlot={<ProfileBlogPosts preloadedInitialBlogs={preloadedInitialBlogs} username={username} />} />
                 </div>
             </SidebarProvider>
         </div>

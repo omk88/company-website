@@ -438,7 +438,7 @@ export const getFeaturedState = query({
   },
 });
 
-export const getPaginatedPostsByAuthor = query({
+export const getPaginatedPostsByUsername = query({
   args: {
     username: v.string(),
     paginationOpts: paginationOptsValidator,
@@ -450,7 +450,7 @@ export const getPaginatedPostsByAuthor = query({
       .order("desc")
       .paginate(args.paginationOpts);
   }
-})
+});
 
 export const getPostsByAuthor = query({
   args: { author: v.string() },

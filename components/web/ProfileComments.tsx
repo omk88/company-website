@@ -4,16 +4,16 @@ import { api } from "@/convex/_generated/api";
 import { Preloaded, useConvex, usePreloadedQuery } from "convex/react";
 import { useEffect, useRef, useState } from "react";
 
-interface ProfileBlogPostsProps {
+interface ProfileCommentsProps {
     username: string;
-    preloadedInitialBlogs: Preloaded<typeof api.blogs.getPaginatedPostsByUsername>;
+    preloadedInitialComments: Preloaded<typeof api.comments.getPaginatedCommentsByUsername>;
 }
 
-export function ProfileBlogPosts({ username, preloadedInitialBlogs }: ProfileBlogPostsProps) {
+export function ProfileComments({ username, preloadedInitialComments }: ProfileCommentsProps) {
     const convex = useConvex();
-    const initialData = usePreloadedQuery(preloadedInitialBlogs);
+    const initialData = usePreloadedQuery(preloadedInitialComments);
 
-    const [blogs, setBlogs] = useState(initialData.page);
+    const [comments, setComments] = useState(initialData.page);
     const [cursor, setCursor] = useState<string | null>(initialData.continueCursor);
     const [isDone, setIsDone] = useState(initialData.isDone);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -25,7 +25,7 @@ export function ProfileBlogPosts({ username, preloadedInitialBlogs }: ProfileBlo
         setIsLoadingMore(true);
 
         try {
-            const result = await convex.query(api.blogs.getPaginatedPostsByUsername, {
+            const result = await convex.query(api.comments.getPaginatedCommentsByUsername, {
                 username,
                 paginationOpts: {
                     numItems: 6,
@@ -34,7 +34,7 @@ export function ProfileBlogPosts({ username, preloadedInitialBlogs }: ProfileBlo
                 }
             });
 
-            setBlogs((prev) => [...prev, ...result.page]);
+            setComments((prev) => [...prev, ...result.page]);
             setCursor(result.continueCursor);
             setIsDone(result.isDone);
         } catch (error) {
@@ -68,15 +68,15 @@ export function ProfileBlogPosts({ username, preloadedInitialBlogs }: ProfileBlo
 
     return (
         <div className="space-y-4">
-            {blogs.length === 0 ? (
+            {comments.length === 0 ? (
                 <p className="text-muted-foreground">No blogs posted yet.</p>
                 ) : (
                     <>
                         <ul className="flex flex-col gap-4">
-                            {blogs.map((blog) => (
-                                <li key={blog._id} className="p-4 border rounded-xl shadow-sm bg-card">
-                                    <h3 className="text-lg font-semibold">{blog.title}</h3>
-                                    <p className="text-muted-foreground mt-1">{blog.content}</p>
+                            {comments.map((comment) => (
+                                <li key={comment._id} className="p-4 border rounded-xl shadow-sm bg-card">
+                                    <h3 className="text-lg font-semibold">{comment.blogTitle}</h3>
+                                    <p className="text-muted-foreground mt-1">{comment.body}</p>
                                 </li>
                             ))}
                         </ul>
