@@ -440,13 +440,13 @@ export const getFeaturedState = query({
 
 export const getPaginatedPostsByAuthor = query({
   args: {
-    authorId: v.string(),
+    username: v.string(),
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
     return await ctx.db
       .query("blogs")
-      .withIndex("by_author", (q) => q.eq("author", args.authorId))
+      .withIndex("by_username", (q) => q.eq("username", args.username))
       .order("desc")
       .paginate(args.paginationOpts);
   }

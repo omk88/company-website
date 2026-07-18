@@ -1,11 +1,11 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { LeftSidebarProfile } from "@/components/web/LeftSidebarProfile";
 import { ProfileContentWrapper } from "@/components/web/ProfileContentWrapper";
-import { ProfileBlogGridContainer } from "@/components/web/ProfileBlogGridContainer"; 
 import { SearchProvider } from "@/components/web/SearchContext";
 import { api } from "@/convex/_generated/api";
 import { preloadQuery } from "convex/nextjs";
 import { preloadAuthQuery } from "@/lib/auth-server";
+import { ProfileBlogPosts } from "@/components/web/ProfileBlogPosts";
 
 interface profileRouteProps {
     params: Promise<{
@@ -14,15 +14,24 @@ interface profileRouteProps {
 }
 
 export default async function Profile({ params }: profileRouteProps) {
-
     const { username } = await params;
 
-    const preloadedProfilePromise = await preloadQuery(api.profiles.getProfileByUsername, { username: username });
-    const preloadedCurrentUserPromise = await preloadAuthQuery(api.auth.getCurrentUser);
+    const preloadedProfilePromise = preloadQuery(api.profiles.getProfileByUsername, { username });
+    const preloadedCurrentUserPromise = preloadAuthQuery(api.auth.getCurrentUser);
+    
+    const preloadedInitialBlogsPromise = preloadQuery(api.blogs.getPaginatedPostsByAuthor, {
+        username: username,
+        paginationOpts: {
+            numItems: 6,    
+            cursor: null,   
+            id: 0,
+        }
+    });
 
-    const [preloadedProfile, preloadedCurrentUser] = await Promise.all([
+    const [preloadedProfile, preloadedCurrentUser, preloadedInitialBlogs] = await Promise.all([
         preloadedProfilePromise,
-        preloadedCurrentUserPromise
+        preloadedCurrentUserPromise,
+        preloadedInitialBlogsPromise
     ]);
 
     return (
@@ -35,7 +44,7 @@ export default async function Profile({ params }: profileRouteProps) {
                 </SearchProvider>
 
                 <div className="bg-white w-full pl-[var(--sidebar-width)] ml-2">
-                    <ProfileContentWrapper preloadedProfile={preloadedProfile} blogGridSlot={<ProfileBlogGridContainer username={username}  />} />
+                    <ProfileContentWrapper preloadedProfile={preloadedProfile} blogGridSlot={<ProfileBlogPosts preloadedInitialBlogs={preloadedInitialBlogs} />} />
                 </div>
             </SidebarProvider>
         </div>
