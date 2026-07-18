@@ -231,6 +231,19 @@ export const updateProfile = mutation({
       throw new Error("Profile not found");
     }
 
+    if (args.profilePic) {
+      const profilePicId = args.profilePic;
+
+      const ledgerRecord = await ctx.db
+        .query("uploadedAvatar")
+        .withIndex("by_storageId", (q) => q.eq("storageId", profilePicId))
+        .first();
+
+      if (ledgerRecord) {
+        await ctx.db.delete(ledgerRecord._id);
+      }
+    }
+
     const { id, ...fieldsToUpdate } = args;
 
     if (!("profilePic" in args)) {

@@ -113,8 +113,8 @@ const schema = defineSchema({
 
   uploadedAvatar: defineTable({
     storageId: v.id("_storage"),
-    createdAt: v.number(),
   })
+  .index("by_storageId", ["storageId"])
 });
 
 export default schema;

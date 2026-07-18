@@ -8,7 +8,6 @@ export const create = mutation({
     handler: async (ctx, args) => {
         const newRecordId = await ctx.db.insert("uploadedAvatar", {
             storageId: args.storageId,
-            createdAt: Date.now(),
         });
 
         return newRecordId;

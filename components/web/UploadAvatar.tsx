@@ -31,6 +31,7 @@ export function UploadAvatar({
     const abortControllerRef = useRef<AbortController | null>(null);
     
     const generateUploadUrl = useMutation(api.profiles.generateUploadUrl);
+    const logUploadedAvatar = useMutation(api.avatars.create);
 
     const handleRemoveProfilePic = () => {
         if (previewSrc) URL.revokeObjectURL(previewSrc);
@@ -80,6 +81,8 @@ export function UploadAvatar({
                 if (!result.ok) throw new Error("Upload failed");
 
                 const data = (await result.json()) as { storageId: Id<"_storage"> };
+
+                await logUploadedAvatar({ storageId: data.storageId });
                 
                 onPendingIdChange(data.storageId);
                 return data.storageId;

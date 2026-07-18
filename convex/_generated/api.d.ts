@@ -9,10 +9,13 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as avatarCleanup from "../avatarCleanup.js";
+import type * as avatars from "../avatars.js";
 import type * as blogs from "../blogs.js";
 import type * as chat from "../chat.js";
 import type * as comments from "../comments.js";
 import type * as contact from "../contact.js";
+import type * as crons from "../crons.js";
 import type * as http from "../http.js";
 import type * as profiles from "../profiles.js";
 import type * as subscribers from "../subscribers.js";
@@ -25,10 +28,13 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  avatarCleanup: typeof avatarCleanup;
+  avatars: typeof avatars;
   blogs: typeof blogs;
   chat: typeof chat;
   comments: typeof comments;
   contact: typeof contact;
+  crons: typeof crons;
   http: typeof http;
   profiles: typeof profiles;
   subscribers: typeof subscribers;
