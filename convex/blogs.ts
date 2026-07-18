@@ -87,7 +87,7 @@ export const getBlogVoteState = query({
       const vote = await ctx.db
         .query("blogVotes")
         .withIndex("by_user_and_blog", (q) =>
-          q.eq("userId", identity.subject).eq("blogId", args.blogId)
+          q.eq("userId", identity.subject as Id<"profiles">).eq("blogId", args.blogId)
         )
         .unique();
       hasVoted = !!vote;
@@ -115,7 +115,7 @@ export const getBlogFeaturedState = query({
       const vote = await ctx.db
         .query("featuredBlogs")
         .withIndex("by_user_and_blog", (q) =>
-          q.eq("userId", identity.subject).eq("blogId", args.blogId)
+          q.eq("userId", identity.subject as Id<"profiles">).eq("blogId", args.blogId)
         )
         .unique();
       isFeatured = !!vote;
@@ -134,7 +134,7 @@ export const toggleFeatured = mutation({
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return null;
-    const userId = identity.subject;
+    const userId = identity.subject as Id<"profiles">;
 
     const blog = await ctx.db.get(args.blogId);
     if (!blog) return null;
@@ -169,7 +169,7 @@ export const toggleBlogVote = mutation({
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return null;
-    const userId = identity.subject;
+    const userId = identity.subject as Id<"profiles">;
 
     const blog = await ctx.db.get(args.blogId);
     if (!blog) return null;
@@ -354,7 +354,7 @@ export const getPaginatedPosts = query({
     searchTerm: v.optional(v.string()),
     activeTags: v.optional(v.array(v.string())),
     sortOrder: v.optional(v.string()),
-    author: v.optional(v.string()),
+    author: v.optional(v.id("profiles")),
   },
   handler: async (ctx, args) => {
     const search = args.searchTerm?.trim();
@@ -365,27 +365,34 @@ export const getPaginatedPosts = query({
     let paginatedResults;
 
     if (search) {
-      paginatedResults = await ctx.db
-        .query("blogs")
-        .withSearchIndex("search_title_subtitle", (q) => q.search("title", search))
-        .paginate(args.paginationOpts);
+      const queryInit = ctx.db.query("blogs");
+      const finalQuery = queryInit.withSearchIndex("search_title_subtitle", (q) => 
+        q.search("title", search)
+      );
+
+      paginatedResults = await finalQuery.paginate(args.paginationOpts);
     } else {
-      let baseQuery;
-      
-      if (sort === "hot") {
-        baseQuery = ctx.db.query("blogs").withIndex("by_likes");
-      } else if (sort === "top") {
-        baseQuery = ctx.db.query("blogs").withIndex("by_totalViews");
+      const queryInit = ctx.db.query("blogs");
+      let finalQuery;
+
+      if (authorFilter) {
+        finalQuery = queryInit.filter((q) => q.eq(q.field("author"), authorFilter));
       } else {
-        baseQuery = ctx.db.query("blogs").withIndex("by_createdAt");
+        if (sort === "hot") {
+          finalQuery = queryInit.withIndex("by_likes");
+        } else if (sort === "top") {
+          finalQuery = queryInit.withIndex("by_totalViews");
+        } else {
+          finalQuery = queryInit.withIndex("by_createdAt");
+        }
       }
       
-      paginatedResults = await baseQuery.order("desc").paginate(args.paginationOpts);
+      paginatedResults = await finalQuery.order("desc").paginate(args.paginationOpts);
     }
 
     let filteredPage = paginatedResults.page;
 
-    if (authorFilter) {
+    if (search && authorFilter) {
       filteredPage = filteredPage.filter(post => post.author === authorFilter);
     }
 

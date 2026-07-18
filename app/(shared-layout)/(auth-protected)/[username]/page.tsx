@@ -34,9 +34,8 @@ export default async function Profile({ params }: profileRouteProps) {
                     </aside>
                 </SearchProvider>
 
-                
                 <div className="bg-white w-full pl-[var(--sidebar-width)] ml-2">
-                    <ProfileContentWrapper />
+                    <ProfileContentWrapper preloadedProfile={preloadedProfile} blogGridSlot={<ProfileBlogGridContainer username={username}  />} />
                 </div>
             </SidebarProvider>
         </div>

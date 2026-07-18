@@ -3,15 +3,15 @@ import { v } from "convex/values";
 
 const schema = defineSchema({
   blogs: defineTable({
+    storageId: v.string(),
+    author: v.string(),
     title: v.string(),
     subtitle: v.string(),
     imageUrl: v.string(),
     content: v.string(),
-    author: v.string(),
     authorName: v.string(),
     username: v.string(),
     tags: v.array(v.string()), 
-    storageId: v.string(),
     createdAt: v.number(),
     totalViews: v.number(),
     likes: v.number(),
@@ -29,7 +29,7 @@ const schema = defineSchema({
   }),
 
   viewLogs: defineTable({
-    blogId: v.id("blogs"),
+    blogId: v.string(),
     viewedAt: v.number(),
   })
   .index("by_viewedAt", ["viewedAt"])
@@ -49,7 +49,7 @@ const schema = defineSchema({
   }),
 
   comments: defineTable({
-    blogId: v.id("blogs"),
+    blogId: v.string(),
     authorId: v.string(),
     authorName: v.string(),
     blogTitle: v.string(),
@@ -99,20 +99,21 @@ const schema = defineSchema({
 
   blogVotes: defineTable({
     userId: v.string(),
-    blogId: v.id("blogs"),
+    blogId: v.string(),
   })
     .index("by_user_and_blog", ["userId", "blogId"])
     .index("by_blog", ["blogId"]),
 
   featuredBlogs: defineTable({
     userId: v.string(),
-    blogId: v.id("blogs"),
+    blogId: v.string(),
   })
     .index("by_user_and_blog", ["userId", "blogId"])
     .index("by_blog", ["blogId"]),
 
   uploadedAvatar: defineTable({
     storageId: v.id("_storage"),
+    createdAt: v.number(),
   })
 });
 

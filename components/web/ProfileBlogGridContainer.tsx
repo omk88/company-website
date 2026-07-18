@@ -4,21 +4,28 @@ import { cacheLife, cacheTag } from "next/cache";
 import { BlogGridManager } from "./BlogGridManager";
 
 interface ProfileBlogGridContainerProps {
-  author: string;
+    username: string;
 }
 
-export async function ProfileBlogGridContainer({ author }: ProfileBlogGridContainerProps) {
+export async function ProfileBlogGridContainer({ username }: ProfileBlogGridContainerProps) {
     "use cache";
     cacheTag("trending-blogs");  
     cacheLife("hours");
 
-    const postsByAuthor = await fetchQuery(api.blogs.getPostsByAuthor, { author }) ?? [];
+    const profileData = await fetchQuery(api.profiles.getProfileByUsername, { username });
+    const profileId = profileData?.profile?._id;
+
+    if (!profileId) {
+        return <div>Profile not found</div>;
+    }
+
+    const postsByAuthor = await fetchQuery(api.blogs.getPostsByAuthor, { author: profileId });
 
     return (
         <BlogGridManager 
             initialServerPosts={postsByAuthor} 
             disableSearch={true} 
-            author={author}
+            author={profileId}
         />
     );
 }

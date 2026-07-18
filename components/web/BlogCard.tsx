@@ -15,7 +15,6 @@ export interface BlogPostPreview {
   createdAt: number;
   totalViews: number;   
   likes: number;       
-  dislikes: number;     
   commentCount: number; 
 }
 

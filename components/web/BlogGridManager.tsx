@@ -7,13 +7,14 @@ import { Frown } from "lucide-react";
 import { useLocalSearch } from "@/components/web/SearchContext"; 
 import { usePaginatedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
 
 const POSTS_PER_BATCH = 9;
 
 interface BlogGridManagerProps {
   initialServerPosts: BlogPostPreview[]; 
   disableSearch?: boolean;
-  author?: string;
+  author: Id<"profiles">;
 }
 
 function useSafeSearch(disableSearch: boolean) {

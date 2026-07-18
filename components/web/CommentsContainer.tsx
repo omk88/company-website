@@ -1,9 +1,10 @@
 import { api } from "@/convex/_generated/api"
 import { useQuery } from "convex/react"
 import { CommentCard } from "./CommentCard"
+import { Id } from "@/convex/_generated/dataModel";
 
 interface CommentsContainerProps {
-    authorId: string;
+    authorId: Id<"profiles">;
 }
 
 export function CommentsContainer({ authorId }: CommentsContainerProps) {
