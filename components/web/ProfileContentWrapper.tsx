@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { TabsSwitch, TabItem } from "@/components/web/TabsSwitch";
-import { CommentsContainer } from "./CommentsContainer";
 import { Preloaded, usePreloadedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 
@@ -31,7 +30,7 @@ export function ProfileContentWrapper({ commentsSlot, blogsSlot, preloadedProfil
           onTabChange={setActiveTab} 
         />
       </div>
-      <div className="pl-4 pr-4">
+      <div className="w-full pl-4 pr-4">
         {activeTab === "blog-articles" && blogsSlot}
         
         {activeTab === "comments" && commentsSlot}

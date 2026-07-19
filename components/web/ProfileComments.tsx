@@ -67,12 +67,12 @@ export function ProfileComments({ username, preloadedInitialComments }: ProfileC
     }, [cursor, isDone, isLoadingMore]);
 
     return (
-        <div className="space-y-4">
+        <div className="w-full space-y-4">
             {comments.length === 0 ? (
                 <p className="text-muted-foreground">No blogs posted yet.</p>
                 ) : (
                     <>
-                        <ul className="flex flex-col gap-4">
+                        <ul className="w-full flex flex-col gap-4">
                             {comments.map((comment) => (
                                 <li key={comment._id} className="p-4 border rounded-xl shadow-sm bg-card">
                                     <h3 className="text-lg font-semibold">{comment.blogTitle}</h3>
