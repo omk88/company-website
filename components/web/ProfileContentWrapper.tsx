@@ -46,8 +46,15 @@ export function ProfileContentWrapper({ commentsSlot, blogsSlot }: ProfileConten
           onTabChange={setActiveTab} 
         />
 
-        <SidebarSort />
-        <SidebarSearch />
+        <div className="flex flex-row w-1/2 justify-end gap-4">
+          <div>
+            <SidebarSort />
+          </div>
+
+          <div>
+            <SidebarSearch />
+          </div>
+        </div>
       </div>
 
       <div className="w-full pl-4 pr-4">

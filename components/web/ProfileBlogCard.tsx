@@ -32,7 +32,7 @@ export function ProfileBlogCard({ id, imageUrl, authorName, title, subtitle, tot
     }).format(new Date(date));
 
     return (
-        <div className="group flex flex-col md:flex-row h-auto md:h-[200px] border border-border/50 rounded-none">
+        <div className="group flex flex-col md:flex-row h-auto md:h-[190px] border border-border/50 rounded-none">
             
             <Link 
                 href={`/insights/${id}`}
