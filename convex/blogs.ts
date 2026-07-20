@@ -2,7 +2,8 @@ import { Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { paginationOptsValidator } from "convex/server";
-import { cubeTexture } from "three/src/nodes/accessors/CubeTextureNode.js";
+
+const WORDS_PER_MINUTE = 225;
 
 export const generateUploadUrl = mutation({
   args: {},
@@ -25,6 +26,11 @@ export const createPost = mutation({
   handler: async (ctx, args) => {
     const generatedImageUrl = await ctx.storage.getUrl(args.storageId);
 
+    const words = args.content.trim().split(/\s+/);
+    const wordCount = words.filter(word => word.length > 0).length;
+
+    const readTimeMinutes = Math.max(1, Math.ceil(wordCount / WORDS_PER_MINUTE));
+
     const [_, profile] = await Promise.all([
       ctx.db.insert("blogs", {
         title: args.title,
@@ -41,6 +47,7 @@ export const createPost = mutation({
         commentCount: 0,
         featured: false,
         createdAt: Date.now(),
+        readTime: readTimeMinutes,
       }),
       ctx.db
         .query("profiles")

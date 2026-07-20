@@ -17,6 +17,7 @@ const schema = defineSchema({
     likes: v.number(),
     featured: v.boolean(),
     commentCount: v.number(), 
+    readTime: v.number(),
   })
   .index("by_createdAt", ["createdAt"])
   .index("by_totalViews", ["totalViews"])

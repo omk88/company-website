@@ -3,6 +3,7 @@
 import { api } from "@/convex/_generated/api";
 import { Preloaded, useConvex, usePreloadedQuery } from "convex/react";
 import { useEffect, useRef, useState } from "react";
+import { ProfileBlogCard } from "./ProfileBlogCard";
 
 interface ProfileBlogPostsProps {
     username: string;
@@ -74,9 +75,8 @@ export function ProfileBlogPosts({ username, preloadedInitialBlogs }: ProfileBlo
                     <>
                         <ul className="flex flex-col gap-4">
                             {blogs.map((blog) => (
-                                <li key={blog._id} className="p-4 border rounded-xl shadow-sm bg-card">
-                                    <h3 className="text-lg font-semibold">{blog.title}</h3>
-                                    <p className="text-muted-foreground mt-1">{blog.content}</p>
+                                <li key={blog._id}>
+                                    <ProfileBlogCard id={blog._id} imageUrl={blog.imageUrl} authorName={blog.authorName} title={blog.title} subtitle={blog.subtitle} totalViews={blog.totalViews} likes={blog.likes} commentCount={blog.commentCount} date={blog._creationTime} readTime={blog.readTime} tags={blog.tags} />
                                 </li>
                             ))}
                         </ul>

@@ -2,19 +2,14 @@
 
 import { useState } from "react";
 import { TabsSwitch, TabItem } from "@/components/web/TabsSwitch";
-import { Preloaded, usePreloadedQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
 
 interface ProfileContentWrapperProps {
   blogsSlot: React.ReactNode;
   commentsSlot: React.ReactNode;
-  preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
 }
 
-export function ProfileContentWrapper({ commentsSlot, blogsSlot, preloadedProfile }: ProfileContentWrapperProps) {
+export function ProfileContentWrapper({ commentsSlot, blogsSlot }: ProfileContentWrapperProps) {
   const [activeTab, setActiveTab] = useState("blog-articles");
-
-  const profileData = usePreloadedQuery(preloadedProfile);
 
   const tabs: TabItem[] = [
     { value: "blog-articles", label: "Blog Articles" },
