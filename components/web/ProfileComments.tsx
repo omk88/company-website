@@ -3,6 +3,7 @@
 import { api } from "@/convex/_generated/api";
 import { Preloaded, useConvex, usePreloadedQuery } from "convex/react";
 import { useEffect, useRef, useState } from "react";
+import { ProfileCommentCard } from "./ProfileCommentCard";
 
 interface ProfileCommentsProps {
     username: string;
@@ -74,9 +75,8 @@ export function ProfileComments({ username, preloadedInitialComments }: ProfileC
                     <>
                         <ul className="w-full flex flex-col gap-4">
                             {comments.map((comment) => (
-                                <li key={comment._id} className="p-4 border rounded-xl shadow-sm bg-card">
-                                    <h3 className="text-lg font-semibold">{comment.blogTitle}</h3>
-                                    <p className="text-muted-foreground mt-1">{comment.body}</p>
+                                <li key={comment._id} >
+                                    <ProfileCommentCard id={comment._id} authorName={comment.authorName} blogTitle={comment.blogTitle} body={comment.body} likes={comment.likes} date={comment._creationTime} />
                                 </li>
                             ))}
                         </ul>

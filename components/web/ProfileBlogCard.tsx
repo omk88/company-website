@@ -1,8 +1,13 @@
-import { Eye, ThumbsUp, MessageSquare } from "lucide-react";
+import { Eye, ThumbsUp, MessageSquare, Ellipsis, Copy } from "lucide-react";
 import Image from "next/image";
 import { HoverCard, HoverCardTrigger, HoverCardContent } from "../ui/hover-card";
 import { Badge } from "../ui/badge";
 import Link from "next/link";
+import { Button } from "../ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { FaFacebook, FaXTwitter } from "react-icons/fa6";
+import { toast } from "sonner";
+import { RxLinkedinLogo } from "react-icons/rx";
 
 interface ProfileBlogCardProps {
     id: string;
@@ -27,7 +32,7 @@ export function ProfileBlogCard({ id, imageUrl, authorName, title, subtitle, tot
     }).format(new Date(date));
 
     return (
-        <div className="group flex flex-col md:flex-row h-auto md:h-[240px] border border-border/50 rounded-none">
+        <div className="group flex flex-col md:flex-row h-auto md:h-[200px] border border-border/50 rounded-none">
             
             <Link 
                 href={`/insights/${id}`}
@@ -42,13 +47,74 @@ export function ProfileBlogCard({ id, imageUrl, authorName, title, subtitle, tot
                 />
             </Link>
 
-            <div className="flex flex-col flex-1 justify-start gap-3 p-6 min-w-0">
-                <div className="min-w-0">
+            <div className="flex flex-col flex-1 justify-start px-4 py-2 min-w-0">
+                <div className="min-w-0 pointer-events-none">
                     <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-muted-foreground">
                         <div>
                             {authorName} • {formattedDate}
                         </div>
-                        <span>{readTime} min read</span>
+                        
+                        <div className="flex flex-row items-center gap-8">
+                            <span>{readTime} min read</span>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button 
+                                        variant="ghost"
+                                        className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground pointer-events-auto"
+                                    >
+                                        <Ellipsis className="w-4 h-4 stroke-[2.3]" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="w-48">
+                                    <DropdownMenuLabel>Share</DropdownMenuLabel>
+                                    
+                                    <DropdownMenuItem 
+                                        className="font-bold cursor-pointer flex items-center gap-2 whitespace-nowrap"
+                                        onClick={() => {
+                                            navigator.clipboard.writeText(window.location.href);
+                                            toast.success("Link copied to clipboard!");
+                                        }}
+                                    >
+                                        <Copy className="h-4 w-4 shrink-0" strokeWidth={3} />
+                                        <span>Copy link</span>
+                                    </DropdownMenuItem>
+                        
+                                    <DropdownMenuItem 
+                                        className="cursor-pointer flex items-center gap-2 whitespace-nowrap"
+                                        onClick={() => {
+                                            const shareUrl = `https://x.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent("Check out this article!")}`;
+                                            window.open(shareUrl, "_blank", "noopener,noreferrer");
+                                        }}
+                                    >
+                                        <FaXTwitter className="h-4 w-4 shrink-0" />
+                                        <span>X (Twitter)</span>
+                                    </DropdownMenuItem>
+
+
+                                    <DropdownMenuItem 
+                                        className="cursor-pointer flex items-center gap-2 whitespace-nowrap"
+                                        onClick={() => {
+                                            const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`;
+                                            window.open(shareUrl, "_blank", "noopener,noreferrer");
+                                        }}
+                                    >
+                                        <RxLinkedinLogo className="h-4 w-4 shrink-0" />
+                                        <span>LinkedIn</span>
+                                    </DropdownMenuItem>
+                        
+                                    <DropdownMenuItem 
+                                        className="cursor-pointer flex items-center gap-2 whitespace-nowrap"
+                                        onClick={() => {
+                                            const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`;
+                                            window.open(shareUrl, "_blank", "noopener,noreferrer");
+                                        }}
+                                    >
+                                        <FaFacebook className="h-4 w-4 shrink-0" />
+                                        <span>Facebook</span>
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
                     </div>
                 </div>
 
