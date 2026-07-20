@@ -20,7 +20,7 @@ export function SidebarSort() {
       value={sortOrder}
       onValueChange={setSortOrder}
     >
-      <SelectTrigger className="w-full text-xs h-9 bg-background border-border/50 shadow-xs focus:ring-1 focus:ring-primary">
+      <SelectTrigger className="w-full text-xs bg-background border-border/50 focus:ring-1">
         <SelectValue placeholder="Sort order" />
       </SelectTrigger>
       
