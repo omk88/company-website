@@ -33,7 +33,7 @@ export function TabsSwitch({ tabs, value, defaultValue, onTabChange }: TabsSwitc
   if (tabs.length === 0) return null;
 
   return (
-    <div className="p-4">
+    <div>
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         <TabsList className="flex w-max gap-1 p-1">
           {tabs.map((tab) => (

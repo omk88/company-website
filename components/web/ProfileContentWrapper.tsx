@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { TabsSwitch, TabItem } from "@/components/web/TabsSwitch";
-import { Search, X } from "lucide-react";
-import { Input } from "../ui/input";
 import { useLocalSearch } from "./SearchContext";
 import { SidebarSort } from "./SidebarSort";
 import { SidebarSearch } from "./SidebarSearch";
@@ -37,8 +35,8 @@ export function ProfileContentWrapper({ commentsSlot, blogsSlot }: ProfileConten
   ];
 
   return (
-    <>
-      <div className="gap-4 pr-4 flex flex-row items-center justify-between w-full">
+    <div className="mr-4">
+      <div className="sticky top-16 z-10 bg-background gap-4 py-4 px-4 flex flex-row items-center justify-between w-full">
 
         <TabsSwitch 
           tabs={tabs} 
@@ -57,11 +55,11 @@ export function ProfileContentWrapper({ commentsSlot, blogsSlot }: ProfileConten
         </div>
       </div>
 
-      <div className="w-full pl-4 pr-4">
+      <div className="w-full px-4 mb-8">
         {activeTab === "blog-articles" && blogsSlot}
         
         {activeTab === "comments" && commentsSlot}
       </div>
-    </>
+    </div>
   );
 }

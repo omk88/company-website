@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import { Textarea } from "../ui/textarea";
 import { Image, Paperclip, X } from "lucide-react";
+import imageCompression from "browser-image-compression";
 
 const AVAILABLE_TAGS = ["Product", "Research", "Design", "Technology", "Opinion", "Tutorials"];
 
@@ -146,21 +147,33 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
             return;
         }
 
-        if (!editingBlogId && !selectedImage) {
-            toast.error("Please upload a cover image from your computer.");
-            return;
-        }
-
         setIsLoading(true);
+        
         try {
+
+            if (!selectedImage) {
+                toast.error("Please upload a cover image from your computer.");
+                return;
+            }
+
             let storageId = existingPost?.storageId || "";
 
-            if (selectedImage) {
+            const options = {
+                maxSizeMB: 1.0,                  
+                maxWidthOrHeight: 1920,      
+                useWebWorker: true,
+                fileType: 'image/webp' as const,
+                initialQuality: 0.85,      
+            };
+
+            const compressedFile = (await imageCompression(selectedImage, options)) as File;
+
+            if (compressedFile) {
                 const uploadUrl = await generateUploadUrl();
                 const result = await fetch(uploadUrl, {
                     method: "POST",
-                    headers: { "Content-Type": selectedImage.type },
-                    body: selectedImage,
+                    headers: { "Content-Type": compressedFile.type },
+                    body: compressedFile,
                 });
 
                 if (!result.ok) throw new Error("Failed to upload image bundle.");
