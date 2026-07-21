@@ -1,7 +1,7 @@
 "use client";
 
 import { Sidebar, SidebarContent, SidebarGroup, SidebarFooter, SidebarGroupLabel } from "../ui/sidebar";
-import { ChartNoAxesColumn, GraduationCap, MapPin, MessageSquareText, SquareLibrary, Terminal, ThumbsUp } from "lucide-react";
+import { Cake, ChartNoAxesColumn, GraduationCap, MapPin, MessageSquareText, SquareLibrary, Terminal, ThumbsUp } from "lucide-react";
 import Link from "next/link";
 import { EditProfileButton } from "./EditProfileButton";
 import { ICON_MAP } from "@/lib/socials";
@@ -34,6 +34,12 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
     currentUser?.userId && 
     profile?.userId && 
     currentUser.userId === profile.userId;
+
+  const formattedDate = new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(profile._creationTime);
 
   return (
     <Sidebar 
@@ -150,6 +156,10 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
           </SidebarGroupLabel>
           <div className="flex flex-col bg-muted rounded-sm p-3 gap-3">
             <div className="flex flex-col items-start gap-2.5">
+              <div className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                <Cake className="h-4 w-4 shrink-0" />
+                <h1>{formattedDate}</h1>
+              </div>
               <div className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
                 <ThumbsUp className="h-4 w-4 shrink-0" />
                 <h1>{profile.totalLikes} Total Likes</h1>
