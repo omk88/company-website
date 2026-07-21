@@ -474,12 +474,20 @@ export const getPaginatedPostsByUsername = query({
         .paginate(args.paginationOpts);
     }
 
-    if (sortOrder === "new") {
+    if (sortOrder === "hot") {
       return await ctx.db
         .query("blogs")
-        .withIndex("by_username", (q) => q.eq("username", args.username))
+        .withIndex("by_username_hot", (q) => q.eq("username", args.username))
         .order("desc")
         .paginate(args.paginationOpts);
+    }
+
+    if (sortOrder === "controversial") {
+      return await ctx.db
+        .query("blogs")
+        .withIndex("by_username_controversial", (q) => q.eq("username", args.username))
+        .order("desc")
+        .paginate(args.paginationOpts)
     }
 
     if (sortOrder === "top") {
@@ -490,45 +498,11 @@ export const getPaginatedPostsByUsername = query({
         .paginate(args.paginationOpts)
     }
 
-    const allUserPosts = await ctx.db
+    return await ctx.db
       .query("blogs")
       .withIndex("by_username", (q) => q.eq("username", args.username))
-      .collect();
-
-    const now = Date.now();
-
-    const sortedPosts = allUserPosts.sort((a, b) => {
-      if (sortOrder === "hot") {
-        const ageInHoursA = Math.max((now - a._creationTime) / (1000 * 60 * 60), 1);
-        const ageInHoursB = Math.max((now - b._creationTime) / (1000 * 60 * 60), 1);
-
-        const scoreA = (a.likes + a.commentCount * 2) / Math.pow(ageInHoursA + 2, 1.5);
-        const scoreB = (b.likes + b.commentCount * 2) / Math.pow(ageInHoursB + 2, 1.5);
-
-        return scoreB - scoreA;
-      }
-
-      if (sortOrder === "controversial") {
-        const scoreA = a.commentCount > 0 ? a.commentCount / Math.max(a.likes, 1) : 0;
-        const scoreB = b.commentCount > 0 ? b.commentCount / Math.max(b.likes, 1) : 0;
-
-        return scoreB - scoreA;
-      }
-
-      return 0;
-    });
-
-    const numItems = args.paginationOpts.numItems;
-    const startIndex = args.paginationOpts.cursor ? parseInt(args.paginationOpts.cursor, 10) : 0;
-
-    const page = sortedPosts.slice(startIndex, startIndex + numItems);
-    const hasMore = startIndex + numItems < sortedPosts.length;
-
-    return {
-      page,
-      isDone: !hasMore,
-      continueCursor: hasMore ? String(startIndex + numItems) : "",
-    };
+      .order("desc")
+      .paginate(args.paginationOpts)
   },
 });
 

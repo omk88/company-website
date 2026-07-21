@@ -66,7 +66,11 @@ const schema = defineSchema({
   })
     .index("by_blog", ["blogId"])
     .index("by_authorId", ["authorId"])
-    .index("by_username", ["username"]),
+    .index("by_username", ["username"])
+    .searchIndex("search_body", {
+    searchField: "body",
+    filterFields: ["username"],
+  }),
 
   profiles: defineTable({
     userId: v.string(),

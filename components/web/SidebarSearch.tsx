@@ -5,7 +5,11 @@ import { Input } from "@/components/ui/input";
 import { useLocalSearch } from "@/components/web/SearchContext";
 import { useState, useEffect } from "react";
 
-export function SidebarSearch() {
+interface SidebarSearchProps {
+  placeholder: string;
+}
+
+export function SidebarSearch({ placeholder }: SidebarSearchProps) {
   const { searchTerm, setSearchTerm } = useLocalSearch();
   const [localValue, setLocalValue] = useState(searchTerm);
 
@@ -27,7 +31,7 @@ export function SidebarSearch() {
       
       <Input
         type="text"
-        placeholder="Search insights..."
+        placeholder={`Search ${placeholder}...`}
         value={localValue}
         onChange={(e) => setLocalValue(e.target.value)}
         className="pl-9 pr-9 text-xs bg-background border-border/50 rounded-md focus-visible:ring-1 focus-visible:ring-primary w-full"

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { TabsSwitch, TabItem } from "@/components/web/TabsSwitch";
 import { SidebarSort } from "./SidebarSort";
 import { SidebarSearch } from "./SidebarSearch";
+import { useLocalSearch } from "./SearchContext";
 
 interface ProfileContentWrapperProps {
   blogsSlot: React.ReactNode;
@@ -11,12 +12,21 @@ interface ProfileContentWrapperProps {
 }
 
 export function ProfileContentWrapper({ commentsSlot, blogsSlot }: ProfileContentWrapperProps) {
-  const [activeTab, setActiveTab] = useState("blog-articles");  
+  const [activeTab, setActiveTab] = useState("blog-articles"); 
+  const { setSearchTerm, setSortOrder } = useLocalSearch();
 
   const tabs: TabItem[] = [
     { value: "blog-articles", label: "Blog Articles" },
     { value: "comments", label: "Comments" },
   ];
+
+  useEffect(() => {
+    setSearchTerm("");
+    setSortOrder("new");
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [activeTab, setSearchTerm, setSortOrder]);
+
+  const searchPlaceholder = activeTab === "blog-articles" ? "insights" : "comments";
 
   return (
     <div className="mr-4">
@@ -34,7 +44,7 @@ export function ProfileContentWrapper({ commentsSlot, blogsSlot }: ProfileConten
           </div>
 
           <div>
-            <SidebarSearch />
+            <SidebarSearch placeholder={searchPlaceholder} />
           </div>
         </div>
       </div>

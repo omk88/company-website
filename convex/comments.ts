@@ -200,10 +200,20 @@ export const toggleCommentVote = mutation({
 
 export const getPaginatedCommentsByUsername = query({
   args: {
+    searchTerm: v.optional(v.string()),
     username: v.string(),
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
+    const cleanSearchTerm = args.searchTerm?.trim();
+
+    if (cleanSearchTerm) {
+      return await ctx.db
+        .query("comments")
+        .withSearchIndex("search_body", (q) => q.search("body", cleanSearchTerm))
+        .paginate(args.paginationOpts);
+    }
+
     return await ctx.db
       .query("comments")
       .withIndex("by_username", (q) => q.eq("username", args.username))

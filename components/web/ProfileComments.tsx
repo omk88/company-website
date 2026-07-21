@@ -4,6 +4,7 @@ import { api } from "@/convex/_generated/api";
 import { Preloaded, useConvex, usePreloadedQuery } from "convex/react";
 import { useEffect, useRef, useState } from "react";
 import { ProfileCommentCard } from "./ProfileCommentCard";
+import { useLocalSearch } from "./SearchContext";
 
 interface ProfileCommentsProps {
     username: string;
@@ -14,16 +15,61 @@ export function ProfileComments({ username, preloadedInitialComments }: ProfileC
     const convex = useConvex();
     const initialData = usePreloadedQuery(preloadedInitialComments);
 
+    const searchContext = useLocalSearch();
+    const searchTerm = searchContext?.searchTerm ?? "";
+
     const [comments, setComments] = useState(initialData.page);
     const [cursor, setCursor] = useState<string | null>(initialData.continueCursor);
     const [isDone, setIsDone] = useState(initialData.isDone);
-    const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const loadMoreRef = useRef<HTMLDivElement>(null);
 
+    useEffect(() => {
+        if (!searchTerm.trim()) {
+            setComments(initialData.page);
+            setCursor(initialData.continueCursor);
+            setIsDone(initialData.isDone);
+            return;
+        }
+
+        let isMounted = true;
+        setIsLoading(true);
+
+        const fetchFilteredBlogs = async () => {
+            try {
+                const result = await convex.query(api.comments.getPaginatedCommentsByUsername, {
+                    username,
+                    searchTerm: searchTerm.trim(),
+                    paginationOpts: {
+                        numItems: 6,
+                        cursor: null,
+                        id: 0,
+                    },
+                });
+
+                if (isMounted) {
+                    setComments(result.page);
+                    setCursor(result.continueCursor);
+                    setIsDone(result.isDone);
+                }
+            } catch (error) {
+                console.error("Error searching blogs:", error);
+            } finally {
+                if (isMounted) setIsLoading(false);
+            }
+        };
+
+        fetchFilteredBlogs();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [searchTerm, username, convex, initialData]);
+
     const loadMore = async () => {
-        if (isDone || isLoadingMore || !cursor) return;
-        setIsLoadingMore(true);
+        if (isDone || isLoading || !cursor) return;
+        setIsLoading(true);
 
         try {
             const result = await convex.query(api.comments.getPaginatedCommentsByUsername, {
@@ -41,7 +87,7 @@ export function ProfileComments({ username, preloadedInitialComments }: ProfileC
         } catch (error) {
             console.error("Error loading more blogs:", error);
         } finally {
-            setIsLoadingMore(false);
+            setIsLoading(false);
         }
     }
 
@@ -65,7 +111,7 @@ export function ProfileComments({ username, preloadedInitialComments }: ProfileC
         return () => {
             if (currentTarget) observer.unobserve(currentTarget);
         };
-    }, [cursor, isDone, isLoadingMore]);
+    }, [cursor, isDone, isLoading]);
 
     return (
         <div className="w-full space-y-4">
@@ -83,7 +129,7 @@ export function ProfileComments({ username, preloadedInitialComments }: ProfileC
 
                         {!isDone && (
                             <div ref={loadMoreRef} className="py-6 text-center text-sm text-muted-foreground">
-                                {isLoadingMore ? "Loading more blogs..." : "Loading..."}
+                                {isLoading ? "Loading more blogs..." : "Loading..."}
                             </div>
                         )}
                     </>
