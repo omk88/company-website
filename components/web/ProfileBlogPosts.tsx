@@ -17,6 +17,7 @@ export function ProfileBlogPosts({ username, preloadedInitialBlogs }: ProfileBlo
 
     const searchContext = useLocalSearch();
     const searchTerm = searchContext?.searchTerm ?? "";
+    const sortOrder = searchContext?.sortOrder ?? "new";
 
     const [blogs, setBlogs] = useState(initialData.page);
     const [cursor, setCursor] = useState<string | null>(initialData.continueCursor);
@@ -26,7 +27,7 @@ export function ProfileBlogPosts({ username, preloadedInitialBlogs }: ProfileBlo
     const loadMoreRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        if (!searchTerm.trim()) {
+        if (!searchTerm.trim() && sortOrder === "new") {
             setBlogs(initialData.page);
             setCursor(initialData.continueCursor);
             setIsDone(initialData.isDone);
@@ -41,6 +42,7 @@ export function ProfileBlogPosts({ username, preloadedInitialBlogs }: ProfileBlo
                 const result = await convex.query(api.blogs.getPaginatedPostsByUsername, {
                     username,
                     searchTerm: searchTerm.trim(),
+                    sortOrder,
                     paginationOpts: {
                         numItems: 6,
                         cursor: null,
@@ -65,7 +67,7 @@ export function ProfileBlogPosts({ username, preloadedInitialBlogs }: ProfileBlo
         return () => {
             isMounted = false;
         };
-    }, [searchTerm, username, convex, initialData]);
+    }, [searchTerm, sortOrder, username, convex, initialData]);
 
     const loadMore = async () => {
         if (isDone || isLoading || !cursor) return;
@@ -74,7 +76,8 @@ export function ProfileBlogPosts({ username, preloadedInitialBlogs }: ProfileBlo
         try {
             const result = await convex.query(api.blogs.getPaginatedPostsByUsername, {
                 username,
-                searchTerm: searchTerm ? searchTerm : undefined,
+                searchTerm: searchTerm.trim() || undefined,
+                sortOrder,
                 paginationOpts: {
                     numItems: 6,
                     cursor: cursor,

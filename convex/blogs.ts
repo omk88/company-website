@@ -448,13 +448,13 @@ export const getFeaturedState = query({
 export const getPaginatedPostsByUsername = query({
   args: {
     searchTerm: v.optional(v.string()),
-
+    sortOrder: v.optional(v.string()),
     username: v.string(),
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
-
     const cleanSearchTerm = args.searchTerm?.trim();
+    const sortOrder = args.sortOrder || "new";
 
     if (cleanSearchTerm) {
       return await ctx.db
@@ -463,12 +463,62 @@ export const getPaginatedPostsByUsername = query({
         .paginate(args.paginationOpts);
     }
 
-    return await ctx.db
+    if (sortOrder === "new") {
+      return await ctx.db
+        .query("blogs")
+        .withIndex("by_username", (q) => q.eq("username", args.username))
+        .order("desc")
+        .paginate(args.paginationOpts);
+    }
+
+    if (sortOrder === "top") {
+      return await ctx.db
+        .query("blogs")
+        .withIndex("by_username_likes", (q) => q.eq("username", args.username))
+        .order("desc")
+        .paginate(args.paginationOpts)
+    }
+
+    const allUserPosts = await ctx.db
       .query("blogs")
       .withIndex("by_username", (q) => q.eq("username", args.username))
-      .order("desc")
-      .paginate(args.paginationOpts);
-  }
+      .collect();
+
+    const now = Date.now();
+
+    const sortedPosts = allUserPosts.sort((a, b) => {
+      if (sortOrder === "hot") {
+        const ageInHoursA = Math.max((now - a._creationTime) / (1000 * 60 * 60), 1);
+        const ageInHoursB = Math.max((now - b._creationTime) / (1000 * 60 * 60), 1);
+
+        const scoreA = (a.likes + a.commentCount * 2) / Math.pow(ageInHoursA + 2, 1.5);
+        const scoreB = (b.likes + b.commentCount * 2) / Math.pow(ageInHoursB + 2, 1.5);
+
+        return scoreB - scoreA;
+      }
+
+      if (sortOrder === "controversial") {
+        const scoreA = a.commentCount > 0 ? a.commentCount / Math.max(a.likes, 1) : 0;
+        const scoreB = b.commentCount > 0 ? b.commentCount / Math.max(b.likes, 1) : 0;
+
+        return scoreB - scoreA;
+      }
+
+      return 0;
+    });
+
+    const numItems = args.paginationOpts.numItems;
+    const startIndex = args.paginationOpts.cursor ? parseInt(args.paginationOpts.cursor, 10) : 0;
+
+    const page = sortedPosts.slice(startIndex, startIndex + numItems);
+    const hasMore = startIndex + numItems < sortedPosts.length;
+
+    return {
+      page,
+      isDone: !hasMore,
+      continueCursor: hasMore ? String(startIndex + numItems) : "",
+    };
+  },
 });
 
 export const getPostsByAuthor = query({
