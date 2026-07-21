@@ -454,12 +454,12 @@ export const getPaginatedPostsByUsername = query({
   },
   handler: async (ctx, args) => {
 
-    if (args.searchTerm && args.searchTerm.trim() !== "") {
+    const cleanSearchTerm = args.searchTerm?.trim();
+
+    if (cleanSearchTerm) {
       return await ctx.db
         .query("blogs")
-        .withSearchIndex("search_title", (q) =>
-          q.search("title", args.searchTerm!).eq("username", args.username)
-        )
+        .withSearchIndex("search_title", (q) => q.search("title", cleanSearchTerm).eq("username", args.username))
         .paginate(args.paginationOpts);
     }
 
