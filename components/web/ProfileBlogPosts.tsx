@@ -4,6 +4,7 @@ import { api } from "@/convex/_generated/api";
 import { Preloaded, useConvex, usePreloadedQuery } from "convex/react";
 import { useEffect, useRef, useState } from "react";
 import { ProfileBlogCard } from "./ProfileBlogCard";
+import { useLocalSearch } from "./SearchContext";
 
 interface ProfileBlogPostsProps {
     username: string;
@@ -14,20 +15,66 @@ export function ProfileBlogPosts({ username, preloadedInitialBlogs }: ProfileBlo
     const convex = useConvex();
     const initialData = usePreloadedQuery(preloadedInitialBlogs);
 
+    const searchContext = useLocalSearch();
+    const searchTerm = searchContext?.searchTerm ?? "";
+
     const [blogs, setBlogs] = useState(initialData.page);
     const [cursor, setCursor] = useState<string | null>(initialData.continueCursor);
     const [isDone, setIsDone] = useState(initialData.isDone);
-    const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const loadMoreRef = useRef<HTMLDivElement>(null);
 
+    useEffect(() => {
+        if (!searchTerm.trim()) {
+            setBlogs(initialData.page);
+            setCursor(initialData.continueCursor);
+            setIsDone(initialData.isDone);
+            return;
+        }
+
+        let isMounted = true;
+        setIsLoading(true);
+
+        const fetchFilteredBlogs = async () => {
+            try {
+                const result = await convex.query(api.blogs.getPaginatedPostsByUsername, {
+                    username,
+                    searchTerm: searchTerm.trim(),
+                    paginationOpts: {
+                        numItems: 6,
+                        cursor: null,
+                        id: 0,
+                    },
+                });
+
+                if (isMounted) {
+                    setBlogs(result.page);
+                    setCursor(result.continueCursor);
+                    setIsDone(result.isDone);
+                }
+            } catch (error) {
+                console.error("Error searching blogs:", error);
+            } finally {
+                if (isMounted) setIsLoading(false);
+            }
+        };
+
+        fetchFilteredBlogs();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [searchTerm, username, convex, initialData]);
+
     const loadMore = async () => {
-        if (isDone || isLoadingMore || !cursor) return;
-        setIsLoadingMore(true);
+        if (isDone || isLoading || !cursor) return;
+        setIsLoading(true);
 
         try {
             const result = await convex.query(api.blogs.getPaginatedPostsByUsername, {
                 username,
+                searchTerm: searchTerm ? searchTerm : undefined,
                 paginationOpts: {
                     numItems: 6,
                     cursor: cursor,
@@ -41,12 +88,12 @@ export function ProfileBlogPosts({ username, preloadedInitialBlogs }: ProfileBlo
         } catch (error) {
             console.error("Error loading more blogs:", error);
         } finally {
-            setIsLoadingMore(false);
+            setIsLoading(false);
         }
     }
 
     useEffect(() => {
-        if (isDone) return;
+        if (isDone || isLoading) return;
 
         const observer = new IntersectionObserver(
             (entries) => {
@@ -65,7 +112,7 @@ export function ProfileBlogPosts({ username, preloadedInitialBlogs }: ProfileBlo
         return () => {
             if (currentTarget) observer.unobserve(currentTarget);
         };
-    }, [cursor, isDone, isLoadingMore]);
+    }, [cursor, isDone, isLoading, searchTerm]);
 
     return (
         <div className="space-y-4">
@@ -83,7 +130,7 @@ export function ProfileBlogPosts({ username, preloadedInitialBlogs }: ProfileBlo
 
                         {!isDone && (
                             <div ref={loadMoreRef} className="py-6 text-center text-sm text-muted-foreground">
-                                {isLoadingMore ? "Loading more blogs..." : "Loading..."}
+                                {isLoading ? "Loading more blogs..." : "Loading..."}
                             </div>
                         )}
                     </>

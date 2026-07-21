@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { TabsSwitch, TabItem } from "@/components/web/TabsSwitch";
-import { useLocalSearch } from "./SearchContext";
 import { SidebarSort } from "./SidebarSort";
 import { SidebarSearch } from "./SidebarSearch";
 
@@ -12,22 +11,7 @@ interface ProfileContentWrapperProps {
 }
 
 export function ProfileContentWrapper({ commentsSlot, blogsSlot }: ProfileContentWrapperProps) {
-  const [activeTab, setActiveTab] = useState("blog-articles");
-
-  const { searchTerm, setSearchTerm } = useLocalSearch();
-  const [localValue, setLocalValue] = useState(searchTerm);
-  
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setSearchTerm(localValue);
-    }, 200);
-  
-      return () => clearTimeout(timer);
-    }, [localValue, setSearchTerm]);
-  
-  useEffect(() => {
-    setLocalValue(searchTerm);
-  }, [searchTerm]);
+  const [activeTab, setActiveTab] = useState("blog-articles");  
 
   const tabs: TabItem[] = [
     { value: "blog-articles", label: "Blog Articles" },

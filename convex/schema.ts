@@ -25,9 +25,9 @@ const schema = defineSchema({
   .index("by_featured", ["featured"])
   .index("by_author", ["author"])
   .index("by_username", ["username"])
-  .searchIndex("search_title_subtitle", {
+  .searchIndex("search_title", {
     searchField: "title",
-    filterFields: ["subtitle"],
+    filterFields: ["username"],
   }),
 
   viewLogs: defineTable({

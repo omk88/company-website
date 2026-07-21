@@ -374,7 +374,7 @@ export const getPaginatedPosts = query({
 
     if (search) {
       const queryInit = ctx.db.query("blogs");
-      const finalQuery = queryInit.withSearchIndex("search_title_subtitle", (q) => 
+      const finalQuery = queryInit.withSearchIndex("search_title", (q) => 
         q.search("title", search)
       );
 
@@ -447,10 +447,22 @@ export const getFeaturedState = query({
 
 export const getPaginatedPostsByUsername = query({
   args: {
+    searchTerm: v.optional(v.string()),
+
     username: v.string(),
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
+
+    if (args.searchTerm && args.searchTerm.trim() !== "") {
+      return await ctx.db
+        .query("blogs")
+        .withSearchIndex("search_title", (q) =>
+          q.search("title", args.searchTerm!).eq("username", args.username)
+        )
+        .paginate(args.paginationOpts);
+    }
+
     return await ctx.db
       .query("blogs")
       .withIndex("by_username", (q) => q.eq("username", args.username))
