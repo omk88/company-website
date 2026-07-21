@@ -115,7 +115,7 @@ export function ProfileBlogPosts({ username, preloadedInitialBlogs }: ProfileBlo
         return () => {
             if (currentTarget) observer.unobserve(currentTarget);
         };
-    }, [cursor, isDone, isLoading, searchTerm]);
+    }, [cursor, isDone, isLoading, searchTerm, sortOrder]);
 
     return (
         <div className="space-y-4">

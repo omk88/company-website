@@ -17,6 +17,7 @@ export function ProfileComments({ username, preloadedInitialComments }: ProfileC
 
     const searchContext = useLocalSearch();
     const searchTerm = searchContext?.searchTerm ?? "";
+    const sortOrder = searchContext?.sortOrder ?? "new";
 
     const [comments, setComments] = useState(initialData.page);
     const [cursor, setCursor] = useState<string | null>(initialData.continueCursor);
@@ -26,7 +27,7 @@ export function ProfileComments({ username, preloadedInitialComments }: ProfileC
     const loadMoreRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        if (!searchTerm.trim()) {
+        if (!searchTerm.trim() && sortOrder === "new") {
             setComments(initialData.page);
             setCursor(initialData.continueCursor);
             setIsDone(initialData.isDone);
@@ -41,6 +42,7 @@ export function ProfileComments({ username, preloadedInitialComments }: ProfileC
                 const result = await convex.query(api.comments.getPaginatedCommentsByUsername, {
                     username,
                     searchTerm: searchTerm.trim(),
+                    sortOrder,
                     paginationOpts: {
                         numItems: 6,
                         cursor: null,
@@ -65,7 +67,7 @@ export function ProfileComments({ username, preloadedInitialComments }: ProfileC
         return () => {
             isMounted = false;
         };
-    }, [searchTerm, username, convex, initialData]);
+    }, [searchTerm, sortOrder, username, convex, initialData]);
 
     const loadMore = async () => {
         if (isDone || isLoading || !cursor) return;
@@ -74,6 +76,8 @@ export function ProfileComments({ username, preloadedInitialComments }: ProfileC
         try {
             const result = await convex.query(api.comments.getPaginatedCommentsByUsername, {
                 username,
+                searchTerm: searchTerm.trim() || undefined,
+                sortOrder,
                 paginationOpts: {
                     numItems: 6,
                     cursor: cursor,
@@ -92,7 +96,7 @@ export function ProfileComments({ username, preloadedInitialComments }: ProfileC
     }
 
     useEffect(() => {
-        if (isDone) return;
+        if (isDone || isLoading) return;
 
         const observer = new IntersectionObserver(
             (entries) => {
@@ -111,7 +115,7 @@ export function ProfileComments({ username, preloadedInitialComments }: ProfileC
         return () => {
             if (currentTarget) observer.unobserve(currentTarget);
         };
-    }, [cursor, isDone, isLoading]);
+    }, [cursor, isDone, isLoading, searchTerm, sortOrder]);
 
     return (
         <div className="w-full space-y-4">

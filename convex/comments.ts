@@ -2,7 +2,8 @@ import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { authComponent } from "./auth";
 import { paginationOptsValidator } from "convex/server";
-import { calculateScores } from "./scoreAlgorithm";
+import { calculateScores, calculateCommentScores } from "./scoreAlgorithm";
+import { Id } from "./_generated/dataModel";
 
 export const getCommentsByBlog = query({
   args: {
@@ -98,10 +99,12 @@ export const createComment = mutation({
         blogId: args.blogId,
         body: args.body,
         authorId: user._id,
-        authorName: user.name ?? profile.username, 
+        authorName: user.name ?? profile.username,
         username: profile.username,
-        blogTitle: blog.title,                 
+        blogTitle: blog.title,
         likes: 0,
+        hotScore: 0,
+        controversialScore: 0
       }),
       ctx.db.patch(args.blogId, {
         commentCount: newCommentCount,
@@ -165,6 +168,9 @@ export const toggleCommentVote = mutation({
     let newLikes = comment.likes ?? 0;
     let likesChange = 0;
 
+    const blog = await ctx.db.get(comment.blogId as Id<"blogs">);
+    const blogLikes = blog?.likes ?? 0;
+
     if (existingVote) {
       await ctx.db.delete(existingVote._id);
       newLikes = Math.max(0, newLikes - 1);
@@ -178,8 +184,17 @@ export const toggleCommentVote = mutation({
       likesChange = 1;
     }
 
+    const { hotScore, controversialScore } = calculateCommentScores(
+      comment._creationTime,
+      newLikes,
+      blogLikes,
+      comment.body.length
+    );
+
     await ctx.db.patch(args.commentId, {
       likes: newLikes,
+      hotScore,
+      controversialScore,
     });
 
     if (likesChange !== 0) {
@@ -201,16 +216,42 @@ export const toggleCommentVote = mutation({
 export const getPaginatedCommentsByUsername = query({
   args: {
     searchTerm: v.optional(v.string()),
+    sortOrder: v.optional(v.string()),
     username: v.string(),
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
     const cleanSearchTerm = args.searchTerm?.trim();
+    const sortOrder = args.sortOrder || "new";
+
+      if (sortOrder === "hot") {
+        return await ctx.db
+          .query("comments")
+          .withIndex("by_username_hot", (q) => q.eq("username", args.username))
+          .order("desc")
+          .paginate(args.paginationOpts);
+      }
+  
+      if (sortOrder === "top") {
+        return await ctx.db
+          .query("comments")
+          .withIndex("by_username_likes", (q) => q.eq("username", args.username))
+          .order("desc")
+          .paginate(args.paginationOpts)
+      }
+
+      if (sortOrder === "controversial") {
+        return await ctx.db
+          .query("comments")
+          .withIndex("by_username_controversial", (q) => q.eq("username", args.username))
+          .order("desc")
+          .paginate(args.paginationOpts)
+      }
 
     if (cleanSearchTerm) {
       return await ctx.db
         .query("comments")
-        .withSearchIndex("search_body", (q) => q.search("body", cleanSearchTerm))
+        .withSearchIndex("search_body", (q) => q.search("body", cleanSearchTerm).eq("username", args.username))
         .paginate(args.paginationOpts);
     }
 

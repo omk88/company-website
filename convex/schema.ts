@@ -62,11 +62,16 @@ const schema = defineSchema({
     username: v.string(),
     blogTitle: v.string(),
     likes: v.number(),
-    body: v.string()
+    body: v.string(),
+    hotScore: v.number(),
+    controversialScore: v.number(),
   })
     .index("by_blog", ["blogId"])
     .index("by_authorId", ["authorId"])
     .index("by_username", ["username"])
+    .index("by_username_likes", ["username", "likes"])
+    .index("by_username_hot", ["username", "hotScore"])
+    .index("by_username_controversial", ["username", "controversialScore"])
     .searchIndex("search_body", {
     searchField: "body",
     filterFields: ["username"],
