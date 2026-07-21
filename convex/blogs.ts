@@ -2,6 +2,7 @@ import { Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { paginationOptsValidator } from "convex/server";
+import { calculateScores } from "./scoreAlgorithm";
 
 const WORDS_PER_MINUTE = 225;
 
@@ -45,6 +46,8 @@ export const createPost = mutation({
         totalViews: 0,
         likes: 0,
         commentCount: 0,
+        hotScore: 0,
+        controversialScore: 0,
         featured: false,
         createdAt: Date.now(),
         readTime: readTimeMinutes,
@@ -205,8 +208,16 @@ export const toggleBlogVote = mutation({
       likesChange = 1;
     }
 
+    const { hotScore, controversialScore } = calculateScores(
+      blog._creationTime,
+      newLikes,
+      blog.commentCount ?? 0
+    );
+
     await ctx.db.patch(args.blogId, {
       likes: newLikes,
+      hotScore,
+      controversialScore,
     });
 
     if (likesChange !== 0) {

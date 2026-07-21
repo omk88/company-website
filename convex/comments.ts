@@ -1,8 +1,8 @@
 import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { authComponent } from "./auth";
-import { Id } from "./_generated/dataModel";
 import { paginationOptsValidator } from "convex/server";
+import { calculateScores } from "./scoreAlgorithm";
 
 export const getCommentsByBlog = query({
   args: {
@@ -86,6 +86,13 @@ export const createComment = mutation({
       throw new ConvexError("User profile not found");
     }
 
+    const newCommentCount = (blog.commentCount ?? 0) + 1;
+    const { hotScore, controversialScore } = calculateScores(
+      blog._creationTime,
+      blog.likes ?? 0,
+      newCommentCount,
+    );
+
     const [commentId] = await Promise.all([
       ctx.db.insert("comments", {
         blogId: args.blogId,
@@ -97,7 +104,9 @@ export const createComment = mutation({
         likes: 0,
       }),
       ctx.db.patch(args.blogId, {
-        commentCount: (blog.commentCount ?? 0) + 1,
+        commentCount: newCommentCount,
+        hotScore,
+        controversialScore,
       }),
       ctx.db.patch(profile._id, {
         commentsPublished: (profile.commentsPublished || 0) + 1,

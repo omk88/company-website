@@ -16,7 +16,9 @@ const schema = defineSchema({
     totalViews: v.number(),
     likes: v.number(),
     featured: v.boolean(),
-    commentCount: v.number(), 
+    commentCount: v.number(),
+    hotScore: v.number(),
+    controversialScore: v.number(), 
     readTime: v.number(),
   })
   .index("by_createdAt", ["createdAt"])
@@ -26,6 +28,8 @@ const schema = defineSchema({
   .index("by_author", ["author"])
   .index("by_username", ["username"])
   .index("by_username_likes", ["username", "likes"])
+  .index("by_username_hot", ["username", "hotScore"])
+  .index("by_username_controversial", ["username", "controversialScore"])
   .searchIndex("search_title", {
     searchField: "title",
     filterFields: ["username"],
