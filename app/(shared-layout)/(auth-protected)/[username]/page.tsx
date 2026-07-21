@@ -54,7 +54,7 @@ export default async function Profile({ params }: profileRouteProps) {
 
                 <div className="w-full ml-[24rem] bg-white">
                     <SearchProvider >
-                        <ProfileContentWrapper commentsSlot={<ProfileComments preloadedInitialComments={preloadedInitialComments} username={username} />} blogsSlot={<ProfileBlogPosts preloadedInitialBlogs={preloadedInitialBlogs} username={username} />} />
+                        <ProfileContentWrapper commentsSlot={<ProfileComments preloadedInitialComments={preloadedInitialComments} username={username} />} blogsSlot={<ProfileBlogPosts preloadedProfile={preloadedProfile} preloadedInitialBlogs={preloadedInitialBlogs} username={username} />} />
                     </SearchProvider>
                 </div>
             </SidebarProvider>

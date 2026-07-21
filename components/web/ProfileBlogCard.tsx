@@ -8,6 +8,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { FaFacebook, FaXTwitter } from "react-icons/fa6";
 import { toast } from "sonner";
 import { RxLinkedinLogo } from "react-icons/rx";
+import { api } from "@/convex/_generated/api";
+import { Preloaded, usePreloadedQuery } from "convex/react";
 
 interface ProfileBlogCardProps {
     id: string;
@@ -21,9 +23,16 @@ interface ProfileBlogCardProps {
     date: number;
     readTime: number;
     tags: Array<string>;    
+    preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
 }
 
-export function ProfileBlogCard({ id, imageUrl, authorName, title, subtitle, totalViews, likes, commentCount, date, readTime, tags }: ProfileBlogCardProps) {
+export function ProfileBlogCard({ id, imageUrl, authorName, title, subtitle, totalViews, likes, commentCount, date, readTime, tags, preloadedProfile }: ProfileBlogCardProps) {
+
+    const profileData = usePreloadedQuery(preloadedProfile);
+
+    const profile = profileData.profile;
+    const avatarSrc = profileData.profilePicture;
+    const defaultAvatarSrc = profileData.defaultProfilePicture;
 
     const formattedDate = new Intl.DateTimeFormat("en-GB", {
         day: "2-digit",
@@ -51,7 +60,32 @@ export function ProfileBlogCard({ id, imageUrl, authorName, title, subtitle, tot
                 <div className="min-w-0 pointer-events-none">
                     <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-muted-foreground">
                         <div>
-                            {authorName} • {formattedDate}
+                            <HoverCard openDelay={100} closeDelay={100}>
+                                <HoverCardTrigger asChild>
+                                <span className="cursor-pointer hover:text-blue-600 font-medium pointer-events-auto">
+                                    {authorName}
+                                </span>
+                                </HoverCardTrigger>
+                                <HoverCardContent side="bottom" align="start" className="w-80">
+                                <div className="flex flex-row gap-4">
+                                    <div className="h-12 w-12 border-2 border-muted rounded-full overflow-hidden bg-muted relative shrink-0">
+                                        <img
+                                        src={avatarSrc || defaultAvatarSrc || ""}
+                                        alt="profile"
+                                        className="h-full w-full object-cover rounded-full"
+                                        decoding="async" 
+                                        />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <h4 className="text-base">{ authorName }</h4>
+                                        <h4 className="text-md">{ profile?.username }</h4>
+                                    </div>
+                                    <div className="flex flex-wrap gap-1.5 max-h-[120px] overflow-y-auto pt-0.5">
+                                    </div>
+                                </div>
+                                </HoverCardContent>
+                            </HoverCard>
+                            {" "}• {formattedDate}
                         </div>
                         
                         <div className="flex flex-row items-center gap-8">
@@ -159,14 +193,14 @@ export function ProfileBlogCard({ id, imageUrl, authorName, title, subtitle, tot
                                     ))}
                                 </div>
                                 
-                                {tags.length > 2 && (
+                                {tags.length > 4 && (
                                     <HoverCard openDelay={100} closeDelay={100}>
                                         <HoverCardTrigger asChild>
                                             <Badge 
                                                 variant="outline" 
                                                 className="font-mono text-[10px] px-1.5 py-0.5 whitespace-nowrap border-black dark:border-white cursor-help hover:bg-muted transition-colors shrink-0"
                                             >
-                                                +{tags.length - 2}
+                                                +{tags.length - 4}
                                             </Badge>
                                         </HoverCardTrigger>
                                         

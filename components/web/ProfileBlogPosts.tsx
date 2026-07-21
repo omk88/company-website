@@ -8,10 +8,11 @@ import { useLocalSearch } from "./SearchContext";
 
 interface ProfileBlogPostsProps {
     username: string;
+    preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
     preloadedInitialBlogs: Preloaded<typeof api.blogs.getPaginatedPostsByUsername>;
 }
 
-export function ProfileBlogPosts({ username, preloadedInitialBlogs }: ProfileBlogPostsProps) {
+export function ProfileBlogPosts({ username, preloadedProfile, preloadedInitialBlogs }: ProfileBlogPostsProps) {
     const convex = useConvex();
     const initialData = usePreloadedQuery(preloadedInitialBlogs);
 
@@ -126,7 +127,7 @@ export function ProfileBlogPosts({ username, preloadedInitialBlogs }: ProfileBlo
                         <ul className="flex flex-col gap-4">
                             {blogs.map((blog) => (
                                 <li key={blog._id}>
-                                    <ProfileBlogCard id={blog._id} imageUrl={blog.imageUrl} authorName={blog.authorName} title={blog.title} subtitle={blog.subtitle} totalViews={blog.totalViews} likes={blog.likes} commentCount={blog.commentCount} date={blog._creationTime} readTime={blog.readTime} tags={blog.tags} />
+                                    <ProfileBlogCard preloadedProfile={preloadedProfile} id={blog._id} imageUrl={blog.imageUrl} authorName={blog.authorName} title={blog.title} subtitle={blog.subtitle} totalViews={blog.totalViews} likes={blog.likes} commentCount={blog.commentCount} date={blog._creationTime} readTime={blog.readTime} tags={blog.tags} />
                                 </li>
                             ))}
                         </ul>

@@ -1,7 +1,6 @@
 "use client";
 
 import { Sidebar, SidebarContent, SidebarGroup, SidebarFooter, SidebarGroupLabel } from "../ui/sidebar";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { ChartNoAxesColumn, GraduationCap, MapPin, MessageSquareText, SquareLibrary, Terminal, ThumbsUp } from "lucide-react";
 import Link from "next/link";
 import { EditProfileButton } from "./EditProfileButton";
