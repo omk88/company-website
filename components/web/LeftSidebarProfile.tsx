@@ -1,7 +1,7 @@
 "use client";
 
 import { Sidebar, SidebarContent, SidebarGroup, SidebarFooter, SidebarGroupLabel } from "../ui/sidebar";
-import { Cake, ChartNoAxesColumn, GraduationCap, MapPin, MessageSquareText, SquareLibrary, Terminal, ThumbsUp } from "lucide-react";
+import { Cake, ChartNoAxesColumn, GraduationCap, Library, MapPin, MessageSquareText, SquareLibrary, Terminal, ThumbsUp, User } from "lucide-react";
 import Link from "next/link";
 import { EditProfileButton } from "./EditProfileButton";
 import { ICON_MAP } from "@/lib/socials";
@@ -48,7 +48,7 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
     >
       <SidebarContent className="!p-0">
         <div className="p-2 pb-0">
-          <div className="flex flex-row items-center gap-2 w-full">
+          <div className="flex flex-row items-center gap-4 w-full">
             <div className="h-16 w-16 border-2 border-muted rounded-full overflow-hidden bg-muted relative shrink-0">
               <img
                 src={avatarSrc || defaultAvatarSrc || ""}
@@ -76,67 +76,35 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
             </div>
           </div>
         </div>
-        
-        {hasContent && (
-          <SidebarGroup className="!pt-0">
-            <div className="flex flex-col bg-muted rounded-sm p-3 gap-3">
-              {profile.bio?.trim() && (
-                <p className="text-sm leading-relaxed text-foreground">
-                  {profile.bio}
-                </p>
-              )}
-              
-              {profile.education?.length > 0 && (
-                profile.education.map((item, index) => (
-                  <div 
-                    key={index} 
-                    className="flex flex-row items-start gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground"
-                  >
-                    <GraduationCap className="h-4 w-4 shrink-0 pt-0.5" />
-                    <div className="flex flex-col gap-0.5 text-muted-foreground">
-                      <h2>
-                        {item.degree} in {item.subject}
-                      </h2>
-                      <p>
-                        {item.institution}
-                      </p>
-                    </div>
-                  </div>
-                ))
-              )}
 
-              {profile.socials?.length > 0 && (
-                <div className="flex flex-row gap-3 items-center pt-1">
-                  {profile.socials.map((social, index) => {
-                    const normalizedPlatform = social.platform.toLowerCase().trim();
-                    const IconComponent = ICON_MAP[normalizedPlatform];
-
-                    if (!IconComponent || !social.url) return null;
-
-                    const iconSizeClass = normalizedPlatform === "x" ? "h-4 w-4" : "h-4.5 w-4.5";
-
-                    return (
-                      <Link 
-                        key={index} 
-                        href={social.url} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                      >
-                        <IconComponent 
-                          className={`${iconSizeClass} transition-transform hover:scale-105 cursor-pointer opacity-80 hover:opacity-100`} 
-                        />
-                      </Link>
-                    );
-                  })}
-                </div>
-              )}
+        <div className="p-4 gap-6 flex flex-col font-extralight text-sm font-mono tracking-tight select-none w-full mt-auto">
+          <div className="flex items-center justify-between w-full px-12">
+            <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
+              <User className="w-4 h-4 stroke-[2.3] shrink-0" />
+              <span>{10}</span>
             </div>
-          </SidebarGroup>
-        )}
+            <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
+              <ThumbsUp className="w-4 h-4 stroke-[2.3] shrink-0" />
+              <span>{23}</span>
+            </div>
+            <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
+              <Library className="w-4 h-4 stroke-[2.3] shrink-0" />
+              <span>{75}</span>
+            </div>
+            <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
+              <MessageSquareText className="w-4 h-4 stroke-[2.3] shrink-0" />
+              <span>{12}</span>
+            </div>
+          </div>
+
+          <div>
+            <p>-Masters in Adult Education & Masters in Human Relations. -Hall of Fame College Policy Debater -2X NAACP Award Nominee -Public Education is retreating. I'm filling the void. Teaching the histories, frameworks, & knowledge they're erasing.</p>
+          </div>
+        </div>
 
         {profile.skills?.length > 0 && (
           <SidebarGroup>
-            <SidebarGroupLabel className="w-full justify-center mb-1">
+            <SidebarGroupLabel className="w-full justify-center mb-1 mt-50">
               <h1 className="flex items-center justify-center gap-2 text-sm font-medium text-foreground">
                 <Terminal className="w-4 h-4 stroke-[2.3] shrink-0" />
                 <span>Skills/Languages</span>
