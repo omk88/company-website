@@ -47,8 +47,8 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
       style={{ height: "calc(100vh - 4rem)" }}
     >
       <SidebarContent className="!p-0">
-        <div className="p-2 pb-0 mt-2">
-          <div className="rounded-lg p-2 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${"/tech_banner_preview.png"})` }}>
+        <div className="p-2 pb-0">
+          <div className="flex flex-row items-center gap-2 w-full">
             <div className="h-16 w-16 border-2 border-muted rounded-full overflow-hidden bg-muted relative shrink-0">
               <img
                 src={avatarSrc || defaultAvatarSrc || ""}
@@ -57,21 +57,24 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
                 decoding="async" 
               />
             </div>
-          </div>
 
-          <h1 className="flex w-full items-center justify-between gap-2 text-lg font-medium text-foreground mt-2">
-            <span>{displayName}</span>
-            {isOwnProfile && 
-              <EditProfileButton profile={profile} avatarSrc={avatarSrc || ""} defaultAvatarSrc={defaultAvatarSrc || ""} />
-            }
-          </h1>
-          
-          {profile.location?.trim() && (
-            <p className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground pb-2">
-              <MapPin className="h-3.5 w-3.5 shrink-0" /> 
-              {profile.location}
-            </p>
-          )}
+            <div className="relative w-full">
+              <div className="flex flex-col">
+                <h4 className="text-base font-semibold leading-none">{displayName}</h4>
+                <p className="text-sm text-muted-foreground leading-none mt-1">{`@${profile.username}`}</p>
+              </div>
+
+              {isOwnProfile && (
+                <div className="absolute right-0 top-0 flex items-center h-[1em]">
+                  <EditProfileButton
+                    profile={profile}
+                    avatarSrc={avatarSrc || ""}
+                    defaultAvatarSrc={defaultAvatarSrc || ""}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
         </div>
         
         {hasContent && (
