@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { RxLinkedinLogo } from "react-icons/rx";
 import { api } from "@/convex/_generated/api";
 import { Preloaded, usePreloadedQuery } from "convex/react";
+import { ProfileHoverCard } from "./ProfileHoverCard";
 
 interface ProfileBlogCardProps {
     id: string;
@@ -27,19 +28,6 @@ interface ProfileBlogCardProps {
 }
 
 export function ProfileBlogCard({ id, imageUrl, authorName, title, subtitle, totalViews, likes, commentCount, date, readTime, tags, preloadedProfile }: ProfileBlogCardProps) {
-
-    const profileData = usePreloadedQuery(preloadedProfile);
-
-    const profile = profileData.profile;
-    const avatarSrc = profileData.profilePicture;
-    const defaultAvatarSrc = profileData.defaultProfilePicture;
-
-    const formattedDate = new Intl.DateTimeFormat("en-GB", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-    }).format(new Date(date));
-
     return (
         <div className="group flex flex-col md:flex-row h-auto md:h-[190px] border border-border/50 rounded-none">
             
@@ -59,68 +47,7 @@ export function ProfileBlogCard({ id, imageUrl, authorName, title, subtitle, tot
             <div className="flex flex-col flex-1 justify-start px-4 py-2 min-w-0">
                 <div className="min-w-0 pointer-events-none">
                     <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-muted-foreground">
-                        <div>
-                            <HoverCard openDelay={100} closeDelay={100}>
-                                <HoverCardTrigger asChild>
-                                <span className="cursor-pointer hover:text-blue-600 font-medium pointer-events-auto">
-                                    {authorName}
-                                </span>
-                                </HoverCardTrigger>
-                                <HoverCardContent side="bottom" align="start" className="w-80 p-0 overflow-hidden">
-                                <div className="flex flex-col">
-                                    <div 
-                                    className="h-24 w-full bg-cover bg-center bg-no-repeat relative p-3" 
-                                    style={{ backgroundImage: `url(${"/tech_banner_preview.png"})` }}
-                                    >
-                                    <div className="absolute -bottom-6 left-3 h-14 w-14 border-2 border-background rounded-full overflow-hidden bg-muted shrink-0 shadow-sm">
-                                        <img
-                                        src={avatarSrc || defaultAvatarSrc || ""}
-                                        alt="profile"
-                                        className="h-full w-full object-cover rounded-full"
-                                        decoding="async" 
-                                        />
-                                    </div>
-                                    </div>
-
-                                    <div className="pt-8 p-4 flex flex-col gap-2">
-                                    <div className="flex flex-col">
-                                        <h4 className="text-base font-semibold leading-tight">{authorName}</h4>
-                                        <p className="text-sm text-muted-foreground">{profile?.username}</p>
-                                    </div>
-
-                                    <div className="flex flex-wrap gap-1.5 max-h-[200px] overflow-y-auto pt-0.5">
-                                        <p className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground pb-2">
-                                            <MapPin className="h-3.5 w-3.5 shrink-0" /> 
-                                            {profile?.location}
-                                        </p>
-                                        <div className="flex flex-col bg-muted rounded-sm p-3 gap-3">
-                                            <div className="flex flex-col items-start gap-2.5">
-                                                <div className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
-                                                    <Cake className="h-4 w-4 shrink-0" />
-                                                    <h1>{formattedDate}</h1>
-                                                </div>
-                                                <div className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
-                                                    <ThumbsUp className="h-4 w-4 shrink-0" />
-                                                    <h1>{profile?.totalLikes} Total Likes</h1>
-                                                </div>
-                                                <div className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
-                                                    <SquareLibrary className="h-4 w-4 shrink-0" />
-                                                    <h1>{profile?.articlesPublished} Insights Published</h1>
-                                                </div>
-                                                <div className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
-                                                    <MessageSquareText className="h-4 w-4 shrink-0" />
-                                                    <h2>{profile?.commentsPublished} Comments Written</h2>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    </div>
-                                </div>
-                                </HoverCardContent>
-                            </HoverCard>
-                            {" "}• {formattedDate}
-                        </div>
-                        
+                        <ProfileHoverCard authorName={authorName} date={date} preloadedProfile={preloadedProfile}/>
                         <div className="flex flex-row items-center gap-8">
                             <span>{readTime} min read</span>
                             <DropdownMenu>
