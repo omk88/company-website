@@ -1,4 +1,4 @@
-import { Eye, ThumbsUp, MessageSquare, Ellipsis, Copy } from "lucide-react";
+import { Eye, ThumbsUp, MessageSquare, Ellipsis, Copy, MapPin, Cake, MessageSquareText, SquareLibrary } from "lucide-react";
 import Image from "next/image";
 import { HoverCard, HoverCardTrigger, HoverCardContent } from "../ui/hover-card";
 import { Badge } from "../ui/badge";
@@ -66,9 +66,13 @@ export function ProfileBlogCard({ id, imageUrl, authorName, title, subtitle, tot
                                     {authorName}
                                 </span>
                                 </HoverCardTrigger>
-                                <HoverCardContent side="bottom" align="start" className="w-80">
-                                <div className="flex flex-row gap-4">
-                                    <div className="h-12 w-12 border-2 border-muted rounded-full overflow-hidden bg-muted relative shrink-0">
+                                <HoverCardContent side="bottom" align="start" className="w-80 p-0 overflow-hidden">
+                                <div className="flex flex-col">
+                                    <div 
+                                    className="h-24 w-full bg-cover bg-center bg-no-repeat relative p-3" 
+                                    style={{ backgroundImage: `url(${"/tech_banner_preview.png"})` }}
+                                    >
+                                    <div className="absolute -bottom-6 left-3 h-14 w-14 border-2 border-background rounded-full overflow-hidden bg-muted shrink-0 shadow-sm">
                                         <img
                                         src={avatarSrc || defaultAvatarSrc || ""}
                                         alt="profile"
@@ -76,11 +80,40 @@ export function ProfileBlogCard({ id, imageUrl, authorName, title, subtitle, tot
                                         decoding="async" 
                                         />
                                     </div>
-                                    <div className="flex flex-col">
-                                        <h4 className="text-base">{ authorName }</h4>
-                                        <h4 className="text-md">{ profile?.username }</h4>
                                     </div>
-                                    <div className="flex flex-wrap gap-1.5 max-h-[120px] overflow-y-auto pt-0.5">
+
+                                    <div className="pt-8 p-4 flex flex-col gap-2">
+                                    <div className="flex flex-col">
+                                        <h4 className="text-base font-semibold leading-tight">{authorName}</h4>
+                                        <p className="text-sm text-muted-foreground">{profile?.username}</p>
+                                    </div>
+
+                                    <div className="flex flex-wrap gap-1.5 max-h-[200px] overflow-y-auto pt-0.5">
+                                        <p className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground pb-2">
+                                            <MapPin className="h-3.5 w-3.5 shrink-0" /> 
+                                            {profile?.location}
+                                        </p>
+                                        <div className="flex flex-col bg-muted rounded-sm p-3 gap-3">
+                                            <div className="flex flex-col items-start gap-2.5">
+                                                <div className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                                                    <Cake className="h-4 w-4 shrink-0" />
+                                                    <h1>{formattedDate}</h1>
+                                                </div>
+                                                <div className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                                                    <ThumbsUp className="h-4 w-4 shrink-0" />
+                                                    <h1>{profile?.totalLikes} Total Likes</h1>
+                                                </div>
+                                                <div className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                                                    <SquareLibrary className="h-4 w-4 shrink-0" />
+                                                    <h1>{profile?.articlesPublished} Insights Published</h1>
+                                                </div>
+                                                <div className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                                                    <MessageSquareText className="h-4 w-4 shrink-0" />
+                                                    <h2>{profile?.commentsPublished} Comments Written</h2>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                     </div>
                                 </div>
                                 </HoverCardContent>

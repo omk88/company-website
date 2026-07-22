@@ -47,14 +47,16 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
       style={{ height: "calc(100vh - 4rem)" }}
     >
       <SidebarContent className="!p-0">
-        <div className="p-2 pb-0">
-          <div className="h-16 w-16 border-2 border-muted rounded-full overflow-hidden bg-muted relative shrink-0">
-            <img
-              src={avatarSrc || defaultAvatarSrc || ""}
-              alt="profile"
-              className="h-full w-full object-cover rounded-full"
-              decoding="async" 
-            />
+        <div className="p-2 pb-0 mt-2">
+          <div className="rounded-lg p-2 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${"/tech_banner_preview.png"})` }}>
+            <div className="h-16 w-16 border-2 border-muted rounded-full overflow-hidden bg-muted relative shrink-0">
+              <img
+                src={avatarSrc || defaultAvatarSrc || ""}
+                alt="profile"
+                className="h-full w-full object-cover rounded-full"
+                decoding="async" 
+              />
+            </div>
           </div>
 
           <h1 className="flex w-full items-center justify-between gap-2 text-lg font-medium text-foreground mt-2">
