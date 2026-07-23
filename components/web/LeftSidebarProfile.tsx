@@ -1,12 +1,12 @@
 "use client";
 
 import { Sidebar, SidebarContent, SidebarGroup, SidebarFooter, SidebarGroupLabel } from "../ui/sidebar";
-import { Cake, ChartNoAxesColumn, GraduationCap, Library, MapPin, MessageSquareText, SquareLibrary, Terminal, ThumbsUp, User } from "lucide-react";
-import Link from "next/link";
+import { Cake, ChartNoAxesColumn, GraduationCap, Library, MapPin, MessageSquareText, SquareLibrary, Terminal, ThumbsUp, User, Link } from "lucide-react";
 import { EditProfileButton } from "./EditProfileButton";
 import { ICON_MAP } from "@/lib/socials";
 import { Preloaded, usePreloadedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { LinksHoverCard } from "./LinksHoverCard";
 
 interface profileProps {
   preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
@@ -77,7 +77,20 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
           </div>
         </div>
 
-        <div className="p-4 gap-6 flex flex-col font-extralight text-sm font-mono tracking-tight select-none w-full mt-auto">
+        <div className="p-4 gap-4 flex flex-col font-extralight text-sm font-mono tracking-tight select-none w-full mt-auto">
+          
+          <div>
+            <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
+              <Cake className="w-4 h-4 stroke-[2.3] shrink-0" />
+              <p>Jul 18, 2026</p>
+            </div>
+
+            <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
+              <MapPin className="w-4 h-4 stroke-[2.3] shrink-0" />
+              <p>London, England, United Kingdom</p>
+            </div>
+          </div>
+
           <div className="flex items-center justify-between w-full px-12">
             <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
               <User className="w-4 h-4 stroke-[2.3] shrink-0" />
@@ -99,6 +112,21 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
 
           <div>
             <p>-Masters in Adult Education & Masters in Human Relations. -Hall of Fame College Policy Debater -2X NAACP Award Nominee -Public Education is retreating. I'm filling the void. Teaching the histories, frameworks, & knowledge they're erasing.</p>
+          </div>
+
+          <div className="flex flex-row gap-4">
+
+            <LinksHoverCard socials={profile.socials} />
+
+            <div className="bg-zinc-200 text-muted-foreground p-2 rounded-2xl flex items-center gap-1.5 min-w-[3rem] justify-start">
+              <Terminal className="w-4 h-4 stroke-[2.3] shrink-0" />
+              <span>{7}</span>
+            </div>
+
+            <div className="bg-zinc-200 text-muted-foreground p-2 rounded-2xl flex items-center gap-1.5 min-w-[3rem] justify-start">
+              <GraduationCap className="w-4 h-4 stroke-[2.3] shrink-0" />
+              <span>{7}</span>
+            </div>
           </div>
         </div>
 
