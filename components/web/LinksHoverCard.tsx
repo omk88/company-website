@@ -1,15 +1,7 @@
 import { Globe, Link as LinkIcon } from "lucide-react";
 import { HoverCard, HoverCardTrigger, HoverCardContent } from "../ui/hover-card";
 import { Doc } from "@/convex/_generated/dataModel";
-import { 
-  FaGithub, 
-  FaTwitter, 
-  FaXTwitter, 
-  FaLinkedin, 
-  FaInstagram,
-  FaYoutube, 
-  FaBluesky
-} from "react-icons/fa6";
+import { FaGithub, FaTwitter, FaXTwitter, FaLinkedin, FaInstagram,FaYoutube, FaBluesky } from "react-icons/fa6";
 import { ComponentType } from "react";
 import { FaFacebook, FaTiktok, FaTwitch } from "react-icons/fa";
 import { SiSubstack } from "react-icons/si";

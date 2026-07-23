@@ -8,6 +8,7 @@ import { Preloaded, usePreloadedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { LinksHoverCard } from "./LinksHoverCard";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
+import { SkillsHoverCard } from "./SkillsHoverCard";
 
 interface profileProps {
   preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
@@ -78,7 +79,7 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
           </div>
         </div>
 
-        <div className="p-4 gap-4 flex flex-col font-extralight text-sm font-mono tracking-tight select-none w-full mt-auto">
+        <div className="p-4 gap-4 flex flex-col font-extralight text-sm font-mono tracking-tight select-none w-full">
           
           <div>
             <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
@@ -146,10 +147,7 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
 
             <LinksHoverCard socials={profile.socials} />
 
-            <div className="bg-zinc-200 text-muted-foreground p-2 rounded-2xl flex items-center gap-1.5 min-w-[3rem] justify-start">
-              <Terminal className="w-4 h-4 stroke-[2.3] shrink-0" />
-              <span>{7}</span>
-            </div>
+            <SkillsHoverCard skills={profile.skills} />
 
             <div className="bg-zinc-200 text-muted-foreground p-2 rounded-2xl flex items-center gap-1.5 min-w-[3rem] justify-start">
               <GraduationCap className="w-4 h-4 stroke-[2.3] shrink-0" />
@@ -157,53 +155,6 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
             </div>
           </div>
         </div>
-
-        {profile.skills?.length > 0 && (
-          <SidebarGroup>
-            <SidebarGroupLabel className="w-full justify-center mb-1 mt-50">
-              <h1 className="flex items-center justify-center gap-2 text-sm font-medium text-foreground">
-                <Terminal className="w-4 h-4 stroke-[2.3] shrink-0" />
-                <span>Skills/Languages</span>
-              </h1>
-            </SidebarGroupLabel>
-            <div className="flex flex-col bg-muted rounded-sm p-3 gap-3">
-              <div className="flex flex-col items-start gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
-                {profile.skills.map((skill, index) => (
-                  <div key={index}>• {skill}</div>
-                ))}
-              </div>
-            </div>
-          </SidebarGroup>
-        )}
-
-        <SidebarGroup>
-          <SidebarGroupLabel className="w-full justify-center mb-1">
-            <h1 className="flex items-center justify-center gap-2 text-sm font-medium text-foreground">
-              <ChartNoAxesColumn className="w-4 h-4 stroke-[2.3] shrink-0" />
-              <span>Metrics</span>
-            </h1>
-          </SidebarGroupLabel>
-          <div className="flex flex-col bg-muted rounded-sm p-3 gap-3">
-            <div className="flex flex-col items-start gap-2.5">
-              <div className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
-                <Cake className="h-4 w-4 shrink-0" />
-                <h1>{formattedDate}</h1>
-              </div>
-              <div className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
-                <ThumbsUp className="h-4 w-4 shrink-0" />
-                <h1>{profile.totalLikes} Total Likes</h1>
-              </div>
-              <div className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
-                <SquareLibrary className="h-4 w-4 shrink-0" />
-                <h1>{profile.articlesPublished} Insights Published</h1>
-              </div>
-              <div className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
-                <MessageSquareText className="h-4 w-4 shrink-0" />
-                <h2>{profile.commentsPublished} Comments Written</h2>
-              </div>
-            </div>
-          </div>
-        </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="hidden" />
     </Sidebar>
