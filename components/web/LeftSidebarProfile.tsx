@@ -9,6 +9,7 @@ import { api } from "@/convex/_generated/api";
 import { LinksHoverCard } from "./LinksHoverCard";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { SkillsHoverCard } from "./SkillsHoverCard";
+import { EducationHoverCard } from "./EducationHoverCard";
 
 interface profileProps {
   preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
@@ -144,16 +145,11 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
           </div>
 
           <div className="flex flex-row gap-4">
-
             <LinksHoverCard socials={profile.socials} />
-
+            <EducationHoverCard education={profile.education} />
             <SkillsHoverCard skills={profile.skills} />
-
-            <div className="bg-zinc-200 text-muted-foreground p-2 rounded-2xl flex items-center gap-1.5 min-w-[3rem] justify-start">
-              <GraduationCap className="w-4 h-4 stroke-[2.3] shrink-0" />
-              <span>{7}</span>
-            </div>
           </div>
+          
         </div>
       </SidebarContent>
       <SidebarFooter className="hidden" />
