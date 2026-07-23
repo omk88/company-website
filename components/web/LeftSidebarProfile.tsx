@@ -7,6 +7,7 @@ import { ICON_MAP } from "@/lib/socials";
 import { Preloaded, usePreloadedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { LinksHoverCard } from "./LinksHoverCard";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 
 interface profileProps {
   preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
@@ -82,36 +83,63 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
           <div>
             <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
               <Cake className="w-4 h-4 stroke-[2.3] shrink-0" />
-              <p>Jul 18, 2026</p>
+              <p>{ formattedDate }</p>
             </div>
 
             <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
               <MapPin className="w-4 h-4 stroke-[2.3] shrink-0" />
-              <p>London, England, United Kingdom</p>
+              <p>{ profile.location }</p>
             </div>
           </div>
 
-          <div className="flex items-center justify-between w-full px-12">
-            <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
+          <div className="flex items-center justify-between w-full px-12 -m-2">
+            <div className="flex items-center gap-1.5 min-w-[3rem] justify-start p-2 rounded-2xl hover:bg-zinc-100 transition-colors cursor-pointer">
               <User className="w-4 h-4 stroke-[2.3] shrink-0" />
               <span>{10}</span>
             </div>
-            <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
-              <ThumbsUp className="w-4 h-4 stroke-[2.3] shrink-0" />
-              <span>{23}</span>
-            </div>
-            <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
-              <Library className="w-4 h-4 stroke-[2.3] shrink-0" />
-              <span>{75}</span>
-            </div>
-            <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
-              <MessageSquareText className="w-4 h-4 stroke-[2.3] shrink-0" />
-              <span>{12}</span>
-            </div>
+            <TooltipProvider delayDuration={200}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center gap-1.5 min-w-[3rem] justify-start p-2 rounded-2xl hover:bg-zinc-100 transition-colors cursor-pointer">
+                    <ThumbsUp className="w-4 h-4 stroke-[2.3] shrink-0" />
+                    <span>{ profile.totalLikes }</span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" align="center">
+                  <p className="text-xs font-medium">{ profile.totalLikes } Total Likes</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <TooltipProvider delayDuration={200}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center gap-1.5 min-w-[3rem] justify-start p-2 rounded-2xl hover:bg-zinc-100 transition-colors cursor-pointer">
+                    <Library className="w-4 h-4 stroke-[2.3] shrink-0" />
+                    <span>{ profile.articlesPublished }</span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" align="center">
+                  <p className="text-xs font-medium">{ profile.articlesPublished } Insights Published</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <TooltipProvider delayDuration={200}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center gap-1.5 min-w-[3rem] justify-start p-2 rounded-2xl hover:bg-zinc-100 transition-colors cursor-pointer">
+                    <MessageSquareText className="w-4 h-4 stroke-[2.3] shrink-0" />
+                    <span>{ profile.commentsPublished }</span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" align="center">
+                  <p className="text-xs font-medium">{ profile.commentsPublished } Comments Published</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
 
           <div>
-            <p>-Masters in Adult Education & Masters in Human Relations. -Hall of Fame College Policy Debater -2X NAACP Award Nominee -Public Education is retreating. I'm filling the void. Teaching the histories, frameworks, & knowledge they're erasing.</p>
+            <p>{ profile.bio }</p>
           </div>
 
           <div className="flex flex-row gap-4">
