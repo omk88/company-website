@@ -1,7 +1,8 @@
-import { MapPin, Cake, ThumbsUp, SquareLibrary, MessageSquareText } from "lucide-react";
+import { MapPin, Cake, ThumbsUp, SquareLibrary, MessageSquareText, Library, User } from "lucide-react";
 import { HoverCard, HoverCardTrigger, HoverCardContent } from "../ui/hover-card";
 import { api } from "@/convex/_generated/api";
 import { Preloaded, usePreloadedQuery } from "convex/react";
+import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "../ui/tooltip";
 
 interface ProfileHoverCardProps {
     authorName: string;
@@ -16,11 +17,11 @@ export function ProfileHoverCard({ authorName, date, preloadedProfile }: Profile
     const avatarSrc = profileData.profilePicture;
     const defaultAvatarSrc = profileData.defaultProfilePicture;
 
-    const formattedDate = new Intl.DateTimeFormat("en-GB", {
-        day: "2-digit",
-        month: "2-digit",
+    const formattedDate = new Intl.DateTimeFormat("en-US", {
+        month: "short",
+        day: "numeric",
         year: "numeric",
-    }).format(new Date(date));
+    }).format(profile?._creationTime);
 
     return (
         <div>
@@ -31,12 +32,9 @@ export function ProfileHoverCard({ authorName, date, preloadedProfile }: Profile
                     </span>
                 </HoverCardTrigger>
                 <HoverCardContent side="bottom" align="start" className="w-80 p-0 overflow-hidden">
-                    <div className="flex flex-col">
-                        <div 
-                            className="h-24 w-full bg-cover bg-center bg-no-repeat relative p-3" 
-                            style={{ backgroundImage: `url(${"/tech_banner_preview.png"})` }}
-                        >
-                            <div className="absolute -bottom-6 left-3 h-14 w-14 border-2 border-background rounded-full overflow-hidden bg-muted shrink-0">
+                    <div className="flex flex-col p-2">
+                        <div className="flex flex-row items-center gap-2 w-full">
+                            <div className="h-12 w-12 border-2 border-muted rounded-full overflow-hidden bg-muted relative shrink-0">
                                 <img
                                     src={avatarSrc || defaultAvatarSrc || ""}
                                     alt="profile"
@@ -44,39 +42,76 @@ export function ProfileHoverCard({ authorName, date, preloadedProfile }: Profile
                                     decoding="async" 
                                 />
                             </div>
-                        </div>
 
-                        <div className="pt-8 px-4 pb-3 flex flex-col gap-2">
-                            <div className="flex flex-col">
-                                <h4 className="text-base font-semibold leading-tight">{authorName}</h4>
-                                <p className="text-sm text-muted-foreground">{profile?.username}</p>
-                            </div>
-
-                            <p className="flex flex-row items-center gap-1 text-[0.675rem] font-mono uppercase tracking-wider text-muted-foreground">
-                                <MapPin className="h-3.5 w-3.5 shrink-0" /> 
-                                {profile?.location}
-                            </p>
-                        </div>
-
-                        <div className="w-full bg-muted p-4 border-t">
-                            <div className="flex flex-col items-start gap-2.5">
-                                <div className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
-                                    <Cake className="h-4 w-4 shrink-0" />
-                                    <h1>{formattedDate}</h1>
-                                </div>
-                                <div className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
-                                    <ThumbsUp className="h-4 w-4 shrink-0" />
-                                    <h1>{profile?.totalLikes} Total Likes</h1>
-                                </div>
-                                <div className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
-                                    <SquareLibrary className="h-4 w-4 shrink-0" />
-                                    <h1>{profile?.articlesPublished} Insights Published</h1>
-                                </div>
-                                <div className="flex flex-row items-center gap-2 text-xs font-mono uppercase tracking-wider text-muted-foreground">
-                                    <MessageSquareText className="h-4 w-4 shrink-0" />
-                                    <h2>{profile?.commentsPublished} Comments Written</h2>
+                            <div className="relative w-full">
+                                <div className="flex flex-col">
+                                    <h4 className="text-base font-semibold leading-none">{authorName}</h4>
+                                    <p className="text-sm text-muted-foreground leading-none mt-1">{`@${profile?.username}`}</p>
                                 </div>
                             </div>
+                        </div>
+
+                        <div className="p-4 gap-4 flex flex-col font-extralight text-[14px] font-mono tracking-tight select-none w-full">
+                            <div>
+                                <div className="flex items-start gap-1.5 min-w-[3rem] justify-start">
+                                    <Cake className="w-4 h-4 stroke-[2.3] shrink-0 mt-0.5" />
+                                    <p>{ formattedDate }</p>
+                                </div>
+                    
+                                <div className="flex items-start gap-1.5 min-w-[3rem] justify-start">
+                                    <MapPin className="w-4 h-4 stroke-[2.3] shrink-0 mt-0.5" />
+                                    <p>{ profile?.location }</p>
+                                </div>
+                            </div>
+
+                            <div>
+                                <p>{ profile?.bio }</p>
+                            </div>
+                            <div className="flex items-center justify-between w-full -m-2">
+                                <div className="flex items-center gap-1.5 min-w-[3rem] justify-start p-2 rounded-2xl hover:bg-zinc-100 transition-colors cursor-pointer">
+                                    <User className="w-4 h-4 stroke-[2.3] shrink-0 mt-0.5" />
+                                    <span>{10}</span>
+                                </div>
+                                <TooltipProvider delayDuration={200}>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                        <div className="flex items-center gap-1.5 min-w-[3rem] justify-start p-2 rounded-2xl hover:bg-zinc-100 transition-colors cursor-pointer">
+                                            <ThumbsUp className="w-4 h-4 stroke-[2.3] shrink-0" />
+                                            <span>{ profile?.totalLikes }</span>
+                                        </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="bottom" align="center">
+                                        <p className="text-xs font-medium">{ profile?.totalLikes } Total Likes</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                    </TooltipProvider>
+                                    <TooltipProvider delayDuration={200}>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                        <div className="flex items-center gap-1.5 min-w-[3rem] justify-start p-2 rounded-2xl hover:bg-zinc-100 transition-colors cursor-pointer">
+                                            <Library className="w-4 h-4 stroke-[2.3] shrink-0" />
+                                            <span>{ profile?.articlesPublished }</span>
+                                        </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="bottom" align="center">
+                                        <p className="text-xs font-medium">{ profile?.articlesPublished } Insights Published</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                    </TooltipProvider>
+                                    <TooltipProvider delayDuration={200}>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                        <div className="flex items-center gap-1.5 min-w-[3rem] justify-start p-2 rounded-2xl hover:bg-zinc-100 transition-colors cursor-pointer">
+                                            <MessageSquareText className="w-4 h-4 stroke-[2.3] shrink-0" />
+                                            <span>{ profile?.commentsPublished }</span>
+                                        </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="bottom" align="center">
+                                        <p className="text-xs font-medium">{ profile?.commentsPublished } Comments Published</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                    </TooltipProvider>
+                                </div>
                         </div>
                     </div>
                 </HoverCardContent>

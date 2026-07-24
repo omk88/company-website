@@ -83,20 +83,20 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
         <div className="p-4 gap-4 flex flex-col font-extralight text-sm font-mono tracking-tight select-none w-full">
           
           <div>
-            <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
+            <div className="flex items-start gap-1.5 min-w-[3rem] justify-start">
               <Cake className="w-4 h-4 stroke-[2.3] shrink-0" />
               <p>{ formattedDate }</p>
             </div>
 
-            <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
-              <MapPin className="w-4 h-4 stroke-[2.3] shrink-0" />
+            <div className="flex items-start gap-1.5 min-w-[3rem] justify-start">
+              <MapPin className="w-4 h-4 stroke-[2.3] shrink-0 mt-0.5" />
               <p>{ profile.location }</p>
             </div>
           </div>
 
           <div className="flex items-center justify-between w-full px-12 -m-2">
             <div className="flex items-center gap-1.5 min-w-[3rem] justify-start p-2 rounded-2xl hover:bg-zinc-100 transition-colors cursor-pointer">
-              <User className="w-4 h-4 stroke-[2.3] shrink-0" />
+              <User className="w-4 h-4 stroke-[2.3] shrink-0 mt-0.5" />
               <span>{10}</span>
             </div>
             <TooltipProvider delayDuration={200}>
