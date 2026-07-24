@@ -11,6 +11,7 @@ import { RxLinkedinLogo } from "react-icons/rx";
 import { api } from "@/convex/_generated/api";
 import { Preloaded, usePreloadedQuery } from "convex/react";
 import { ProfileHoverCard } from "./ProfileHoverCard";
+import { Checkbox } from "../ui/checkbox";
 
 interface ProfileBlogCardProps {
     id: string;
@@ -25,9 +26,11 @@ interface ProfileBlogCardProps {
     readTime: number;
     tags: Array<string>;    
     preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
+    isSelected?: boolean;
+    onSelectChange?: (checked: boolean) => void;
 }
 
-export function ProfileBlogCard({ id, imageUrl, authorName, title, subtitle, totalViews, likes, commentCount, date, readTime, tags, preloadedProfile }: ProfileBlogCardProps) {
+export function ProfileBlogCard({ id, imageUrl, authorName, title, subtitle, totalViews, likes, commentCount, date, readTime, tags, preloadedProfile, isSelected, onSelectChange }: ProfileBlogCardProps) {
     return (
         <div className="group flex flex-col md:flex-row h-auto md:h-[190px] border border-border/50 rounded-none">
             
@@ -35,6 +38,22 @@ export function ProfileBlogCard({ id, imageUrl, authorName, title, subtitle, tot
                 href={`/insights/${id}`}
                 className="relative aspect-video md:aspect-auto w-full md:w-2/5 md:h-full overflow-hidden bg-muted border-b md:border-b-0 md:border-r border-border/50 shrink-0 block"
             >
+
+                <div 
+                    className="absolute z-1 bg-white backdrop-blur-sm p-1 border-r border-b"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }}
+                >
+                    <Checkbox 
+                        id={`select-card-${id}`} 
+                        checked={isSelected}
+                        onCheckedChange={(checked) => onSelectChange?.(!!checked)}
+                        className="data-[state=checked]:bg-primary"
+                    />
+                </div>
+
                 <Image
                     src={imageUrl}
                     alt={title}
