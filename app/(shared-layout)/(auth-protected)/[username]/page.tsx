@@ -1,12 +1,10 @@
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { LeftSidebarProfile } from "@/components/web/LeftSidebarProfile";
 import { ProfileContentWrapper } from "@/components/web/ProfileContentWrapper";
 import { SearchProvider } from "@/components/web/SearchContext";
 import { api } from "@/convex/_generated/api";
 import { preloadQuery } from "convex/nextjs";
 import { preloadAuthQuery } from "@/lib/auth-server";
-import { ProfileBlogPosts } from "@/components/web/ProfileBlogPosts";
-import { ProfileComments } from "@/components/web/ProfileComments";
 
 interface profileRouteProps {
     params: Promise<{
@@ -54,7 +52,13 @@ export default async function Profile({ params }: profileRouteProps) {
 
                 <div className="w-full ml-[24rem] bg-white">
                     <SearchProvider >
-                        <ProfileContentWrapper preloadedProfile={preloadedProfile} preloadedCurrentUser={preloadedCurrentUser} commentsSlot={<ProfileComments preloadedInitialComments={preloadedInitialComments} username={username} />} blogsSlot={<ProfileBlogPosts preloadedCurrentUser={preloadedCurrentUser} preloadedProfile={preloadedProfile} preloadedInitialBlogs={preloadedInitialBlogs} username={username} />} />
+                        <ProfileContentWrapper
+                            username={username}
+                            preloadedProfile={preloadedProfile}
+                            preloadedCurrentUser={preloadedCurrentUser}
+                            preloadedInitialBlogs={preloadedInitialBlogs}
+                            preloadedInitialComments={preloadedInitialComments}
+                        />
                     </SearchProvider>
                 </div>
             </SidebarProvider>

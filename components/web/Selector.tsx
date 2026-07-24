@@ -1,11 +1,16 @@
 "use client";
 
-import { useState } from "react";
 import { Checkbox } from "../ui/checkbox";
 import { Trash2 } from "lucide-react";
 
-export function Selector() {
-  const [isSelected, setIsSelected] = useState(false);
+interface SelectorProps {
+  isAllSelected: boolean;
+  isSomeSelected: boolean;
+  onToggleAll: (checked: boolean) => void;
+  onDelete?: () => void;
+}
+
+export function Selector({isAllSelected, isSomeSelected, onToggleAll, onDelete}: SelectorProps) {
 
   return (
     <label 
@@ -14,11 +19,11 @@ export function Selector() {
     >
       <Checkbox
         id="checkbox-delete"
-        checked={isSelected}
-        onCheckedChange={(checked) => setIsSelected(!!checked)}
+        checked={isAllSelected}
+        onCheckedChange={(checked) => onToggleAll(!!checked)}
       />
 
-      {isSelected ? (
+      {isSomeSelected ? (
         <span 
           role="button"
           onClick={(e) => {

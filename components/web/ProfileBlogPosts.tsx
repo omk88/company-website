@@ -5,16 +5,21 @@ import { Preloaded, useConvex, usePreloadedQuery } from "convex/react";
 import { useEffect, useRef, useState } from "react";
 import { ProfileBlogCard } from "./ProfileBlogCard";
 import { useLocalSearch } from "./SearchContext";
+import { SelectableCardWrapper } from "./SelectableCardWrapper";
 
 interface ProfileBlogPostsProps {
     username: string;
     preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
     preloadedInitialBlogs: Preloaded<typeof api.blogs.getPaginatedPostsByUsername>;
     preloadedCurrentUser: Preloaded<typeof api.auth.getCurrentUser>;
+    selectedIds: string[];
+    setSelectedIds: React.Dispatch<React.SetStateAction<string[]>>;
+    onLoadedIdsChange: (ids: string[]) => void;
 }
 
-export function ProfileBlogPosts({ username, preloadedProfile, preloadedInitialBlogs, preloadedCurrentUser }: ProfileBlogPostsProps) {
+export function ProfileBlogPosts({ username, preloadedProfile, preloadedInitialBlogs, preloadedCurrentUser, selectedIds, setSelectedIds, onLoadedIdsChange }: ProfileBlogPostsProps) {
     const convex = useConvex();
+
     const initialData = usePreloadedQuery(preloadedInitialBlogs);
     const currentUser = usePreloadedQuery(preloadedCurrentUser);
     const profileData = usePreloadedQuery(preloadedProfile);
@@ -124,6 +129,16 @@ export function ProfileBlogPosts({ username, preloadedProfile, preloadedInitialB
         };
     }, [cursor, isDone, isLoading, searchTerm, sortOrder]);
 
+    useEffect(() => {
+        onLoadedIdsChange(blogs.map((b) => b._id));
+    }, [blogs, onLoadedIdsChange]);
+
+    const handleSelectChange = (id: string, checked: boolean) => {
+        setSelectedIds((prev) =>
+            checked ? [...prev, id] : prev.filter((item) => item !== id)
+        );
+    };
+
     return (
         <div className="space-y-4">
             {blogs.length === 0 ? (
@@ -133,7 +148,26 @@ export function ProfileBlogPosts({ username, preloadedProfile, preloadedInitialB
                         <ul className="flex flex-col gap-4">
                             {blogs.map((blog) => (
                                 <li key={blog._id}>
-                                    <ProfileBlogCard preloadedProfile={preloadedProfile} id={blog._id} imageUrl={blog.imageUrl} authorName={blog.authorName} title={blog.title} subtitle={blog.subtitle} totalViews={blog.totalViews} likes={blog.likes} commentCount={blog.commentCount} date={blog._creationTime} readTime={blog.readTime} tags={blog.tags} />
+                                    <SelectableCardWrapper
+                                        id={blog._id}
+                                        isSelected={selectedIds.includes(blog._id)}
+                                        onSelectChange={handleSelectChange}
+                                    >
+                                        <ProfileBlogCard
+                                            preloadedProfile={preloadedProfile}
+                                            id={blog._id}
+                                            imageUrl={blog.imageUrl}
+                                            authorName={blog.authorName}
+                                            title={blog.title}
+                                            subtitle={blog.subtitle}
+                                            totalViews={blog.totalViews}
+                                            likes={blog.likes}
+                                            commentCount={blog.commentCount}
+                                            date={blog._creationTime}
+                                            readTime={blog.readTime}
+                                            tags={blog.tags}
+                                        />
+                                    </SelectableCardWrapper>
                                 </li>
                             ))}
                         </ul>

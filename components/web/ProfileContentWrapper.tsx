@@ -7,19 +7,21 @@ import { SidebarSearch } from "./SidebarSearch";
 import { useLocalSearch } from "./SearchContext";
 import { api } from "@/convex/_generated/api";
 import { Preloaded, usePreloadedQuery } from "convex/react";
-import { Checkbox } from "../ui/checkbox";
-import { FieldGroup, Field, FieldLabel } from "../ui/field";
 import { Selector } from "./Selector";
+import { ProfileBlogPosts } from "./ProfileBlogPosts";
+import { ProfileComments } from "./ProfileComments";
 
 interface ProfileContentWrapperProps {
-  blogsSlot: React.ReactNode;
-  commentsSlot: React.ReactNode;
+  username: string;
   preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
   preloadedCurrentUser: Preloaded<typeof api.auth.getCurrentUser>;
+  preloadedInitialBlogs: Preloaded<typeof api.blogs.getPaginatedPostsByUsername>;
+  preloadedInitialComments: Preloaded<typeof api.comments.getPaginatedCommentsByUsername>;
 }
 
-export function ProfileContentWrapper({ preloadedCurrentUser, preloadedProfile, commentsSlot, blogsSlot }: ProfileContentWrapperProps) {
+export function ProfileContentWrapper({ username, preloadedProfile, preloadedCurrentUser, preloadedInitialBlogs, preloadedInitialComments }: ProfileContentWrapperProps) {
   const [activeTab, setActiveTab] = useState("blog-articles"); 
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const { setSearchTerm, setSortOrder } = useLocalSearch();
 
   const currentUser = usePreloadedQuery(preloadedCurrentUser);
@@ -27,6 +29,24 @@ export function ProfileContentWrapper({ preloadedCurrentUser, preloadedProfile, 
   const profile = profileData.profile;
 
   const isOwnProfile = currentUser?.userId && profile?.userId && currentUser.userId === profile.userId;
+
+  const [allBlogIds, setAllBlogIds] = useState<string[]>([]);
+
+  const isSomeSelected = selectedIds.length > 0;
+  const isAllSelected = allBlogIds.length > 0 && selectedIds.length === allBlogIds.length;
+
+  const handleToggleAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds([...allBlogIds]);
+    } else {
+      setSelectedIds([]); 
+    }
+  };
+
+  const handleDeleteSelected = () => {
+    console.log("Deleting blogs with IDs:", selectedIds);
+    setSelectedIds([]);
+  };
 
   const tabs: TabItem[] = [
     { value: "blog-articles", label: "Blog Articles" },
@@ -36,6 +56,7 @@ export function ProfileContentWrapper({ preloadedCurrentUser, preloadedProfile, 
   useEffect(() => {
     setSearchTerm("");
     setSortOrder("new");
+    setSelectedIds([]);
     window.scrollTo({ top: 0, behavior: "instant" });
   }, [activeTab, setSearchTerm, setSortOrder]);
 
@@ -52,7 +73,7 @@ export function ProfileContentWrapper({ preloadedCurrentUser, preloadedProfile, 
             onTabChange={setActiveTab} 
           />
 
-          <Selector />
+          <Selector isAllSelected={false} isSomeSelected={isSomeSelected} onToggleAll={handleToggleAll} onDelete={handleDeleteSelected} />
         </div>
 
         <div className="flex flex-row w-1/2 justify-end gap-4">
@@ -67,9 +88,24 @@ export function ProfileContentWrapper({ preloadedCurrentUser, preloadedProfile, 
       </div>
 
       <div className="w-full px-4 mb-8">
-        {activeTab === "blog-articles" && blogsSlot}
+        {activeTab === "blog-articles" && (
+          <ProfileBlogPosts
+            preloadedCurrentUser={preloadedCurrentUser}
+            preloadedProfile={preloadedProfile}
+            preloadedInitialBlogs={preloadedInitialBlogs}
+            username={username}
+            selectedIds={selectedIds}
+            setSelectedIds={setSelectedIds}
+            onLoadedIdsChange={setAllBlogIds}
+          />
+        )}
         
-        {activeTab === "comments" && commentsSlot}
+        {activeTab === "comments" && (
+          <ProfileComments
+            preloadedInitialComments={preloadedInitialComments}
+            username={username}
+          />
+        )}
       </div>
     </div>
   );
