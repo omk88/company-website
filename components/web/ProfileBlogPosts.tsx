@@ -10,11 +10,17 @@ interface ProfileBlogPostsProps {
     username: string;
     preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
     preloadedInitialBlogs: Preloaded<typeof api.blogs.getPaginatedPostsByUsername>;
+    preloadedCurrentUser: Preloaded<typeof api.auth.getCurrentUser>;
 }
 
-export function ProfileBlogPosts({ username, preloadedProfile, preloadedInitialBlogs }: ProfileBlogPostsProps) {
+export function ProfileBlogPosts({ username, preloadedProfile, preloadedInitialBlogs, preloadedCurrentUser }: ProfileBlogPostsProps) {
     const convex = useConvex();
     const initialData = usePreloadedQuery(preloadedInitialBlogs);
+    const currentUser = usePreloadedQuery(preloadedCurrentUser);
+    const profileData = usePreloadedQuery(preloadedProfile);
+    const profile = profileData.profile;
+
+    const isOwnProfile = currentUser?.userId && profile?.userId && currentUser.userId === profile.userId;
 
     const searchContext = useLocalSearch();
     const searchTerm = searchContext?.searchTerm ?? "";
