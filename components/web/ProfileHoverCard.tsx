@@ -3,6 +3,7 @@ import { HoverCard, HoverCardTrigger, HoverCardContent } from "../ui/hover-card"
 import { api } from "@/convex/_generated/api";
 import { Preloaded, usePreloadedQuery } from "convex/react";
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "../ui/tooltip";
+import Link from "next/link";
 
 interface ProfileHoverCardProps {
     authorName: string;
@@ -17,6 +18,9 @@ export function ProfileHoverCard({ authorName, date, preloadedProfile }: Profile
     const avatarSrc = profileData.profilePicture;
     const defaultAvatarSrc = profileData.defaultProfilePicture;
 
+    const profileUsername = profileData.profile?.username;
+    const profileLink = profileUsername ? `/${profileUsername}` : "/profile";
+
     const formattedDate = new Intl.DateTimeFormat("en-US", {
         month: "short",
         day: "numeric",
@@ -27,9 +31,11 @@ export function ProfileHoverCard({ authorName, date, preloadedProfile }: Profile
         <div>
             <HoverCard openDelay={100} closeDelay={100}>
                 <HoverCardTrigger asChild>
-                    <span className="cursor-pointer hover:text-blue-600 font-medium pointer-events-auto">
-                        {authorName}
-                    </span>
+                    <Link href={profileLink}>
+                        <span className="cursor-pointer hover:text-blue-600 font-medium pointer-events-auto">
+                            {authorName}
+                        </span>
+                    </Link>
                 </HoverCardTrigger>
                 <HoverCardContent side="bottom" align="start" className="w-80 p-0 overflow-hidden">
                     <div className="flex flex-col p-2">
