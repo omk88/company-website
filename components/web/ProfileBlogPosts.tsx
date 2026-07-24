@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { ProfileBlogCard } from "./ProfileBlogCard";
 import { useLocalSearch } from "./SearchContext";
 import { SelectableCardWrapper } from "./SelectableCardWrapper";
+import { Id } from "@/convex/_generated/dataModel";
 
 interface ProfileBlogPostsProps {
     username: string;
@@ -13,8 +14,8 @@ interface ProfileBlogPostsProps {
     preloadedInitialBlogs: Preloaded<typeof api.blogs.getPaginatedPostsByUsername>;
     preloadedCurrentUser: Preloaded<typeof api.auth.getCurrentUser>;
     selectedIds: string[];
-    setSelectedIds: React.Dispatch<React.SetStateAction<string[]>>;
-    onLoadedIdsChange: (ids: string[]) => void;
+    setSelectedIds: React.Dispatch<React.SetStateAction<Id<"blogs">[]>>;
+    onLoadedIdsChange: (ids: Id<"blogs">[]) => void;
 }
 
 export function ProfileBlogPosts({ username, preloadedProfile, preloadedInitialBlogs, preloadedCurrentUser, selectedIds, setSelectedIds, onLoadedIdsChange }: ProfileBlogPostsProps) {
@@ -133,7 +134,7 @@ export function ProfileBlogPosts({ username, preloadedProfile, preloadedInitialB
         onLoadedIdsChange(blogs.map((b) => b._id));
     }, [blogs, onLoadedIdsChange]);
 
-    const handleSelectChange = (id: string, checked: boolean) => {
+    const handleSelectChange = (id: Id<"blogs">, checked: boolean) => {
         setSelectedIds((prev) =>
             checked ? [...prev, id] : prev.filter((item) => item !== id)
         );

@@ -34,9 +34,7 @@ interface BlogPostFormProps {
 }
 
 function LivePostPreview({ control, previewImage }: { control: Control<BlogFormValues>; previewImage: string | null }) {
-    const formValues = useWatch({
-        control,
-    });
+    const formValues = useWatch({control});
 
     const title = formValues.title || "[TITLE]";
     const subtitle = formValues.subtitle || "[SUBTITLE]";

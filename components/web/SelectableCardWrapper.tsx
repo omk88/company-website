@@ -1,11 +1,12 @@
 "use client";
 
+import { Id } from "@/convex/_generated/dataModel";
 import { Checkbox } from "../ui/checkbox";
 
 interface SelectableCardWrapperProps {
-    id: string;
+    id: Id<"blogs">;
     isSelected: boolean;
-    onSelectChange: (id: string, checked: boolean) => void;
+    onSelectChange: (id: Id<"blogs">, checked: boolean) => void;
     children: React.ReactNode;
 }
 

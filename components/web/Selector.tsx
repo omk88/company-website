@@ -13,10 +13,7 @@ interface SelectorProps {
 export function Selector({isAllSelected, isSomeSelected, onToggleAll, onDelete}: SelectorProps) {
 
   return (
-    <label 
-      htmlFor="checkbox-delete" 
-      className="inline-flex items-center gap-2 px-3 py-1.5 text-xs bg-background border border-border/50 rounded-md cursor-pointer select-none focus-within:ring-1 hover:bg-accent/50 transition-colors"
-    >
+    <div className="inline-flex items-center gap-2 px-3 py-1.5 text-xs bg-background border border-border/50 rounded-md select-none focus-within:ring-1">
       <Checkbox
         id="checkbox-delete"
         checked={isAllSelected}
@@ -24,17 +21,19 @@ export function Selector({isAllSelected, isSomeSelected, onToggleAll, onDelete}:
       />
 
       {isSomeSelected ? (
-        <span 
-          role="button"
-          onClick={(e) => {
-          }}
+        <button 
+          type="button"
+          onClick={(e) => { e.stopPropagation(); onDelete?.(); }}
           className="flex items-center justify-center text-muted-foreground hover:text-destructive transition-colors"
+          title="Delete selected items"
         >
           <Trash2 className="h-4 w-4 transition-transform active:scale-90" />
-        </span>
+        </button>
       ) : (
-        <span className="font-medium text-foreground">Select</span>
+        <label htmlFor="checkbox-delete" className="font-medium text-foreground cursor-pointer">
+          Select
+        </label>
       )}
-    </label>
+    </div>
   );
 }

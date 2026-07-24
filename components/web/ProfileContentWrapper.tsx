@@ -6,10 +6,11 @@ import { SidebarSort } from "./SidebarSort";
 import { SidebarSearch } from "./SidebarSearch";
 import { useLocalSearch } from "./SearchContext";
 import { api } from "@/convex/_generated/api";
-import { Preloaded, usePreloadedQuery } from "convex/react";
+import { Preloaded, useMutation, usePreloadedQuery } from "convex/react";
 import { Selector } from "./Selector";
 import { ProfileBlogPosts } from "./ProfileBlogPosts";
 import { ProfileComments } from "./ProfileComments";
+import { Id } from "@/convex/_generated/dataModel";
 
 interface ProfileContentWrapperProps {
   username: string;
@@ -21,8 +22,10 @@ interface ProfileContentWrapperProps {
 
 export function ProfileContentWrapper({ username, preloadedProfile, preloadedCurrentUser, preloadedInitialBlogs, preloadedInitialComments }: ProfileContentWrapperProps) {
   const [activeTab, setActiveTab] = useState("blog-articles"); 
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [selectedIds, setSelectedIds] = useState<Id<"blogs">[]>([]);
   const { setSearchTerm, setSortOrder } = useLocalSearch();
+
+  const deleteBlogs = useMutation(api.blogs.deleteBlogs);
 
   const currentUser = usePreloadedQuery(preloadedCurrentUser);
   const profileData = usePreloadedQuery(preloadedProfile);
@@ -30,7 +33,7 @@ export function ProfileContentWrapper({ username, preloadedProfile, preloadedCur
 
   const isOwnProfile = currentUser?.userId && profile?.userId && currentUser.userId === profile.userId;
 
-  const [allBlogIds, setAllBlogIds] = useState<string[]>([]);
+  const [allBlogIds, setAllBlogIds] = useState<Id<"blogs">[]>([]);
 
   const isSomeSelected = selectedIds.length > 0;
   const isAllSelected = allBlogIds.length > 0 && selectedIds.length === allBlogIds.length;
@@ -43,8 +46,12 @@ export function ProfileContentWrapper({ username, preloadedProfile, preloadedCur
     }
   };
 
-  const handleDeleteSelected = () => {
+  const handleDeleteSelected = async () => {
     console.log("Deleting blogs with IDs:", selectedIds);
+
+    await deleteBlogs({
+      blogIds: selectedIds
+    })
     setSelectedIds([]);
   };
 
@@ -73,7 +80,7 @@ export function ProfileContentWrapper({ username, preloadedProfile, preloadedCur
             onTabChange={setActiveTab} 
           />
 
-          <Selector isAllSelected={false} isSomeSelected={isSomeSelected} onToggleAll={handleToggleAll} onDelete={handleDeleteSelected} />
+          <Selector isAllSelected={isAllSelected} isSomeSelected={isSomeSelected} onToggleAll={handleToggleAll} onDelete={handleDeleteSelected} />
         </div>
 
         <div className="flex flex-row w-1/2 justify-end gap-4">
