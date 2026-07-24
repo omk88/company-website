@@ -52,7 +52,7 @@ export function IncrementBlogLikesDislikes({
   const userEmail = currentUser?.email;
   const isCompanyUser = userEmail?.endsWith("@taqtiq.tech");
 
-  const deleteBlogMutation = useMutation(api.blogs.deleteBlog);
+  const deleteBlogMutation = useMutation(api.blogs.deleteBlogs);
 
   const router = useRouter(); 
   
@@ -151,7 +151,7 @@ export function IncrementBlogLikesDislikes({
     setIsDeleting(true);
 
     try {
-      await deleteBlogMutation({ blogId: blog._id });
+      await deleteBlogMutation({ blogIds: [blog._id] });
       toast.success("Blog successfully deleted.");
       setIsOpen(false);
       router.push("/insights");
