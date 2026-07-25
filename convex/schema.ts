@@ -30,11 +30,24 @@ const schema = defineSchema({
   .index("by_username_likes", ["username", "likes"])
   .index("by_username_hot", ["username", "hotScore"])
   .index("by_username_controversial", ["username", "controversialScore"])
-  .searchIndex("search_title", {
-    searchField: "title",
-    filterFields: ["username"],
-  }),
+  .searchIndex("search_title", { searchField: "title", filterFields: ["username"] }),
 
+  blogTags: defineTable({
+    blogId: v.id("blogs"),
+    username: v.string(),
+    tag: v.string(),
+    createdAt: v.number(),
+    likes: v.number(),
+    hotScore: v.number(),
+    controversialScore: v.number(),
+  })
+  .index("by_blog", ["blogId"])
+  .index("by_tag_username", ["tag", "username"])
+  .index("by_tag_username_createdAt", ["tag", "username", "createdAt"])
+  .index("by_tag_username_likes", ["tag", "username", "likes"])
+  .index("by_tag_username_hot", ["tag", "username", "hotScore"])
+  .index("by_tag_username_controversial", ["tag", "username", "controversialScore"]),
+  
   viewLogs: defineTable({
     blogId: v.string(),
     viewedAt: v.number(),

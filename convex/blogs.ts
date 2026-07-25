@@ -29,33 +29,49 @@ export const createPost = mutation({
 
     const words = args.content.trim().split(/\s+/);
     const wordCount = words.filter(word => word.length > 0).length;
-
     const readTimeMinutes = Math.max(1, Math.ceil(wordCount / WORDS_PER_MINUTE));
+    const now = Date.now();
 
-    const [_, profile] = await Promise.all([
-      ctx.db.insert("blogs", {
-        title: args.title,
-        subtitle: args.subtitle,
-        content: args.content,
-        author: args.author,
-        authorName: args.authorName,
+    const blogId = await ctx.db.insert("blogs", {
+      title: args.title,
+      subtitle: args.subtitle,
+      content: args.content,
+      author: args.author,
+      authorName: args.authorName,
+      username: args.username,
+      tags: args.tags,
+      storageId: args.storageId,
+      imageUrl: generatedImageUrl || "",
+      totalViews: 0,
+      likes: 0,
+      commentCount: 0,
+      hotScore: 0,
+      controversialScore: 0,
+      featured: false,
+      createdAt: now,
+      readTime: readTimeMinutes,
+    });
+
+    const tagPromises = args.tags.map((tag) =>
+      ctx.db.insert("blogTags", {
+        blogId,
+        tag,
         username: args.username,
-        tags: args.tags,
-        storageId: args.storageId,
-        imageUrl: generatedImageUrl || "",
-        totalViews: 0,
+        createdAt: now,
         likes: 0,
-        commentCount: 0,
         hotScore: 0,
         controversialScore: 0,
-        featured: false,
-        createdAt: Date.now(),
-        readTime: readTimeMinutes,
-      }),
-      ctx.db
-        .query("profiles")
-        .withIndex("by_userId", (q) => q.eq("userId", args.author))
-        .unique()
+      })
+    );
+
+    const profilePromise = ctx.db
+      .query("profiles")
+      .withIndex("by_userId", (q) => q.eq("userId", args.author))
+      .unique();
+
+    const [_, profile] = await Promise.all([
+      Promise.all(tagPromises),
+      profilePromise,
     ]);
 
     if (profile) {
@@ -63,6 +79,8 @@ export const createPost = mutation({
         articlesPublished: (profile.articlesPublished || 0) + 1,
       });
     }
+
+    return blogId;
   },
 });
 
@@ -245,12 +263,13 @@ export const deleteBlogs = mutation({
       const blog = await ctx.db.get(blogId);
       if (!blog) continue;
 
-      const [featuredBlogs, blogVotes, comments, viewLogs, blogAuthorProfile] = await Promise.all([
+      const [featuredBlogs, blogVotes, comments, viewLogs, blogAuthorProfile, blogTags] = await Promise.all([
         ctx.db.query("featuredBlogs").withIndex("by_blog", (q) => q.eq("blogId", blogId)).collect(),
         ctx.db.query("blogVotes").withIndex("by_blog", (q) => q.eq("blogId", blogId)).collect(),
         ctx.db.query("comments").withIndex("by_blog", (q) => q.eq("blogId", blogId)).collect(),
         ctx.db.query("viewLogs").withIndex("by_blog", (q) => q.eq("blogId", blogId)).collect(),
         ctx.db.query("profiles").withIndex("by_userId", (q) => q.eq("userId", blog.author)).unique(),
+        ctx.db.query("blogTags").withIndex("by_blog", (q) => q.eq("blogId", blogId)).collect(),
       ]);
 
       const commentVotesNested = await Promise.all(
@@ -317,7 +336,8 @@ export const deleteBlogs = mutation({
         ...blogVotes.map((bv) => ctx.db.delete(bv._id)),
         ...comments.map((c) => ctx.db.delete(c._id)),
         ...viewLogs.map((vl) => ctx.db.delete(vl._id)),
-        ...commentVotes.map((cv) => ctx.db.delete(cv._id))
+        ...commentVotes.map((cv) => ctx.db.delete(cv._id)),
+        ...blogTags.map((bt) => ctx.db.delete(bt._id))
       );
 
       await Promise.all(databaseWrites);
@@ -358,6 +378,40 @@ export const updatePost = mutation({
           console.warn("Could not remove old asset:", e);
         }
       }
+    }
+
+    const oldTags = currentPost.tags;
+    const newTags = fieldsToUpdate.tags;
+
+    if (JSON.stringify(oldTags) !== JSON.stringify(newTags)) {
+      const existingBlogTags = await ctx.db
+        .query("blogTags")
+        .withIndex("by_blog", (q) => q.eq("blogId", blogId))
+        .collect();
+
+      const tagsToRemove = existingBlogTags.filter(
+        (bt) => !newTags.includes(bt.tag)
+      );
+
+      const existingTagNames = existingBlogTags.map((bt) => bt.tag);
+      const tagsToAdd = newTags.filter((tag) => !existingTagNames.includes(tag));
+
+      const tagOperations = [
+        ...tagsToRemove.map((bt) => ctx.db.delete(bt._id)),
+        ...tagsToAdd.map((tag) => 
+          ctx.db.insert("blogTags", {
+            blogId,
+            tag,
+            username: fieldsToUpdate.username,
+            createdAt: currentPost.createdAt,
+            likes: currentPost.likes,
+            hotScore: currentPost.hotScore,
+            controversialScore: currentPost.controversialScore,
+          })
+        ),
+      ];
+
+      await Promise.all(tagOperations)
     }
 
     await ctx.db.patch(blogId, {
@@ -460,6 +514,7 @@ export const getFeaturedState = query({
 
 export const getPaginatedPostsByUsername = query({
   args: {
+    activeTags: v.optional(v.array(v.string())),
     searchTerm: v.optional(v.string()),
     sortOrder: v.optional(v.string()),
     username: v.string(),
@@ -468,13 +523,66 @@ export const getPaginatedPostsByUsername = query({
   handler: async (ctx, args) => {
     const cleanSearchTerm = args.searchTerm?.trim();
     const sortOrder = args.sortOrder || "new";
+    const tags = args.activeTags || [];
 
     if (cleanSearchTerm) {
-      return await ctx.db
+      const searchResults = await ctx.db
         .query("blogs")
-        .withSearchIndex("search_title", (q) => q.search("title", cleanSearchTerm).eq("username", args.username))
+        .withSearchIndex("search_title", (q) =>
+          q.search("title", cleanSearchTerm).eq("username", args.username)
+        )
         .paginate(args.paginationOpts);
+
+      if (tags.length > 0) {
+        return {
+          ...searchResults,
+          page: searchResults.page.filter((blog) =>
+            tags.some((tag) => blog.tags?.includes(tag))
+          ),
+        };
+      }
+
+      return searchResults;
     }
+
+
+    if (tags.length > 0) {
+      const primaryTag = tags[0];
+      let tagQuery;
+
+      if (sortOrder === "hot") {
+        tagQuery = ctx.db
+          .query("blogTags")
+          .withIndex("by_tag_username_hot", (q) => q.eq("tag", primaryTag).eq("username", args.username))
+          .order("desc");
+      } else if (sortOrder === "controversial") {
+        tagQuery = ctx.db
+          .query("blogTags")
+          .withIndex("by_tag_username_controversial", (q) => q.eq("tag", primaryTag).eq("username", args.username))
+          .order("desc");
+      } else if (sortOrder === "top") {
+        tagQuery = ctx.db
+          .query("blogTags")
+          .withIndex("by_tag_username_likes", (q) => q.eq("tag", primaryTag).eq("username", args.username))
+          .order("desc");
+      } else {
+        tagQuery = ctx.db
+          .query("blogTags")
+          .withIndex("by_tag_username_createdAt", (q) => q.eq("tag", primaryTag).eq("username", args.username))
+          .order("desc");
+      }
+
+      const paginatedTagEntries = await tagQuery.paginate(args.paginationOpts);
+
+      const blogPromises = paginatedTagEntries.page.map((item) => ctx.db.get(item.blogId));
+      const blogs = await Promise.all(blogPromises);
+
+      return {
+        ...paginatedTagEntries,
+        page: blogs.filter((b): b is NonNullable<typeof b> => b !== null)
+      };
+    }
+
 
     if (sortOrder === "hot") {
       return await ctx.db
@@ -489,7 +597,7 @@ export const getPaginatedPostsByUsername = query({
         .query("blogs")
         .withIndex("by_username_controversial", (q) => q.eq("username", args.username))
         .order("desc")
-        .paginate(args.paginationOpts)
+        .paginate(args.paginationOpts);
     }
 
     if (sortOrder === "top") {
@@ -497,14 +605,14 @@ export const getPaginatedPostsByUsername = query({
         .query("blogs")
         .withIndex("by_username_likes", (q) => q.eq("username", args.username))
         .order("desc")
-        .paginate(args.paginationOpts)
+        .paginate(args.paginationOpts);
     }
 
     return await ctx.db
       .query("blogs")
       .withIndex("by_username", (q) => q.eq("username", args.username))
       .order("desc")
-      .paginate(args.paginationOpts)
+      .paginate(args.paginationOpts);
   },
 });
 
