@@ -11,6 +11,7 @@ import { Selector } from "./Selector";
 import { ProfileBlogPosts } from "./ProfileBlogPosts";
 import { ProfileComments } from "./ProfileComments";
 import { Id } from "@/convex/_generated/dataModel";
+import { SidebarTags } from "./SidebarTags";
 
 interface ProfileContentWrapperProps {
   username: string;
@@ -24,8 +25,6 @@ export function ProfileContentWrapper({ username, preloadedProfile, preloadedCur
   const [activeTab, setActiveTab] = useState("blog-articles"); 
   const [selectedIds, setSelectedIds] = useState<Id<"blogs">[]>([]);
   const { setSearchTerm, setSortOrder } = useLocalSearch();
-
-  const deleteBlogs = useMutation(api.blogs.deleteBlogs);
 
   const currentUser = usePreloadedQuery(preloadedCurrentUser);
   const profileData = usePreloadedQuery(preloadedProfile);
@@ -44,14 +43,6 @@ export function ProfileContentWrapper({ username, preloadedProfile, preloadedCur
     } else {
       setSelectedIds([]); 
     }
-  };
-
-  const handleDeleteSelected = async () => {
-
-    await deleteBlogs({
-      blogIds: selectedIds
-    })
-    setSelectedIds([]);
   };
 
   const tabs: TabItem[] = [
@@ -89,6 +80,11 @@ export function ProfileContentWrapper({ username, preloadedProfile, preloadedCur
         </div>
 
         <div className="flex flex-row w-1/2 justify-end gap-4">
+
+          <div>
+            <SidebarTags />
+          </div>
+
           <div>
             <SidebarSort />
           </div>

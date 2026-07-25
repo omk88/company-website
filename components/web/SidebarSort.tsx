@@ -1,15 +1,7 @@
 "use client";
 
 import { useLocalSearch } from "@/components/web/SearchContext";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowUp, CalendarArrowUp, Flame, Swords } from "lucide-react";
 
 export function SidebarSort() {
