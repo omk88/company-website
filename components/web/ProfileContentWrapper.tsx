@@ -47,7 +47,6 @@ export function ProfileContentWrapper({ username, preloadedProfile, preloadedCur
   };
 
   const handleDeleteSelected = async () => {
-    console.log("Deleting blogs with IDs:", selectedIds);
 
     await deleteBlogs({
       blogIds: selectedIds
@@ -80,7 +79,13 @@ export function ProfileContentWrapper({ username, preloadedProfile, preloadedCur
             onTabChange={setActiveTab} 
           />
 
-          <Selector isAllSelected={isAllSelected} isSomeSelected={isSomeSelected} onToggleAll={handleToggleAll} onDelete={handleDeleteSelected} />
+          <Selector
+            isAllSelected={isAllSelected}
+            isSomeSelected={isSomeSelected}
+            selectedIds={selectedIds}
+            onToggleAll={handleToggleAll}
+            onSuccess={() => setSelectedIds([])}
+          />
         </div>
 
         <div className="flex flex-row w-1/2 justify-end gap-4">

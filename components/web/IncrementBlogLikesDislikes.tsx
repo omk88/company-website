@@ -2,12 +2,12 @@
 
 import { api } from "@/convex/_generated/api";
 import { Doc } from "@/convex/_generated/dataModel";
-import { useConvex, useMutation, useQuery, usePreloadedQuery } from "convex/react";
+import { useConvex, useMutation, usePreloadedQuery } from "convex/react";
 import { usePreloadedAuthQuery } from "@convex-dev/better-auth/nextjs/client";
 import { Preloaded } from "convex/react";
-import { Copy, Ellipsis, Loader2, MessageSquare, SquarePen, Star, ThumbsUp, Trash2, TriangleAlert } from "lucide-react";
+import { Copy, Ellipsis,  MessageSquare, SquarePen, Star, ThumbsUp, Trash2, TriangleAlert } from "lucide-react";
 import { Button } from "../ui/button";
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import { toast } from "sonner";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { FaFacebook } from "react-icons/fa";
@@ -16,8 +16,7 @@ import { RxLinkedinLogo } from "react-icons/rx";
 import { Separator } from "../ui/separator";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
-
+import { DeleteBlogDialog } from "./DeleteBlogDialog";
 
 interface IncrementBlogLikesProps {
   blog: Doc<"blogs">;
@@ -36,8 +35,6 @@ export function IncrementBlogLikesDislikes({
 }: IncrementBlogLikesProps) {
 
   const convex = useConvex();
-
-  const [isOpen, setIsOpen] = useState(false);
   
   const currentUser = usePreloadedAuthQuery(preloadedUser);
   const voteState = usePreloadedQuery(preloadedVoteState);
@@ -47,12 +44,9 @@ export function IncrementBlogLikesDislikes({
 
   const [isVotePending, startVoteTransition] = useTransition();
   const [isFeaturedPending, startFeaturedTransition] = useTransition();
-  const [isDeleting, setIsDeleting] = useState(false);
 
   const userEmail = currentUser?.email;
   const isCompanyUser = userEmail?.endsWith("@taqtiq.tech");
-
-  const deleteBlogMutation = useMutation(api.blogs.deleteBlogs);
 
   const router = useRouter(); 
   
@@ -147,74 +141,8 @@ export function IncrementBlogLikesDislikes({
     document.getElementById("comments")?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handleDelete = async () => {
-    setIsDeleting(true);
-
-    try {
-      await deleteBlogMutation({ blogIds: [blog._id] });
-      toast.success("Blog successfully deleted.");
-      setIsOpen(false);
-      router.push("/insights");
-
-    } catch (error) {
-      toast.error("Failed to delete blog.");
-      setIsDeleting(false);
-
-    }
-  };
-
-  const handleOpenChange = (open: boolean) => {
-    setIsOpen(open);
-  };
-
   return (
     <div className="flex flex-col items-center gap-2 p-6 text-muted-foreground text-xs">
-      <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader className="gap-1">
-            <DialogTitle>
-              Delete blog post?
-            </DialogTitle>
-            <DialogDescription className="flex flex-cols gap-4 p-4">
-                <TriangleAlert className="w-20 h-20 text-yellow-500" />
-                <span>
-                  Are you sure you want to delete this blog? This action cannot be undone and will permanently remove this post and all of its comments.
-                </span>
-            </DialogDescription>
-          </DialogHeader>
-
-          <DialogFooter className="gap-4">
-            <Button
-              type="button"
-              disabled={isDeleting}
-              onClick={() => handleDelete()}
-              className={`w-full sm:w-auto gap-2 transition-colors hover:bg-red-700 hover:text-white ${
-                isDeleting 
-                  ? "bg-red-700 text-white" 
-                  : ""
-              }`}
-            >
-              {isDeleting ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Deleting...
-                </>
-              ) : (
-                "Delete blog"
-              )}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => handleOpenChange(false)}
-              disabled={isDeleting}
-              className="w-full sm:w-auto"
-            >
-              Cancel
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
       <Button 
         variant="ghost" 
         onClick={handleLikeClick}
@@ -330,13 +258,17 @@ export function IncrementBlogLikesDislikes({
                 </Link>
             </Button>
 
-            <Button 
-                variant="ghost" 
-                className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-destructive disabled:opacity-100"
-                onClick={() => handleOpenChange(true)}
-            >
-              <Trash2 className="!h-5 !w-5 transition-transform active:scale-90" />
-            </Button>
+            <DeleteBlogDialog
+              blogIds={[blog._id]}
+              trigger={
+                <Button 
+                    variant="ghost" 
+                    className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-destructive disabled:opacity-100"
+                >
+                  <Trash2 className="!h-5 !w-5 transition-transform active:scale-90" />
+                </Button>
+              }
+            />
         </>
       )}
     </div>
