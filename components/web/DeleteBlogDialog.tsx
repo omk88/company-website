@@ -1,5 +1,4 @@
 import { TriangleAlert, Loader2 } from "lucide-react";
-import router from "next/router";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
@@ -21,16 +20,18 @@ export function DeleteBlogDialog({ blogIds, trigger, onSuccess }: DeleteBlogDial
     
     const deleteBlogMutation = useMutation(api.blogs.deleteBlogs);
 
+    const isMultiple = blogIds.length > 1;
+
     const handleDelete = async () => {
         setIsDeleting(true);
 
         try {
             await deleteBlogMutation({ blogIds });
-            toast.success("Blog successfully deleted.");
+            toast.success( isMultiple ? `${blogIds.length} blogs successfully deleted.` : "Blog successfully deleted.");
             setIsOpen(false);
             onSuccess?.();
         } catch (error) {
-            toast.error("Failed to delete blog.");
+            toast.error(isMultiple ? "Failed to delete blogs." : "Failed to delete blog.");
             setIsDeleting(false);
         }
     };
@@ -41,12 +42,15 @@ export function DeleteBlogDialog({ blogIds, trigger, onSuccess }: DeleteBlogDial
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader className="gap-1">
             <DialogTitle>
-              Delete blog post?
+              {isMultiple ? `Delete ${blogIds.length} blog posts?` : "Delete blog post?"}
             </DialogTitle>
             <DialogDescription className="flex flex-cols gap-4 p-4">
                 <TriangleAlert className="w-20 h-20 text-yellow-500" />
                 <span>
-                  Are you sure you want to delete this blog? This action cannot be undone and will permanently remove this post and all of its comments.
+                  {isMultiple
+                    ? `Are you sure you want to delete these ${blogIds.length} blogs? This action cannot be undone and will permanently remove these posts and all of their comments.`
+                    : "Are you sure you want to delete this blog? This action cannot be undone and will permanently remove this post and all of its comments."
+                  }
                 </span>
             </DialogDescription>
           </DialogHeader>
@@ -68,7 +72,7 @@ export function DeleteBlogDialog({ blogIds, trigger, onSuccess }: DeleteBlogDial
                   Deleting...
                 </>
               ) : (
-                "Delete blog"
+                isMultiple ? `Delete ${blogIds.length} blogs` : "Delete blog"
               )}
             </Button>
             <Button

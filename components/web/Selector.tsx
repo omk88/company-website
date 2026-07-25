@@ -30,8 +30,7 @@ export function Selector({isAllSelected, isSomeSelected, selectedIds, onToggleAl
           trigger={
             <button 
               type="button"
-              className="flex items-center justify-center text-muted-foreground hover:text-destructive transition-colors"
-              title="Delete selected items"
+              className="flex items-center justify-center text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
             >
               <Trash2 className="h-4 w-4 transition-transform active:scale-90" />
             </button>
