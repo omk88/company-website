@@ -260,6 +260,9 @@ export function IncrementBlogLikesDislikes({
 
             <DeleteBlogDialog
               blogIds={[blog._id]}
+              onSuccess={() => {
+                router.push("/insights");
+              }}
               trigger={
                 <Button 
                     variant="ghost" 

@@ -29,12 +29,9 @@ export function DeleteBlogDialog({ blogIds, trigger, onSuccess }: DeleteBlogDial
             toast.success("Blog successfully deleted.");
             setIsOpen(false);
             onSuccess?.();
-            router.push("/insights");
-
         } catch (error) {
             toast.error("Failed to delete blog.");
             setIsDeleting(false);
-
         }
     };
 
