@@ -1,76 +1,81 @@
 "use client";
 
-import { useLocalSearch } from "@/components/web/SearchContext";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useState } from "react";
+import { ChevronDown, Tag } from "lucide-react";
+import { 
+  Popover, 
+  PopoverContent, 
+  PopoverTrigger 
+} from "@/components/ui/popover";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
 import { Checkbox } from "../ui/checkbox";
-import { Tag } from "lucide-react";
+
+const TAG_ITEMS = [
+  { id: "all", label: "All Topics" },
+  { id: "product", label: "Product" },
+  { id: "research", label: "Research" },
+  { id: "design", label: "Design" },
+  { id: "technology", label: "Technology" },
+  { id: "opinion", label: "Opinion" },
+  { id: "tutorials", label: "Tutorials" },
+];
 
 export function SidebarTags() {
-  const { sortOrder, setSortOrder } = useLocalSearch();
+  const [selectedTags, setSelectedTags] = useState<Record<string, boolean>>(() =>
+    TAG_ITEMS.reduce((acc, tag) => ({ ...acc, [tag.id]: true }), {})
+  );
+
+  const toggleTag = (id: string) => {
+    setSelectedTags((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
 
   return (
-    <Select
-      value={sortOrder}
-      onValueChange={setSortOrder}
-    >
-      <SelectTrigger className="w-full text-xs bg-background border-border/50 focus:ring-1">
-        <span className="flex flex-row gap-2"><Tag />Tags</span>
-      </SelectTrigger>
-      
-      <SelectContent position="popper">
-        <FieldGroup className="gap-3 p-2">
+    <Popover>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          className="flex gap-2 h-8 w-full items-center justify-between rounded-lg border border-border/50 bg-background pl-3 pr-2 text-xs placeholder:text-muted-foreground focus:ring-1"
+        >
+          <span className="flex flex-row items-center gap-2">
+            <Tag className="h-3.5 w-3.5" />
+            Tags
+          </span>
+          <ChevronDown className="h-4 w-4 opacity-50" />
+        </button>
+      </PopoverTrigger>
+
+      <PopoverContent 
+        align="start" 
+        className="w-[var(--radix-popover-trigger-width)] min-w-[8rem] p-0"
+      >
+        <FieldGroup className="gap-1 p-2">
+          <FieldLabel className="px-2 text-xs font-medium text-muted-foreground select-none">
+            Tags
+          </FieldLabel>
+
+          {TAG_ITEMS.map((item) => (
             <Field
-                orientation="horizontal"
-                className="flex items-center gap-2 px-2 py-1.5 rounded-sm hover:bg-accent hover:text-accent-foreground cursor-pointer transition-colors"
+              key={item.id}
+              orientation="horizontal"
+              className="flex items-center gap-2 px-2 py-1.5 rounded-sm hover:bg-accent hover:text-accent-foreground cursor-pointer transition-colors select-none"
+              onClick={() => toggleTag(item.id)}
             >
-                <Checkbox id="all" name="all" defaultChecked />
-                <FieldLabel htmlFor="all" className="font-normal"> <span className="!text-xs">All Topics</span> </FieldLabel>
+              <Checkbox
+                id={item.id}
+                name={item.id}
+                checked={selectedTags[item.id]}
+                onCheckedChange={() => toggleTag(item.id)}
+              />
+              <FieldLabel
+                htmlFor={item.id}
+                className="font-normal cursor-pointer select-none"
+              >
+                <span className="!text-xs">{item.label}</span>
+              </FieldLabel>
             </Field>
-            <Field
-                orientation="horizontal"
-                className="flex items-center gap-2 px-2 py-1.5 rounded-sm hover:bg-accent hover:text-accent-foreground cursor-pointer transition-colors"
-            >
-                <Checkbox id="product" name="product" defaultChecked />
-                <FieldLabel htmlFor="product" className="font-normal"> <span className="!text-xs">Product</span> </FieldLabel>
-            </Field>
-            <Field
-                orientation="horizontal"
-                className="flex items-center gap-2 px-2 py-1.5 rounded-sm hover:bg-accent hover:text-accent-foreground cursor-pointer transition-colors"
-            >
-                <Checkbox id="research" name="research" defaultChecked />
-                <FieldLabel htmlFor="research" className="font-normal"> <span className="!text-xs">Research</span> </FieldLabel>
-            </Field>
-            <Field
-                orientation="horizontal"
-                className="flex items-center gap-2 px-2 py-1.5 rounded-sm hover:bg-accent hover:text-accent-foreground cursor-pointer transition-colors"
-            >
-                <Checkbox id="design" name="design" defaultChecked />
-                <FieldLabel htmlFor="design" className="font-normal"> <span className="!text-xs">Design</span> </FieldLabel>
-            </Field>
-            <Field
-                orientation="horizontal"
-                className="flex items-center gap-2 px-2 py-1.5 rounded-sm hover:bg-accent hover:text-accent-foreground cursor-pointer transition-colors"
-            >
-                <Checkbox id="technology" name="technology" defaultChecked />
-                <FieldLabel htmlFor="technology" className="font-normal"> <span className="!text-xs">Technology</span> </FieldLabel>
-            </Field>
-            <Field
-                orientation="horizontal"
-                className="flex items-center gap-2 px-2 py-1.5 rounded-sm hover:bg-accent hover:text-accent-foreground cursor-pointer transition-colors"
-            >
-                <Checkbox id="opinion" name="opinion" defaultChecked />
-                <FieldLabel htmlFor="opinion" className="font-normal"> <span className="!text-xs">Opinion</span> </FieldLabel>
-            </Field>
-            <Field
-                orientation="horizontal"
-                className="flex items-center gap-2 px-2 py-1.5 rounded-sm hover:bg-accent hover:text-accent-foreground cursor-pointer transition-colors"
-            >
-                <Checkbox id="tutorials" name="tutorials" defaultChecked />
-                <FieldLabel htmlFor="tutorials" className="font-normal"> <span className="!text-xs">Tutorials</span> </FieldLabel>
-            </Field>
+          ))}
         </FieldGroup>
-      </SelectContent>
-    </Select>
+      </PopoverContent>
+    </Popover>
   );
 }
