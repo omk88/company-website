@@ -10,6 +10,7 @@ import { LinksHoverCard } from "./LinksHoverCard";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { SkillsHoverCard } from "./SkillsHoverCard";
 import { EducationHoverCard } from "./EducationHoverCard";
+import { FollowButton } from "./FollowButton";
 
 interface profileProps {
   preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
@@ -33,10 +34,7 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
   const displayName = (firstName && lastName) ? `${firstName} ${lastName}` : username;
   const hasContent = profile.bio.trim() || profile.education.length > 0 || profile.socials.length > 0;
 
-  const isOwnProfile = 
-    currentUser?.userId && 
-    profile?.userId && 
-    currentUser.userId === profile.userId;
+  const isOwnProfile = currentUser?.userId && profile?.userId && currentUser.userId === profile.userId;
 
   const formattedDate = new Intl.DateTimeFormat("en-US", {
     month: "short",
@@ -81,7 +79,7 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
         </div>
 
         <div className="p-4 gap-4 flex flex-col font-extralight text-sm font-mono tracking-tight select-none w-full">
-          
+              
           <div>
             <div className="flex items-start gap-1.5 min-w-[3rem] justify-start">
               <Cake className="w-4 h-4 stroke-[2.3] shrink-0" />
@@ -149,8 +147,13 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
             <EducationHoverCard education={profile.education} />
             <SkillsHoverCard skills={profile.skills} />
           </div>
-          
         </div>
+
+        { currentUser && !isOwnProfile && (
+          <FollowButton />
+          )
+        }
+
       </SidebarContent>
       <SidebarFooter className="hidden" />
     </Sidebar>

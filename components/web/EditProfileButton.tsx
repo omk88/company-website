@@ -5,20 +5,10 @@ import { useForm, useFieldArray, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { api } from "@/convex/_generated/api";
-import { useConvex, useMutation, useQuery } from "convex/react";
-import { ImagePlus, Pen, Plus, Trash2, Check, ChevronsUpDown, GraduationCap, MapPin, Loader2, X, CircleX } from "lucide-react";
+import { useConvex, useMutation } from "convex/react";
+import {  Pen, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-  DialogClose,
-} from "@/components/ui/dialog";
-import { Avatar, AvatarBadge, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { Doc, Id } from "@/convex/_generated/dataModel";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { Input } from "../ui/input";
 import { Field, FieldLabel } from "../ui/field";
 import { Textarea } from "../ui/textarea";
@@ -30,9 +20,8 @@ import majorsData from "@/data/majors.json";
 import { SkillsFields } from "./EditFormFields/SkillsField";
 import { SocialLinksFields } from "./EditFormFields/SocialLinksField";
 import { useRouter } from "next/navigation";
-import imageCompression from 'browser-image-compression';
-import { Spinner } from "../ui/spinner";
 import { UploadAvatar } from "./UploadAvatar";
+import { Doc, Id } from "@/convex/_generated/dataModel";
 
 const formatPlatformName = (name: string) => {
   if (name.toLowerCase() === "x") return "Twitter / X";

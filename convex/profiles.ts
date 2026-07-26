@@ -1,3 +1,4 @@
+import { Id } from "./_generated/dataModel";
 import { mutation, MutationCtx, query } from "./_generated/server";
 import { v } from "convex/values";
 
@@ -51,6 +52,8 @@ export const initialiseProfile = mutation({
       totalLikes: 0,
       articlesPublished: 0,
       commentsPublished: 0,
+      followerCount: 0,
+      followingCount: 0,
     });
 
     return newProfileId;
@@ -178,6 +181,8 @@ export const createProfile = mutation({
     totalLikes: v.number(),
     articlesPublished: v.number(),
     commentsPublished: v.number(),
+    followerCount: v.number(),
+    followingCount: v.number(),
   },
   handler: async (ctx, args) => {
     const existingUser = await ctx.db
@@ -296,3 +301,64 @@ async function updateAuthorNameForAllPostsHelper(
 
   await Promise.all(updatePromises);
 }
+
+export const toggleFollow = mutation({
+  args: { targetProfileId: v.id("profiles") },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated.");
+
+    const currentProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
+      .unique();
+
+    if (!currentProfile) {
+      throw new Error("Profile not found.")
+    }
+
+    const currentProfileId = currentProfile._id;
+
+    if (currentProfileId === args.targetProfileId) {
+      throw new Error("You cannot follow yourself.")
+    }
+
+    const existingFollow = await ctx.db
+      .query("follows")
+      .withIndex("by_follower_and_following", (q) =>
+        q
+          .eq("followerId", currentProfileId)
+          .eq("followingId", args.targetProfileId)
+      )
+      .unique();
+
+    const targetProfile = await ctx.db.get(args.targetProfileId);
+    if (!targetProfile) throw new Error("Target profile not found.");
+
+    if (existingFollow) {
+      await ctx.db.delete(existingFollow._id);
+
+      await ctx.db.patch(currentProfileId, {
+        followingCount: Math.max(0, currentProfile.followingCount - 1),
+      });
+
+      await ctx.db.patch(args.targetProfileId, {
+        followerCount: Math.max(0, targetProfile.followerCount - 1),
+      });
+
+      return { isFollowing: false };
+    } else {
+
+      await ctx.db.insert("follows", {
+        followerId: currentProfileId,
+        followingId: args.targetProfileId,
+      });
+
+      await ctx.db.patch(currentProfileId, {
+        followerCount: targetProfile.followerCount + 1,
+      });
+
+      return { isFollowing: true };
+    }
+  }, 
+});

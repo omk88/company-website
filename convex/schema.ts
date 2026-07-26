@@ -21,16 +21,16 @@ const schema = defineSchema({
     controversialScore: v.number(), 
     readTime: v.number(),
   })
-  .index("by_createdAt", ["createdAt"])
-  .index("by_totalViews", ["totalViews"])
-  .index("by_likes", ["likes"])
-  .index("by_featured", ["featured"])
-  .index("by_author", ["author"])
-  .index("by_username", ["username"])
-  .index("by_username_likes", ["username", "likes"])
-  .index("by_username_hot", ["username", "hotScore"])
-  .index("by_username_controversial", ["username", "controversialScore"])
-  .searchIndex("search_title", { searchField: "title", filterFields: ["username"] }),
+    .index("by_createdAt", ["createdAt"])
+    .index("by_totalViews", ["totalViews"])
+    .index("by_likes", ["likes"])
+    .index("by_featured", ["featured"])
+    .index("by_author", ["author"])
+    .index("by_username", ["username"])
+    .index("by_username_likes", ["username", "likes"])
+    .index("by_username_hot", ["username", "hotScore"])
+    .index("by_username_controversial", ["username", "controversialScore"])
+    .searchIndex("search_title", { searchField: "title", filterFields: ["username"] }),
 
   blogTags: defineTable({
     blogId: v.id("blogs"),
@@ -41,24 +41,25 @@ const schema = defineSchema({
     hotScore: v.number(),
     controversialScore: v.number(),
   })
-  .index("by_blog", ["blogId"])
-  .index("by_tag_username", ["tag", "username"])
-  .index("by_tag_username_createdAt", ["tag", "username", "createdAt"])
-  .index("by_tag_username_likes", ["tag", "username", "likes"])
-  .index("by_tag_username_hot", ["tag", "username", "hotScore"])
-  .index("by_tag_username_controversial", ["tag", "username", "controversialScore"]),
+    .index("by_blog", ["blogId"])
+    .index("by_tag_username", ["tag", "username"])
+    .index("by_tag_username_createdAt", ["tag", "username", "createdAt"])
+    .index("by_tag_username_likes", ["tag", "username", "likes"])
+    .index("by_tag_username_hot", ["tag", "username", "hotScore"])
+    .index("by_tag_username_controversial", ["tag", "username", "controversialScore"]),
   
   viewLogs: defineTable({
     blogId: v.string(),
     viewedAt: v.number(),
   })
-  .index("by_viewedAt", ["viewedAt"])
-  .index("by_blog", ["blogId"]),
+    .index("by_viewedAt", ["viewedAt"])
+    .index("by_blog", ["blogId"]),
 
   subscribers: defineTable({
     email: v.string(),
     subscribedAt: v.number(),
-  }).index("by_email", ["email"]),
+  })
+    .index("by_email", ["email"]),
 
   contactMessages: defineTable({
     name: v.string(),
@@ -117,9 +118,11 @@ const schema = defineSchema({
     totalLikes: v.number(),
     articlesPublished: v.number(),
     commentsPublished: v.number(),
+    followerCount: v.number(),
+    followingCount: v.number(),
   })
-  .index("by_userId", ["userId"])
-  .index("by_username", ["username"]),
+    .index("by_userId", ["userId"])
+    .index("by_username", ["username"]),
 
   commentVotes: defineTable({
     userId: v.string(),
@@ -145,7 +148,15 @@ const schema = defineSchema({
   uploadedAvatar: defineTable({
     storageId: v.id("_storage"),
   })
-  .index("by_storageId", ["storageId"])
+  .index("by_storageId", ["storageId"]),
+
+  follows: defineTable({
+    followerId: v.id("profiles"),
+    followingId: v.id("profiles"),
+  })
+    .index("by_follower_and_following", ["followerId", "followingId"])
+    .index("by_following", ["followingId"])
+    .index("by_follower", ["followerId"]),
 });
 
 export default schema;
