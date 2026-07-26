@@ -63,7 +63,7 @@ export function ProfileContentWrapper({ username, preloadedProfile, preloadedCur
     <div className="mr-4">
       <div className="sticky top-16 z-10 bg-background gap-4 py-4 px-4 flex flex-row items-center justify-between w-full">
 
-        <div className="flex flex-row items-center gap-2">
+        <div className="flex flex-row items-center gap-2 shrink-0">
           <TabsSwitch 
             tabs={tabs} 
             value={activeTab} 
@@ -79,20 +79,20 @@ export function ProfileContentWrapper({ username, preloadedProfile, preloadedCur
           />
         </div>
 
-        <div className="flex flex-row w-1/2 justify-end gap-4">
-
-          <div>
+        <div className="flex flex-1 min-w-0 flex-row items-center justify-end gap-3">
+          <div className="shrink-0">
             <SidebarTags />
           </div>
 
-          <div>
+          <div className="shrink-0">
             <SidebarSort />
           </div>
 
-          <div>
+          <div className="shrink-0 w-64">
             <SidebarSearch placeholder={searchPlaceholder} />
           </div>
         </div>
+
       </div>
 
       <div className="w-full px-4 mb-8">
