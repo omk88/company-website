@@ -55,13 +55,16 @@ export function SidebarTags() {
       <PopoverTrigger asChild>
         <button
           type="button"
-          className="flex gap-2 h-8 w-full items-center justify-between rounded-lg border border-border/50 bg-background pl-3 pr-2 text-xs placeholder:text-muted-foreground focus:ring-1"
+          className="flex h-8 w-fit shrink-0 items-center justify-between gap-2 rounded-lg border border-border/50 bg-background pl-3 pr-2 text-xs whitespace-nowrap placeholder:text-muted-foreground focus:ring-1"
         >
-          <span className="flex flex-row items-center gap-2">
-            <Tag className="h-3.5 w-3.5" />
-            Tags { activeTags.length > 0 && !isAllSelected ? `(${activeTags.length})` : "" }
+          <span className="flex flex-row items-center gap-1.5 whitespace-nowrap">
+            <Tag className="h-3.5 w-3.5 shrink-0" />
+            <span>Tags</span>
+            {activeTags.length > 0 && !isAllSelected && (
+              <span className="text-muted-foreground">({activeTags.length})</span>
+            )}
           </span>
-          <ChevronDown className="h-4 w-4 opacity-50" />
+          <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
         </button>
       </PopoverTrigger>
 
