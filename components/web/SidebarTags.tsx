@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/popover";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
 import { Checkbox } from "../ui/checkbox";
+import { useLocalSearch } from "./SearchContext";
 
 const TAG_ITEMS = [
   { id: "all", label: "All Topics" },
@@ -21,12 +22,32 @@ const TAG_ITEMS = [
 ];
 
 export function SidebarTags() {
-  const [selectedTags, setSelectedTags] = useState<Record<string, boolean>>(() =>
-    TAG_ITEMS.reduce((acc, tag) => ({ ...acc, [tag.id]: true }), {})
-  );
+  const { activeTags, setActiveTags } = useLocalSearch();
+
+  const isAllSelected = activeTags.length === 0 || activeTags.includes("all");
 
   const toggleTag = (id: string) => {
-    setSelectedTags((prev) => ({ ...prev, [id]: !prev[id] }));
+    if (id === "all") {
+      setActiveTags([]);
+      return;
+    }
+
+    setActiveTags((prev) => {
+      const currentWithoutAll = prev.filter((t) => t !== "all");
+
+      if (currentWithoutAll.includes(id)) {
+        const updated = currentWithoutAll.filter((t) => t !== id);
+        return updated;
+      } else {
+        return [...currentWithoutAll, id];
+      }
+    });
+  };
+
+  const isChecked = (id: string) => {
+    if (id === "all") return isAllSelected;
+    if (isAllSelected) return true;
+    return activeTags.includes(id);
   };
 
   return (
@@ -38,7 +59,7 @@ export function SidebarTags() {
         >
           <span className="flex flex-row items-center gap-2">
             <Tag className="h-3.5 w-3.5" />
-            Tags
+            Tags { activeTags.length > 0 && !isAllSelected ? `(${activeTags.length})` : "" }
           </span>
           <ChevronDown className="h-4 w-4 opacity-50" />
         </button>
@@ -63,7 +84,7 @@ export function SidebarTags() {
               <Checkbox
                 id={item.id}
                 name={item.id}
-                checked={selectedTags[item.id]}
+                checked={isChecked(item.id)}
                 onCheckedChange={() => toggleTag(item.id)}
               />
               <FieldLabel

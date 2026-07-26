@@ -31,6 +31,7 @@ export function ProfileBlogPosts({ username, preloadedProfile, preloadedInitialB
     const searchContext = useLocalSearch();
     const searchTerm = searchContext?.searchTerm ?? "";
     const sortOrder = searchContext?.sortOrder ?? "new";
+    const activeTags = searchContext?.activeTags ?? [];
 
     const [blogs, setBlogs] = useState(initialData.page);
     const [cursor, setCursor] = useState<string | null>(initialData.continueCursor);
@@ -40,7 +41,7 @@ export function ProfileBlogPosts({ username, preloadedProfile, preloadedInitialB
     const loadMoreRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        if (!searchTerm.trim() && sortOrder === "new") {
+        if (!searchTerm.trim() && sortOrder === "new" && activeTags.length === 0) {
             setBlogs(initialData.page);
             setCursor(initialData.continueCursor);
             setIsDone(initialData.isDone);
@@ -54,7 +55,8 @@ export function ProfileBlogPosts({ username, preloadedProfile, preloadedInitialB
             try {
                 const result = await convex.query(api.blogs.getPaginatedPostsByUsername, {
                     username,
-                    searchTerm: searchTerm.trim(),
+                    searchTerm: searchTerm.trim() || undefined,
+                    activeTags: activeTags.length > 0 ? activeTags : undefined,
                     sortOrder,
                     paginationOpts: {
                         numItems: 6,
@@ -80,7 +82,7 @@ export function ProfileBlogPosts({ username, preloadedProfile, preloadedInitialB
         return () => {
             isMounted = false;
         };
-    }, [searchTerm, sortOrder, username, convex, initialData]);
+    }, [searchTerm, sortOrder, activeTags, username, convex, initialData]);
 
     const loadMore = async () => {
         if (isDone || isLoading || !cursor) return;
@@ -90,6 +92,7 @@ export function ProfileBlogPosts({ username, preloadedProfile, preloadedInitialB
             const result = await convex.query(api.blogs.getPaginatedPostsByUsername, {
                 username,
                 searchTerm: searchTerm.trim() || undefined,
+                activeTags: activeTags.length > 0 ? activeTags : undefined,
                 sortOrder,
                 paginationOpts: {
                     numItems: 6,
@@ -128,7 +131,7 @@ export function ProfileBlogPosts({ username, preloadedProfile, preloadedInitialB
         return () => {
             if (currentTarget) observer.unobserve(currentTarget);
         };
-    }, [cursor, isDone, isLoading, searchTerm, sortOrder]);
+    }, [cursor, isDone, isLoading, searchTerm, sortOrder, activeTags]);
 
     useEffect(() => {
         onLoadedIdsChange(blogs.map((b) => b._id));
