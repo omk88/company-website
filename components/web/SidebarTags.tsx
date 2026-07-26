@@ -1,12 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { ChevronDown, Tag } from "lucide-react";
-import { 
-  Popover, 
-  PopoverContent, 
-  PopoverTrigger 
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
 import { Checkbox } from "../ui/checkbox";
 import { useLocalSearch } from "./SearchContext";
@@ -33,21 +28,22 @@ export function SidebarTags() {
     }
 
     setActiveTags((prev) => {
+
+      const cleanPrev = prev.filter((t) => t !== "all");
       const currentWithoutAll = prev.filter((t) => t !== "all");
 
-      if (currentWithoutAll.includes(id)) {
-        const updated = currentWithoutAll.filter((t) => t !== id);
+      if (cleanPrev.includes(id)) {
+        const updated = cleanPrev.filter((t) => t !== id);
         return updated;
       } else {
-        return [...currentWithoutAll, id];
+        return [...cleanPrev, id];
       }
     });
   };
 
   const isChecked = (id: string) => {
     if (id === "all") return isAllSelected;
-    if (isAllSelected) return true;
-    return activeTags.includes(id);
+    return !isAllSelected && activeTags.includes(id);
   };
 
   return (
@@ -69,7 +65,7 @@ export function SidebarTags() {
       </PopoverTrigger>
 
       <PopoverContent 
-        align="start" 
+        align="end" 
         className="w-[var(--radix-popover-trigger-width)] min-w-[8rem] p-0"
       >
         <FieldGroup className="gap-1 p-2">
