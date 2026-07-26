@@ -150,7 +150,7 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
         </div>
 
         { currentUser && !isOwnProfile && (
-          <FollowButton />
+          <FollowButton targetProfileId={profile._id} displayName={displayName} />
           )
         }
 

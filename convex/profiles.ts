@@ -335,27 +335,33 @@ export const toggleFollow = mutation({
     const targetProfile = await ctx.db.get(args.targetProfileId);
     if (!targetProfile) throw new Error("Target profile not found.");
 
+    const currentFollowing = currentProfile.followingCount || 0;
+    const targetFollowers = targetProfile.followerCount || 0;
+
     if (existingFollow) {
       await ctx.db.delete(existingFollow._id);
 
       await ctx.db.patch(currentProfileId, {
-        followingCount: Math.max(0, currentProfile.followingCount - 1),
+        followingCount: Math.max(0, currentFollowing - 1),
       });
 
       await ctx.db.patch(args.targetProfileId, {
-        followerCount: Math.max(0, targetProfile.followerCount - 1),
+        followerCount: Math.max(0, targetFollowers - 1),
       });
 
       return { isFollowing: false };
     } else {
-
       await ctx.db.insert("follows", {
         followerId: currentProfileId,
         followingId: args.targetProfileId,
       });
 
       await ctx.db.patch(currentProfileId, {
-        followerCount: targetProfile.followerCount + 1,
+        followingCount: currentFollowing + 1,
+      });
+
+      await ctx.db.patch(args.targetProfileId, {
+        followerCount: targetFollowers + 1,
       });
 
       return { isFollowing: true };
