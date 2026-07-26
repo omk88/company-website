@@ -156,6 +156,7 @@ export function ProfileBlogPosts({ username, preloadedProfile, preloadedInitialB
                                         id={blog._id}
                                         isSelected={selectedIds.includes(blog._id)}
                                         onSelectChange={handleSelectChange}
+                                        isOwnProfile={isOwnProfile}
                                     >
                                         <ProfileBlogCard
                                             preloadedProfile={preloadedProfile}

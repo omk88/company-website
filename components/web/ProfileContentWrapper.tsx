@@ -6,7 +6,7 @@ import { SidebarSort } from "./SidebarSort";
 import { SidebarSearch } from "./SidebarSearch";
 import { useLocalSearch } from "./SearchContext";
 import { api } from "@/convex/_generated/api";
-import { Preloaded, useMutation, usePreloadedQuery } from "convex/react";
+import { Preloaded, usePreloadedQuery } from "convex/react";
 import { Selector } from "./Selector";
 import { ProfileBlogPosts } from "./ProfileBlogPosts";
 import { ProfileComments } from "./ProfileComments";
@@ -70,13 +70,15 @@ export function ProfileContentWrapper({ username, preloadedProfile, preloadedCur
             onTabChange={setActiveTab} 
           />
 
-          <Selector
-            isAllSelected={isAllSelected}
-            isSomeSelected={isSomeSelected}
-            selectedIds={selectedIds}
-            onToggleAll={handleToggleAll}
-            onSuccess={() => setSelectedIds([])}
-          />
+          { isOwnProfile &&
+            <Selector
+              isAllSelected={isAllSelected}
+              isSomeSelected={isSomeSelected}
+              selectedIds={selectedIds}
+              onToggleAll={handleToggleAll}
+              onSuccess={() => setSelectedIds([])}
+            />
+          }
         </div>
 
         <div className="flex flex-1 min-w-0 flex-row items-center justify-end gap-3">

@@ -7,10 +7,20 @@ interface SelectableCardWrapperProps {
     id: Id<"blogs">;
     isSelected: boolean;
     onSelectChange: (id: Id<"blogs">, checked: boolean) => void;
+    isOwnProfile: string | boolean | undefined;
     children: React.ReactNode;
 }
 
-export function SelectableCardWrapper({id, isSelected, onSelectChange, children}: SelectableCardWrapperProps) {
+export function SelectableCardWrapper({id, isSelected, onSelectChange, isOwnProfile, children}: SelectableCardWrapperProps) {
+
+    if (!isOwnProfile) {
+        return (
+            <>
+                {children}
+            </>
+        )
+    }
+
     return (
         <div className="relative group">
             <div 
