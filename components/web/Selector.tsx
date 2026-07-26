@@ -16,7 +16,7 @@ interface SelectorProps {
 export function Selector({isAllSelected, isSomeSelected, selectedIds, onToggleAll, onSuccess}: SelectorProps) {
 
   return (
-    <div className="inline-flex items-center gap-2 px-3 py-1.5 text-xs bg-background border border-border/50 rounded-md select-none focus-within:ring-1">
+    <div className="h-8 inline-flex items-center gap-2 px-3 text-xs bg-background border border-border/50 rounded-md select-none focus-within:ring-1">
       <Checkbox
         id="checkbox-delete"
         checked={isAllSelected}
