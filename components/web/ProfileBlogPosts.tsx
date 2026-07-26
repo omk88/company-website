@@ -146,7 +146,7 @@ export function ProfileBlogPosts({ username, preloadedProfile, preloadedInitialB
     return (
         <div className="space-y-4">
             {blogs.length === 0 ? (
-                <p className="text-muted-foreground">No blogs posted yet.</p>
+                <p className="text-muted-foreground">{username} has not posted any insights yet.</p>
                 ) : (
                     <>
                         <ul className="flex flex-col gap-4">

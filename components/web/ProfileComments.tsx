@@ -120,7 +120,7 @@ export function ProfileComments({ username, preloadedInitialComments }: ProfileC
     return (
         <div className="w-full space-y-4">
             {comments.length === 0 ? (
-                <p className="text-muted-foreground">No blogs posted yet.</p>
+                <p className="text-muted-foreground">{username} has not posted any comments yet.</p>
                 ) : (
                     <>
                         <ul className="w-full flex flex-col gap-4">

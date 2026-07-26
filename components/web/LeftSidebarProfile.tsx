@@ -90,10 +90,12 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
               <p>{ formattedDate }</p>
             </div>
 
-            <div className="flex items-start gap-1.5 min-w-[3rem] justify-start">
-              <MapPin className="w-4 h-4 stroke-[2.3] shrink-0 mt-0.5" />
-              <p>{ profile.location }</p>
-            </div>
+            { profile.location && (
+              <div className="flex items-start gap-1.5 min-w-[3rem] justify-start">
+                <MapPin className="w-4 h-4 stroke-[2.3] shrink-0 mt-0.5" />
+                <p>{ profile.location }</p>
+              </div>
+            )}
           </div>
 
           <div className="flex items-center justify-between w-full px-12 -m-2">
@@ -103,7 +105,7 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
               trigger={
                 <div 
                   onMouseEnter={() => setShouldPrefetchFollowers(true)}
-                  className="flex items-center gap-1.5 min-w-[3rem] justify-start p-2 rounded-2xl hover:bg-zinc-100 transition-colors cursor-pointer"
+                  className="flex items-center gap-1.5 min-w-[3rem] justify-start p-2 rounded-2xl hover:bg-zinc-100 hover:text-blue-600 transition-colors cursor-pointer"
                 >
                   <User className="w-4 h-4 stroke-[2.3] shrink-0 mt-0.5" />
                   <span>{profile.followerCount}</span>
@@ -151,14 +153,24 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
             </TooltipProvider>
           </div>
 
-          <div>
-            <p>{ profile.bio }</p>
-          </div>
+          {profile.bio && (
+            <div>
+              <p>{ profile.bio }</p>
+            </div>
+          )}
 
           <div className="flex flex-row gap-4">
-            <LinksHoverCard socials={profile.socials} />
-            <EducationHoverCard education={profile.education} />
-            <SkillsHoverCard skills={profile.skills} />
+            {profile.socials.length > 0 && (
+              <LinksHoverCard socials={profile.socials} />
+            )}
+
+            {profile.education.length > 0 && (
+              <EducationHoverCard education={profile.education} />
+            )}
+            
+            {profile.skills.length > 0 && (
+              <SkillsHoverCard skills={profile.skills} />
+            )}
           </div>
         </div>
 
