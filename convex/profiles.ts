@@ -1,3 +1,4 @@
+import { paginationOptsValidator } from "convex/server";
 import { Id } from "./_generated/dataModel";
 import { mutation, MutationCtx, query } from "./_generated/server";
 import { v } from "convex/values";
@@ -122,6 +123,43 @@ export const getProfileByUsername = query({
     };
 
     return { profilePicture, defaultProfilePicture, profile: sanitizedProfile };
+  },
+});
+
+export const getProfileFollowers = query({
+  args: {
+    profileId: v.id("profiles"),
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, args) => {
+    const page = await ctx.db
+      .query("follows")
+      .withIndex("by_following", (q) => q.eq("followingId", args.profileId))
+      .paginate(args.paginationOpts);
+
+    const followers = await Promise.all(
+      page.page.map(async (follow) => {
+        const followerProfile = await ctx.db.get(follow.followerId);
+        if (!followerProfile) return null;
+
+        const picUrl = followerProfile.profilePic ? await ctx.storage.getUrl(followerProfile.profilePic) : null;
+        const defaultPicUrl = followerProfile.defaultProfilePic ? await ctx.storage.getUrl(followerProfile.defaultProfilePic) : null;
+
+        return {
+          _id: followerProfile._id,
+          username: followerProfile.username,
+          firstName: followerProfile.firstName ?? "",
+          lastName: followerProfile.lastName ?? "",
+          profilePicUrl: picUrl,
+          defaultProfilePic: defaultPicUrl,
+        };
+      })
+    );
+
+    return {
+      ...page,
+      page: followers.filter(Boolean),
+    };
   },
 });
 

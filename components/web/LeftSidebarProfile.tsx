@@ -11,6 +11,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/
 import { SkillsHoverCard } from "./SkillsHoverCard";
 import { EducationHoverCard } from "./EducationHoverCard";
 import { FollowButton } from "./FollowButton";
+import { FollowsDialog } from "./FollowsDialog";
+import { useState } from "react";
 
 interface profileProps {
   preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
@@ -19,6 +21,8 @@ interface profileProps {
 
 export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: profileProps) {
 
+  const [shouldPrefetchFollowers, setShouldPrefetchFollowers] = useState(false);
+  
   const profileData = usePreloadedQuery(preloadedProfile);
   const currentUser = usePreloadedQuery(preloadedCurrentUser);
 
@@ -93,10 +97,19 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
           </div>
 
           <div className="flex items-center justify-between w-full px-12 -m-2">
-            <div className="flex items-center gap-1.5 min-w-[3rem] justify-start p-2 rounded-2xl hover:bg-zinc-100 transition-colors cursor-pointer">
-              <User className="w-4 h-4 stroke-[2.3] shrink-0 mt-0.5" />
-              <span>{10}</span>
-            </div>
+            <FollowsDialog
+              profileId={profile._id}
+              onMouseEnter={() => setShouldPrefetchFollowers(true)}
+              trigger={
+                <div 
+                  onMouseEnter={() => setShouldPrefetchFollowers(true)}
+                  className="flex items-center gap-1.5 min-w-[3rem] justify-start p-2 rounded-2xl hover:bg-zinc-100 transition-colors cursor-pointer"
+                >
+                  <User className="w-4 h-4 stroke-[2.3] shrink-0 mt-0.5" />
+                  <span>{profile.followerCount}</span>
+                </div>
+              }
+            />
             <TooltipProvider delayDuration={200}>
               <Tooltip>
                 <TooltipTrigger asChild>
