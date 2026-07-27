@@ -22,12 +22,15 @@ interface ProfileCommentCardProps {
 export function ProfileCommentCard({ id, authorName, blogTitle, body, likes, date, preloadedProfile }: ProfileCommentCardProps) {
 
     return (
-        <div className="group flex flex-col md:flex-row h-auto md:h-[130px] border border-border/50 rounded-none">
+        <div className="group flex flex-col md:flex-row h-auto md:h-[130px] border border-border/50 rounded-none transition-colors duration-100 hover:bg-muted/50 dark:bg-muted/30">
 
             <div className="flex flex-col flex-1 justify-start px-12 py-2 min-w-0">
-                <div className="min-w-0 pointer-events-none">
+                <div className="min-w-0">
                     <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-muted-foreground">
-                        <ProfileHoverCard authorName={authorName} date={date} preloadedProfile={preloadedProfile}/>
+                        <div className="flex items-center gap-2">
+                            <ProfileHoverCard authorName={authorName} date={date} preloadedProfile={preloadedProfile}/> 
+                            | <span className="font-bold group-hover:text-blue-600 transition-colors duration-100">{blogTitle}</span>
+                        </div>
                         
                         <div className="flex flex-row items-center gap-8">
                             <DropdownMenu>
@@ -92,11 +95,11 @@ export function ProfileCommentCard({ id, authorName, blogTitle, body, likes, dat
                     </div>
                 </div>
 
-                <Link href={`/insights/${id}`} className="block hover:no-underline group/text">
-                    <h3 className="text-sm font-bold tracking-tight line-clamp-1 md:line-clamp-2 text-foreground transition-colors duration-200 group-hover/text:text-blue-600 uppercase break-words">
-                        {blogTitle}
-                    </h3>
-                    <p className="line-clamp-3 md:line-clamp-3 leading-relaxed text-sm break-words">
+                <Link
+                    href={`/insights/${id}`}
+                    className="flex-1 my-1 flex items-start w-full group/text hover:no-underline"
+                >
+                    <p className="line-clamp-3 md:line-clamp-3 leading-relaxed text-sm break-words w-full">
                         {body}
                     </p>
                 </Link>
