@@ -64,15 +64,19 @@ export function ProfileHoverCard({ authorName, date, preloadedProfile }: Profile
                                     <p>{ formattedDate }</p>
                                 </div>
                     
-                                <div className="flex items-start gap-1.5 min-w-[3rem] justify-start">
-                                    <MapPin className="w-4 h-4 stroke-[2.3] shrink-0 mt-0.5" />
-                                    <p>{ profile?.location }</p>
-                                </div>
+                                {profile?.location && (
+                                    <div className="flex items-start gap-1.5 min-w-[3rem] justify-start">
+                                        <MapPin className="w-4 h-4 stroke-[2.3] shrink-0 mt-0.5" />
+                                        <p>{ profile?.location }</p>
+                                    </div>
+                                )}
                             </div>
 
-                            <div>
-                                <p>{ profile?.bio }</p>
-                            </div>
+                            {profile?.bio && (
+                                <div>
+                                    <p>{ profile?.bio }</p>
+                                </div>
+                            )}
                             <div className="flex items-center justify-between w-full -m-2">
                                 <div className="flex items-center gap-1.5 min-w-[3rem] justify-start p-2 rounded-2xl hover:bg-zinc-100 transition-colors cursor-pointer">
                                     <User className="w-4 h-4 stroke-[2.3] shrink-0 mt-0.5" />
