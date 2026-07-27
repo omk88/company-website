@@ -4,6 +4,9 @@ import { Id } from "@/convex/_generated/dataModel";
 import { Checkbox } from "../ui/checkbox";
 import { Button } from "../ui/button";
 import { Pen } from "lucide-react";
+import { useConvex } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import Link from "next/link";
 
 interface SelectableCardWrapperProps {
     id: Id<"blogs">;
@@ -15,6 +18,8 @@ interface SelectableCardWrapperProps {
 
 export function SelectableCardWrapper({id, isSelected, onSelectChange, isOwnProfile, children}: SelectableCardWrapperProps) {
 
+    const convex = useConvex();
+    
     if (!isOwnProfile) {
         return (
             <>
@@ -22,6 +27,12 @@ export function SelectableCardWrapper({id, isSelected, onSelectChange, isOwnProf
             </>
         )
     }
+
+    const prefetchBlog = () => {
+        convex.query(api.blogs.getBlogById, { blogId: id }).catch((err) => {
+            console.error("Prefetch failed:", err);
+        });
+    };
 
     return (
         <div className="relative group">
@@ -46,7 +57,12 @@ export function SelectableCardWrapper({id, isSelected, onSelectChange, isOwnProf
                         size="icon" 
                         className="h-6 w-6 rounded-sm cursor-pointer hover:bg-accent/50"
                     >
-                        <Pen className="h-3.5 w-3.5" />
+                        <Link
+                            href={`/company/blog?id=${id}`}
+                            onMouseEnter={prefetchBlog}
+                        >
+                            <Pen className="h-3.5 w-3.5" />
+                        </Link>
                     </Button>
                 </div>
             </div>

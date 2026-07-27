@@ -18,6 +18,7 @@ export function Selector({isAllSelected, isSomeSelected, selectedIds, onToggleAl
   return (
     <div className="h-8 inline-flex items-center gap-2 px-3 text-xs bg-background border border-border/50 rounded-md select-none focus-within:ring-1">
       <Checkbox
+        className="cursor-pointer"
         id="checkbox-delete"
         checked={isAllSelected}
         onCheckedChange={(checked) => onToggleAll(!!checked)}
