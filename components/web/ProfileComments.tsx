@@ -5,15 +5,26 @@ import { Preloaded, useConvex, usePreloadedQuery } from "convex/react";
 import { useEffect, useRef, useState } from "react";
 import { ProfileCommentCard } from "./ProfileCommentCard";
 import { useLocalSearch } from "./SearchContext";
+import { SelectableCardWrapper } from "./SelectableCardWrapper";
+import { Id } from "@/convex/_generated/dataModel";
 
 interface ProfileCommentsProps {
     username: string;
+    preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
     preloadedInitialComments: Preloaded<typeof api.comments.getPaginatedCommentsByUsername>;
+    preloadedCurrentUser: Preloaded<typeof api.auth.getCurrentUser>;
+    selectedIds: Id<"comments">[];
+    setSelectedIds: React.Dispatch<React.SetStateAction<Id<"comments">[]>>;
+    onLoadedIdsChange: (ids: Id<"comments">[]) => void;
 }
 
-export function ProfileComments({ username, preloadedInitialComments }: ProfileCommentsProps) {
+export function ProfileComments({ username, preloadedInitialComments, selectedIds, setSelectedIds, preloadedProfile, preloadedCurrentUser, onLoadedIdsChange }: ProfileCommentsProps) {
     const convex = useConvex();
+
     const initialData = usePreloadedQuery(preloadedInitialComments);
+    const currentUser = usePreloadedQuery(preloadedCurrentUser);
+    const profileData = usePreloadedQuery(preloadedProfile);
+    const profile = profileData.profile;
 
     const searchContext = useLocalSearch();
     const searchTerm = searchContext?.searchTerm ?? "";
@@ -23,6 +34,8 @@ export function ProfileComments({ username, preloadedInitialComments }: ProfileC
     const [cursor, setCursor] = useState<string | null>(initialData.continueCursor);
     const [isDone, setIsDone] = useState(initialData.isDone);
     const [isLoading, setIsLoading] = useState(false);
+
+    const isOwnProfile = currentUser?.userId && profile?.userId && currentUser.userId === profile.userId;
 
     const loadMoreRef = useRef<HTMLDivElement>(null);
 
@@ -117,6 +130,16 @@ export function ProfileComments({ username, preloadedInitialComments }: ProfileC
         };
     }, [cursor, isDone, isLoading, searchTerm, sortOrder]);
 
+    useEffect(() => {
+        onLoadedIdsChange(comments.map((comment) => comment._id));
+    }, [comments, onLoadedIdsChange]);
+
+    const handleSelectChange = (id: Id<"comments">, checked: boolean) => {
+        setSelectedIds((prev) =>
+            checked ? [...prev, id] : prev.filter((item) => item !== id)
+        );
+    };
+
     return (
         <div className="w-full space-y-4">
             {comments.length === 0 ? (
@@ -126,7 +149,14 @@ export function ProfileComments({ username, preloadedInitialComments }: ProfileC
                         <ul className="w-full flex flex-col gap-4">
                             {comments.map((comment) => (
                                 <li key={comment._id} >
-                                    <ProfileCommentCard id={comment._id} authorName={comment.authorName} blogTitle={comment.blogTitle} body={comment.body} likes={comment.likes} date={comment._creationTime} />
+                                    <SelectableCardWrapper
+                                        id={comment._id}
+                                        isSelected={selectedIds.includes(comment._id)}
+                                        onSelectChange={handleSelectChange}
+                                        isOwnProfile={isOwnProfile}
+                                    >
+                                        <ProfileCommentCard id={comment._id} authorName={comment.authorName} blogTitle={comment.blogTitle} body={comment.body} likes={comment.likes} date={comment._creationTime} preloadedProfile={preloadedProfile} />
+                                    </SelectableCardWrapper>
                                 </li>
                             ))}
                         </ul>

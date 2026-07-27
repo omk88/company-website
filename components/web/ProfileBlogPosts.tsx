@@ -7,6 +7,9 @@ import { ProfileBlogCard } from "./ProfileBlogCard";
 import { useLocalSearch } from "./SearchContext";
 import { SelectableCardWrapper } from "./SelectableCardWrapper";
 import { Id } from "@/convex/_generated/dataModel";
+import { Pen } from "lucide-react";
+import { Button } from "../ui/button";
+import Link from "next/link";
 
 interface ProfileBlogPostsProps {
     username: string;
@@ -157,6 +160,24 @@ export function ProfileBlogPosts({ username, preloadedProfile, preloadedInitialB
                                         isSelected={selectedIds.includes(blog._id)}
                                         onSelectChange={handleSelectChange}
                                         isOwnProfile={isOwnProfile}
+                                        actions={
+                                            <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-6 w-6 rounded-sm cursor-pointer hover:bg-accent/50"
+                                            >
+                                            <Link
+                                                href={`/company/blog?id=${blog._id}`}
+                                                onMouseEnter={() => {
+                                                convex.query(api.blogs.getBlogById, { blogId: blog._id }).catch((err) => {
+                                                    console.error("Prefetch failed:", err);
+                                                });
+                                                }}
+                                            >
+                                                <Pen className="h-3.5 w-3.5" />
+                                            </Link>
+                                            </Button>
+                                        }
                                     >
                                         <ProfileBlogCard
                                             preloadedProfile={preloadedProfile}

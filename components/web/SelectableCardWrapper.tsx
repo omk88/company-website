@@ -8,15 +8,16 @@ import { useConvex } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import Link from "next/link";
 
-interface SelectableCardWrapperProps {
-    id: Id<"blogs">;
+interface SelectableCardWrapperProps<T extends string> {
+    id: T;
     isSelected: boolean;
-    onSelectChange: (id: Id<"blogs">, checked: boolean) => void;
+    onSelectChange: (id: T, checked: boolean) => void;
     isOwnProfile: string | boolean | undefined;
     children: React.ReactNode;
+    actions?: React.ReactNode;
 }
 
-export function SelectableCardWrapper({id, isSelected, onSelectChange, isOwnProfile, children}: SelectableCardWrapperProps) {
+export function SelectableCardWrapper<T extends string>({id, isSelected, onSelectChange, isOwnProfile, children, actions}: SelectableCardWrapperProps<T>) {
 
     const convex = useConvex();
     
@@ -27,12 +28,6 @@ export function SelectableCardWrapper({id, isSelected, onSelectChange, isOwnProf
             </>
         )
     }
-
-    const prefetchBlog = () => {
-        convex.query(api.blogs.getBlogById, { blogId: id }).catch((err) => {
-            console.error("Prefetch failed:", err);
-        });
-    };
 
     return (
         <div className="relative group">
@@ -55,19 +50,7 @@ export function SelectableCardWrapper({id, isSelected, onSelectChange, isOwnProf
                             className="h-3.5 w-3.5 data-[state=checked]:bg-primary border-black cursor-pointer"
                         />
                     </div>
-
-                    <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-6 w-6 rounded-sm cursor-pointer hover:bg-accent/50"
-                    >
-                        <Link
-                            href={`/company/blog?id=${id}`}
-                            onMouseEnter={prefetchBlog}
-                        >
-                            <Pen className="h-3.5 w-3.5" />
-                        </Link>
-                    </Button>
+                    {actions}
                 </div>
             </div>
 

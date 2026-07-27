@@ -2,18 +2,28 @@
 
 import { Checkbox } from "../ui/checkbox";
 import { Trash2 } from "lucide-react";
-import { DeleteBlogDialog } from "./DeleteBlogDialog";
-import { Id } from "@/convex/_generated/dataModel";
 
-interface SelectorProps {
+interface SelectorProps<T extends string> {
   isAllSelected: boolean;
   isSomeSelected: boolean;
-  selectedIds: Id<"blogs">[];
+  selectedIds: T[];
   onToggleAll: (checked: boolean) => void;
-  onSuccess?: () => void;
+  renderDeleteDialog: (
+    selectedIds: T[],
+    trigger: React.ReactNode
+  ) => React.ReactNode;
 }
 
-export function Selector({isAllSelected, isSomeSelected, selectedIds, onToggleAll, onSuccess}: SelectorProps) {
+export function Selector<T extends string>({isAllSelected, isSomeSelected, selectedIds, onToggleAll, renderDeleteDialog}: SelectorProps<T>) {
+
+  const triggerButton = (
+    <button
+      type="button"
+      className="flex items-center justify-center text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
+    >
+      <Trash2 className="h-4 w-4 transition-transform active:scale-90" />
+    </button>
+  );
 
   return (
     <div className="h-8 inline-flex items-center gap-2 px-3 text-xs bg-background border border-border/50 rounded-md select-none focus-within:ring-1">
@@ -25,18 +35,7 @@ export function Selector({isAllSelected, isSomeSelected, selectedIds, onToggleAl
       />
 
       {isSomeSelected ? (
-        <DeleteBlogDialog
-          blogIds={selectedIds}
-          onSuccess={onSuccess}
-          trigger={
-            <button 
-              type="button"
-              className="flex items-center justify-center text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
-            >
-              <Trash2 className="h-4 w-4 transition-transform active:scale-90" />
-            </button>
-          }
-        />
+        renderDeleteDialog(selectedIds, triggerButton)
       ) : (
         <label htmlFor="checkbox-delete" className="font-medium text-foreground cursor-pointer">
           Select

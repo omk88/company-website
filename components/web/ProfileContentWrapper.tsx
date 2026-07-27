@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { TabsSwitch, TabItem } from "@/components/web/TabsSwitch";
 import { SidebarSort } from "./SidebarSort";
 import { SidebarSearch } from "./SidebarSearch";
@@ -12,6 +12,8 @@ import { ProfileBlogPosts } from "./ProfileBlogPosts";
 import { ProfileComments } from "./ProfileComments";
 import { Id } from "@/convex/_generated/dataModel";
 import { SidebarTags } from "./SidebarTags";
+import { DeleteBlogDialog } from "./DeleteBlogDialog";
+import { DeleteCommentDialog } from "./DeleteCommentDialog";
 
 interface ProfileContentWrapperProps {
   username: string;
@@ -23,7 +25,13 @@ interface ProfileContentWrapperProps {
 
 export function ProfileContentWrapper({ username, preloadedProfile, preloadedCurrentUser, preloadedInitialBlogs, preloadedInitialComments }: ProfileContentWrapperProps) {
   const [activeTab, setActiveTab] = useState("blog-articles"); 
-  const [selectedIds, setSelectedIds] = useState<Id<"blogs">[]>([]);
+
+  const [selectedBlogIds, setSelectedBlogIds] = useState<Id<"blogs">[]>([]);
+  const [allBlogIds, setAllBlogIds] = useState<Id<"blogs">[]>([]);
+
+  const [selectedCommentIds, setSelectedCommentIds] = useState<Id<"comments">[]>([]);
+  const [allCommentIds, setAllCommentIds] = useState<Id<"comments">[]>([]);
+
   const { setSearchTerm, setSortOrder } = useLocalSearch();
 
   const currentUser = usePreloadedQuery(preloadedCurrentUser);
@@ -32,18 +40,21 @@ export function ProfileContentWrapper({ username, preloadedProfile, preloadedCur
 
   const isOwnProfile = currentUser?.userId && profile?.userId && currentUser.userId === profile.userId;
 
-  const [allBlogIds, setAllBlogIds] = useState<Id<"blogs">[]>([]);
+  const isBlogTab = activeTab === "blog-articles";
 
-  const isSomeSelected = selectedIds.length > 0;
-  const isAllSelected = allBlogIds.length > 0 && selectedIds.length === allBlogIds.length;
+  const currentSelectedIds = isBlogTab ? selectedBlogIds : selectedCommentIds;
+  const currentAllIds = isBlogTab ? allBlogIds : allCommentIds;
+
+  const isSomeSelected = currentSelectedIds.length > 0;
+  const isAllSelected = currentAllIds.length > 0 && currentSelectedIds.length === currentAllIds.length;
 
   const handleToggleAll = (checked: boolean) => {
-    if (checked) {
-      setSelectedIds([...allBlogIds]);
+    if (isBlogTab) {
+      setSelectedBlogIds(checked ? [...allBlogIds] : []);
     } else {
-      setSelectedIds([]); 
+      setSelectedCommentIds(checked ? [...allCommentIds] : []);
     }
-  };
+  }
 
   const tabs: TabItem[] = [
     { value: "blog-articles", label: "Blog Articles" },
@@ -53,7 +64,8 @@ export function ProfileContentWrapper({ username, preloadedProfile, preloadedCur
   useEffect(() => {
     setSearchTerm("");
     setSortOrder("new");
-    setSelectedIds([]);
+    setSelectedBlogIds([]);
+    setSelectedCommentIds([]);
     window.scrollTo({ top: 0, behavior: "instant" });
   }, [activeTab, setSearchTerm, setSortOrder]);
 
@@ -70,15 +82,37 @@ export function ProfileContentWrapper({ username, preloadedProfile, preloadedCur
             onTabChange={setActiveTab} 
           />
 
-          { isOwnProfile &&
-            <Selector
-              isAllSelected={isAllSelected}
-              isSomeSelected={isSomeSelected}
-              selectedIds={selectedIds}
-              onToggleAll={handleToggleAll}
-              onSuccess={() => setSelectedIds([])}
-            />
-          }
+          {isOwnProfile && (
+            isBlogTab ? (
+              <Selector
+                isAllSelected={isAllSelected}
+                isSomeSelected={isSomeSelected}
+                selectedIds={selectedBlogIds}
+                onToggleAll={handleToggleAll}
+                renderDeleteDialog={(ids, trigger) => (
+                  <DeleteBlogDialog
+                    blogIds={ids}
+                    onSuccess={() => setSelectedBlogIds([])}
+                    trigger={trigger}
+                  />
+                )}
+              />
+            ) : (
+              <Selector
+                isAllSelected={isAllSelected}
+                isSomeSelected={isSomeSelected}
+                selectedIds={selectedCommentIds}
+                onToggleAll={handleToggleAll}
+                renderDeleteDialog={(ids, trigger) => (
+                  <DeleteCommentDialog
+                    commentIds={ids}
+                    onSuccess={() => setSelectedCommentIds([])}
+                    trigger={trigger}
+                  />
+                )}
+              />
+            )
+          )}
         </div>
 
         <div className="flex flex-1 min-w-0 flex-row items-center justify-end gap-3">
@@ -98,22 +132,25 @@ export function ProfileContentWrapper({ username, preloadedProfile, preloadedCur
       </div>
 
       <div className="w-full px-4 mb-8">
-        {activeTab === "blog-articles" && (
+        {isBlogTab ? (
           <ProfileBlogPosts
             preloadedCurrentUser={preloadedCurrentUser}
             preloadedProfile={preloadedProfile}
             preloadedInitialBlogs={preloadedInitialBlogs}
             username={username}
-            selectedIds={selectedIds}
-            setSelectedIds={setSelectedIds}
+            selectedIds={selectedBlogIds}
+            setSelectedIds={setSelectedBlogIds}
             onLoadedIdsChange={setAllBlogIds}
           />
-        )}
-        
-        {activeTab === "comments" && (
+        ) : (
           <ProfileComments
+            preloadedCurrentUser={preloadedCurrentUser}
+            preloadedProfile={preloadedProfile}
             preloadedInitialComments={preloadedInitialComments}
             username={username}
+            selectedIds={selectedCommentIds}
+            setSelectedIds={setSelectedCommentIds}
+            onLoadedIdsChange={setAllCommentIds}
           />
         )}
       </div>

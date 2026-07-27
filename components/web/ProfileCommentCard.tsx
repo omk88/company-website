@@ -5,6 +5,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { FaFacebook, FaXTwitter } from "react-icons/fa6";
 import { toast } from "sonner";
 import { RxLinkedinLogo } from "react-icons/rx";
+import { ProfileHoverCard } from "./ProfileHoverCard";
+import { api } from "@/convex/_generated/api";
+import { Preloaded } from "convex/react";
 
 interface ProfileCommentCardProps {
     id: string;
@@ -13,25 +16,18 @@ interface ProfileCommentCardProps {
     body: string;
     likes: number;
     date: number;
+    preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
 }
 
-export function ProfileCommentCard({ id, authorName, blogTitle, body, likes, date }: ProfileCommentCardProps) {
-
-    const formattedDate = new Intl.DateTimeFormat("en-GB", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-    }).format(new Date(date));
+export function ProfileCommentCard({ id, authorName, blogTitle, body, likes, date, preloadedProfile }: ProfileCommentCardProps) {
 
     return (
         <div className="group flex flex-col md:flex-row h-auto md:h-[130px] border border-border/50 rounded-none">
 
-            <div className="flex flex-col flex-1 justify-start px-4 py-2 min-w-0">
+            <div className="flex flex-col flex-1 justify-start px-12 py-2 min-w-0">
                 <div className="min-w-0 pointer-events-none">
                     <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-muted-foreground">
-                        <div>
-                            {authorName} • {formattedDate}
-                        </div>
+                        <ProfileHoverCard authorName={authorName} date={date} preloadedProfile={preloadedProfile}/>
                         
                         <div className="flex flex-row items-center gap-8">
                             <DropdownMenu>
@@ -96,7 +92,7 @@ export function ProfileCommentCard({ id, authorName, blogTitle, body, likes, dat
                     </div>
                 </div>
 
-                <Link href={`/insights/${id}`} className="space-y-1.5 block hover:no-underline group/text">
+                <Link href={`/insights/${id}`} className="block hover:no-underline group/text">
                     <h3 className="text-sm font-bold tracking-tight line-clamp-1 md:line-clamp-2 text-foreground transition-colors duration-200 group-hover/text:text-blue-600 uppercase break-words">
                         {blogTitle}
                     </h3>
