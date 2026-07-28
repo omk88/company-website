@@ -23,6 +23,7 @@ export const createPost = mutation({
     username: v.string(),
     tags: v.array(v.string()),
     storageId: v.string(), 
+    postType: v.union(v.literal("community"), v.literal("team")),
   },
   handler: async (ctx, args) => {
     const generatedImageUrl = await ctx.storage.getUrl(args.storageId);
@@ -50,6 +51,7 @@ export const createPost = mutation({
       featured: false,
       createdAt: now,
       readTime: readTimeMinutes,
+      postType: args.postType,
     });
 
     const tagPromises = args.tags.map((tag) =>
@@ -61,6 +63,7 @@ export const createPost = mutation({
         likes: 0,
         hotScore: 0,
         controversialScore: 0,
+        postType: args.postType,
       })
     );
 
@@ -407,6 +410,7 @@ export const updatePost = mutation({
             likes: currentPost.likes,
             hotScore: currentPost.hotScore,
             controversialScore: currentPost.controversialScore,
+            postType: currentPost.postType,
           })
         ),
       ];
@@ -611,6 +615,72 @@ export const getPaginatedPostsByUsername = query({
     return await ctx.db
       .query("blogs")
       .withIndex("by_username", (q) => q.eq("username", args.username))
+      .order("desc")
+      .paginate(args.paginationOpts);
+  },
+});
+
+export const getPaginatedPostsByType = query({
+  args: {
+    postType: v.union(v.literal("community"), v.literal("team")),
+    activeTags: v.optional(v.array(v.string())),
+    searchTerm: v.optional(v.string()),
+    sortOrder: v.optional(v.string()),
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, args) => {
+    const cleanSearchTerm = args.searchTerm?.trim();
+    const sortOrder = args.sortOrder || "new";
+    const tags = args.activeTags || [];
+
+    if (cleanSearchTerm) {
+      const searchResults = await ctx.db
+        .query("blogs")
+        .withSearchIndex("search_title_by_type", (q) => q.search("title", cleanSearchTerm).eq("postType", args.postType))
+        .paginate(args.paginationOpts);
+
+      if (tags.length > 0) {
+        return {
+          ...searchResults,
+          page: searchResults.page.filter((blog) => tags.some((tag) => blog.tags?.includes(tag))),
+        };
+      }
+
+      return searchResults;
+    }
+
+    if (tags.length > 0) {
+      const primaryTag = tags[0];
+
+      const tagIndexName = 
+        sortOrder === "hot" ? "by_tag_type_hot" :
+        sortOrder === "controversial" ? "by_tag_type_controversial" :
+        sortOrder === "top" ? "by_tag_type_likes" :
+        "by_tag_type_createdAt" as const;
+
+      const paginatedTagEntries = await ctx.db
+        .query("blogTags")
+        .withIndex(tagIndexName, (q) => q.eq("tag", primaryTag).eq("postType", args.postType))
+        .order("desc")
+        .paginate(args.paginationOpts);
+
+      const blogs = await Promise.all(paginatedTagEntries.page.map((item) => ctx.db.get(item.blogId)));
+
+      return {
+        ...paginatedTagEntries,
+        page: blogs.filter((b): b is NonNullable<typeof b> => b !== null),
+      };
+    }
+
+    const indexName = 
+      sortOrder === "hot" ? "by_type_hot": 
+      sortOrder === "controversial" ? "by_type_controversial" : 
+      sortOrder === "top" ? "by_type_likes" :
+      "by_type" as const;
+
+    return await ctx.db
+      .query("blogs")
+      .withIndex(indexName, (q) => q.eq("postType", args.postType))
       .order("desc")
       .paginate(args.paginationOpts);
   },

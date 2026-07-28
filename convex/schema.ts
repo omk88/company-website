@@ -20,6 +20,7 @@ const schema = defineSchema({
     hotScore: v.number(),
     controversialScore: v.number(), 
     readTime: v.number(),
+    postType: v.union(v.literal("community"), v.literal("team")),
   })
     .index("by_createdAt", ["createdAt"])
     .index("by_totalViews", ["totalViews"])
@@ -30,7 +31,13 @@ const schema = defineSchema({
     .index("by_username_likes", ["username", "likes"])
     .index("by_username_hot", ["username", "hotScore"])
     .index("by_username_controversial", ["username", "controversialScore"])
-    .searchIndex("search_title", { searchField: "title", filterFields: ["username"] }),
+    .searchIndex("search_title", { searchField: "title", filterFields: ["username"] })
+
+    .index("by_type", ["postType"])
+    .index("by_type_hot", ["postType", "hotScore"])
+    .index("by_type_controversial", ["postType", "controversialScore"])
+    .index("by_type_likes", ["postType", "likes"])
+    .searchIndex("search_title_by_type", { searchField: "title", filterFields: ["postType"] }),
 
   blogTags: defineTable({
     blogId: v.id("blogs"),
@@ -40,7 +47,14 @@ const schema = defineSchema({
     likes: v.number(),
     hotScore: v.number(),
     controversialScore: v.number(),
+    postType: v.union(v.literal("community"), v.literal("team")),
   })
+
+    .index("by_tag_type_createdAt", ["tag", "postType", "createdAt"])
+    .index("by_tag_type_hot", ["tag", "postType", "hotScore"])
+    .index("by_tag_type_controversial", ["tag", "postType", "controversialScore"])
+    .index("by_tag_type_likes", ["tag", "postType", "likes"])
+
     .index("by_blog", ["blogId"])
     .index("by_tag_username", ["tag", "username"])
     .index("by_tag_username_createdAt", ["tag", "username", "createdAt"])

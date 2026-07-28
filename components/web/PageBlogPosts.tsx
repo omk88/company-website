@@ -1,35 +1,25 @@
-"use client";
-
 import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+import { username } from "better-auth/plugins";
 import { Preloaded, useConvex, usePreloadedQuery } from "convex/react";
-import { useEffect, useRef, useState } from "react";
+import { Link, Pen } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Button } from "../ui/button";
 import { BlogCard } from "./BlogCard";
 import { useLocalSearch } from "./SearchContext";
 import { SelectableCardWrapper } from "./SelectableCardWrapper";
-import { Id } from "@/convex/_generated/dataModel";
-import { Pen } from "lucide-react";
-import { Button } from "../ui/button";
-import Link from "next/link";
 
-interface ProfileBlogPostsProps {
-    username: string;
+interface PageBlogPostsProps {
     preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
     preloadedInitialBlogs: Preloaded<typeof api.blogs.getPaginatedPostsByUsername>;
-    preloadedCurrentUser: Preloaded<typeof api.auth.getCurrentUser>;
-    selectedIds: string[];
-    setSelectedIds: React.Dispatch<React.SetStateAction<Id<"blogs">[]>>;
-    onLoadedIdsChange: (ids: Id<"blogs">[]) => void;
 }
 
-export function ProfileBlogPosts({ username, preloadedProfile, preloadedInitialBlogs, preloadedCurrentUser, selectedIds, setSelectedIds, onLoadedIdsChange }: ProfileBlogPostsProps) {
+export function PageBlogPosts({ preloadedProfile, preloadedInitialBlogs }: PageBlogPostsProps) {
     const convex = useConvex();
 
     const initialData = usePreloadedQuery(preloadedInitialBlogs);
-    const currentUser = usePreloadedQuery(preloadedCurrentUser);
     const profileData = usePreloadedQuery(preloadedProfile);
     const profile = profileData.profile;
-
-    const isOwnProfile = currentUser?.userId && profile?.userId && currentUser.userId === profile.userId;
 
     const searchContext = useLocalSearch();
     const searchTerm = searchContext?.searchTerm ?? "";
