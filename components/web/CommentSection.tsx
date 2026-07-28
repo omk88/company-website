@@ -51,7 +51,7 @@ export function CommentSection(props: { preloadedComments: Preloaded<typeof api.
     }
 
     return (
-        <Card className="rounded-none">
+        <Card className="rounded-none mb-6">
             <CardHeader className="flex flex-row items-center gap-2 border-b">
                 <MessageSquare className="size-5" />
                 <h2 className="text-xl font-bold">{data.length} Comments</h2>

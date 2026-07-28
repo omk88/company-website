@@ -25,7 +25,7 @@ export function TrendingBlogsClient({ initialTrendingBlogs }: TrendingBlogsClien
                     <li key={blog._id} className="w-full block">
                         <Link 
                             href={`/insights/${blog._id}`} 
-                            className="group/trending block w-full text-inherit no-underline cursor-pointer p-3 rounded-sm bg-muted transition-all duration-200 hover:bg-zinc-200 dark:hover:bg-zinc-900"
+                            className="group/trending block w-full text-inherit no-underline cursor-pointer p-3 rounded-lg bg-muted transition-all duration-200 hover:bg-zinc-200 dark:hover:bg-zinc-900"
                         >
                             <div className="w-full flex flex-col gap-1">
                                 <div className="overflow-hidden">
@@ -38,7 +38,6 @@ export function TrendingBlogsClient({ initialTrendingBlogs }: TrendingBlogsClien
                                     <LiveMetrics 
                                         views={blog.totalViews ?? 0} 
                                         likes={blog.likes ?? 0} 
-                                        dislikes={blog.dislikes ?? 0} 
                                         comments={blog.commentCount ?? 0} 
                                         showDislikes={false}
                                     />

@@ -67,7 +67,7 @@ export function NavbarAuthClient({ initialIsAuth, initialImage }: NavbarAuthClie
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Link href={profileLink}>
-                                    <Button variant="ghost" size="icon">
+                                    <Button variant="ghost" size="icon" className="cursor-pointer">
                                         <div className="h-5 w-5 rounded-full overflow-hidden border border-muted flex items-center justify-center bg-transparent">
                                             <img 
                                                 src={avatarSrc} 

@@ -34,7 +34,7 @@ export function FeaturedBlogsClient({ initialFeaturedBlogs }: FeaturedBlogsClien
 
     if (initialFeaturedBlogs.length === 0) {
         return (
-            <div className="flex flex-col gap-0 w-full bg-muted rounded-sm overflow-hidden transition-all duration-200 hover:bg-zinc-200 dark:hover:bg-zinc-900">
+            <div className="flex flex-col gap-0 w-full bg-muted rounded-lg overflow-hidden transition-all duration-200 hover:bg-zinc-200 dark:hover:bg-zinc-900">
                 <div className="relative aspect-video w-full flex items-center justify-center p-6">
                     <span className="text-muted-foreground text-sm font-medium text-center max-w-[250px] break-words whitespace-normal">
                         No featured posts found.

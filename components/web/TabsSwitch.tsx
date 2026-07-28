@@ -40,7 +40,7 @@ export function TabsSwitch({ tabs, value, defaultValue, onTabChange }: TabsSwitc
             <TabsTrigger
               key={tab.value}
               value={tab.value}
-              className="flex items-center gap-1.5 px-4 whitespace-nowrap"
+              className="flex items-center gap-1.5 px-4 whitespace-nowrap cursor-pointer"
             >
               <span>{tab.label}</span>
             </TabsTrigger>

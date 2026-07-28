@@ -51,7 +51,7 @@ export function SidebarTags() {
       <PopoverTrigger asChild>
         <button
           type="button"
-          className="flex h-8 w-fit shrink-0 items-center justify-between gap-2 rounded-lg border border-border/50 bg-background pl-3 pr-2 text-xs whitespace-nowrap placeholder:text-muted-foreground focus:ring-1"
+          className="flex h-8 w-fit shrink-0 items-center justify-between gap-2 rounded-lg border border-border/50 bg-background pl-3 pr-2 text-xs whitespace-nowrap placeholder:text-muted-foreground focus:ring-1 cursor-pointer"
         >
           <span className="flex flex-row items-center gap-1.5 whitespace-nowrap">
             <Tag className="h-3.5 w-3.5 shrink-0" />

@@ -54,7 +54,7 @@ export function ProfileBlogCard({ id, imageUrl, authorName, title, subtitle, tot
                                 <DropdownMenuTrigger asChild>
                                     <Button 
                                         variant="ghost"
-                                        className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground pointer-events-auto"
+                                        className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground pointer-events-auto cursor-pointer"
                                     >
                                         <Ellipsis className="w-4 h-4 stroke-[2.3]" />
                                     </Button>

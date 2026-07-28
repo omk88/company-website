@@ -27,17 +27,15 @@ export function ProfileCommentCard({ id, authorName, blogTitle, body, likes, dat
             <div className="flex flex-col flex-1 justify-start px-12 py-2 min-w-0">
                 <div className="min-w-0">
                     <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-muted-foreground">
-                        <div className="flex items-center gap-2">
-                            <ProfileHoverCard authorName={authorName} date={date} preloadedProfile={preloadedProfile}/> 
-                            | <span className="font-bold group-hover:text-blue-600 transition-colors duration-100">{blogTitle}</span>
-                        </div>
+                        <ProfileHoverCard authorName={authorName} date={date} preloadedProfile={preloadedProfile}/> 
                         
                         <div className="flex flex-row items-center gap-8">
+                            <span className="font-bold group-hover:text-blue-600 transition-colors duration-100">{blogTitle}</span>
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button 
                                         variant="ghost"
-                                        className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground pointer-events-auto"
+                                        className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground pointer-events-auto cursor-pointer"
                                     >
                                         <Ellipsis className="w-4 h-4 stroke-[2.3]" />
                                     </Button>
