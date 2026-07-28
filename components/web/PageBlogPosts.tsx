@@ -1,13 +1,9 @@
 import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
 import { username } from "better-auth/plugins";
 import { Preloaded, useConvex, usePreloadedQuery } from "convex/react";
-import { Link, Pen } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
-import { Button } from "../ui/button";
 import { BlogCard } from "./BlogCard";
 import { useLocalSearch } from "./SearchContext";
-import { SelectableCardWrapper } from "./SelectableCardWrapper";
 
 interface PageBlogPostsProps {
     preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
@@ -46,8 +42,8 @@ export function PageBlogPosts({ preloadedProfile, preloadedInitialBlogs }: PageB
 
         const fetchFilteredBlogs = async () => {
             try {
-                const result = await convex.query(api.blogs.getPaginatedPostsByUsername, {
-                    username,
+                const result = await convex.query(api.blogs.getPaginatedPostsByType, {
+                    postType: "community",
                     searchTerm: searchTerm.trim() || undefined,
                     activeTags: activeTags.length > 0 ? activeTags : undefined,
                     sortOrder,
@@ -82,8 +78,8 @@ export function PageBlogPosts({ preloadedProfile, preloadedInitialBlogs }: PageB
         setIsLoading(true);
 
         try {
-            const result = await convex.query(api.blogs.getPaginatedPostsByUsername, {
-                username,
+            const result = await convex.query(api.blogs.getPaginatedPostsByType, {
+                postType: "community",
                 searchTerm: searchTerm.trim() || undefined,
                 activeTags: activeTags.length > 0 ? activeTags : undefined,
                 sortOrder,
@@ -126,64 +122,29 @@ export function PageBlogPosts({ preloadedProfile, preloadedInitialBlogs }: PageB
         };
     }, [cursor, isDone, isLoading, searchTerm, sortOrder, activeTags]);
 
-    useEffect(() => {
-        onLoadedIdsChange(blogs.map((b) => b._id));
-    }, [blogs, onLoadedIdsChange]);
-
-    const handleSelectChange = (id: Id<"blogs">, checked: boolean) => {
-        setSelectedIds((prev) =>
-            checked ? [...prev, id] : prev.filter((item) => item !== id)
-        );
-    };
-
     return (
         <div className="space-y-4">
             {blogs.length === 0 ? (
-                <p className="text-muted-foreground">{username} has not posted any insights yet.</p>
+                <p className="text-muted-foreground">No insights posted yet.</p>
                 ) : (
                     <>
                         <ul className="flex flex-col gap-4">
                             {blogs.map((blog) => (
                                 <li key={blog._id}>
-                                    <SelectableCardWrapper
+                                    <BlogCard
+                                        preloadedProfile={preloadedProfile}
                                         id={blog._id}
-                                        isSelected={selectedIds.includes(blog._id)}
-                                        onSelectChange={handleSelectChange}
-                                        isOwnProfile={isOwnProfile}
-                                        actions={
-                                            <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="h-6 w-6 rounded-sm cursor-pointer hover:bg-accent/50"
-                                            >
-                                            <Link
-                                                href={`/company/blog?id=${blog._id}`}
-                                                onMouseEnter={() => {
-                                                convex.query(api.blogs.getBlogById, { blogId: blog._id }).catch((err) => {
-                                                    console.error("Prefetch failed:", err);
-                                                });
-                                                }}
-                                            >
-                                                <Pen className="h-3.5 w-3.5" />
-                                            </Link>
-                                            </Button>
-                                        }
-                                    >
-                                        <BlogCard
-                                            preloadedProfile={preloadedProfile}
-                                            id={blog._id}
-                                            imageUrl={blog.imageUrl}
-                                            authorName={blog.authorName}
-                                            title={blog.title}
-                                            subtitle={blog.subtitle}
-                                            totalViews={blog.totalViews}
-                                            likes={blog.likes}
-                                            commentCount={blog.commentCount}
-                                            date={blog._creationTime}
-                                            readTime={blog.readTime}
-                                            tags={blog.tags}
-                                        />
-                                    </SelectableCardWrapper>
+                                        imageUrl={blog.imageUrl}
+                                        authorName={blog.authorName}
+                                        title={blog.title}
+                                        subtitle={blog.subtitle}
+                                        totalViews={blog.totalViews}
+                                        likes={blog.likes}
+                                        commentCount={blog.commentCount}
+                                        date={blog._creationTime}
+                                        readTime={blog.readTime}
+                                        tags={blog.tags}
+                                    />
                                 </li>
                             ))}
                         </ul>

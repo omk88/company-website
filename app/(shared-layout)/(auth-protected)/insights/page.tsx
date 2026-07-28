@@ -6,6 +6,10 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { LeftSidebar } from "@/components/web/LeftSidebar";
 import { RightSidebar } from "@/components/web/RightSidebar";
 import { SearchProvider } from "@/components/web/SearchContext";
+import { PageBlogPosts } from "@/components/web/PageBlogPosts";
+import { preloadQuery } from "convex/nextjs";
+import { api } from "@/convex/_generated/api";
+import { preloadAuthQuery } from "@/lib/auth-server";
 
 export const metadata: Metadata = {
   title: "Insights",
@@ -14,6 +18,14 @@ export const metadata: Metadata = {
 const INSIGHTS_MODELS = ['/cross.glb'];
 
 export default async function InsightsPage() {
+
+  const preloadedProfilePromise = preloadQuery(api.profiles.getProfileByUsername, { username });
+  const preloadedCurrentUserPromise = preloadAuthQuery(api.auth.getCurrentUser);
+
+  const [preloadedProfile, preloadedInitialBlogs] = await Promise.all([
+    preloadedProfilePromise,
+    preloadedCurrentUserPromise,
+  ]);
 
   return (
     <SidebarProvider>
@@ -59,7 +71,7 @@ export default async function InsightsPage() {
             className="w-full bg-white dark:bg-zinc-950 border-t border-border/50">
             <div className="w-full md:px-[var(--sidebar-width)] mt-4">
               <div className="w-full max-w-5xl mx-auto px-4 pb-4">
-                
+                <PageBlogPosts preloadedProfile={} />
               </div>
             </div>
           </section>
