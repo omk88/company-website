@@ -29,6 +29,7 @@ export function LeftSidebar() {
   return (
     <Sidebar 
       className="flex flex-col !top-16 !z-40 bg-white border-r w-fit !w-auto"
+      bgClass="bg-white" 
       style={{ 
         height: "calc(100vh - 4rem)",
         "--sidebar-width": "fit-content" 
@@ -36,7 +37,7 @@ export function LeftSidebar() {
       collapsible="icon"
     >
       <SidebarContent className="!p-0 w-full">
-        <SidebarGroup className="pt-2 !pl-2 !pr-2 w-full">
+        <SidebarGroup className="pt-4 !pl-2 !pr-2 w-full">
           
           <SidebarMenu className="w-full flex flex-col gap-1">
             {NAV_ITEMS.map((item) => {
@@ -67,10 +68,10 @@ export function LeftSidebar() {
               <Separator />
             </div>
             <SidebarSearch placeholder="insights" />
-            <SidebarSort />
-            <SidebarTags />
+            <SidebarSort fullWidth={true} />
+            <SidebarTags fullWidth={true} />
 
-            <div className="w-full pt-2">
+            <div className="w-full">
               <SidebarMenuButton
                 onClick={() => {
                   console.log("Create Post clicked");

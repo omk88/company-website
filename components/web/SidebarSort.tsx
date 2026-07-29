@@ -3,8 +3,14 @@
 import { useLocalSearch } from "@/components/web/SearchContext";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowUp, CalendarArrowUp, Flame, Swords } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-export function SidebarSort() {
+interface SidebarSortProps {
+  fullWidth?: boolean;
+  className?: string;
+}
+
+export function SidebarSort({ fullWidth = false, className }: SidebarSortProps) {
   const { sortOrder, setSortOrder } = useLocalSearch();
 
   return (
@@ -12,7 +18,13 @@ export function SidebarSort() {
       value={sortOrder}
       onValueChange={setSortOrder}
     >
-      <SelectTrigger className="flex h-8 w-fit shrink-0 items-center justify-between gap-2 rounded-lg border border-border/50 bg-background pl-3 pr-2 text-xs whitespace-nowrap placeholder:text-muted-foreground focus:ring-1 cursor-pointer">
+      <SelectTrigger 
+        className={cn(
+          "flex h-8 shrink-0 items-center justify-between gap-2 rounded-lg border border-border/50 bg-background pl-3 pr-2 text-xs whitespace-nowrap placeholder:text-muted-foreground focus:ring-1 cursor-pointer",
+          fullWidth ? "w-full" : "w-fit",
+          className
+        )}
+      >
         <SelectValue placeholder="Sort order">
           {sortOrder === "new" && <span className="flex items-center gap-1.5"><CalendarArrowUp className="size-3.5" />New</span>}
           {sortOrder === "hot" && <span className="flex items-center gap-1.5"><Flame className="size-3.5" />Hot</span>}

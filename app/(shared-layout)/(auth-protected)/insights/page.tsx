@@ -72,14 +72,14 @@ export default async function InsightsPage() {
 
           <section 
             id="blog-grid-section" 
-            className="w-full bg-white dark:bg-zinc-950 border-t border-border/50">
-            <div className="w-full md:px-[var(--sidebar-width)] mt-4">
-              <div className="w-full max-w-5xl mx-auto px-4 pb-4">
+            className="w-full bg-white dark:bg-zinc-950 border-t border-border/50"
+          >
+            <div className="w-full mt-4">
+              <div className="w-full pl-4 pr-4 pb-4">
                 <PageBlogPosts preloadedInitialBlogs={preloadedInitialBlogs} />
               </div>
             </div>
           </section>
-
         </div>
 
         <aside className="sticky top-16 h-[calc(100vh-4rem)] z-30">

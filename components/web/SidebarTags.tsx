@@ -5,6 +5,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
 import { Checkbox } from "../ui/checkbox";
 import { useLocalSearch } from "./SearchContext";
+import { cn } from "@/lib/utils";
 
 const TAG_ITEMS = [
   { id: "all", label: "All Topics" },
@@ -16,7 +17,12 @@ const TAG_ITEMS = [
   { id: "tutorials", label: "Tutorials" },
 ];
 
-export function SidebarTags() {
+interface SidebarTagsProps {
+  fullWidth?: boolean;
+  className?: string;
+}
+
+export function SidebarTags({ fullWidth, className }: SidebarTagsProps) {
   const { activeTags, setActiveTags } = useLocalSearch();
 
   const isAllSelected = activeTags.length === 0 || activeTags.includes("all");
@@ -51,7 +57,11 @@ export function SidebarTags() {
       <PopoverTrigger asChild>
         <button
           type="button"
-          className="flex h-8 w-fit shrink-0 items-center justify-between gap-2 rounded-lg border border-border/50 bg-background pl-3 pr-2 text-xs whitespace-nowrap placeholder:text-muted-foreground focus:ring-1 cursor-pointer"
+          className={cn(
+            "flex h-8 shrink-0 items-center justify-between gap-2 rounded-lg border border-border/50 bg-background pl-3 pr-2 text-xs whitespace-nowrap placeholder:text-muted-foreground focus:ring-1 cursor-pointer",
+            fullWidth ? "w-full" : "w-fit",
+            className
+          )}
         >
           <span className="flex flex-row items-center gap-1.5 whitespace-nowrap">
             <Tag className="h-3.5 w-3.5 shrink-0" />
