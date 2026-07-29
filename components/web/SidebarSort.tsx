@@ -12,7 +12,7 @@ export function SidebarSort() {
       value={sortOrder}
       onValueChange={setSortOrder}
     >
-      <SelectTrigger className="w-full text-xs bg-background border-border/50 focus:ring-1 cursor-pointer">
+      <SelectTrigger className="flex h-8 w-fit shrink-0 items-center justify-between gap-2 rounded-lg border border-border/50 bg-background pl-3 pr-2 text-xs whitespace-nowrap placeholder:text-muted-foreground focus:ring-1 cursor-pointer">
         <SelectValue placeholder="Sort order">
           {sortOrder === "new" && <span className="flex items-center gap-1.5"><CalendarArrowUp className="size-3.5" />New</span>}
           {sortOrder === "hot" && <span className="flex items-center gap-1.5"><Flame className="size-3.5" />Hot</span>}
