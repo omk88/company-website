@@ -9,7 +9,6 @@ import { SearchProvider } from "@/components/web/SearchContext";
 import { PageBlogPosts } from "@/components/web/PageBlogPosts";
 import { preloadQuery } from "convex/nextjs";
 import { api } from "@/convex/_generated/api";
-import { preloadAuthQuery } from "@/lib/auth-server";
 
 export const metadata: Metadata = {
   title: "Insights",
@@ -19,12 +18,17 @@ const INSIGHTS_MODELS = ['/cross.glb'];
 
 export default async function InsightsPage() {
 
-  const preloadedProfilePromise = preloadQuery(api.profiles.getProfileByUsername, { username });
-  const preloadedCurrentUserPromise = preloadAuthQuery(api.auth.getCurrentUser);
+  const preloadedInitialBlogsPromise = preloadQuery(api.blogs.getPaginatedPostsByType, {
+    postType: "community",
+    paginationOpts: {
+        numItems: 6,    
+        cursor: null,   
+        id: 0,
+    }
+});
 
-  const [preloadedProfile, preloadedInitialBlogs] = await Promise.all([
-    preloadedProfilePromise,
-    preloadedCurrentUserPromise,
+  const [preloadedInitialBlogs] = await Promise.all([
+    preloadedInitialBlogsPromise
   ]);
 
   return (
@@ -71,7 +75,7 @@ export default async function InsightsPage() {
             className="w-full bg-white dark:bg-zinc-950 border-t border-border/50">
             <div className="w-full md:px-[var(--sidebar-width)] mt-4">
               <div className="w-full max-w-5xl mx-auto px-4 pb-4">
-                <PageBlogPosts preloadedProfile={} />
+                <PageBlogPosts preloadedInitialBlogs={preloadedInitialBlogs} />
               </div>
             </div>
           </section>

@@ -8,14 +8,13 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { FaFacebook, FaXTwitter } from "react-icons/fa6";
 import { toast } from "sonner";
 import { RxLinkedinLogo } from "react-icons/rx";
-import { api } from "@/convex/_generated/api";
-import { Preloaded } from "convex/react";
 import { ProfileHoverCard } from "./ProfileHoverCard";
 
 interface BlogCardProps {
     id: string;
     imageUrl: string;
     authorName: string;
+    username: string;
     title: string;
     subtitle: string;
     totalViews: number;
@@ -24,10 +23,9 @@ interface BlogCardProps {
     date: number;
     readTime: number;
     tags: Array<string>;    
-    preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
 }
 
-export function BlogCard({ id, imageUrl, authorName, title, subtitle, totalViews, likes, commentCount, date, readTime, tags, preloadedProfile }: BlogCardProps) {
+export function BlogCard({ id, imageUrl, authorName, title, subtitle, totalViews, likes, commentCount, date, readTime, tags, username }: BlogCardProps) {
     return (
         <div className="group flex flex-col md:flex-row h-auto md:h-[190px] border border-border/50 rounded-none transition-colors duration-100 hover:bg-muted/50 dark:bg-muted/30">
             
@@ -47,7 +45,7 @@ export function BlogCard({ id, imageUrl, authorName, title, subtitle, totalViews
             <div className="flex flex-col flex-1 justify-start px-4 py-2 min-w-0">
                 <div className="min-w-0 pointer-events-none">
                     <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-muted-foreground">
-                        <ProfileHoverCard authorName={authorName} date={date} preloadedProfile={preloadedProfile}/>
+                        <ProfileHoverCard authorName={authorName} date={date} authorUsername={username}/>
                         <div className="flex flex-row items-center gap-8">
                             <span>{readTime} min read</span>
                             <DropdownMenu>

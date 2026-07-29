@@ -1,3 +1,5 @@
+"use client";
+
 import { api } from "@/convex/_generated/api";
 import { username } from "better-auth/plugins";
 import { Preloaded, useConvex, usePreloadedQuery } from "convex/react";
@@ -6,16 +8,13 @@ import { BlogCard } from "./BlogCard";
 import { useLocalSearch } from "./SearchContext";
 
 interface PageBlogPostsProps {
-    preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
-    preloadedInitialBlogs: Preloaded<typeof api.blogs.getPaginatedPostsByUsername>;
+    preloadedInitialBlogs: Preloaded<typeof api.blogs.getPaginatedPostsByType>;
 }
 
-export function PageBlogPosts({ preloadedProfile, preloadedInitialBlogs }: PageBlogPostsProps) {
+export function PageBlogPosts({ preloadedInitialBlogs }: PageBlogPostsProps) {
     const convex = useConvex();
 
     const initialData = usePreloadedQuery(preloadedInitialBlogs);
-    const profileData = usePreloadedQuery(preloadedProfile);
-    const profile = profileData.profile;
 
     const searchContext = useLocalSearch();
     const searchTerm = searchContext?.searchTerm ?? "";
@@ -132,10 +131,10 @@ export function PageBlogPosts({ preloadedProfile, preloadedInitialBlogs }: PageB
                             {blogs.map((blog) => (
                                 <li key={blog._id}>
                                     <BlogCard
-                                        preloadedProfile={preloadedProfile}
                                         id={blog._id}
                                         imageUrl={blog.imageUrl}
                                         authorName={blog.authorName}
+                                        username={blog.username}
                                         title={blog.title}
                                         subtitle={blog.subtitle}
                                         totalViews={blog.totalViews}

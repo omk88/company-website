@@ -202,6 +202,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                     username: String(userData?.username || ""),
                     tags: data.tags,
                     storageId: storageId,
+                    postType: "community"
                 });
                 toast.success("Blog article published successfully!");
             }

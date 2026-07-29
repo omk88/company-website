@@ -180,10 +180,10 @@ export function ProfileBlogPosts({ username, preloadedProfile, preloadedInitialB
                                         }
                                     >
                                         <BlogCard
-                                            preloadedProfile={preloadedProfile}
                                             id={blog._id}
                                             imageUrl={blog.imageUrl}
                                             authorName={blog.authorName}
+                                            username={blog.username}
                                             title={blog.title}
                                             subtitle={blog.subtitle}
                                             totalViews={blog.totalViews}

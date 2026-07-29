@@ -1,24 +1,25 @@
 import { MapPin, Cake, ThumbsUp, SquareLibrary, MessageSquareText, Library, User } from "lucide-react";
 import { HoverCard, HoverCardTrigger, HoverCardContent } from "../ui/hover-card";
 import { api } from "@/convex/_generated/api";
-import { Preloaded, usePreloadedQuery } from "convex/react";
+import { Preloaded, usePreloadedQuery, useQuery } from "convex/react";
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "../ui/tooltip";
 import Link from "next/link";
 
 interface ProfileHoverCardProps {
     authorName: string;
+    authorUsername: string;
     date: number;
-    preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
 }
 
-export function ProfileHoverCard({ authorName, date, preloadedProfile }: ProfileHoverCardProps) {
-    const profileData = usePreloadedQuery(preloadedProfile);
+export function ProfileHoverCard({ authorName, authorUsername, date }: ProfileHoverCardProps) {
 
-    const profile = profileData.profile;
-    const avatarSrc = profileData.profilePicture;
-    const defaultAvatarSrc = profileData.defaultProfilePicture;
+    const profileData = useQuery(api.profiles.getProfileByUsername, { username: authorUsername });
 
-    const profileUsername = profileData.profile?.username;
+    const profile = profileData?.profile;
+    const avatarSrc = profileData?.profilePicture;
+    const defaultAvatarSrc = profileData?.defaultProfilePicture;
+
+    const profileUsername = profileData?.profile?.username;
     const profileLink = profileUsername ? `/${profileUsername}` : "/profile";
 
     const formattedDate = new Intl.DateTimeFormat("en-US", {
