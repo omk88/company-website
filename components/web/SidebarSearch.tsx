@@ -7,9 +7,10 @@ import { useState, useEffect } from "react";
 
 interface SidebarSearchProps {
   placeholder: string;
+  fullWidth?: boolean;
 }
 
-export function SidebarSearch({ placeholder }: SidebarSearchProps) {
+export function SidebarSearch({ placeholder, fullWidth = false }: SidebarSearchProps) {
   const { searchTerm, setSearchTerm } = useLocalSearch();
   const [localValue, setLocalValue] = useState(searchTerm);
 
@@ -37,7 +38,9 @@ export function SidebarSearch({ placeholder }: SidebarSearchProps) {
         placeholder={fullPlaceholder}
         value={localValue}
         onChange={(e) => setLocalValue(e.target.value)}
-        className={`pl-9 ${rightPaddingClass} text-xs w-auto [field-sizing:content] bg-background border-border/50 rounded-md focus-visible:ring-1 focus-visible:ring-primary`}
+        className={`pl-9 ${rightPaddingClass} text-xs bg-background border-border/50 rounded-md focus-visible:ring-1 focus-visible:ring-primary ${
+          fullWidth ? "w-full" : "w-auto [field-sizing:content]"
+        }`}
       />
       
       {localValue && (

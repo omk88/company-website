@@ -36,7 +36,7 @@ export default async function InsightsPage() {
       <SearchProvider>
         <aside 
           className="shrink-0"
-          style={{ "--sidebar-width": "12.5rem" } as React.CSSProperties}
+          style={{ "--sidebar-width": "12.8rem" } as React.CSSProperties}
         >
           <LeftSidebar />
         </aside>
