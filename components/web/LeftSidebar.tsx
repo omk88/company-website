@@ -48,8 +48,8 @@ export function LeftSidebar() {
                     onClick={() => setActiveId(item.id)}
                     className={`
                       w-full cursor-pointer justify-start px-3 py-2 rounded-xl text-sm font-medium transition-colors
-                      data-[active=true]:bg-slate-200/70 data-[active=true]:text-foreground data-[active=true]:font-semibold
-                      hover:bg-slate-100
+                      data-[active=true]:bg-muted/80 data-[active=true]:text-foreground data-[active=true]:font-semibold
+                      hover:bg-muted/50
                     `}
                   >
                     <Icon className="h-4 w-4 shrink-0" />
@@ -60,7 +60,7 @@ export function LeftSidebar() {
             })}
           </SidebarMenu>
 
-          <div className="flex flex-col py-4 gap-3 items-start w-full">
+          <div className="flex flex-col py-2 gap-3 items-start w-full">
             <div className="w-full px-2 py-1">
               <Separator />
             </div>

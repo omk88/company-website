@@ -64,7 +64,7 @@ export function BlogCard({ id, imageUrl, authorName, title, subtitle, totalViews
                                         className="font-bold cursor-pointer flex items-center gap-2 whitespace-nowrap"
                                         onClick={() => {
                                             navigator.clipboard.writeText(window.location.href);
-                                            toast.success("Link copied to clipboard!");
+                                            toast.success("Link copied to clipboard.");
                                         }}
                                     >
                                         <Copy className="h-4 w-4 shrink-0" strokeWidth={3} />
@@ -111,7 +111,7 @@ export function BlogCard({ id, imageUrl, authorName, title, subtitle, totalViews
                 </div>
 
                 <Link href={`/insights/${id}`} className="space-y-1.5 block hover:no-underline">
-                    <h3 className="text-2xl font-bold tracking-tight line-clamp-1 md:line-clamp-2 text-foreground transition-colors duration-100 group-hover:text-blue-600 uppercase break-words">
+                    <h3 className="text-2xl font-bold tracking-tight line-clamp-1 md:line-clamp-2 text-foreground transition-colors duration-100 group-hover:text-blue-600 break-words">
                         {title}
                     </h3>
                     <p className="text-muted-foreground line-clamp-3 md:line-clamp-3 leading-relaxed text-sm break-words">

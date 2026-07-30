@@ -34,7 +34,7 @@ export function RightSidebar() {
         </SidebarGroup>
         <SidebarGroup>
           <SidebarGroupLabel className="w-full justify-center">
-            <h1 className="flex items-start justify-center gap-2 text-sm font-medium text-foreground">
+            <h1 className="flex items-center justify-center gap-2 text-sm font-medium text-foreground">
               <TrendingUp className="w-4 h-4 md:w-4 md:h-4 stroke-[2.3] shrink-0" />
               <span>Trending</span>
             </h1>

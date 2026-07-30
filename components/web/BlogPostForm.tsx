@@ -33,6 +33,33 @@ interface BlogPostFormProps {
     editingBlogId?: string; 
 }
 
+function toTitleCase(str: string): string {
+  if (!str) return "";
+  
+  const minorWords = new Set([
+    'a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 
+    'if', 'in', 'nor', 'of', 'on', 'or', 'so', 'the', 'to', 'up', 'yet'
+  ]);
+
+  return str
+    .toLowerCase()
+    .split(' ')
+    .map((word, index, wordsArray) => {
+      if (!word) return word;
+
+      const isFirstWord = index === 0;
+      const isLastWord = index === wordsArray.length - 1;
+      const isMinor = minorWords.has(word);
+
+      if (isFirstWord || isLastWord || !isMinor) {
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      }
+
+      return word;
+    })
+    .join(' ');
+}
+
 function LivePostPreview({ control, previewImage }: { control: Control<BlogFormValues>; previewImage: string | null }) {
     const formValues = useWatch({control});
 
@@ -148,13 +175,14 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
         setIsLoading(true);
         
         try {
-
-            if (!selectedImage) {
+            if (!selectedImage && !existingPost?.imageUrl) {
                 toast.error("Please upload a cover image from your computer.");
                 return;
             }
 
             let storageId = existingPost?.storageId || "";
+
+            const formattedTitle = toTitleCase(data.title);
 
             const options = {
                 maxSizeMB: 1.0,                  
@@ -164,9 +192,9 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                 initialQuality: 0.85,      
             };
 
-            const compressedFile = (await imageCompression(selectedImage, options)) as File;
+            if (selectedImage) {
+                const compressedFile = (await imageCompression(selectedImage, options)) as File;
 
-            if (compressedFile) {
                 const uploadUrl = await generateUploadUrl();
                 const result = await fetch(uploadUrl, {
                     method: "POST",
@@ -182,7 +210,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
             if (editingBlogId) {
                 await updateBlog({
                     blogId: editingBlogId as Id<"blogs">,
-                    title: data.title,
+                    title: formattedTitle,
                     subtitle: data.subtitle,
                     content: data.content,
                     author: userData?.userId || "",

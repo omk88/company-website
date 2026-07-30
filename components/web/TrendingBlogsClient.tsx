@@ -25,11 +25,11 @@ export function TrendingBlogsClient({ initialTrendingBlogs }: TrendingBlogsClien
                     <li key={blog._id} className="w-full block">
                         <Link 
                             href={`/insights/${blog._id}`} 
-                            className="group/trending block w-full text-inherit no-underline cursor-pointer p-3 rounded-lg bg-muted transition-all duration-200 hover:bg-zinc-200 dark:hover:bg-zinc-900"
+                            className="group/trending block w-full text-inherit no-underline cursor-pointer p-3 rounded-2xl bg-muted/50 hover:bg-muted/80 transition-all duration-100"
                         >
                             <div className="w-full flex flex-col gap-1">
                                 <div className="overflow-hidden">
-                                    <h3 className="uppercase break-words text-sm font-semibold tracking-tight line-clamp-2 text-foreground transition-colors duration-200 group-hover/trending:text-blue-600 leading-snug">
+                                    <h3 className="break-words text-sm font-semibold tracking-tight line-clamp-2 text-foreground transition-colors duration-200 group-hover/trending:text-blue-600 leading-snug">
                                         {blog.title}
                                     </h3>
                                 </div>
