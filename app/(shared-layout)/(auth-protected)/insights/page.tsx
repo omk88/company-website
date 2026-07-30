@@ -42,45 +42,13 @@ export default async function InsightsPage() {
         </aside>
 
         <div className="w-full flex flex-col min-h-screen">
-          
-          <section className="w-full pt-4 pb-4 [margin-left:calc((18rem-12.8rem)/2)]">
-            <div className="w-full">
-              <div className="w-full max-w-xl mx-auto px-4 flex flex-col items-center justify-start gap-4 md:gap-6">
-                <div className="w-full h-30 max-w-md flex items-center justify-center relative overflow-hidden shrink-0 transform-gpu">
-                  <GridCube 
-                    models={INSIGHTS_MODELS} 
-                    storageKey="insights_cross_path" 
-                    glitchEnabled={false} 
-                  />
-                </div>
-
-                <div className="w-full flex flex-col items-center gap-4 -mt-2 md:-mt-4">
-                  <div className="text-center space-y-1.5 max-w-md shrink-0">
-                    <h1 className="flex items-center justify-center gap-2.5 font-bold text-xl md:text-2xl text-foreground tracking-tight">
-                      <Eye className="w-5 h-5 md:w-6 md:h-6 stroke-[2.3] shrink-0" />
-                      <span>Insights.</span>
-                    </h1>
-                    <p className="text-sm md:text-base text-muted-foreground max-w-sm mx-auto leading-normal">
-                      Subscribe to our newsletter to learn more about our latest insights, news and product launches.
-                    </p>
-                  </div>
-                  
-                  <div className="w-full max-w-md shrink-0 mx-auto">
-                    <NewsletterSubscriptionForm />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
 
           <section 
             id="blog-grid-section" 
-            className="w-full bg-white dark:bg-zinc-950 border-t border-border/50 relative"
+            className="w-full h-full bg-white dark:bg-zinc-950"
           >
-            <div className="w-full mt-4">
-              <div className="w-full pl-4 pr-4 pb-4">
-                <PageBlogPosts preloadedInitialBlogs={preloadedInitialBlogs} />
-              </div>
+            <div>
+              <PageBlogPosts preloadedInitialBlogs={preloadedInitialBlogs} />
             </div>
           </section>
         </div>

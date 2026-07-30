@@ -122,7 +122,7 @@ export function PageBlogPosts({ preloadedInitialBlogs }: PageBlogPostsProps) {
     }, [cursor, isDone, isLoading, searchTerm, sortOrder, activeTags]);
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-4 p-2">
             {blogs.length === 0 ? (
                 <p className="text-muted-foreground">No insights posted yet.</p>
                 ) : (
