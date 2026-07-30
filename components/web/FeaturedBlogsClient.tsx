@@ -34,14 +34,12 @@ export function FeaturedBlogsClient({ initialFeaturedBlogs }: FeaturedBlogsClien
 
     if (initialFeaturedBlogs.length === 0) {
         return (
-            <div className="flex flex-col gap-0 w-full bg-muted rounded-lg overflow-hidden transition-all duration-200 hover:bg-zinc-200 dark:hover:bg-zinc-900">
-                <div className="relative aspect-video w-full flex items-center justify-center p-6">
-                    <span className="text-muted-foreground text-sm font-medium text-center max-w-[250px] break-words whitespace-normal">
+            <div className="flex flex-col gap-0 w-full bg-muted rounded-2xl p-4 overflow-hidden">
+                <div className="flex items-center justify-center p-6">
+                    <span className="text-muted-foreground text-sm font-medium text-center">
                         No featured posts found.
                     </span>
                 </div>
-                <div className="pt-3 px-3 pb-2 h-[3.25rem] opacity-0 pointer-events-none" aria-hidden="true" />
-                <div className="h-10 opacity-0 pointer-events-none" aria-hidden="true" />
             </div>
         );
     }
@@ -54,52 +52,60 @@ export function FeaturedBlogsClient({ initialFeaturedBlogs }: FeaturedBlogsClien
     });
 
     return (
-        <div className="group/content flex flex-col gap-0 w-full bg-muted rounded-sm overflow-hidden transition-all duration-200 hover:bg-zinc-200 dark:hover:bg-zinc-900">
+        <div className="group/content flex flex-col w-full bg-muted/50 rounded-2xl p-4 transition-all duration-200 hover:bg-muted/80">
+            <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-semibold text-muted-foreground tracking-wider uppercase">
+                    Featured Post
+                </span>
+                <div className="flex items-center gap-1">
+                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handlePrev}>
+                        <ArrowLeft className="h-3.5 w-3.5" />
+                    </Button>
+                    <span className="text-xs text-muted-foreground font-medium select-none px-1">
+                        {currentIndex + 1}/{initialFeaturedBlogs.length}
+                    </span>
+                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleNext}>
+                        <ArrowRight className="h-3.5 w-3.5" />
+                    </Button>
+                </div>
+            </div>
+
             <Link 
                 href={`/insights/${currentPost._id}`}
-                className="flex flex-col w-full text-inherit no-underline cursor-pointer"
+                className="flex items-start justify-between gap-4 w-full text-inherit no-underline cursor-pointer group"
             >
-                <div className="relative aspect-video w-full overflow-hidden shrink-0">
+                <div className="flex flex-col justify-between flex-1 min-w-0">
+                    <div>
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium mb-1.5">
+                            <span className="font-semibold text-foreground truncate max-w-[120px]">
+                                {currentPost.authorName}
+                            </span>
+                            <span>•</span>
+                            <span className="shrink-0">{formattedDate}</span>
+                        </div>
+
+                        <h3 className="text-sm md:text-base font-semibold leading-snug tracking-tight text-foreground transition-colors duration-200 group-hover:text-blue-600 line-clamp-3">
+                            {currentPost.title}
+                        </h3>
+                    </div>
+                </div>
+
+                <div className="relative h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden bg-background">
                     {initialFeaturedBlogs.map((post, index) => (
                         <Image
                             key={post._id}
                             src={post.imageUrl}
                             alt={post.title}
                             fill
-                            className={`object-cover ${
-                                index === currentIndex ? "block" : "hidden"
+                            className={`object-cover transition-opacity duration-300 ${
+                                index === currentIndex ? "opacity-100 block" : "opacity-0 hidden"
                             }`}
-                            sizes="(max-width: 1200px) 100vw, 1200px"
+                            sizes="(max-width: 768px) 80px, 96px"
                             priority={index === 0} 
                         />
                     ))}
                 </div>
-                
-                <div className="pt-3 px-3 pb-2">
-                    <div className="text-xs font-mono uppercase tracking-wider text-muted-foreground flex justify-between">
-                        <span>{currentPost.authorName}</span>
-                        <span>{formattedDate}</span>
-                    </div>
-
-                    <div className="mt-2 h-[3.25rem] flex flex-col justify-start overflow-hidden">
-                        <h3 className="uppercase break-words text-lg font-bold tracking-tight text-foreground transition-colors duration-200 group-hover/content:text-blue-600 leading-snug line-clamp-2">
-                            {currentPost.title}
-                        </h3>
-                    </div>
-                </div>
             </Link>
-
-            <div className="flex flex-row justify-center items-center gap-2 border-border/40 px-3 pb-3">
-                <Button variant="ghost" size="icon" onClick={handlePrev}>
-                    <ArrowLeft className="h-4 w-4" />
-                </Button>
-                <span className="text-center min-w-[16px] text-muted-foreground font-medium text-sm select-none">
-                    {currentIndex + 1}
-                </span>
-                <Button variant="ghost" size="icon" onClick={handleNext}>
-                    <ArrowRight className="h-4 w-4" />
-                </Button>
-            </div>
         </div>
     );
 }

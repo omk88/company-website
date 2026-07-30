@@ -25,13 +25,7 @@ export function RightSidebar() {
       style={{ height: "calc(100vh - 4rem)" }}
     >
       <SidebarContent className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-none">
-        <SidebarGroup className="!pt-0 !pl-0 !pr-2"> 
-          <SidebarGroupLabel className="w-full justify-center">
-            <h1 className="flex items-start justify-center gap-2 text-sm font-medium text-foreground">
-              <Sparkles className="w-4 h-4 md:w-4 md:h-4 stroke-[2.3] shrink-0" />
-              <span>Featured</span>
-            </h1>
-          </SidebarGroupLabel>
+        <SidebarGroup className="!pl-0 !pr-2"> 
           <SidebarGroupContent>
             <Suspense fallback={<FeaturedBlogsSkeleton />}>
               <FeaturedBlogs />
