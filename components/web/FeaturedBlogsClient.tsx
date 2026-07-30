@@ -90,7 +90,7 @@ export function FeaturedBlogsClient({ initialFeaturedBlogs }: FeaturedBlogsClien
                     </div>
                 </div>
 
-                <div className="relative h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden bg-background">
+                <div className="relative h-20 w-20 md:h-20 md:w-20 shrink-0 rounded-xl overflow-hidden bg-background">
                     {initialFeaturedBlogs.map((post, index) => (
                         <Image
                             key={post._id}

@@ -25,7 +25,7 @@ export default async function InsightsPage() {
         cursor: null,   
         id: 0,
     }
-});
+  });
 
   const [preloadedInitialBlogs] = await Promise.all([
     preloadedInitialBlogsPromise
@@ -41,9 +41,9 @@ export default async function InsightsPage() {
           <LeftSidebar />
         </aside>
 
-        <div className="w-full flex flex-col">
+        <div className="w-full flex flex-col min-h-screen">
           
-          <section className="w-full pt-4 pb-4">
+          <section className="w-full pt-4 pb-4 [margin-left:calc((18rem-12.8rem)/2)]">
             <div className="w-full">
               <div className="w-full max-w-xl mx-auto px-4 flex flex-col items-center justify-start gap-4 md:gap-6">
                 <div className="w-full h-30 max-w-md flex items-center justify-center relative overflow-hidden shrink-0 transform-gpu">
@@ -75,7 +75,7 @@ export default async function InsightsPage() {
 
           <section 
             id="blog-grid-section" 
-            className="w-full bg-white dark:bg-zinc-950 border-t border-border/50"
+            className="w-full bg-white dark:bg-zinc-950 border-t border-border/50 relative"
           >
             <div className="w-full mt-4">
               <div className="w-full pl-4 pr-4 pb-4">
