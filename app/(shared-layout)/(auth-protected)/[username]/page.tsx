@@ -50,7 +50,7 @@ export default async function Profile({ params }: profileRouteProps) {
                     <LeftSidebarProfile preloadedProfile={preloadedProfile} preloadedCurrentUser={preloadedCurrentUser} />
                 </aside>
 
-                <div className="w-full ml-[24rem] bg-white">
+                <div className="w-full bg-white">
                     <SearchProvider >
                         <ProfileContentWrapper
                             username={username}

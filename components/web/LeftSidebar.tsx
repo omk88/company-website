@@ -10,7 +10,8 @@ import {
   SidebarFooter, 
   SidebarMenu, 
   SidebarMenuItem, 
-  SidebarMenuButton 
+  SidebarMenuButton, 
+  SidebarProvider
 } from "../ui/sidebar";
 import { SidebarSearch } from "./SidebarSearch";
 import { SidebarSort } from "./SidebarSort";
@@ -28,12 +29,8 @@ export function LeftSidebar() {
 
   return (
     <Sidebar 
-      className="flex flex-col !top-16 !z-40 bg-white border-r w-fit !w-auto"
+      className="flex flex-col !top-16 !z-40 bg-white border-r"
       bgClass="bg-white" 
-      style={{ 
-        height: "calc(100vh - 4rem)",
-        "--sidebar-width": "fit-content" 
-      } as React.CSSProperties}
       collapsible="icon"
     >
       <SidebarContent className="!p-0 w-full">

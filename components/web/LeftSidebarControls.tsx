@@ -29,7 +29,7 @@ export async function LeftSidebarControls({ blog }: ViewTrackerProps) {
 
 
   return (
-    <Sidebar className="!w-40 !top-16 !z-40">
+    <Sidebar bgClass="bg-white" showBorder={false} className="!w-40 !top-16 !z-40">
       <SidebarHeader>
         <Link className={buttonVariants({variant: "ghost"})} href="/insights">
             <ArrowLeft className="size-4" />

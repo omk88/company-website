@@ -48,6 +48,7 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
 
   return (
     <Sidebar 
+      bgClass="bg-white" 
       className="flex flex-col !top-16 !z-40 overflow-hidden !p-0 bg-white"
       style={{ height: "calc(100vh - 4rem)" }}
     >

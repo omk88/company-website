@@ -34,16 +34,19 @@ export default async function InsightsPage() {
   return (
     <SidebarProvider>
       <SearchProvider>
-        <aside className="sticky top-16 h-[calc(100vh-4rem)] z-30">
+        <aside 
+          className="shrink-0"
+          style={{ "--sidebar-width": "12.5rem" } as React.CSSProperties}
+        >
           <LeftSidebar />
         </aside>
 
         <div className="w-full flex flex-col">
           
           <section className="w-full pt-4 pb-4">
-            <div className="w-full md:px-[var(--sidebar-width)]">
+            <div className="w-full">
               <div className="w-full max-w-xl mx-auto px-4 flex flex-col items-center justify-start gap-4 md:gap-6">
-                <div className="w-full h-30 max-w-md lg:max-w-[460px] flex items-center justify-center relative overflow-hidden shrink-0 transform-gpu">
+                <div className="w-full h-30 max-w-md flex items-center justify-center relative overflow-hidden shrink-0 transform-gpu">
                   <GridCube 
                     models={INSIGHTS_MODELS} 
                     storageKey="insights_cross_path" 
@@ -82,7 +85,10 @@ export default async function InsightsPage() {
           </section>
         </div>
 
-        <aside className="sticky top-16 h-[calc(100vh-4rem)] z-30">
+        <aside 
+          className="shrink-0"
+          style={{ "--sidebar-width": "18rem" } as React.CSSProperties}
+        >
           <RightSidebar />
         </aside>
       </SearchProvider>

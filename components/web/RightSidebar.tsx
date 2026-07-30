@@ -1,4 +1,4 @@
-import { MessageCircleWarning, Sparkles, TrendingUp } from "lucide-react";
+import { Sparkles, TrendingUp } from "lucide-react";
 import { 
   Sidebar, 
   SidebarHeader, 
@@ -6,7 +6,8 @@ import {
   SidebarGroup, 
   SidebarGroupLabel,
   SidebarGroupContent,
-  SidebarFooter 
+  SidebarFooter, 
+  SidebarProvider
 } from "../ui/sidebar";
 import { FeaturedBlogs } from "./FeaturedBlogsContainer";
 import { TrendingBlogs } from "./TrendingBlogsContainer";
@@ -17,6 +18,8 @@ import { TrendingBlogsSkeleton } from "./TrendingBlogsSkeleton";
 export function RightSidebar() {
   return (
     <Sidebar 
+      bgClass="bg-transparent" 
+      showBorder={false}
       side="right" 
       className="!top-16 !z-40 flex flex-col !p-0 overflow-hidden"
       style={{ height: "calc(100vh - 4rem)" }}
