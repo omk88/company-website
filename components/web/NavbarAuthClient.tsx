@@ -24,6 +24,7 @@ export function NavbarAuthClient({ initialIsAuth, initialImage }: NavbarAuthClie
     const [open, setOpen] = useState(false);
 
     const handleSignOut = async () => {
+        setOpen(false);
         await authClient.signOut({
             fetchOptions: {
                 onSuccess: () => {
@@ -128,21 +129,22 @@ export function NavbarAuthClient({ initialIsAuth, initialImage }: NavbarAuthClie
                                         </div>
 
                                         <div className="flex flex-col gap-0.5">
-                                        <Link
-                                            href={`/company/blog`}
-                                            onClick={() => setOpen(false)}
-                                            className="flex items-center text-muted-foreground gap-2.5 px-2.5 py-2 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-colors duration-100 cursor-pointer"
-                                        >
-                                            <Plus className="w-4 h-4 stroke-[2] shrink-0 group-hover:text-current" />
-                                            <span>Create a post</span>
-                                        </Link>
+                                            <Link
+                                                href={`/company/blog`}
+                                                onClick={() => setOpen(false)}
+                                                className="flex items-center text-muted-foreground gap-2.5 px-2.5 py-2 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-colors duration-100 cursor-pointer"
+                                            >
+                                                <Plus className="w-4 h-4 stroke-[2] shrink-0 group-hover:text-current" />
+                                                <span>Create a post</span>
+                                            </Link>
 
-                                        <button 
-                                            className="w-full flex items-center gap-2.5 px-2.5 py-2 text-sm font-medium rounded-md text-destructive hover:bg-destructive/10 transition-colors duration-100 cursor-pointer text-left"
-                                        >
-                                            <LogOut className="w-4 h-4 stroke-[2] shrink-0" />
-                                            <span>Sign Out</span>
-                                        </button>
+                                            <button 
+                                                className="w-full flex items-center gap-2.5 px-2.5 py-2 text-sm font-medium rounded-md text-destructive hover:bg-destructive/10 transition-colors duration-100 cursor-pointer text-left"
+                                                onClick={handleSignOut}
+                                            >
+                                                <LogOut className="w-4 h-4 stroke-[2] shrink-0" />
+                                                <span>Sign Out</span>
+                                            </button>
                                         </div>
                                     </PopoverContent>
                                 </Popover>
