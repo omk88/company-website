@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button, buttonVariants } from "../ui/button";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
-import { LogOut, LogIn } from "lucide-react";
+import { LogOut, LogIn, ArrowUpRight, Plus } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -87,24 +87,38 @@ export function NavbarAuthClient({ initialIsAuth, initialImage }: NavbarAuthClie
                                         </PopoverTrigger>
                                         <PopoverContent 
                                             align="end" 
-                                            className="w-[var(--radix-popover-trigger-width)] min-w-[8rem] p-0"
+                                            className="p-0"
                                         >
-                                            <div className="flex flex-row items-center gap-2 w-full p-2">
-                                                <div className="h-12 w-12 border-2 border-muted rounded-full overflow-hidden bg-muted relative shrink-0">
-                                                    <img
-                                                        src={avatarSrc}
-                                                        alt="profile"
-                                                        className="h-full w-full object-cover rounded-full"
-                                                        decoding="async" 
-                                                    />
-                                                </div>
+                                            <div className="flex flex-row gap-8 p-2 items-center cursor-pointer">
+                                                <div className="flex flex-row items-center gap-2 w-full">
+                                                    <div className="h-12 w-12 border-2 border-muted rounded-full overflow-hidden bg-muted relative shrink-0">
+                                                        <img
+                                                            src={avatarSrc}
+                                                            alt="profile"
+                                                            className="h-full w-full object-cover rounded-full"
+                                                            decoding="async" 
+                                                        />
+                                                    </div>
 
-                                                <div className="relative w-full">
-                                                    <div className="flex flex-col">
-                                                        <h4 className="text-base font-semibold leading-none">{`${displayName}`}</h4>
-                                                        <p className="text-sm text-muted-foreground leading-none mt-1">{`@${userData?.profile?.username}`}</p>
+                                                    <div className="relative w-full">
+                                                        <div className="flex flex-col">
+                                                            <h4 className="text-base font-semibold leading-none">{`${displayName}`}</h4>
+                                                            <p className="text-sm text-muted-foreground leading-none mt-1">{`@${userData?.profile?.username}`}</p>
+                                                        </div>
                                                     </div>
                                                 </div>
+                                                <div className="flex flex-row gap-2 items-center">
+                                                    <span>View profile</span>
+                                                    <ArrowUpRight className="w-4 h-4 stroke-[2] shrink-0" />
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-row gap-2 items-center p-2">
+                                                <Plus className="w-4 h-4 stroke-[2] shrink-0" />
+                                                <span>Create a post</span>
+                                            </div>
+                                            <div className="flex flex-row gap-2 items-center p-2">
+                                                <LogOut className="w-4 h-4 stroke-[2] shrink-0" />
+                                                <span>Sign Out</span>
                                             </div>
                                         </PopoverContent>
                                     </Popover>
