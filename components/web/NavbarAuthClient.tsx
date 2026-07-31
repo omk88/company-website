@@ -72,56 +72,71 @@ export function NavbarAuthClient({ initialIsAuth, initialImage }: NavbarAuthClie
 
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                    <Popover>
-                                        <PopoverTrigger asChild>
+                                <Popover>
+                                    <PopoverTrigger asChild>
                                             <Button variant="ghost" size="icon" className="cursor-pointer">
                                                 <div className="h-5 w-5 rounded-full overflow-hidden border border-muted flex items-center justify-center bg-transparent">
-                                                    <img 
-                                                        src={avatarSrc} 
-                                                        alt={profileUsername || "User Profile"} 
-                                                        loading="eager" 
+                                                    <img
+                                                        src={avatarSrc}
+                                                        alt={profileUsername || "User Profile"}
+                                                        loading="eager"
                                                         className="h-full w-full object-cover"
                                                     />
                                                 </div>
                                             </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent 
-                                            align="end" 
-                                            className="p-0"
-                                        >
-                                            <div className="flex flex-row gap-8 p-2 items-center cursor-pointer">
-                                                <div className="flex flex-row items-center gap-2 w-full">
-                                                    <div className="h-12 w-12 border-2 border-muted rounded-full overflow-hidden bg-muted relative shrink-0">
-                                                        <img
-                                                            src={avatarSrc}
-                                                            alt="profile"
-                                                            className="h-full w-full object-cover rounded-full"
-                                                            decoding="async" 
-                                                        />
-                                                    </div>
+                                    </PopoverTrigger>
 
-                                                    <div className="relative w-full">
-                                                        <div className="flex flex-col">
-                                                            <h4 className="text-base font-semibold leading-none">{`${displayName}`}</h4>
-                                                            <p className="text-sm text-muted-foreground leading-none mt-1">{`@${userData?.profile?.username}`}</p>
-                                                        </div>
-                                                    </div>
+                                    <PopoverContent 
+                                        align="end" 
+                                        className="w-80 p-1.5 shadow-lg rounded-xl border border-border bg-popover"
+                                    >
+                                        <Link
+                                            href={`/${userData?.profile?.username || ""}`}
+                                            className="group flex items-center justify-between p-2.5 rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors duration-150 cursor-pointer"
+                                        >
+                                            <div className="flex items-center gap-3 min-w-0">
+                                                <div className="h-10 w-10 border border-border rounded-full overflow-hidden bg-muted shrink-0">
+                                                    <img
+                                                        src={avatarSrc}
+                                                        alt="profile"
+                                                        className="h-full w-full object-cover"
+                                                        decoding="async" 
+                                                    />
                                                 </div>
-                                                <div className="flex flex-row gap-2 items-center">
-                                                    <span>View profile</span>
-                                                    <ArrowUpRight className="w-4 h-4 stroke-[2] shrink-0" />
+                                                <div className="flex flex-col min-w-0">
+                                                    <span className="text-sm font-semibold truncate leading-tight">
+                                                        {`${displayName}`}
+                                                    </span>
+                                                    <span className="text-xs text-muted-foreground group-hover:text-accent-foreground/80 truncate mt-0.5">
+                                                        @{userData?.profile?.username}
+                                                    </span>
                                                 </div>
                                             </div>
-                                            <div className="flex flex-row gap-2 items-center p-2">
-                                                <Plus className="w-4 h-4 stroke-[2] shrink-0" />
-                                                <span>Create a post</span>
+
+                                            <div className="flex items-center gap-1 text-xs font-medium text-muted-foreground group-hover:text-accent-foreground shrink-0 pl-2">
+                                                <span className="hidden sm:inline">View</span>
+                                                <ArrowUpRight className="w-4 h-4 stroke-[2] transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                                             </div>
-                                            <div className="flex flex-row gap-2 items-center p-2">
-                                                <LogOut className="w-4 h-4 stroke-[2] shrink-0" />
-                                                <span>Sign Out</span>
-                                            </div>
-                                        </PopoverContent>
-                                    </Popover>
+                                        </Link>
+
+                                        <div className="flex flex-col gap-0.5">
+                                        <Link
+                                            href={`/profile/${userData?.profile?.username || ""}`}
+                                            className="flex items-center gap-2.5 px-2.5 py-2 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-colors duration-150 cursor-pointer"
+                                        >
+                                            <Plus className="w-4 h-4 stroke-[2] shrink-0 text-muted-foreground group-hover:text-current" />
+                                            <span>Create a post</span>
+                                        </Link>
+
+                                        <button 
+                                            className="w-full flex items-center gap-2.5 px-2.5 py-2 text-sm font-medium rounded-md text-destructive hover:bg-destructive/10 transition-colors duration-150 cursor-pointer text-left"
+                                        >
+                                            <LogOut className="w-4 h-4 stroke-[2] shrink-0" />
+                                            <span>Sign Out</span>
+                                        </button>
+                                        </div>
+                                    </PopoverContent>
+                                </Popover>
                             </TooltipTrigger>
                             <TooltipContent side="bottom" align="center">
                                 <p className="text-xs font-medium">Profile</p>
