@@ -10,6 +10,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Separator } from "../ui/separator";
+import { useState } from "react";
 
 interface NavbarAuthClientProps {
     initialIsAuth: boolean;
@@ -19,6 +21,7 @@ interface NavbarAuthClientProps {
 export function NavbarAuthClient({ initialIsAuth, initialImage }: NavbarAuthClientProps) {
     const router = useRouter();
     const { data: session, isPending } = authClient.useSession();
+    const [open, setOpen] = useState(false);
 
     const handleSignOut = async () => {
         await authClient.signOut({
@@ -72,7 +75,7 @@ export function NavbarAuthClient({ initialIsAuth, initialImage }: NavbarAuthClie
 
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Popover>
+                                <Popover open={open} onOpenChange={setOpen}>
                                     <PopoverTrigger asChild>
                                             <Button variant="ghost" size="icon" className="cursor-pointer">
                                                 <div className="h-5 w-5 rounded-full overflow-hidden border border-muted flex items-center justify-center bg-transparent">
@@ -92,7 +95,8 @@ export function NavbarAuthClient({ initialIsAuth, initialImage }: NavbarAuthClie
                                     >
                                         <Link
                                             href={`/${userData?.profile?.username || ""}`}
-                                            className="group flex items-center justify-between p-2.5 rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors duration-150 cursor-pointer"
+                                            onClick={() => setOpen(false)}
+                                            className="group flex items-center justify-between p-2.5 rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors duration-100 cursor-pointer"
                                         >
                                             <div className="flex items-center gap-3 min-w-0">
                                                 <div className="h-10 w-10 border border-border rounded-full overflow-hidden bg-muted shrink-0">
@@ -119,17 +123,21 @@ export function NavbarAuthClient({ initialIsAuth, initialImage }: NavbarAuthClie
                                             </div>
                                         </Link>
 
+                                        <div className="w-full px-2">
+                                            <Separator />
+                                        </div>
+
                                         <div className="flex flex-col gap-0.5">
                                         <Link
                                             href={`/profile/${userData?.profile?.username || ""}`}
-                                            className="flex items-center gap-2.5 px-2.5 py-2 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-colors duration-150 cursor-pointer"
+                                            className="flex items-center gap-2.5 px-2.5 py-2 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-colors duration-100 cursor-pointer"
                                         >
                                             <Plus className="w-4 h-4 stroke-[2] shrink-0 text-muted-foreground group-hover:text-current" />
                                             <span>Create a post</span>
                                         </Link>
 
                                         <button 
-                                            className="w-full flex items-center gap-2.5 px-2.5 py-2 text-sm font-medium rounded-md text-destructive hover:bg-destructive/10 transition-colors duration-150 cursor-pointer text-left"
+                                            className="w-full flex items-center gap-2.5 px-2.5 py-2 text-sm font-medium rounded-md text-destructive hover:bg-destructive/10 transition-colors duration-100 cursor-pointer text-left"
                                         >
                                             <LogOut className="w-4 h-4 stroke-[2] shrink-0" />
                                             <span>Sign Out</span>
