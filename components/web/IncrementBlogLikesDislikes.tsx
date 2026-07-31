@@ -5,7 +5,7 @@ import { Doc } from "@/convex/_generated/dataModel";
 import { useConvex, useMutation, usePreloadedQuery } from "convex/react";
 import { usePreloadedAuthQuery } from "@convex-dev/better-auth/nextjs/client";
 import { Preloaded } from "convex/react";
-import { Copy, Ellipsis,  MessageSquare, SquarePen, Star, ThumbsUp, Trash2, TriangleAlert } from "lucide-react";
+import { Copy, Ellipsis,  MessageSquare, SmilePlus, SquarePen, Star, ThumbsUp, Trash2, TriangleAlert } from "lucide-react";
 import { Button } from "../ui/button";
 import { useTransition } from "react";
 import { toast } from "sonner";
@@ -17,6 +17,7 @@ import { Separator } from "../ui/separator";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { DeleteBlogDialog } from "./DeleteBlogDialog";
+import { EMOJI_REACTIONS, ReactionType } from "@/app/constants/reactions";
 
 interface IncrementBlogLikesProps {
   blog: Doc<"blogs">;
@@ -141,12 +142,16 @@ export function IncrementBlogLikesDislikes({
     document.getElementById("comments")?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const handleSelectReaction = async (type: ReactionType) => {
+    
+  };
+
   return (
     <div className="flex flex-col items-center gap-2 p-6 text-muted-foreground text-xs">
       <Button 
         variant="ghost" 
         onClick={handleLikeClick}
-        className="h-12 w-12 rounded-full text-muted-foreground hover:text-foreground"
+        className="h-12 w-12 rounded-full text-muted-foreground hover:text-foreground cursor-pointer"
       >
         <ThumbsUp
           className={`!h-5 !w-5 transition-none ${
@@ -159,9 +164,42 @@ export function IncrementBlogLikesDislikes({
         </span>
       </Button>
 
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button 
+            variant="ghost" 
+            className="h-12 w-12 rounded-full text-muted-foreground hover:text-foreground cursor-pointer"
+          >
+            <SmilePlus
+              className="!h-5 !w-5 transition-transform active:scale-90"
+            />
+            <span>
+              {0}
+            </span>
+          </Button>
+        </DropdownMenuTrigger>
+          <DropdownMenuContent 
+            align="start" 
+            className="flex flex-row items-center gap-4 p-4 w-auto min-w-0"
+          >
+            {EMOJI_REACTIONS.map(({ type, emoji, label }) => (
+              <DropdownMenuItem
+                key={type}
+                onClick={() => handleSelectReaction(type)}
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full cursor-pointer text-3xl p-0 hover:bg-accent focus:bg-accent transition-transform hover:scale-120 focus:outline-none"
+                title={label}
+              >
+                <span role="img" aria-label={label}>
+                  {emoji}
+                </span>
+              </DropdownMenuItem>
+            ))} 
+          </DropdownMenuContent>
+      </DropdownMenu>
+
       <Button 
         variant="ghost" 
-        className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground"
+        className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground cursor-pointer"
         onClick={scrollToView}
       >
         <MessageSquare className="!h-5 !w-5 transition-transform active:scale-90" />
@@ -171,7 +209,7 @@ export function IncrementBlogLikesDislikes({
         <DropdownMenuTrigger asChild>
             <Button 
                 variant="ghost" 
-                className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground disabled:opacity-100"
+                className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground disabled:opacity-100 cursor-pointer"
             >
                 <Ellipsis
                     className="!h-5 !w-5 transition-transform active:scale-90"
@@ -236,7 +274,7 @@ export function IncrementBlogLikesDislikes({
             <Button 
                 variant="ghost" 
                 onClick={handleFeaturedClick} 
-                className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground disabled:opacity-100"
+                className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground disabled:opacity-100 cursor-pointer"
             >
                 <Star
                     className={`!h-5 !w-5 transition-all active:scale-90 ${
@@ -247,7 +285,7 @@ export function IncrementBlogLikesDislikes({
 
             <Button 
                 variant="ghost" 
-                className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground disabled:opacity-100"
+                className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground disabled:opacity-100 cursor-pointer"
                 asChild
             >
                 <Link
@@ -266,7 +304,7 @@ export function IncrementBlogLikesDislikes({
               trigger={
                 <Button 
                     variant="ghost" 
-                    className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-destructive disabled:opacity-100"
+                    className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-destructive disabled:opacity-100 cursor-pointer"
                 >
                   <Trash2 className="!h-5 !w-5 transition-transform active:scale-90" />
                 </Button>
