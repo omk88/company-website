@@ -72,7 +72,7 @@ export function ProfileContentWrapper({ username, preloadedProfile, preloadedCur
   const searchPlaceholder = activeTab === "blog-articles" ? "insights" : "comments";
 
   return (
-    <div className="mr-4">
+    <div>
       <div className="sticky top-16 z-10 bg-background gap-4 py-4 px-4 flex flex-row items-center justify-between w-full">
 
         <div className="flex flex-row items-center gap-2 shrink-0">
@@ -124,7 +124,7 @@ export function ProfileContentWrapper({ username, preloadedProfile, preloadedCur
             <SidebarSort />
           </div>
 
-          <div className="shrink-0 w-64">
+          <div className="shrink-0">
             <SidebarSearch placeholder={searchPlaceholder} />
           </div>
         </div>
