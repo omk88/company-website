@@ -58,7 +58,7 @@ export function FeaturedBlogsClient({ initialFeaturedBlogs }: FeaturedBlogsClien
     });
 
     return (
-        <div className="group/content flex flex-col justify-between w-full bg-muted/50 rounded-2xl p-4 transition-all duration-100 hover:bg-muted/80">
+        <div className="flex flex-col justify-between w-full bg-muted/50 rounded-2xl p-4 transition-all duration-100 hover:bg-muted/80">
             <div className="flex items-center justify-between mb-3">
                 <h1 className="flex items-center justify-center gap-2 text-xs font-medium text-muted-foreground">
                     <Sparkles className="w-3.5 h-3.5 stroke-[2.3] shrink-0" />
@@ -79,7 +79,7 @@ export function FeaturedBlogsClient({ initialFeaturedBlogs }: FeaturedBlogsClien
 
             <Link 
                 href={`/insights/${currentPost._id}`}
-                className="flex items-start justify-between gap-4 w-full text-inherit no-underline cursor-pointer group mb-4"
+                className="group/card flex items-start justify-between gap-4 w-full text-inherit no-underline cursor-pointer mb-4"
             >
                 <div className="flex flex-col justify-between flex-1 min-w-0">
                     <div>
@@ -91,7 +91,7 @@ export function FeaturedBlogsClient({ initialFeaturedBlogs }: FeaturedBlogsClien
                             <span className="shrink-0">{formattedDate}</span>
                         </div>
 
-                        <h3 className="text-sm font-semibold leading-snug tracking-tight text-foreground transition-colors duration-100 group-hover:text-blue-600 line-clamp-3">
+                        <h3 className="text-sm font-semibold leading-snug tracking-tight text-foreground transition-colors duration-100 group-hover/card:text-blue-600 line-clamp-3">
                             {currentPost.title}
                         </h3>
                     </div>

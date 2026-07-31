@@ -16,6 +16,7 @@ import {
 import { SidebarSearch } from "./SidebarSearch";
 import { SidebarSort } from "./SidebarSort";
 import { SidebarTags } from "./SidebarTags";
+import Link from "next/link";
 
 const NAV_ITEMS = [
   { id: "home", label: "Home", icon: Home },
@@ -69,18 +70,21 @@ export function LeftSidebar() {
             <SidebarTags fullWidth={true} />
 
             <div className="w-full">
-              <SidebarMenuButton
-                onClick={() => {
-                  console.log("Create Post clicked");
-                }}
-                className={`
-                  w-full justify-start px-3 py-2 rounded-xl text-sm font-medium transition-colors
-                  bg-black text-white hover:bg-slate-800 active:bg-slate-900 cursor-pointer
-                `}
+              <Link
+                  href={`/company/blog`}
               >
-                <Plus className="h-4 w-4 shrink-0 stroke-[2.5]" />
-                <span>Create a Post</span>
-              </SidebarMenuButton>
+                <SidebarMenuButton
+                  className={`
+                    group w-full justify-center !h-auto !rounded-md text-xs font-semibold
+                    !bg-foreground hover:!bg-foreground/90 !text-background
+                    transition-all duration-100 active:scale-[0.99] cursor-pointer
+                    inline-flex items-center gap-2
+                  `}
+                >
+                  <Plus className="w-4 h-4 shrink-0 stroke-[2.3]" />
+                  <span>Create a Post</span>
+                </SidebarMenuButton>
+              </Link>
             </div>
           </div>
 

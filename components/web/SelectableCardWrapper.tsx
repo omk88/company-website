@@ -1,12 +1,7 @@
 "use client";
 
-import { Id } from "@/convex/_generated/dataModel";
 import { Checkbox } from "../ui/checkbox";
-import { Button } from "../ui/button";
-import { Pen } from "lucide-react";
 import { useConvex } from "convex/react";
-import { api } from "@/convex/_generated/api";
-import Link from "next/link";
 
 interface SelectableCardWrapperProps<T extends string> {
     id: T;

@@ -44,11 +44,11 @@ export default function Home() {
                 
                 <Link 
                   href="/products" 
-                  className="group px-6 py-3.5 bg-foreground hover:bg-foreground/90 text-background font-semibold text-sm rounded-full transition-all duration-200 active:scale-98 inline-flex items-center gap-2 shadow-sm"
+                  className="group px-6 py-3.5 bg-foreground hover:bg-foreground/90 text-background font-semibold text-sm rounded-full transition-all duration-100 active:scale-98 inline-flex items-center gap-2 shadow-sm"
                 >
                   <span>See our products</span>
                   <ArrowRight 
-                    className="w-4 h-4 text-background transform transition-transform duration-200 group-hover:translate-x-0.5" 
+                    className="w-4 h-4 text-background transform transition-transform duration-100 group-hover:translate-x-0.5" 
                     strokeWidth={2.5} 
                   />
                 </Link>
@@ -77,9 +77,7 @@ export default function Home() {
           <Technologies />
         </div>
       </section>
-
       <Footer />
-
     </div>
   );
 }
