@@ -1,7 +1,7 @@
-import { MapPin, Cake, ThumbsUp, SquareLibrary, MessageSquareText, Library, User } from "lucide-react";
+import { MapPin, Cake, ThumbsUp, MessageSquareText, Library, User } from "lucide-react";
 import { HoverCard, HoverCardTrigger, HoverCardContent } from "../ui/hover-card";
 import { api } from "@/convex/_generated/api";
-import { Preloaded, usePreloadedQuery, useQuery } from "convex/react";
+import { useQuery } from "convex/react";
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "../ui/tooltip";
 import Link from "next/link";
 
@@ -9,6 +9,38 @@ interface ProfileHoverCardProps {
     authorName: string;
     authorUsername: string;
     date: number;
+}
+
+function formatSmartDate(date: Date | number): string {
+  const targetDate = typeof date === "number" ? new Date(date) : date;
+  const now = new Date();
+  
+  const diffInMs = now.getTime() - targetDate.getTime();
+  const diffInSeconds = Math.floor(diffInMs / 1000);
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  const diffInDays = Math.floor(diffInHours / 24);
+
+  if (diffInDays < 3) {
+    const rtf = new Intl.RelativeTimeFormat("en-US", { numeric: "auto" });
+
+    if (diffInMinutes < 1) {
+      return "just now";
+    }
+    if (diffInMinutes < 60) {
+      return rtf.format(-diffInMinutes, "minute");
+    }
+    if (diffInHours < 24) {
+      return rtf.format(-diffInHours, "hour");
+    }
+    return rtf.format(-diffInDays, "day");
+  }
+
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(targetDate);
 }
 
 export function ProfileHoverCard({ authorName, authorUsername, date }: ProfileHoverCardProps) {
@@ -22,11 +54,7 @@ export function ProfileHoverCard({ authorName, authorUsername, date }: ProfileHo
     const profileUsername = profileData?.profile?.username;
     const profileLink = profileUsername ? `/${profileUsername}` : "/profile";
 
-    const formattedDate = new Intl.DateTimeFormat("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-    }).format(profile?._creationTime);
+    const formattedDate = formatSmartDate(date);
 
     return (
         <div>

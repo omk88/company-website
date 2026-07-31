@@ -152,7 +152,7 @@ export function ProfileBlogPosts({ username, preloadedProfile, preloadedInitialB
                 <p className="text-muted-foreground">{username} has not posted any insights yet.</p>
                 ) : (
                     <>
-                        <ul className="flex flex-col gap-4">
+                        <ul className="flex flex-col gap-2">
                             {blogs.map((blog) => (
                                 <li key={blog._id}>
                                     <SelectableCardWrapper

@@ -127,7 +127,7 @@ export function PageBlogPosts({ preloadedInitialBlogs }: PageBlogPostsProps) {
                 <p className="text-muted-foreground">No insights posted yet.</p>
                 ) : (
                     <>
-                        <ul className="flex flex-col gap-4">
+                        <ul className="flex flex-col gap-2">
                             {blogs.map((blog) => (
                                 <li key={blog._id}>
                                     <BlogCard
