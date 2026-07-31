@@ -71,7 +71,7 @@ export function LeftSidebar() {
 
             <div className="w-full">
               <Link
-                  href={`/company/blog`}
+                href={`/company/blog`}
               >
                 <SidebarMenuButton
                   className={`
@@ -81,7 +81,7 @@ export function LeftSidebar() {
                     inline-flex items-center gap-2
                   `}
                 >
-                  <Plus className="w-4 h-4 shrink-0 stroke-[2.3]" />
+                  <Plus className="w-3 h-3 shrink-0 stroke-[2.3]" />
                   <span>Create a Post</span>
                 </SidebarMenuButton>
               </Link>

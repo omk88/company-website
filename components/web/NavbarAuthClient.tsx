@@ -129,10 +129,11 @@ export function NavbarAuthClient({ initialIsAuth, initialImage }: NavbarAuthClie
 
                                         <div className="flex flex-col gap-0.5">
                                         <Link
-                                            href={`/profile/${userData?.profile?.username || ""}`}
-                                            className="flex items-center gap-2.5 px-2.5 py-2 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-colors duration-100 cursor-pointer"
+                                            href={`/company/blog`}
+                                            onClick={() => setOpen(false)}
+                                            className="flex items-center text-muted-foreground gap-2.5 px-2.5 py-2 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-colors duration-100 cursor-pointer"
                                         >
-                                            <Plus className="w-4 h-4 stroke-[2] shrink-0 text-muted-foreground group-hover:text-current" />
+                                            <Plus className="w-4 h-4 stroke-[2] shrink-0 group-hover:text-current" />
                                             <span>Create a post</span>
                                         </Link>
 
