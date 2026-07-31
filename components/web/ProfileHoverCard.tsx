@@ -11,7 +11,7 @@ interface ProfileHoverCardProps {
     date: number;
 }
 
-function formatSmartDate(date: Date | number): string {
+function formatSmartDate(date: Date | number, timeDifference: boolean): string {
   const targetDate = typeof date === "number" ? new Date(date) : date;
   const now = new Date();
   
@@ -54,7 +54,8 @@ export function ProfileHoverCard({ authorName, authorUsername, date }: ProfileHo
     const profileUsername = profileData?.profile?.username;
     const profileLink = profileUsername ? `/${profileUsername}` : "/profile";
 
-    const formattedDate = formatSmartDate(date);
+    const formattedBlogDate = formatSmartDate(date, false);
+    const formattedProfileDate = profile?._creationTime ? formatSmartDate(profile._creationTime, true) : null;
 
     return (
         <div>
@@ -90,7 +91,7 @@ export function ProfileHoverCard({ authorName, authorUsername, date }: ProfileHo
                             <div>
                                 <div className="flex items-start gap-1.5 min-w-[3rem] justify-start">
                                     <Cake className="w-4 h-4 stroke-[2.3] shrink-0 mt-0.5" />
-                                    <p>{ formattedDate }</p>
+                                    <p>{ formattedProfileDate }</p>
                                 </div>
                     
                                 {profile?.location && (
@@ -155,7 +156,7 @@ export function ProfileHoverCard({ authorName, authorUsername, date }: ProfileHo
                     </div>
                 </HoverCardContent>
             </HoverCard>
-            {" "}• {formattedDate}
+            {" "}• {formattedBlogDate}
         </div>
     )
 }
