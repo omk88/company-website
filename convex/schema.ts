@@ -164,7 +164,7 @@ const schema = defineSchema({
     blogId: v.id("blogs"),
     type: v.string(), 
   })
-    .index("by_user_and_blog", ["userId", "blogId"]),
+    .index("by_user_blog_and_type", ["userId", "blogId", "type"]),
 
   featuredBlogs: defineTable({
     userId: v.string(),

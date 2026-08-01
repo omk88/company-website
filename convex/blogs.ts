@@ -790,43 +790,35 @@ export const toggleBlogReaction = mutation({
 
     const existingReaction = await ctx.db
       .query("blogReactions")
-      .withIndex("by_user_and_blog", (q) =>
-        q.eq("userId", userId).eq("blogId", args.blogId)
+      .withIndex("by_user_blog_and_type", (q) =>
+        q
+          .eq("userId", userId)
+          .eq("blogId", args.blogId)
+          .eq("type", args.reactionType)
       )
       .unique();
 
     const targetField = REACTION_FIELD_MAP[args.reactionType];
-    const updates: Record<string, number> = {};
-    let netReactionChange = 0;
+    let countChange = 0;
 
     if (existingReaction) {
-      if (existingReaction.type === args.reactionType) {
-        await ctx.db.delete(existingReaction._id);
-        updates[targetField] = Math.max(0, (blog[targetField] ?? 0) - 1);
-        netReactionChange = -1;
-      } else {
-        const oldField = REACTION_FIELD_MAP[existingReaction.type as keyof typeof REACTION_FIELD_MAP];
-        await ctx.db.patch(existingReaction._id, { type: args.reactionType });
-
-        if (oldField) {
-          updates[oldField] = Math.max(0, (blog[oldField] ?? 0) - 1);
-        }
-        updates[targetField] = (blog[targetField] ?? 0) + 1;
-        netReactionChange = 0;
-      }
+      await ctx.db.delete(existingReaction._id);
+      countChange = -1;
     } else {
       await ctx.db.insert("blogReactions", {
         userId,
         blogId: args.blogId,
         type: args.reactionType,
       });
-      updates[targetField] = (blog[targetField] ?? 0) + 1;
-      netReactionChange = 1;
+      countChange = 1;
     }
 
-    const getCount = (field: keyof typeof REACTION_FIELD_MAP) => {
-      const fieldName = REACTION_FIELD_MAP[field];
-      return updates[fieldName] !== undefined ? updates[fieldName] : (blog[fieldName] ?? 0);
+    const currentCount = blog[targetField] ?? 0;
+    const newCount = Math.max(0, currentCount + countChange);
+
+    const getCount = (type: keyof typeof REACTION_FIELD_MAP) => {
+      const field = REACTION_FIELD_MAP[type];
+      return type === args.reactionType ? newCount : (blog[field] ?? 0);
     };
 
     const totalReactions = 
@@ -843,12 +835,12 @@ export const toggleBlogReaction = mutation({
     );
 
     await ctx.db.patch(args.blogId, {
-      ...updates,
+      [targetField]: newCount,
       hotScore,
       controversialScore,
     });
 
-    if (netReactionChange !== 0) {
+    if (countChange !== 0) {
       const authorProfile = await ctx.db
         .query("profiles")
         .withIndex("by_userId", (q) => q.eq("userId", blog.author))
@@ -857,8 +849,8 @@ export const toggleBlogReaction = mutation({
       if (authorProfile) {
         const currentLikes = authorProfile.totalLikes ?? 0;
         await ctx.db.patch(authorProfile._id, {
-          totalLikes: Math.max(0, currentLikes + netReactionChange),
-        })
+          totalLikes: Math.max(0, currentLikes + countChange),
+        });
       }
     }
   },
