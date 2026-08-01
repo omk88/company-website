@@ -3,6 +3,7 @@ import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { paginationOptsValidator } from "convex/server";
 import { calculateScores } from "./scoreAlgorithm";
+import schema from "./schema";
 
 const WORDS_PER_MINUTE = 225;
 
@@ -46,11 +47,11 @@ export const createPost = mutation({
       totalViews: 0,
       likes: 0,
       commentCount: 0,
-      heartEmojiCount: 0,
-      insightfulEmojiCount: 0,
-      mindblownEmojiCount: 0,
-      fireEmojiCount: 0,
-      curiousEmojiCount: 0,
+      heartCount: 0,
+      insightfulCount: 0,
+      mindblownCount: 0,
+      fireCount: 0,
+      thinkingCount: 0,
       hotScore: 0,
       controversialScore: 0,
       featured: false,
@@ -758,4 +759,107 @@ export const getBlogById = query({
       imageUrl: resolvedImageUrl ?? "/noImage.png" 
     };
   }
+});
+
+const REACTION_FIELD_MAP = {
+  heart: "heartCount",
+  insightful: "insightfulCount",
+  mindblown: "mindblownCount",
+  fire: "fireCount",
+  thinking: "thinkingCount",
+} as const;
+
+export const toggleBlogReaction = mutation({
+  args: {
+    blogId: v.id("blogs"),
+    reactionType: v.union(
+      v.literal("heart"),
+      v.literal("insightful"),
+      v.literal("mindblown"),
+      v.literal("fire"),
+      v.literal("thinking"),
+    ),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return null;
+    const userId = identity.subject as Id<"profiles">;
+
+    const blog = await ctx.db.get(args.blogId);
+    if (!blog) return null;
+
+    const existingReaction = await ctx.db
+      .query("blogReactions")
+      .withIndex("by_user_and_blog", (q) =>
+        q.eq("userId", userId).eq("blogId", args.blogId)
+      )
+      .unique();
+
+    const targetField = REACTION_FIELD_MAP[args.reactionType];
+    const updates: Record<string, number> = {};
+    let netReactionChange = 0;
+
+    if (existingReaction) {
+      if (existingReaction.type === args.reactionType) {
+        await ctx.db.delete(existingReaction._id);
+        updates[targetField] = Math.max(0, (blog[targetField] ?? 0) - 1);
+        netReactionChange = -1;
+      } else {
+        const oldField = REACTION_FIELD_MAP[existingReaction.type as keyof typeof REACTION_FIELD_MAP];
+        await ctx.db.patch(existingReaction._id, { type: args.reactionType });
+
+        if (oldField) {
+          updates[oldField] = Math.max(0, (blog[oldField] ?? 0) - 1);
+        }
+        updates[targetField] = (blog[targetField] ?? 0) + 1;
+        netReactionChange = 0;
+      }
+    } else {
+      await ctx.db.insert("blogReactions", {
+        userId,
+        blogId: args.blogId,
+        type: args.reactionType,
+      });
+      updates[targetField] = (blog[targetField] ?? 0) + 1;
+      netReactionChange = 1;
+    }
+
+    const getCount = (field: keyof typeof REACTION_FIELD_MAP) => {
+      const fieldName = REACTION_FIELD_MAP[field];
+      return updates[fieldName] !== undefined ? updates[fieldName] : (blog[fieldName] ?? 0);
+    };
+
+    const totalReactions = 
+      getCount("heart") + 
+      getCount("insightful") + 
+      getCount("mindblown") +
+      getCount("fire") +
+      getCount("thinking");
+
+    const { hotScore, controversialScore } = calculateScores(
+      blog._creationTime,
+      totalReactions,
+      blog.commentCount ?? 0,
+    );
+
+    await ctx.db.patch(args.blogId, {
+      ...updates,
+      hotScore,
+      controversialScore,
+    });
+
+    if (netReactionChange !== 0) {
+      const authorProfile = await ctx.db
+        .query("profiles")
+        .withIndex("by_userId", (q) => q.eq("userId", blog.author))
+        .unique();
+
+      if (authorProfile) {
+        const currentLikes = authorProfile.totalLikes ?? 0;
+        await ctx.db.patch(authorProfile._id, {
+          totalLikes: Math.max(0, currentLikes + netReactionChange),
+        })
+      }
+    }
+  },
 });

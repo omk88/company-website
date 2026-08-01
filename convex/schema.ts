@@ -17,11 +17,13 @@ const schema = defineSchema({
     likes: v.number(),
     featured: v.boolean(),
     commentCount: v.number(),
-    heartEmojiCount: v.number(),
-    insightfulEmojiCount: v.number(),
-    mindblownEmojiCount: v.number(),
-    fireEmojiCount: v.number(),
-    curiousEmojiCount: v.number(),
+
+    heartCount: v.number(),
+    insightfulCount: v.number(),
+    mindblownCount: v.number(),
+    fireCount: v.number(),
+    thinkingCount: v.number(),
+
     hotScore: v.number(),
     controversialScore: v.number(), 
     readTime: v.number(),
@@ -156,6 +158,13 @@ const schema = defineSchema({
   })
     .index("by_user_and_blog", ["userId", "blogId"])
     .index("by_blog", ["blogId"]),
+
+  blogReactions: defineTable({
+    userId: v.string(),
+    blogId: v.id("blogs"),
+    type: v.string(), 
+  })
+    .index("by_user_and_blog", ["userId", "blogId"]),
 
   featuredBlogs: defineTable({
     userId: v.string(),

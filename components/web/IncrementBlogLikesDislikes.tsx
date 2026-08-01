@@ -56,6 +56,8 @@ export function IncrementBlogLikesDislikes({
 
   const isFeatured = featuredState?.isFeatured;
 
+  const toggleReactionMutation = useMutation(api.blogs.toggleBlogReaction);
+
   const prefetchBlog = () => {
     convex.query(api.blogs.getBlogById, { blogId: blog._id }).catch((err) => {
       console.error("Prefetch failed:", err);
@@ -143,7 +145,14 @@ export function IncrementBlogLikesDislikes({
   };
 
   const handleSelectReaction = async (type: ReactionType) => {
-    
+    try {
+      await toggleReactionMutation({
+        blogId: blog._id,
+        reactionType: type,
+      });
+    } catch (error) {
+      console.error("Failed to toggle reaction:", error);
+    }
   };
 
   return (

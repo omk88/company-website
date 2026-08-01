@@ -100,31 +100,21 @@ async function BlogContent({
                         </h1>
 
                         <div className="flex flex-wrap items-center gap-1.5">
-                            {EMOJI_REACTIONS.map(({ type, emoji, label }) => {
-                                const fieldMap: Record<string, keyof typeof blog> = {
-                                like: "heartEmojiCount",
-                                insightful: "insightfulEmojiCount",
-                                mindblown: "mindblownEmojiCount",
-                                fire: "fireEmojiCount",
-                                thinking: "curiousEmojiCount",
-                                };
-
-                                const fieldName = fieldMap[type];
-                                
-                                const count = (fieldName ? blog[fieldName] : 0) as number ?? 0;
+                            {EMOJI_REACTIONS.map(({ type, field, emoji, label }) => {
+                                const count = (blog[field] ?? 0) as number;
 
                                 if (count === 0) return null;
 
                                 return (
-                                <Badge
-                                    key={type}
-                                    variant="secondary"
-                                    className="flex items-center gap-1.5 px-2.5 py-1 text-md font-medium"
-                                    title={label}
-                                >
-                                    <span>{emoji}</span>
-                                    <span className="text-muted-foreground">{count}</span>
-                                </Badge>
+                                    <Badge
+                                        key={type}
+                                        variant="secondary"
+                                        className="flex items-center gap-1.5 px-2.5 py-1 text-md font-medium"
+                                        title={label}
+                                    >
+                                        <span>{emoji}</span>
+                                        <span className="text-muted-foreground">{count}</span>
+                                    </Badge>
                                 );
                             })}
                         </div>
