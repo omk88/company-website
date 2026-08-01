@@ -13,8 +13,7 @@ import { LeftSidebarControls } from "@/components/web/LeftSidebarControls";
 import { RightSidebarArticles } from "@/components/web/RightSidebarArticles";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
-import { EMOJI_REACTIONS } from "@/app/constants/reactions";
+import { BlogEmojiReactions } from "@/components/web/BlogEmojiReactions";
 
 interface blogIdRouteProps {
     params: Promise<{
@@ -70,14 +69,6 @@ async function BlogContent({
     const blog = await blogPromise;
     const preloadedComments = await preloadedCommentsPromise;
 
-    const reactions = [
-        { emoji: "❤️", count: blog.heartEmojiCount, label: "Love" },
-        { emoji: "💡", count: blog.lightbulbEmojiCount, label: "Insightful" },
-        { emoji: "🤯", count: blog.mindBlownEmojiCount, label: "Mind Blown" },
-        { emoji: "🔥", count: blog.fireEmojiCount, label: "Hot Take" },
-        { emoji: "🤔", count: blog.thinkingEmojiCount, label: "Thinking" },
-    ];
-
     return (
         <main className="w-full max-w-4xl mx-auto py-3 px-3 animate-in fade-in duration-500">
             <ViewTracker blogId={blog._id} />
@@ -99,25 +90,8 @@ async function BlogContent({
                             {blog.title}
                         </h1>
 
-                        <div className="flex flex-wrap items-center gap-1.5">
-                            {EMOJI_REACTIONS.map(({ type, field, emoji, label }) => {
-                                const count = (blog[field] ?? 0) as number;
+                        <BlogEmojiReactions initialBlog={blog} />
 
-                                if (count === 0) return null;
-
-                                return (
-                                    <Badge
-                                        key={type}
-                                        variant="secondary"
-                                        className="flex items-center gap-1.5 px-2.5 py-1 text-md font-medium"
-                                        title={label}
-                                    >
-                                        <span>{emoji}</span>
-                                        <span className="text-muted-foreground">{count}</span>
-                                    </Badge>
-                                );
-                            })}
-                        </div>
                     </div>
                     <div className="flex flex-col gap-6">
                         <p className="text-lg text-muted-foreground">
