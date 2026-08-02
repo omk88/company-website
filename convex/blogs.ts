@@ -755,12 +755,25 @@ export const getPostsByAuthor = query({
 export const getTrendingPosts = query({
   args: {},
   handler: async (ctx) => {
-    const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    const DAYS_IN_MS = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    const STEP_DAYS = 7;
+    const MAX_DAYS = 30;
 
-    const recentViews = await ctx.db
-      .query("viewLogs")
-      .withIndex("by_viewedAt", (q) => q.gte("viewedAt", sevenDaysAgo))
-      .collect();
+    let currentDays = STEP_DAYS;
+    let recentViews: Array<{ blogId: string; viewedAt: number }> = [];
+
+    while (recentViews.length === 0 && currentDays <= MAX_DAYS) {
+      const timeCutoff = Date.now() - currentDays * DAYS_IN_MS;
+
+      recentViews = await ctx.db
+        .query("viewLogs")
+        .withIndex("by_viewedAt", (q) => q.gte("viewedAt", timeCutoff))
+        .collect();
+    }
+
+    if (recentViews.length === 0) {
+      currentDays += STEP_DAYS;
+    }
 
     const viewCounts: Record<string, number> = {};
     recentViews.forEach((log) => {
@@ -781,6 +794,7 @@ export const getTrendingPosts = query({
         return {
           ...blog,
           recentViews: viewCounts[id],
+          windowDaysUsed: currentDays,
         };
       })
     );

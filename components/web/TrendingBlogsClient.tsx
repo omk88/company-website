@@ -2,24 +2,30 @@
 
 import Link from "next/link"; 
 import { LiveMetrics } from "./LiveMetrics";
-import { BlogPostPreview } from "./BlogCard";
+import { api } from "@/convex/_generated/api";
+import { FunctionReturnType } from "convex/server";
+import { TrendingUp } from "lucide-react";
+import { SidebarGroupLabel } from "../ui/sidebar";
 
-interface TrendingBlogItem extends BlogPostPreview {
-    commentCount: number;
-    recentViews: number;
-}
+type TrendingBlog = FunctionReturnType<typeof api.blogs.getTrendingPosts>[number];
 
 interface TrendingBlogsClientProps {
-    initialTrendingBlogs: TrendingBlogItem[];
+    initialTrendingBlogs: TrendingBlog[];
 }
 
 export function TrendingBlogsClient({ initialTrendingBlogs }: TrendingBlogsClientProps) {
     if (initialTrendingBlogs.length === 0) {
-        return <p className="text-sm text-muted-foreground p-2">No trending posts in the last 7 days.</p>;
+        return <></>;
     }
 
     return (
         <div className="w-full flex flex-col">
+            <SidebarGroupLabel className="w-full justify-center">
+                <h1 className="flex items-center justify-center gap-2 text-sm font-medium text-foreground">
+                    <TrendingUp className="w-4 h-4 md:w-4 md:h-4 stroke-[2.3] shrink-0" />
+                    <span>Trending</span>
+                </h1>
+            </SidebarGroupLabel>
             <ul className="list-none w-full m-0 p-0 space-y-3">
                 {initialTrendingBlogs.map((blog) => (
                     <li key={blog._id} className="w-full block">
