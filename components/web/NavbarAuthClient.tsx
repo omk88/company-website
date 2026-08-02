@@ -65,7 +65,7 @@ export function NavbarAuthClient({ initialIsAuth, initialImage }: NavbarAuthClie
                     <>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Button variant="ghost" size="icon" onClick={handleSignOut}>
+                                <Button variant="ghost" size="icon" onClick={handleSignOut} className="cursor-pointer">
                                     <LogOut className="h-4 w-4" />
                                 </Button>
                             </TooltipTrigger>
@@ -157,7 +157,10 @@ export function NavbarAuthClient({ initialIsAuth, initialImage }: NavbarAuthClie
                 ) : (
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <Link className={buttonVariants({ variant: "ghost", size: "icon" })} href="/sign-in">
+                            <Link 
+                                className={`${buttonVariants({ variant: "ghost", size: "icon" })} cursor-pointer`} 
+                                href="/sign-in"
+                            >
                                 <LogIn className="h-4 w-4" />
                             </Link>
                         </TooltipTrigger>

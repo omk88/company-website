@@ -5,9 +5,13 @@ import { Button } from "../ui/button";
 import { ArrowLeft, ArrowRight, Eye, MessageSquare, Sparkles, ThumbsUp } from "lucide-react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { api } from "@/convex/_generated/api";
+import { FunctionReturnType } from "convex/server";
+
+type FeaturedBlog = FunctionReturnType<typeof api.blogs.getFeaturedPosts>[number];
 
 interface FeaturedBlogsClientProps {
-    initialFeaturedBlogs: [];
+    initialFeaturedBlogs: FeaturedBlog[];
 }
 
 export function FeaturedBlogsClient({ initialFeaturedBlogs }: FeaturedBlogsClientProps) {
@@ -64,13 +68,13 @@ export function FeaturedBlogsClient({ initialFeaturedBlogs }: FeaturedBlogsClien
                     <span>Featured</span>
                 </h1>
                 <div className="flex items-center gap-1 text-muted-foreground ">
-                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handlePrev}>
+                    <Button variant="ghost" size="icon" className="h-6 w-6 cursor-pointer" onClick={handlePrev}>
                         <ArrowLeft className="h-3.5 w-3.5" />
                     </Button>
                     <span className="text-xs select-none px-1">
                         {currentIndex + 1}/{initialFeaturedBlogs.length}
                     </span>
-                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleNext}>
+                    <Button variant="ghost" size="icon" className="h-6 w-6 cursor-pointer" onClick={handleNext}>
                         <ArrowRight className="h-3.5 w-3.5" />
                     </Button>
                 </div>
