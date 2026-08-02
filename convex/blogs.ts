@@ -541,11 +541,18 @@ export const getPaginatedPosts = query({
 export const getFeaturedPosts = query({
   args: {},
   handler: async (ctx) => {
-    const posts = await ctx.db
+    let posts = await ctx.db
       .query("blogs")
       .withIndex("by_featured", (q) => q.eq("featured", true))
       .order("desc")
       .collect();
+
+    if (posts.length === 0) {
+      posts = await ctx.db
+        .query("blogs")
+        .order("desc")
+        .take(5);
+    }
 
     return posts.map(({ content, ...previewFields }) => previewFields);
   },

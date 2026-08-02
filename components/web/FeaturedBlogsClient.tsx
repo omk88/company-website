@@ -31,7 +31,7 @@ export function FeaturedBlogsClient({ initialFeaturedBlogs }: FeaturedBlogsClien
 
     useEffect(() => {
         if (initialFeaturedBlogs.length <= 1) return;
-        const interval = setInterval(handleNext, 10000);
+        const interval = setInterval(handleNext, 100000);
         return () => clearInterval(interval);
     }, [initialFeaturedBlogs.length]);
 
@@ -110,7 +110,7 @@ export function FeaturedBlogsClient({ initialFeaturedBlogs }: FeaturedBlogsClien
                             className={`object-cover transition-opacity duration-100 ${
                                 index === currentIndex ? "opacity-100 block" : "opacity-0 hidden"
                             }`}
-                            sizes="(max-width: 768px) 80px, 96px"
+                            sizes="(max-width: 768px) 200px, 300px"
                             priority={index === 0} 
                         />
                     ))}
