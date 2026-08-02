@@ -15,6 +15,7 @@ import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BlogEmojiReactions } from "@/components/web/BlogEmojiReactions";
 import Link from "next/link";
+import { formatSmartDate, ProfileHoverCard } from "@/components/web/ProfileHoverCard";
 
 interface blogIdRouteProps {
     params: Promise<{
@@ -92,9 +93,24 @@ async function BlogContent({
                         </h1>
                     </div>
                     <div className="flex flex-col gap-4">
-                        <p className="text-sm text-muted-foreground">
-                            Posted by <span className="text-blue-600"><Link href={`/${blog.username}`}>{ blog.authorName }</Link></span> on {new Date(blog._creationTime).toLocaleDateString("en-US")}
-                        </p>
+                        <div className="text-muted-foreground font-light">
+                            <ProfileHoverCard authorUsername={blog.username} authorName={blog.authorName}>
+                                <Link 
+                                    href={`/${blog.username}`} 
+                                    className="cursor-pointer hover:text-blue-600 inline-block"
+                                >
+                                    {blog.authorName}
+                                </Link>
+                            </ProfileHoverCard>
+                            <span>
+                                {" • "}
+                                {new Date(blog._creationTime).toLocaleDateString("en-US", {
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                                })}
+                            </span>
+                        </div>
                         <BlogEmojiReactions initialBlog={blog} />
                         <p className="text-lg text-neutral-600 dark:text-neutral-400 font-medium">
                             {blog.subtitle}

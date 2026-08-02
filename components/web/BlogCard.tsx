@@ -9,6 +9,7 @@ import { FaFacebook, FaXTwitter } from "react-icons/fa6";
 import { toast } from "sonner";
 import { RxLinkedinLogo } from "react-icons/rx";
 import { ProfileHoverCard } from "./ProfileHoverCard";
+import { formatSmartDate } from "./ProfileHoverCard";
 
 interface BlogCardProps {
     id: string;
@@ -43,9 +44,19 @@ export function BlogCard({ id, imageUrl, authorName, title, subtitle, totalViews
             </Link>
 
             <div className="flex flex-col flex-1 justify-start px-4 py-2 min-w-0">
-                <div className="min-w-0 pointer-events-none">
+                <div className="min-w-0">
                     <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-muted-foreground">
-                        <ProfileHoverCard authorName={authorName} date={date} authorUsername={username}/>
+                        <div>
+                            <ProfileHoverCard authorUsername={username} authorName={authorName}>
+                                <Link 
+                                    href={`/${username}`} 
+                                    className="cursor-pointer hover:text-blue-600 font-medium inline-block"
+                                >
+                                    {authorName}
+                                </Link>
+                            </ProfileHoverCard>
+                            {" "}• {formatSmartDate(date, false)}
+                        </div>
                         <div className="flex flex-row items-center gap-8">
                             <span>{readTime} min read</span>
                             <DropdownMenu>

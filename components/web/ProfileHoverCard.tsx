@@ -1,39 +1,48 @@
+"use client";
+
 import { MapPin, Cake, ThumbsUp, MessageSquareText, Library, User } from "lucide-react";
 import { HoverCard, HoverCardTrigger, HoverCardContent } from "../ui/hover-card";
 import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "../ui/tooltip";
-import Link from "next/link";
+import { ReactNode } from "react";
 
 interface ProfileHoverCardProps {
     authorName: string;
     authorUsername: string;
-    date: number;
+    date?: number;
+
+    children: ReactNode;
+    align?: "start" | "center" | "end";
+    side?: "top" | "right" | "bottom" | "left";
 }
 
-function formatSmartDate(date: Date | number, timeDifference: boolean): string {
+export function formatSmartDate(date: Date | number, profileDate: boolean): string {
   const targetDate = typeof date === "number" ? new Date(date) : date;
-  const now = new Date();
-  
-  const diffInMs = now.getTime() - targetDate.getTime();
-  const diffInSeconds = Math.floor(diffInMs / 1000);
-  const diffInMinutes = Math.floor(diffInSeconds / 60);
-  const diffInHours = Math.floor(diffInMinutes / 60);
-  const diffInDays = Math.floor(diffInHours / 24);
 
-  if (diffInDays < 3) {
-    const rtf = new Intl.RelativeTimeFormat("en-US", { numeric: "auto" });
+  if (!profileDate) {
+    const now = new Date();
+    
+    const diffInMs = now.getTime() - targetDate.getTime();
+    const diffInSeconds = Math.floor(diffInMs / 1000);
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    const diffInDays = Math.floor(diffInHours / 24);
 
-    if (diffInMinutes < 1) {
-      return "just now";
+    if (diffInDays < 3) {
+        const rtf = new Intl.RelativeTimeFormat("en-US", { numeric: "auto" });
+
+        if (diffInMinutes < 1) {
+        return "just now";
+        }
+        if (diffInMinutes < 60) {
+        return rtf.format(-diffInMinutes, "minute");
+        }
+        if (diffInHours < 24) {
+        return rtf.format(-diffInHours, "hour");
+        }
+        return rtf.format(-diffInDays, "day");
     }
-    if (diffInMinutes < 60) {
-      return rtf.format(-diffInMinutes, "minute");
-    }
-    if (diffInHours < 24) {
-      return rtf.format(-diffInHours, "hour");
-    }
-    return rtf.format(-diffInDays, "day");
   }
 
   return new Intl.DateTimeFormat("en-US", {
@@ -43,7 +52,7 @@ function formatSmartDate(date: Date | number, timeDifference: boolean): string {
   }).format(targetDate);
 }
 
-export function ProfileHoverCard({ authorName, authorUsername, date }: ProfileHoverCardProps) {
+export function ProfileHoverCard({ authorName, authorUsername, children, align = "start", side = "bottom" }: ProfileHoverCardProps) {
 
     const profileData = useQuery(api.profiles.getProfileByUsername, { username: authorUsername });
 
@@ -54,18 +63,13 @@ export function ProfileHoverCard({ authorName, authorUsername, date }: ProfileHo
     const profileUsername = profileData?.profile?.username;
     const profileLink = profileUsername ? `/${profileUsername}` : "/profile";
 
-    const formattedBlogDate = formatSmartDate(date, false);
     const formattedProfileDate = profile?._creationTime ? formatSmartDate(profile._creationTime, true) : null;
 
     return (
-        <div>
+        <div className="inline-block">
             <HoverCard openDelay={100} closeDelay={100}>
                 <HoverCardTrigger asChild>
-                    <Link href={profileLink}>
-                        <span className="cursor-pointer hover:text-blue-600 font-medium pointer-events-auto">
-                            {authorName}
-                        </span>
-                    </Link>
+                    {children}
                 </HoverCardTrigger>
                 <HoverCardContent side="bottom" align="start" className="w-80 p-0 overflow-hidden">
                     <div className="flex flex-col p-2">
@@ -156,7 +160,6 @@ export function ProfileHoverCard({ authorName, authorUsername, date }: ProfileHo
                     </div>
                 </HoverCardContent>
             </HoverCard>
-            {" "}• {formattedBlogDate}
         </div>
     )
 }
