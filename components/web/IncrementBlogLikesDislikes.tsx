@@ -24,7 +24,8 @@ interface IncrementBlogLikesProps {
   preloadedUser: Preloaded<typeof api.auth.getCurrentUser>;
   preloadedVoteState: Preloaded<typeof api.blogs.getBlogVoteState>;
   preloadedCommentCount: Preloaded<typeof api.comments.getCommentNumber>;
-  preloadedFeaturedState: Preloaded<typeof api.blogs.getBlogFeaturedState>
+  preloadedFeaturedState: Preloaded<typeof api.blogs.getBlogFeaturedState>;
+  preloadedReactionState: Preloaded<typeof api.blogs.getBlogReactionState>;
 }
 
 export function IncrementBlogLikesDislikes({ 
@@ -32,13 +33,15 @@ export function IncrementBlogLikesDislikes({
   preloadedUser, 
   preloadedVoteState, 
   preloadedCommentCount,
-  preloadedFeaturedState 
+  preloadedFeaturedState,
+  preloadedReactionState,
 }: IncrementBlogLikesProps) {
 
   const convex = useConvex();
   
   const currentUser = usePreloadedAuthQuery(preloadedUser);
   const voteState = usePreloadedQuery(preloadedVoteState);
+  const reactionState = usePreloadedQuery(preloadedReactionState);
   const displayComments = usePreloadedQuery(preloadedCommentCount);
 
   const featuredState = usePreloadedQuery(preloadedFeaturedState);
@@ -56,13 +59,61 @@ export function IncrementBlogLikesDislikes({
 
   const isFeatured = featuredState?.isFeatured;
 
-  const toggleReactionMutation = useMutation(api.blogs.toggleBlogReaction);
+  const fieldMap = {
+    heart: "heart",
+    insightful: "insightful",
+    mindblown: "mindblown",
+    fire: "fire",
+    thinking: "thinking",
+  } as const;
 
   const prefetchBlog = () => {
     convex.query(api.blogs.getBlogById, { blogId: blog._id }).catch((err) => {
       console.error("Prefetch failed:", err);
     });
   };
+
+  const toggleReactionMutation = useMutation(api.blogs.toggleBlogReaction)
+    .withOptimisticUpdate((localStore, args) => {
+      const { blogId, reactionType } = args;
+
+      const previous = localStore.getQuery(api.blogs.getBlogReactionState, { blogId });
+      if (!previous) return;
+
+      const userReactions = previous.userReactions ?? [];
+      const counts = previous.counts ?? {
+        heart: 0,
+        insightful: 0,
+        mindblown: 0,
+        fire: 0,
+        thinking: 0,
+      };
+
+      const hasReacted = userReactions.includes(reactionType);
+
+      const nextUserReactions = hasReacted
+        ? userReactions.filter((t) => t !== reactionType)
+        : [...userReactions, reactionType];
+
+      const currentCount = counts[reactionType as keyof typeof counts] ?? 0;
+      const nextCount = hasReacted ? Math.max(0, currentCount - 1) : currentCount + 1;
+
+      localStore.setQuery(
+        api.blogs.getBlogReactionState,
+        { blogId },
+        {
+          userReactions: nextUserReactions,
+          counts: {
+            ...counts,
+            [reactionType]: nextCount,
+          },
+        }
+      );
+    });
+  
+  const totalReactions = reactionState
+    ? Object.values(reactionState.counts).reduce((acc, count) => acc + count, 0)
+    : 0;
 
   const toggleBlogVoteMutation = useMutation(api.blogs.toggleBlogVote)
     .withOptimisticUpdate((localStore, args) => {
@@ -182,27 +233,35 @@ export function IncrementBlogLikesDislikes({
             <SmilePlus
               className="!h-5 !w-5 transition-transform active:scale-90"
             />
-            <span>
-              {0}
-            </span>
+            <span>{totalReactions}</span>
           </Button>
         </DropdownMenuTrigger>
-          <DropdownMenuContent 
-            align="start" 
-            className="flex flex-row items-center gap-4 p-4 w-auto min-w-0"
+          <DropdownMenuContent
+            side="right"
+            align="center"
+            sideOffset={12}
+            className="flex flex-row items-center gap-4 p-4 w-max min-w-0 z-50 overflow-visible"
           >
-            {EMOJI_REACTIONS.map(({ type, emoji, label }) => (
-              <DropdownMenuItem
-                key={type}
-                onClick={() => handleSelectReaction(type)}
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full cursor-pointer text-3xl p-0 hover:bg-accent focus:bg-accent transition-transform hover:scale-120 focus:outline-none"
-                title={label}
-              >
-                <span role="img" aria-label={label}>
-                  {emoji}
-                </span>
-              </DropdownMenuItem>
-            ))} 
+            {EMOJI_REACTIONS.map(({ type, emoji, label }) => {
+              const isSelected = reactionState?.userReactions.includes(type);
+
+              return (
+                <DropdownMenuItem
+                  key={type}
+                  onClick={() => handleSelectReaction(type)}
+                  className={`flex h-9 w-9 shrink-0 justify-center items-center rounded-full cursor-pointer text-3xl p-0 transition-transform hover:scale-120 focus:outline-none ${
+                    isSelected
+                      ? "bg-accent scale-110 font-bold"
+                      : "hover:bg-accent/50 hover:scale-110"
+                  }`}
+                  title={label}
+                >
+                  <span role="img" aria-label={label} className="flex items-center justify-center leading-none">
+                    {emoji}
+                  </span>
+                </DropdownMenuItem>
+              );
+            })}
           </DropdownMenuContent>
       </DropdownMenu>
 

@@ -110,6 +110,44 @@ export const recordView = mutation({
   },
 });
 
+export const getBlogReactionState = query({
+  args: { blogId: v.id("blogs") },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+
+    const blog = await ctx.db.get(args.blogId);
+    if (!blog) {
+      return null;
+    }
+
+    let userReactions: string[] = [];
+
+    if (identity) {
+      const userId = identity.subject as Id<"profiles">;
+
+      const reactions = await ctx.db
+        .query("blogReactions")
+        .withIndex("by_user_blog_and_type", (q) => 
+          q.eq("userId", userId).eq("blogId", args.blogId)
+        )
+        .collect();
+
+      userReactions = reactions.map((r) => r.type);
+    }
+
+    return {
+      userReactions,
+      counts: {
+        heart: blog.heartCount ?? 0,
+        insightful: blog.insightfulCount ?? 0,
+        mindblown: blog.mindblownCount ?? 0,
+        fire: blog.fireCount ?? 0,
+        thinking: blog.thinkingCount ?? 0,
+      }
+    }
+  }
+})
+
 export const getBlogVoteState = query({
   args: { blogId: v.id("blogs") },
   handler: async (ctx, args) => {

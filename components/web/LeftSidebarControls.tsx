@@ -19,12 +19,14 @@ export async function LeftSidebarControls({ blog }: ViewTrackerProps) {
   const preloadedUserPromise = preloadAuthQuery(api.auth.getCurrentUser);
   const preloadedVoteStatePromise = preloadAuthQuery(api.blogs.getBlogVoteState, { blogId: blog._id });
   const preloadedFeaturedStatePromise = preloadAuthQuery(api.blogs.getBlogFeaturedState, { blogId: blog._id });
+  const preloadedReactionStatePromise = preloadAuthQuery(api.blogs.getBlogReactionState, { blogId: blog._id });
 
-  const [preloadedCommentCount, preloadedUser, preloadedVoteState, preloadedFeaturedState] = await Promise.all([
+  const [preloadedCommentCount, preloadedUser, preloadedVoteState, preloadedFeaturedState, preloadedReactionState] = await Promise.all([
     preloadedCommentCountPromise,
     preloadedUserPromise,
     preloadedVoteStatePromise,
-    preloadedFeaturedStatePromise
+    preloadedFeaturedStatePromise,
+    preloadedReactionStatePromise,
   ]);
 
 
@@ -46,6 +48,7 @@ export async function LeftSidebarControls({ blog }: ViewTrackerProps) {
           preloadedVoteState={preloadedVoteState}
           preloadedCommentCount={preloadedCommentCount}
           preloadedFeaturedState={preloadedFeaturedState} 
+          preloadedReactionState={preloadedReactionState}
         />
         <SidebarGroup />
       </SidebarContent>
