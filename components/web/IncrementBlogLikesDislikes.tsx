@@ -184,6 +184,12 @@ export function IncrementBlogLikesDislikes({
     startFeaturedTransition(async () => {
       try {
         await toggleFeaturedMutation({ blogId: blog._id });
+
+        await fetch("/api/revalidate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ tag: "featured-blogs" }),
+        });
       } catch (error) {
         console.error("Failed to process featured:", error);
         toast.error("Failed to update your feature.");

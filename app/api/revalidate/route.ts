@@ -12,10 +12,13 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    revalidateTag('blog', { expire: 0 }); 
-    
-    return NextResponse.json({ revalidated: true });
-  } catch (err) {
+    const body = await request.json().catch(() => ({}));
+    const tagToRevalidate = body.tag || 'blog';
+
+    revalidateTag(tagToRevalidate, { expire: 0 });
+
+    return NextResponse.json({ revalidated: true, tag: tagToRevalidate });
+  } catch (error) {
     return NextResponse.json({ message: 'Error revalidating' }, { status: 500 });
   }
 }

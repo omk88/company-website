@@ -5,10 +5,9 @@ import { Button } from "../ui/button";
 import { ArrowLeft, ArrowRight, Eye, MessageSquare, Sparkles, ThumbsUp } from "lucide-react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { BlogPostPreview } from "./BlogCard";
 
 interface FeaturedBlogsClientProps {
-    initialFeaturedBlogs: BlogPostPreview[];
+    initialFeaturedBlogs: [];
 }
 
 export function FeaturedBlogsClient({ initialFeaturedBlogs }: FeaturedBlogsClientProps) {
