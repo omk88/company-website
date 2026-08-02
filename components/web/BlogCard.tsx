@@ -48,12 +48,7 @@ export function BlogCard({ id, imageUrl, authorName, title, subtitle, totalViews
                     <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-muted-foreground">
                         <div>
                             <ProfileHoverCard authorUsername={username} authorName={authorName}>
-                                <Link 
-                                    href={`/${username}`} 
-                                    className="cursor-pointer hover:text-blue-600 font-medium inline-block"
-                                >
-                                    {authorName}
-                                </Link>
+                                <span className="cursor-pointer">{authorName}</span>
                             </ProfileHoverCard>
                             {" "}• {formatSmartDate(date, false)}
                         </div>

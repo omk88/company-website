@@ -2,37 +2,38 @@
 
 import { api } from "@/convex/_generated/api";
 import { username } from "better-auth/plugins";
-import { Preloaded, useConvex, usePreloadedQuery } from "convex/react";
+import { useConvex } from "convex/react";
 import { useState, useRef, useEffect } from "react";
 import { BlogCard } from "./BlogCard";
 import { useLocalSearch } from "./SearchContext";
+import { FunctionReturnType } from "convex/server";
+
+type PaginatedBlogsResponse = FunctionReturnType<typeof api.blogs.getPaginatedPostsByType>;
 
 interface PageBlogPostsProps {
-    preloadedInitialBlogs: Preloaded<typeof api.blogs.getPaginatedPostsByType>;
+    initialBlogs: PaginatedBlogsResponse
 }
 
-export function PageBlogPosts({ preloadedInitialBlogs }: PageBlogPostsProps) {
+export function PageBlogPosts({ initialBlogs }: PageBlogPostsProps) {
     const convex = useConvex();
-
-    const initialData = usePreloadedQuery(preloadedInitialBlogs);
 
     const searchContext = useLocalSearch();
     const searchTerm = searchContext?.searchTerm ?? "";
     const sortOrder = searchContext?.sortOrder ?? "new";
     const activeTags = searchContext?.activeTags ?? [];
 
-    const [blogs, setBlogs] = useState(initialData.page);
-    const [cursor, setCursor] = useState<string | null>(initialData.continueCursor);
-    const [isDone, setIsDone] = useState(initialData.isDone);
+    const [blogs, setBlogs] = useState(initialBlogs.page);
+    const [cursor, setCursor] = useState<string | null>(initialBlogs.continueCursor);
+    const [isDone, setIsDone] = useState(initialBlogs.isDone);
     const [isLoading, setIsLoading] = useState(false);
 
     const loadMoreRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (!searchTerm.trim() && sortOrder === "new" && activeTags.length === 0) {
-            setBlogs(initialData.page);
-            setCursor(initialData.continueCursor);
-            setIsDone(initialData.isDone);
+            setBlogs(initialBlogs.page);
+            setCursor(initialBlogs.continueCursor);
+            setIsDone(initialBlogs.isDone);
             return;
         }
 
@@ -70,7 +71,7 @@ export function PageBlogPosts({ preloadedInitialBlogs }: PageBlogPostsProps) {
         return () => {
             isMounted = false;
         };
-    }, [searchTerm, sortOrder, activeTags, username, convex, initialData]);
+    }, [searchTerm, sortOrder, activeTags, username, convex, initialBlogs]);
 
     const loadMore = async () => {
         if (isDone || isLoading || !cursor) return;

@@ -6,6 +6,7 @@ import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "../ui/tooltip";
 import { ReactNode } from "react";
+import Link from "next/link";
 
 interface ProfileHoverCardProps {
     authorName: string;
@@ -73,23 +74,27 @@ export function ProfileHoverCard({ authorName, authorUsername, children, align =
                 </HoverCardTrigger>
                 <HoverCardContent side="bottom" align="start" className="w-80 p-0 overflow-hidden">
                     <div className="flex flex-col p-2">
-                        <div className="flex flex-row items-center gap-2 w-full">
-                            <div className="h-12 w-12 border-2 border-muted rounded-full overflow-hidden bg-muted relative shrink-0">
-                                <img
-                                    src={avatarSrc || defaultAvatarSrc || ""}
-                                    alt="profile"
-                                    className="h-full w-full object-cover rounded-full"
-                                    decoding="async" 
-                                />
-                            </div>
+                        <Link 
+                            href={`/${profileUsername}`} 
+                        >
+                            <div className="flex flex-row items-center gap-2 w-full p-2 rounded-lg cursor-pointer transition-colors hover:bg-muted">
+                                <div className="h-12 w-12 border-2 border-muted rounded-full overflow-hidden bg-muted relative shrink-0">
+                                    <img
+                                        src={avatarSrc || defaultAvatarSrc || ""}
+                                        alt="profile"
+                                        className="h-full w-full object-cover rounded-full"
+                                        decoding="async" 
+                                    />
+                                </div>
 
-                            <div className="relative w-full">
-                                <div className="flex flex-col">
-                                    <h4 className="text-base font-semibold leading-none">{authorName}</h4>
-                                    <p className="text-sm text-muted-foreground leading-none mt-1">{`@${profile?.username}`}</p>
+                                <div className="relative w-full">
+                                    <div className="flex flex-col">
+                                        <h4 className="text-base font-semibold leading-none">{authorName}</h4>
+                                        <p className="text-sm text-muted-foreground leading-none mt-1">{`@${profile?.username}`}</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </Link>
 
                         <div className="p-4 gap-4 flex flex-col font-extralight text-[14px] font-mono tracking-tight select-none w-full">
                             <div>
@@ -119,41 +124,41 @@ export function ProfileHoverCard({ authorName, authorUsername, children, align =
                                 <TooltipProvider delayDuration={200}>
                                     <Tooltip>
                                         <TooltipTrigger asChild>
-                                        <div className="flex items-center gap-1.5 min-w-[3rem] justify-start p-2 rounded-2xl hover:bg-zinc-100 transition-colors cursor-pointer">
-                                            <ThumbsUp className="w-4 h-4 stroke-[2.3] shrink-0" />
-                                            <span>{ profile?.totalLikes }</span>
-                                        </div>
+                                            <div className="flex items-center gap-1.5 min-w-[3rem] justify-start p-2 rounded-2xl hover:bg-zinc-100 transition-colors cursor-pointer">
+                                                <ThumbsUp className="w-4 h-4 stroke-[2.3] shrink-0" />
+                                                <span>{ profile?.totalLikes }</span>
+                                            </div>
                                         </TooltipTrigger>
                                         <TooltipContent side="bottom" align="center">
-                                        <p className="text-xs font-medium">{ profile?.totalLikes } Total Likes</p>
+                                            <p className="text-xs font-medium">{ profile?.totalLikes } Total Likes</p>
                                         </TooltipContent>
                                     </Tooltip>
                                     </TooltipProvider>
                                     <TooltipProvider delayDuration={200}>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                        <div className="flex items-center gap-1.5 min-w-[3rem] justify-start p-2 rounded-2xl hover:bg-zinc-100 transition-colors cursor-pointer">
-                                            <Library className="w-4 h-4 stroke-[2.3] shrink-0" />
-                                            <span>{ profile?.articlesPublished }</span>
-                                        </div>
-                                        </TooltipTrigger>
-                                        <TooltipContent side="bottom" align="center">
-                                        <p className="text-xs font-medium">{ profile?.articlesPublished } Insights Published</p>
-                                        </TooltipContent>
-                                    </Tooltip>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                            <div className="flex items-center gap-1.5 min-w-[3rem] justify-start p-2 rounded-2xl hover:bg-zinc-100 transition-colors cursor-pointer">
+                                                <Library className="w-4 h-4 stroke-[2.3] shrink-0" />
+                                                <span>{ profile?.articlesPublished }</span>
+                                            </div>
+                                            </TooltipTrigger>
+                                            <TooltipContent side="bottom" align="center">
+                                            <p className="text-xs font-medium">{ profile?.articlesPublished } Insights Published</p>
+                                            </TooltipContent>
+                                        </Tooltip>
                                     </TooltipProvider>
                                     <TooltipProvider delayDuration={200}>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                        <div className="flex items-center gap-1.5 min-w-[3rem] justify-start p-2 rounded-2xl hover:bg-zinc-100 transition-colors cursor-pointer">
-                                            <MessageSquareText className="w-4 h-4 stroke-[2.3] shrink-0" />
-                                            <span>{ profile?.commentsPublished }</span>
-                                        </div>
-                                        </TooltipTrigger>
-                                        <TooltipContent side="bottom" align="center">
-                                        <p className="text-xs font-medium">{ profile?.commentsPublished } Comments Published</p>
-                                        </TooltipContent>
-                                    </Tooltip>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <div className="flex items-center gap-1.5 min-w-[3rem] justify-start p-2 rounded-2xl hover:bg-zinc-100 transition-colors cursor-pointer">
+                                                    <MessageSquareText className="w-4 h-4 stroke-[2.3] shrink-0" />
+                                                    <span>{ profile?.commentsPublished }</span>
+                                                </div>
+                                            </TooltipTrigger>
+                                            <TooltipContent side="bottom" align="center">
+                                                <p className="text-xs font-medium">{ profile?.commentsPublished } Comments Published</p>
+                                            </TooltipContent>
+                                        </Tooltip>
                                     </TooltipProvider>
                                 </div>
                         </div>

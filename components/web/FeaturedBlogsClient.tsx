@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { api } from "@/convex/_generated/api";
 import { FunctionReturnType } from "convex/server";
+import { ProfileHoverCard } from "./ProfileHoverCard";
 
 type FeaturedBlog = FunctionReturnType<typeof api.blogs.getFeaturedPosts>[number];
 
@@ -79,9 +80,9 @@ export function FeaturedBlogsClient({ initialFeaturedBlogs }: FeaturedBlogsClien
                 <div className="flex flex-col justify-between flex-1 min-w-0">
                     <div>
                         <div className="flex items-center gap-1.5 text-xs font-mono tracking-wider uppercase text-muted-foreground mb-1.5">
-                            <span className="truncate max-w-[120px]">
-                                {currentPost.authorName}
-                            </span>
+                        <ProfileHoverCard authorUsername={currentPost.username} authorName={currentPost.authorName}>
+                            <span className="cursor-pointer">{currentPost.authorName}</span>
+                        </ProfileHoverCard>
                             <span>•</span>
                             <span className="shrink-0">{formattedDate}</span>
                         </div>

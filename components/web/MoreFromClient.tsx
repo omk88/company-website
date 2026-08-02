@@ -6,6 +6,7 @@ import { api } from "@/convex/_generated/api";
 import { FunctionReturnType } from "convex/server";
 import { SidebarGroupLabel } from "../ui/sidebar";
 import { Library } from "lucide-react";
+import { ProfileHoverCard } from "./ProfileHoverCard";
 
 type MoreFromBlog = FunctionReturnType<typeof api.blogs.getPostsByAuthor>[number];
 
@@ -25,7 +26,10 @@ export function MoreFromClient({ initialBlogs, authorName, username }: MoreFromC
             <SidebarGroupLabel className="w-full justify-center">
                 <h1 className="flex justify-center gap-2 p-4 text-sm font-medium text-foreground whitespace-nowrap">
                     <Library className="size-4 stroke-[2.3] shrink-0 mt-0.5" />
-                    <span>More from <span className="text-blue-600"><Link href={`/${username}`}>{ authorName }</Link></span></span>
+                    <span>More from </span>
+                    <ProfileHoverCard authorUsername={username} authorName={authorName}>
+                        <span className="cursor-pointer">{authorName}</span>
+                    </ProfileHoverCard>
                 </h1>
             </SidebarGroupLabel>
             <ul className="list-none w-full m-0 p-0 space-y-3">
