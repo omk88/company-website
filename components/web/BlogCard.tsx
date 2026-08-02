@@ -27,7 +27,7 @@ interface BlogCardProps {
 
 export function BlogCard({ id, imageUrl, authorName, title, subtitle, totalViews, likes, commentCount, date, readTime, tags, username }: BlogCardProps) {
     return (
-        <div className="group flex flex-col md:flex-row h-auto md:h-[190px] border border-border/50 rounded-none transition-colors duration-100 hover:bg-muted/50 dark:bg-muted/30">
+        <div className="group flex flex-col md:flex-row h-auto md:h-[190px] border border-border/50 rounded-none transition-colors duration-100 hover:bg-muted dark:bg-muted/30">
             
             <Link 
                 href={`/insights/${id}`}

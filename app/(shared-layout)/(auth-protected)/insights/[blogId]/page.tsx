@@ -14,6 +14,7 @@ import { RightSidebarArticles } from "@/components/web/RightSidebarArticles";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BlogEmojiReactions } from "@/components/web/BlogEmojiReactions";
+import Link from "next/link";
 
 interface blogIdRouteProps {
     params: Promise<{
@@ -86,17 +87,15 @@ async function BlogContent({
             <div className="px-1 sm:px-6 md:px-2">
                 <div className="flex flex-col">
                     <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between w-full">
-                        <h1 className="uppercase text-4xl font-bold tracking-tight text-neutral-950 dark:text-neutral-50">
+                        <h1 className="text-4xl font-bold tracking-tight text-neutral-950 dark:text-neutral-50">
                             {blog.title}
                         </h1>
-
-                        <BlogEmojiReactions initialBlog={blog} />
-
                     </div>
-                    <div className="flex flex-col gap-6">
-                        <p className="text-lg text-muted-foreground">
-                            Posted by {blog.authorName} on {new Date(blog._creationTime).toLocaleDateString("en-US")}
+                    <div className="flex flex-col gap-4">
+                        <p className="text-sm text-muted-foreground">
+                            Posted by <span className="text-blue-600"><Link href={`/${blog.username}`}>{ blog.authorName }</Link></span> on {new Date(blog._creationTime).toLocaleDateString("en-US")}
                         </p>
+                        <BlogEmojiReactions initialBlog={blog} />
                         <p className="text-lg text-neutral-600 dark:text-neutral-400 font-medium">
                             {blog.subtitle}
                         </p>

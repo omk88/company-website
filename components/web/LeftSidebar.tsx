@@ -49,8 +49,8 @@ export function LeftSidebar() {
                     onClick={() => setActiveId(item.id)}
                     className={`
                       w-full cursor-pointer justify-start px-3 py-2 rounded-xl text-sm font-medium transition-colors
-                      data-[active=true]:bg-muted/80 data-[active=true]:text-foreground data-[active=true]:font-semibold
-                      hover:bg-muted/50
+                      data-[active=true]:hover:bg-zinc-200/50 data-[active=true]:text-foreground data-[active=true]:font-semibold
+                      hover:bg-muted
                     `}
                   >
                     <Icon className="h-4 w-4 shrink-0" />
