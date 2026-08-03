@@ -1,5 +1,4 @@
 import BlogPostForm from "@/components/web/BlogPostForm";
-import { verifyCompanyUser } from "@/lib/auth-guard";
 
 interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;

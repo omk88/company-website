@@ -21,6 +21,7 @@ export function PageBlogPosts({ initialBlogs }: PageBlogPostsProps) {
     const searchTerm = searchContext?.searchTerm ?? "";
     const sortOrder = searchContext?.sortOrder ?? "new";
     const activeTags = searchContext?.activeTags ?? [];
+    const postType = searchContext?.postType ?? "team"
 
     const [blogs, setBlogs] = useState(initialBlogs.page);
     const [cursor, setCursor] = useState<string | null>(initialBlogs.continueCursor);
@@ -30,20 +31,13 @@ export function PageBlogPosts({ initialBlogs }: PageBlogPostsProps) {
     const loadMoreRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        if (!searchTerm.trim() && sortOrder === "new" && activeTags.length === 0) {
-            setBlogs(initialBlogs.page);
-            setCursor(initialBlogs.continueCursor);
-            setIsDone(initialBlogs.isDone);
-            return;
-        }
-
         let isMounted = true;
-        setIsLoading(true);
 
         const fetchFilteredBlogs = async () => {
+            setIsLoading(true);
             try {
                 const result = await convex.query(api.blogs.getPaginatedPostsByType, {
-                    postType: "community",
+                    postType: postType,
                     searchTerm: searchTerm.trim() || undefined,
                     activeTags: activeTags.length > 0 ? activeTags : undefined,
                     sortOrder,
@@ -71,7 +65,7 @@ export function PageBlogPosts({ initialBlogs }: PageBlogPostsProps) {
         return () => {
             isMounted = false;
         };
-    }, [searchTerm, sortOrder, activeTags, username, convex, initialBlogs]);
+    }, [postType, searchTerm, sortOrder, activeTags, username, convex, initialBlogs]);
 
     const loadMore = async () => {
         if (isDone || isLoading || !cursor) return;
@@ -79,7 +73,7 @@ export function PageBlogPosts({ initialBlogs }: PageBlogPostsProps) {
 
         try {
             const result = await convex.query(api.blogs.getPaginatedPostsByType, {
-                postType: "community",
+                postType: postType,
                 searchTerm: searchTerm.trim() || undefined,
                 activeTags: activeTags.length > 0 ? activeTags : undefined,
                 sortOrder,
@@ -87,7 +81,7 @@ export function PageBlogPosts({ initialBlogs }: PageBlogPostsProps) {
                     numItems: 6,
                     cursor: cursor,
                     id: 0,
-                }
+                },
             });
 
             setBlogs((prev) => [...prev, ...result.page]);
@@ -120,7 +114,7 @@ export function PageBlogPosts({ initialBlogs }: PageBlogPostsProps) {
         return () => {
             if (currentTarget) observer.unobserve(currentTarget);
         };
-    }, [cursor, isDone, isLoading, searchTerm, sortOrder, activeTags]);
+    }, [cursor, isDone, isLoading, postType, searchTerm, sortOrder, activeTags]);
 
     return (
         <div className="space-y-4 p-2">
