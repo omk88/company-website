@@ -14,11 +14,11 @@ import { TrendingBlogsSkeleton } from "./TrendingBlogsSkeleton";
 
 interface RightSidebarArticlesProps {
   author: string;
-  authorName: string;
+  displayName: string | undefined;
   username: string;
 }
 
-export function RightSidebarArticles({ author, authorName, username }: RightSidebarArticlesProps) {
+export function RightSidebarArticles({ author, displayName, username }: RightSidebarArticlesProps) {
   return (
     <Sidebar bgClass="bg-white" showBorder={false} side="right" className="!w-75 !top-16 !z-40 h-[calc(100vh-4rem)] flex flex-col overflow-hidden">
       <Separator/>
@@ -26,7 +26,7 @@ export function RightSidebarArticles({ author, authorName, username }: RightSide
         <SidebarGroup>
           <SidebarGroupContent>
             <Suspense fallback={<TrendingBlogsSkeleton />}>
-                <MoreFromContainer author={author} authorName={authorName} username={username}  />
+                <MoreFromContainer author={author} displayName={displayName} username={username}  />
             </Suspense>
           </SidebarGroupContent>
         </SidebarGroup>

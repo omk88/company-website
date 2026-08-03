@@ -56,7 +56,7 @@ export default async function blogIdRoute({ params }: blogIdRouteProps) {
                 </Suspense>
             </div>
 
-            <RightSidebarArticles author={blog.author} authorName={blog.authorName} username={blog.username}  />
+            <RightSidebarArticles author={blog.author} displayName={blog.displayName} username={blog.username}  />
         </SidebarProvider>
     )
 }
@@ -94,12 +94,12 @@ async function BlogContent({
                     </div>
                     <div className="flex flex-col gap-4">
                         <div className="text-muted-foreground font-light">
-                            <ProfileHoverCard authorUsername={blog.username} authorName={blog.authorName}>
+                            <ProfileHoverCard authorUsername={blog.username} displayName={blog.displayName}>
                                 <Link 
                                     href={`/${blog.username}`} 
                                     className="cursor-pointer hover:text-blue-600 inline-block"
                                 >
-                                    {blog.authorName}
+                                    {blog.displayName || blog.username}
                                 </Link>
                             </ProfileHoverCard>
                             <span>

@@ -43,16 +43,7 @@ export async function GET(request: Request) {
     const userData = session.data.user as any;
     const id = userData.id;
     const email = userData.email;
-    const authName = userData.name;
-
-    let firstName = "";
-    let lastName = "";
-
-    if (authName && authName.includes(" ")) {
-      const nameParts = authName.trim().split(/\s+/);
-      firstName = nameParts[0];
-      lastName = nameParts.slice(1).join(" ");
-    }
+    const displayName = userData.displayName;
 
     let profilePicField: Id<"_storage">; 
     let publicProfilePicUrl = ""; 
@@ -90,8 +81,7 @@ export async function GET(request: Request) {
     await fetchAuthMutation(api.profiles.initialiseProfile, {
       userId: id,
       email: email,
-      firstName: firstName, 
-      lastName: lastName,
+      displayName: displayName, 
       defaultProfilePic: profilePicField, 
     });
 

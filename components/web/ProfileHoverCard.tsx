@@ -9,7 +9,7 @@ import { ReactNode } from "react";
 import Link from "next/link";
 
 interface ProfileHoverCardProps {
-    authorName: string;
+    displayName: string | undefined;
     authorUsername: string;
     date?: number;
 
@@ -53,7 +53,7 @@ export function formatSmartDate(date: Date | number, profileDate: boolean): stri
   }).format(targetDate);
 }
 
-export function ProfileHoverCard({ authorName, authorUsername, children, align = "start", side = "bottom" }: ProfileHoverCardProps) {
+export function ProfileHoverCard({ displayName, authorUsername, children, align = "start", side = "bottom" }: ProfileHoverCardProps) {
 
     const profileData = useQuery(api.profiles.getProfileByUsername, { username: authorUsername });
 
@@ -62,7 +62,6 @@ export function ProfileHoverCard({ authorName, authorUsername, children, align =
     const defaultAvatarSrc = profileData?.defaultProfilePicture;
 
     const profileUsername = profileData?.profile?.username;
-    const profileLink = profileUsername ? `/${profileUsername}` : "/profile";
 
     const formattedProfileDate = profile?._creationTime ? formatSmartDate(profile._creationTime, true) : null;
 
@@ -89,7 +88,7 @@ export function ProfileHoverCard({ authorName, authorUsername, children, align =
 
                                 <div className="relative w-full">
                                     <div className="flex flex-col">
-                                        <h4 className="text-base font-semibold leading-none">{authorName}</h4>
+                                        <h4 className="text-base font-semibold leading-none">{displayName || profile?.username}</h4>
                                         <p className="text-sm text-muted-foreground leading-none mt-1">{`@${profile?.username}`}</p>
                                     </div>
                                 </div>

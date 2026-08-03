@@ -8,7 +8,7 @@ export async function TrendingBlogs() {
     cacheTag("trending-blogs");  
     cacheLife("hours");
 
-    const trendingPosts = await fetchQuery(api.blogs.getTrendingPosts) ?? [];
+    const trendingPosts = await fetchQuery(api.blogs.getTrendingPosts);
 
     return <TrendingBlogsClient initialTrendingBlogs={trendingPosts} />;
 }

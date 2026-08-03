@@ -3,9 +3,9 @@ import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { paginationOptsValidator } from "convex/server";
 import { calculateScores } from "./scoreAlgorithm";
-import schema from "./schema";
 
 const WORDS_PER_MINUTE = 225;
+const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
 export const generateUploadUrl = mutation({
   args: {},
@@ -20,7 +20,7 @@ export const createPost = mutation({
     subtitle: v.string(),
     content: v.string(),
     author: v.string(), 
-    authorName: v.string(),
+    displayName: v.optional(v.string()),
     username: v.string(),
     tags: v.array(v.string()),
     storageId: v.string(), 
@@ -39,7 +39,7 @@ export const createPost = mutation({
       subtitle: args.subtitle,
       content: args.content,
       author: args.author,
-      authorName: args.authorName,
+      displayName: args.displayName,
       username: args.username,
       tags: args.tags,
       storageId: args.storageId,
@@ -402,7 +402,7 @@ export const updatePost = mutation({
     subtitle: v.string(),
     content: v.string(),
     author: v.string(),
-    authorName: v.string(),
+    displayName: v.optional(v.string()),
     username: v.string(),
     tags: v.array(v.string()),
     storageId: v.string(), 
@@ -755,7 +755,6 @@ export const getPostsByAuthor = query({
 export const getTrendingPosts = query({
   args: {},
   handler: async (ctx) => {
-    const DAYS_IN_MS = Date.now() - 7 * 24 * 60 * 60 * 1000;
     const STEP_DAYS = 7;
     const MAX_DAYS = 30;
 
@@ -763,16 +762,20 @@ export const getTrendingPosts = query({
     let recentViews: Array<{ blogId: string; viewedAt: number }> = [];
 
     while (recentViews.length === 0 && currentDays <= MAX_DAYS) {
-      const timeCutoff = Date.now() - currentDays * DAYS_IN_MS;
+      const timeCutoff = Date.now() - currentDays * ONE_DAY_MS;
 
       recentViews = await ctx.db
         .query("viewLogs")
         .withIndex("by_viewedAt", (q) => q.gte("viewedAt", timeCutoff))
-        .collect();
+        .take(1000);
+
+      if (recentViews.length === 0) {
+        currentDays += STEP_DAYS;
+      }
     }
 
     if (recentViews.length === 0) {
-      currentDays += STEP_DAYS;
+      return [];
     }
 
     const viewCounts: Record<string, number> = {};
@@ -780,16 +783,14 @@ export const getTrendingPosts = query({
       viewCounts[log.blogId] = (viewCounts[log.blogId] || 0) + 1;
     });
 
-    const sortedBlogIds = Object.keys(viewCounts).sort(
-      (a, b) => viewCounts[b] - viewCounts[a]
-    );
-    const topTrendingIds = sortedBlogIds.slice(0, 5);
+    const topTrendingIds = Object.keys(viewCounts)
+      .sort((a, b) => viewCounts[b] - viewCounts[a])
+      .slice(0, 5);
 
-    const trendingBlogsRaw = await Promise.all(
+    const trendingBlogs = await Promise.all(
       topTrendingIds.map(async (id) => {
-        const blogId = id as Id<"blogs">;
-        const blog = await ctx.db.get(blogId);
-        if (!blog) return null; 
+        const blog = await ctx.db.get(id as Id<"blogs">);
+        if (!blog) return null;
 
         return {
           ...blog,
@@ -799,7 +800,9 @@ export const getTrendingPosts = query({
       })
     );
 
-    return trendingBlogsRaw.filter((blog): blog is NonNullable<typeof blog> => blog !== null);
+    return trendingBlogs.filter(
+      (blog): blog is NonNullable<typeof blog> => blog !== null
+    );
   },
 });
 

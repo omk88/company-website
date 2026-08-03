@@ -9,8 +9,6 @@ export const metadata: Metadata = {
   title: "Insights",
 };
 
-const INSIGHTS_MODELS = ['/cross.glb'];
-
 export default async function InsightsPage() {
 
   return (

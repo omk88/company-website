@@ -59,14 +59,6 @@ export function IncrementBlogLikesDislikes({
 
   const isFeatured = featuredState?.isFeatured;
 
-  const fieldMap = {
-    heart: "heart",
-    insightful: "insightful",
-    mindblown: "mindblown",
-    fire: "fire",
-    thinking: "thinking",
-  } as const;
-
   const prefetchBlog = () => {
     convex.query(api.blogs.getBlogById, { blogId: blog._id }).catch((err) => {
       console.error("Prefetch failed:", err);

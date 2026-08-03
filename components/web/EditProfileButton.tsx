@@ -30,8 +30,7 @@ const formatPlatformName = (name: string) => {
 
 const profileFormSchema = z.object({
   username: z.string().min(2, "Username must be at least 2 characters"),
-  firstName: z.string(),
-  lastName: z.string(),
+  displayName: z.string(),
   location: z.string(),
   locationCountryCode: z.string(), 
   bio: z.string(),
@@ -113,7 +112,7 @@ interface EditProfileButtonProps {
 
 export function EditProfileButton({ profile, avatarSrc, defaultAvatarSrc }: EditProfileButtonProps) {
 
-  const profileStateKey = `${profile.username}-${profile.firstName}-${profile.lastName}-${profile.bio}-${profile.profilePic}-${profile.location}`;
+  const profileStateKey = `${profile.username}-${profile.displayName}-${profile.bio}-${profile.profilePic}-${profile.location}`;
 
   return (
     <EditProfileDialog
@@ -172,8 +171,7 @@ export function EditProfileDialog({ profile, avatarSrc, defaultAvatarSrc, childr
         const updatedProfile = {
           ...currentProfile,
           username: newUsername,
-          firstName: args.firstName ?? currentProfile.profile?.firstName,
-          lastName: args.lastName ?? currentProfile.profile?.lastName,
+          displayName: args.displayName ?? currentProfile.profile?.displayName,
           profilePic: args.profilePic ?? currentProfile.profile?.profilePic,
           location: args.location ?? currentProfile.profile?.location,
           locationCountryCode: args.locationCountryCode ?? currentProfile.profile?.locationCountryCode,
@@ -208,8 +206,7 @@ export function EditProfileDialog({ profile, avatarSrc, defaultAvatarSrc, childr
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
       username: profile.username || "",
-      firstName: profile.firstName || "",
-      lastName: profile.lastName || "",
+      displayName: profile.displayName || "",
       location: profile.location || "",
       locationCountryCode: profile.locationCountryCode || "",
       bio: profile.bio || "",
@@ -376,8 +373,7 @@ export function EditProfileDialog({ profile, avatarSrc, defaultAvatarSrc, childr
     const updateResult = await runUpdateProfile({
       id: profile._id,
       username: data.username,
-      firstName: data.firstName,
-      lastName: data.lastName,
+      displayName: data.displayName,
       profilePic: finalStorageId,
       location: data.location,
       locationCountryCode: data.locationCountryCode,
@@ -450,26 +446,15 @@ export function EditProfileDialog({ profile, avatarSrc, defaultAvatarSrc, childr
                   )}
                 </Field>
 
-                <div className="grid grid-cols-2 gap-2">
-                  <Field>
-                    <FieldLabel>First Name</FieldLabel>
-                    <div className="relative w-full">
-                      <Input type="text" {...form.register("firstName")} placeholder="John" className="pr-9" />
-                      {form.watch("firstName") && (
-                        <button onClick={() => form.setValue("firstName", "", { shouldValidate: true })} type="button" className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted"><X className="h-3.5 w-3.5 stroke-[2]" /></button>
-                      )}
-                    </div>
-                  </Field>
-                  <Field>
-                    <FieldLabel>Last Name</FieldLabel>
-                    <div className="relative w-full">
-                      <Input type="text" {...form.register("lastName")} placeholder="Doe" className="pr-9" />
-                      {form.watch("lastName") && (
-                        <button onClick={() => form.setValue("lastName", "", { shouldValidate: true })} type="button" className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted"><X className="h-3.5 w-3.5 stroke-[2]" /></button>
-                      )}
-                    </div>
-                  </Field>
-                </div>
+                <Field>
+                  <FieldLabel>Display Name</FieldLabel>
+                  <div className="relative w-full">
+                    <Input type="text" {...form.register("displayName")} placeholder="John Doe" className="pr-9" />
+                    {form.watch("displayName") && (
+                      <button onClick={() => form.setValue("displayName", "", { shouldValidate: true })} type="button" className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted"><X className="h-3.5 w-3.5 stroke-[2]" /></button>
+                    )}
+                  </div>
+                </Field>
 
                 <LocationField
                   locationCountryCode={profile.locationCountryCode || ""}

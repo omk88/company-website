@@ -5,16 +5,16 @@ import { MoreFromClient } from "./MoreFromClient";
 
 interface MoreFromContainerProps {
   author: string;
-  authorName: string;
+  displayName: string | undefined;
   username: string;
 }
 
-export async function MoreFromContainer({ author, authorName, username }: MoreFromContainerProps) {
+export async function MoreFromContainer({ author, displayName, username }: MoreFromContainerProps) {
     "use cache";
     cacheTag("trending-blogs");  
     cacheLife("hours");
 
     const postsByAuthor = await fetchQuery(api.blogs.getPostsByAuthor, { author }) ?? [];
 
-    return <MoreFromClient initialBlogs={postsByAuthor} authorName={authorName} username={username} />;
+    return <MoreFromClient initialBlogs={postsByAuthor} displayName={displayName} username={username} />;
 }

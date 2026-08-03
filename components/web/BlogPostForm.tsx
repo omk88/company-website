@@ -167,6 +167,12 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
     };
 
     const onSubmit = async (data: BlogFormValues) => {
+
+        if (!userData) {
+            console.error("No user data.");
+            return;
+        }
+
         if (data.tags.length === 0) {
             toast.error("Please select at least one tag.");
             return;
@@ -213,8 +219,8 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                     title: formattedTitle,
                     subtitle: data.subtitle,
                     content: data.content,
-                    author: userData?.userId || "",
-                    authorName: (userData?.profile?.firstName && userData?.profile?.lastName) ? `${String(userData.profile.firstName)} ${String(userData.profile.lastName)}` : String(userData?.username || ""),
+                    author: userData.userId,
+                    displayName: userData.profile?.displayName,
                     username: String(userData?.username || ""),
                     tags: data.tags,
                     storageId: storageId,
@@ -226,7 +232,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                     subtitle: data.subtitle,
                     content: data.content,
                     author: userData?.userId || "",
-                    authorName: (userData?.profile?.firstName && userData?.profile?.lastName) ? `${String(userData.profile.firstName)} ${String(userData.profile.lastName)}` : String(userData?.username || ""),
+                    displayName: userData.profile?.displayName,
                     username: String(userData?.username || ""),
                     tags: data.tags,
                     storageId: storageId,
@@ -236,7 +242,11 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
             }
 
             try {
-                await fetch("/api/revalidate", { method: "POST" });
+                await fetch("/api/revalidate", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ tag: "featured-blogs" }),
+                });
             } catch (err) {
                 console.error("Background revalidation failure:", err);
             }

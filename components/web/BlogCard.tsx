@@ -14,7 +14,7 @@ import { formatSmartDate } from "./ProfileHoverCard";
 interface BlogCardProps {
     id: string;
     imageUrl: string;
-    authorName: string;
+    displayName: string | undefined;
     username: string;
     title: string;
     subtitle: string;
@@ -26,7 +26,7 @@ interface BlogCardProps {
     tags: Array<string>;    
 }
 
-export function BlogCard({ id, imageUrl, authorName, title, subtitle, totalViews, likes, commentCount, date, readTime, tags, username }: BlogCardProps) {
+export function BlogCard({ id, imageUrl, displayName, title, subtitle, totalViews, likes, commentCount, date, readTime, tags, username }: BlogCardProps) {
     return (
         <div className="group flex flex-col md:flex-row h-auto md:h-[190px] border border-border/50 rounded-none transition-colors duration-100 hover:bg-muted dark:bg-muted/30">
             
@@ -47,8 +47,8 @@ export function BlogCard({ id, imageUrl, authorName, title, subtitle, totalViews
                 <div className="min-w-0">
                     <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-muted-foreground">
                         <div>
-                            <ProfileHoverCard authorUsername={username} authorName={authorName}>
-                                <span className="cursor-pointer">{authorName}</span>
+                            <ProfileHoverCard authorUsername={username} displayName={displayName || username}>
+                                <span className="cursor-pointer">{displayName || username}</span>
                             </ProfileHoverCard>
                             {" "}• {formatSmartDate(date, false)}
                         </div>

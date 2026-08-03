@@ -80,8 +80,8 @@ export function FeaturedBlogsClient({ initialFeaturedBlogs }: FeaturedBlogsClien
                 <div className="flex flex-col justify-between flex-1 min-w-0">
                     <div>
                         <div className="flex items-center gap-1.5 text-xs font-mono tracking-wider uppercase text-muted-foreground mb-1.5">
-                        <ProfileHoverCard authorUsername={currentPost.username} authorName={currentPost.authorName}>
-                            <span className="cursor-pointer">{currentPost.authorName}</span>
+                        <ProfileHoverCard authorUsername={currentPost.username} displayName={currentPost.displayName}>
+                            <span className="cursor-pointer">{currentPost.displayName || currentPost.username}</span>
                         </ProfileHoverCard>
                             <span>•</span>
                             <span className="shrink-0">{formattedDate}</span>

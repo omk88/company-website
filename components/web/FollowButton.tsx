@@ -8,11 +8,12 @@ import { Loader2 } from "lucide-react";
 
 interface FollowButtonProps {
   targetProfileId: Id<"profiles">;
-  displayName: string;
+  username: string;
+  displayName: string | undefined;
   initialIsFollowing?: boolean;
 }
 
-export function FollowButton({ targetProfileId, displayName, initialIsFollowing = false }: FollowButtonProps) {
+export function FollowButton({ targetProfileId, username, displayName, initialIsFollowing = false }: FollowButtonProps) {
   const [isPending, setIsPending] = useState(false);
   const [isFollowing, setIsFollowing] = useState(initialIsFollowing);
 
@@ -26,13 +27,13 @@ export function FollowButton({ targetProfileId, displayName, initialIsFollowing 
 
       if (result?.isFollowing) {
         setIsFollowing(true);
-        toast.success(`Following ${displayName}`);
+        toast.success(`Following ${displayName || username}`);
       } else {
         setIsFollowing(false);
-        toast.success(`Unfollowed ${displayName}`);
+        toast.success(`Unfollowed ${displayName || username}`);
       }
     } catch (error) {
-      toast.error(`Error updating follow status for ${displayName}`);
+      toast.error(`Error updating follow status for ${displayName || username}`);
     } finally {
       setIsPending(false);
     }

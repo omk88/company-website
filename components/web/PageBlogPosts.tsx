@@ -134,7 +134,7 @@ export function PageBlogPosts({ initialBlogs }: PageBlogPostsProps) {
                                     <BlogCard
                                         id={blog._id}
                                         imageUrl={blog.imageUrl}
-                                        authorName={blog.authorName}
+                                        displayName={blog.displayName}
                                         username={blog.username}
                                         title={blog.title}
                                         subtitle={blog.subtitle}

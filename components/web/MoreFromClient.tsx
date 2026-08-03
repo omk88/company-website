@@ -12,11 +12,11 @@ type MoreFromBlog = FunctionReturnType<typeof api.blogs.getPostsByAuthor>[number
 
 interface MoreFromClientProps {
     initialBlogs: MoreFromBlog[];
-    authorName: string;
+    displayName: string | undefined;
     username: string;
 }
 
-export function MoreFromClient({ initialBlogs, authorName, username }: MoreFromClientProps) {
+export function MoreFromClient({ initialBlogs, displayName, username }: MoreFromClientProps) {
     if (initialBlogs.length === 0) {
         return (<></>);
     }
@@ -27,8 +27,8 @@ export function MoreFromClient({ initialBlogs, authorName, username }: MoreFromC
                 <h1 className="flex justify-center gap-2 p-4 text-sm font-medium text-foreground whitespace-nowrap">
                     <Library className="size-4 stroke-[2.3] shrink-0 mt-0.5" />
                     <span>More from </span>
-                    <ProfileHoverCard authorUsername={username} authorName={authorName}>
-                        <span className="cursor-pointer">{authorName}</span>
+                    <ProfileHoverCard authorUsername={username} displayName={displayName}>
+                        <span className="cursor-pointer">{displayName || username}</span>
                     </ProfileHoverCard>
                 </h1>
             </SidebarGroupLabel>

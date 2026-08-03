@@ -7,8 +7,7 @@ export const initialiseProfile = mutation({
   args: {
     userId: v.string(),
     email: v.string(),
-    firstName: v.optional(v.string()),
-    lastName: v.optional(v.string()),
+    displayName: v.optional(v.string()),
     profilePic: v.optional(v.id("_storage")),
     defaultProfilePic: v.id("_storage"),
   },
@@ -46,8 +45,7 @@ export const initialiseProfile = mutation({
     const newProfileId = await ctx.db.insert("profiles", {
       userId: args.userId,
       username: finalUsername,
-      firstName: args.firstName,
-      lastName: args.lastName,
+      displayName: args.displayName,
       profilePic: args.profilePic,
       defaultProfilePic: args.defaultProfilePic,
       totalLikes: 0,
@@ -111,15 +109,14 @@ export const getProfileByUsername = query({
 
     const sanitizedProfile = {
       ...profile,
-      firstName: profile.firstName ?? "",
-      lastName: profile.lastName ?? "",
-      location: profile.location ?? "",
-      locationCountryCode: profile.locationCountryCode ?? "",
-      bio: profile.bio ?? "",
+      displayName: profile.displayName,
+      location: profile.location,
+      locationCountryCode: profile.locationCountryCode,
+      bio: profile.bio,
       
-      education: profile.education ?? [],
-      skills: profile.skills ?? [],
-      socials: profile.socials ?? [],
+      education: profile.education,
+      skills: profile.skills,
+      socials: profile.socials,
     };
 
     return { profilePicture, defaultProfilePicture, profile: sanitizedProfile };
@@ -148,8 +145,7 @@ export const getProfileFollowers = query({
         return {
           _id: followerProfile._id,
           username: followerProfile.username,
-          firstName: followerProfile.firstName ?? "",
-          lastName: followerProfile.lastName ?? "",
+          displayName: followerProfile.displayName,
           profilePicUrl: picUrl,
           defaultProfilePic: defaultPicUrl,
         };
@@ -242,8 +238,7 @@ export const updateProfile = mutation({
   args: {
     id: v.id("profiles"), 
     username: v.optional(v.string()),
-    firstName: v.optional(v.string()),
-    lastName: v.optional(v.string()),
+    displayName: v.optional(v.string()),
     profilePic: v.optional(v.id("_storage")),
     defaultProfilePic: v.optional(v.id("_storage")),
     location: v.optional(v.string()),
@@ -295,18 +290,6 @@ export const updateProfile = mutation({
 
     await ctx.db.patch(existingUser._id, fieldsToUpdate);
 
-    const oldName = (existingUser.firstName && existingUser.lastName) 
-      ? `${existingUser.firstName} ${existingUser.lastName}` 
-      : existingUser.username;
-
-    const newName = (args.firstName && args.lastName) 
-      ? `${args.firstName} ${args.lastName}` 
-      : (args.username ?? oldName);
-
-    if (oldName !== newName) {
-      await updateAuthorNameForAllPostsHelper(ctx, existingUser.userId, newName);
-    }
-
     if (args.profilePic) {
       const publicUrl = await ctx.storage.getUrl(args.profilePic);
       return { publicImageUrl: publicUrl };
@@ -320,25 +303,6 @@ export const updateProfile = mutation({
     return { existingUser: existingUser._id, publicImageUrl: null };
   },
 });
-
-async function updateAuthorNameForAllPostsHelper(
-  ctx: MutationCtx, 
-  authorId: string, 
-  newAuthorName: string
-) {
-  const postsToUpdate = await ctx.db
-    .query("blogs")
-    .withIndex("by_author", (q) => q.eq("author", authorId))
-    .collect();
-
-  const updatePromises = postsToUpdate.map((post) =>
-    ctx.db.patch(post._id, {
-      authorName: newAuthorName,
-    })
-  );
-
-  await Promise.all(updatePromises);
-}
 
 export const toggleFollow = mutation({
   args: { targetProfileId: v.id("profiles") },

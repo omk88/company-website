@@ -9,7 +9,7 @@ const schema = defineSchema({
     subtitle: v.string(),
     imageUrl: v.string(),
     content: v.string(),
-    authorName: v.string(),
+    displayName: v.optional(v.string()),
     username: v.string(),
     tags: v.array(v.string()), 
     createdAt: v.number(),
@@ -93,7 +93,7 @@ const schema = defineSchema({
   comments: defineTable({
     blogId: v.string(),
     authorId: v.string(),
-    authorName: v.string(),
+    displayName: v.optional(v.string()),
     username: v.string(),
     blogTitle: v.string(),
     likes: v.number(),
@@ -115,8 +115,7 @@ const schema = defineSchema({
   profiles: defineTable({
     userId: v.string(),
     username: v.string(),
-    firstName: v.optional(v.string()),
-    lastName: v.optional(v.string()),
+    displayName: v.optional(v.string()),
     profilePic: v.optional(v.id("_storage")),
     defaultProfilePic: v.id("_storage"),
     location: v.optional(v.string()),

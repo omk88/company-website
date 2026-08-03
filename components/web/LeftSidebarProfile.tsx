@@ -34,10 +34,7 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
     return <div className="p-4 text-gray-500">Profile not found</div>;
   }
 
-  const { username, firstName, lastName } = profile;
-  const displayName = (firstName && lastName) ? `${firstName} ${lastName}` : username;
-  const hasContent = profile.bio.trim() || profile.education.length > 0 || profile.socials.length > 0;
-
+  const { username, displayName } = profile;
   const isOwnProfile = currentUser?.userId && profile?.userId && currentUser.userId === profile.userId;
 
   const formattedDate = new Intl.DateTimeFormat("en-US", {
@@ -66,7 +63,7 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
 
             <div className="relative w-full">
               <div className="flex flex-col">
-                <h4 className="text-base font-semibold leading-none">{displayName}</h4>
+                <h4 className="text-base font-semibold leading-none">{displayName || profile.username}</h4>
                 <p className="text-sm text-muted-foreground leading-none mt-1">{`@${profile.username}`}</p>
               </div>
 
@@ -161,22 +158,22 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
           )}
 
           <div className="flex flex-row gap-4">
-            {profile.socials.length > 0 && (
+            {profile.socials && profile.socials.length > 0 && (
               <LinksHoverCard socials={profile.socials} />
             )}
 
-            {profile.education.length > 0 && (
+            {profile.education && profile.education.length > 0 && (
               <EducationHoverCard education={profile.education} />
             )}
             
-            {profile.skills.length > 0 && (
+            {profile.skills && profile.skills.length > 0 && (
               <SkillsHoverCard skills={profile.skills} />
             )}
           </div>
         </div>
 
         { currentUser && !isOwnProfile && (
-          <FollowButton targetProfileId={profile._id} displayName={displayName} />
+          <FollowButton targetProfileId={profile._id} displayName={displayName} username={profile.username} />
           )
         }
 
