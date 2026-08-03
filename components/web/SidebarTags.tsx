@@ -95,10 +95,10 @@ export function SidebarTags({ fullWidth, className }: SidebarTagsProps) {
                 name={item.id}
                 checked={isChecked(item.id)}
                 className="pointer-events-none"
+                tabIndex={-1}
               />
               <FieldLabel
-                htmlFor={item.id}
-                className="font-normal cursor-pointer select-none"
+                className="font-normal cursor-pointer select-none pointer-events-none"
               >
                 <span className="!text-xs">{item.label}</span>
               </FieldLabel>

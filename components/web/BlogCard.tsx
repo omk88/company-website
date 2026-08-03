@@ -152,7 +152,9 @@ export function BlogCard({ id, imageUrl, displayName, title, subtitle, totalView
                                             variant="outline" 
                                             className="font-mono text-[10px] px-1.5 py-0.5 whitespace-nowrap border-black dark:border-white"
                                         >
-                                            {tag}
+                                            <span className="capitalize">
+                                                {tag}
+                                            </span>
                                         </Badge>
                                     ))}
                                 </div>
