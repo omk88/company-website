@@ -18,6 +18,7 @@ import ReactMarkdown from "react-markdown";
 import { Textarea } from "../ui/textarea";
 import { Image, Paperclip, X } from "lucide-react";
 import imageCompression from "browser-image-compression";
+import { FunctionReturnType } from "convex/server";
 
 const AVAILABLE_TAGS = ["product", "research", "design", "technology", "opinion", "tutorials"];
 
@@ -32,6 +33,8 @@ interface BlogFormValues {
 interface BlogPostFormProps {
     editingBlogId?: string; 
 }
+
+export type User = FunctionReturnType<typeof api.auth.getCurrentUser>;
 
 function toTitleCase(str: string): string {
   if (!str) return "";
@@ -60,13 +63,13 @@ function toTitleCase(str: string): string {
     .join(' ');
 }
 
-function LivePostPreview({ control, previewImage }: { control: Control<BlogFormValues>; previewImage: string | null }) {
+function LivePostPreview({ control, previewImage, currentUser }: { control: Control<BlogFormValues>; previewImage: string | null; currentUser: User | undefined }) {
     const formValues = useWatch({control});
 
     const title = formValues.title || "[TITLE]";
     const subtitle = formValues.subtitle || "[SUBTITLE]";
     const content = formValues.content || "[POST CONTENT]";
-    const author = formValues.author || "[AUTHOR NAME]";
+    const author = currentUser?.profile?.displayName || currentUser?.profile?.username;
     const tags = formValues.tags || [];
 
     return (
@@ -179,6 +182,8 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
         }
 
         setIsLoading(true);
+
+        const postType = userData.email?.endsWith("@taqtiq.tech") ? "team" : "community";
         
         try {
             if (!selectedImage && !existingPost?.imageUrl) {
@@ -236,7 +241,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                     username: String(userData?.username || ""),
                     tags: data.tags,
                     storageId: storageId,
-                    postType: "community"
+                    postType: postType
                 });
                 toast.success("Blog article published successfully!");
             }
@@ -451,7 +456,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                     </FieldGroup>
                 </form>
             </div>
-            <LivePostPreview control={control} previewImage={imagePreviewUrl} />
+            <LivePostPreview control={control} previewImage={imagePreviewUrl} currentUser={userData}/>
         </div>
     );
 }

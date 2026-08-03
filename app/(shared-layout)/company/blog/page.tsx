@@ -6,7 +6,6 @@ interface PageProps {
 }
 
 export default async function Blog({ searchParams }: PageProps) {
-  await verifyCompanyUser(); 
   
   const resolvedParams = await searchParams;
   const blogId = typeof resolvedParams.id === "string" ? resolvedParams.id : undefined;
