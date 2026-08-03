@@ -54,7 +54,7 @@ export function FeaturedBlogsClient({ initialFeaturedBlogs }: FeaturedBlogsClien
     });
 
     return (
-        <div className="flex flex-col justify-between w-full bg-muted rounded-2xl p-4 transition-all duration-100 hover:bg-zinc-200/50">
+        <div className="flex flex-col justify-between w-full bg-muted/50 rounded-2xl p-4 transition-all duration-100 hover:bg-muted">
             <div className="flex items-center justify-between mb-3">
                 <h1 className="flex items-center justify-center gap-2 text-xs font-medium text-muted-foreground">
                     <Sparkles className="w-3.5 h-3.5 stroke-[2.3] shrink-0" />
