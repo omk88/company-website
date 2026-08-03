@@ -19,7 +19,7 @@ export function BlogEmojiReactions({ initialBlog }: BlogEmojiReactionsProps) {
     );
 
     return (
-        <div className="flex flex-wrap items-center gap-1.5 min-h-[34px]">
+        <div className="flex flex-wrap items-center gap-1.5 min-h-[20px]">
             {hasReactions ? (
                 EMOJI_REACTIONS.map(({ type, field, emoji, label }) => {
                     const count = (blog[field] ?? 0) as number;
@@ -30,7 +30,7 @@ export function BlogEmojiReactions({ initialBlog }: BlogEmojiReactionsProps) {
                         <Badge
                             key={type}
                             variant="secondary"
-                            className="flex items-center gap-1.5 px-2.5 py-1 text-md font-medium"
+                            className="flex items-center gap-1.5 py-1 text-md font-medium"
                             title={label}
                         >
                             <span>{emoji}</span>
