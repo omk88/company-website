@@ -94,7 +94,7 @@ export function SidebarTags({ fullWidth, className }: SidebarTagsProps) {
                 id={item.id}
                 name={item.id}
                 checked={isChecked(item.id)}
-                onCheckedChange={() => toggleTag(item.id)}
+                className="pointer-events-none"
               />
               <FieldLabel
                 htmlFor={item.id}

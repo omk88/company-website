@@ -62,12 +62,14 @@ const schema = defineSchema({
     .index("by_tag_type_controversial", ["tag", "postType", "controversialScore"])
     .index("by_tag_type_likes", ["tag", "postType", "likes"])
 
-    .index("by_blog", ["blogId"])
+    .index("by_blogId", ["blogId"])
     .index("by_tag_username", ["tag", "username"])
     .index("by_tag_username_createdAt", ["tag", "username", "createdAt"])
     .index("by_tag_username_likes", ["tag", "username", "likes"])
     .index("by_tag_username_hot", ["tag", "username", "hotScore"])
-    .index("by_tag_username_controversial", ["tag", "username", "controversialScore"]),
+    .index("by_tag_username_controversial", ["tag", "username", "controversialScore"])
+    .index("by_tag", ["tag"])
+    .index("by_tag_and_created", ["tag", "createdAt"]),
   
   viewLogs: defineTable({
     blogId: v.string(),

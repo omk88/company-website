@@ -8,7 +8,6 @@ import { SidebarGroupLabel } from "../ui/sidebar";
 import { Library } from "lucide-react";
 import { ProfileHoverCard } from "./ProfileHoverCard";
 import Image from "next/image";
-import { Id } from "@/convex/_generated/dataModel";
 
 type MoreFromBlog = FunctionReturnType<typeof api.blogs.getPostsByAuthor>[number];
 

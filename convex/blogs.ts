@@ -316,7 +316,7 @@ export const deleteBlogs = mutation({
         ctx.db.query("comments").withIndex("by_blog", (q) => q.eq("blogId", blogId)).collect(),
         ctx.db.query("viewLogs").withIndex("by_blog", (q) => q.eq("blogId", blogId)).collect(),
         ctx.db.query("profiles").withIndex("by_userId", (q) => q.eq("userId", blog.author)).unique(),
-        ctx.db.query("blogTags").withIndex("by_blog", (q) => q.eq("blogId", blogId)).collect(),
+        ctx.db.query("blogTags").withIndex("by_blogId", (q) => q.eq("blogId", blogId)).collect(),
       ]);
 
       const commentVotesNested = await Promise.all(
@@ -433,7 +433,7 @@ export const updatePost = mutation({
     if (JSON.stringify(oldTags) !== JSON.stringify(newTags)) {
       const existingBlogTags = await ctx.db
         .query("blogTags")
-        .withIndex("by_blog", (q) => q.eq("blogId", blogId))
+        .withIndex("by_blogId", (q) => q.eq("blogId", blogId))
         .collect();
 
       const tagsToRemove = existingBlogTags.filter(
@@ -682,56 +682,99 @@ export const getPaginatedPostsByType = query({
   handler: async (ctx, args) => {
     const cleanSearchTerm = args.searchTerm?.trim();
     const sortOrder = args.sortOrder || "new";
-    const tags = args.activeTags || [];
+    
+    const tags = (args.activeTags || [])
+      .filter((t) => t && t !== "all")
+      .map((t) => t.trim().toLowerCase());
+
+    const getTagIndexName = () => {
+      switch (sortOrder) {
+        case "hot": return "by_tag_type_hot" as const;
+        case "controversial": return "by_tag_type_controversial" as const;
+        case "top": return "by_tag_type_likes" as const;
+        default: return "by_tag_type_createdAt" as const;
+      }
+    };
+
+    const getBlogIndexName = () => {
+      switch (sortOrder) {
+        case "hot": return "by_type_hot" as const;
+        case "controversial": return "by_type_controversial" as const;
+        case "top": return "by_type_likes" as const;
+        default: return "by_type" as const;
+      }
+    };
 
     if (cleanSearchTerm) {
       const searchResults = await ctx.db
         .query("blogs")
-        .withSearchIndex("search_title_by_type", (q) => q.search("title", cleanSearchTerm).eq("postType", args.postType))
+        .withSearchIndex("search_title_by_type", (q) =>
+          q.search("title", cleanSearchTerm).eq("postType", args.postType)
+        )
         .paginate(args.paginationOpts);
 
-      if (tags.length > 0) {
-        return {
-          ...searchResults,
-          page: searchResults.page.filter((blog) => tags.some((tag) => blog.tags?.includes(tag))),
-        };
-      }
-
-      return searchResults;
-    }
-
-    if (tags.length > 0) {
-      const primaryTag = tags[0];
-
-      const tagIndexName = 
-        sortOrder === "hot" ? "by_tag_type_hot" :
-        sortOrder === "controversial" ? "by_tag_type_controversial" :
-        sortOrder === "top" ? "by_tag_type_likes" :
-        "by_tag_type_createdAt" as const;
-
-      const paginatedTagEntries = await ctx.db
-        .query("blogTags")
-        .withIndex(tagIndexName, (q) => q.eq("tag", primaryTag).eq("postType", args.postType))
-        .order("desc")
-        .paginate(args.paginationOpts);
-
-      const blogs = await Promise.all(paginatedTagEntries.page.map((item) => ctx.db.get(item.blogId)));
+      if (tags.length === 0) return searchResults;
 
       return {
-        ...paginatedTagEntries,
-        page: blogs.filter((b): b is NonNullable<typeof b> => b !== null),
+        ...searchResults,
+        page: searchResults.page.filter((blog) => {
+          const blogTagsLower = (blog.tags || []).map((t) => t.toLowerCase());
+          return tags.every((selectedTag) => blogTagsLower.includes(selectedTag));
+        }),
       };
     }
 
-    const indexName = 
-      sortOrder === "hot" ? "by_type_hot": 
-      sortOrder === "controversial" ? "by_type_controversial" : 
-      sortOrder === "top" ? "by_type_likes" :
-      "by_type" as const;
+    if (tags.length > 0) {
+      const tagIndexName = getTagIndexName();
+      
+      const primaryTag = tags[0];
+      const primaryTagEntries = await ctx.db
+        .query("blogTags")
+        .withIndex(tagIndexName, (q) =>
+          q.eq("tag", primaryTag).eq("postType", args.postType)
+        )
+        .order("desc")
+        .take(100);
+
+      const candidateBlogIds = primaryTagEntries.map((entry) => entry.blogId);
+
+      const matchingBlogIds = await Promise.all(
+        candidateBlogIds.map(async (blogId) => {
+          if (tags.length === 1) return blogId;
+
+          const blogTagEntries = await ctx.db
+            .query("blogTags")
+            .withIndex("by_blogId", (q) => q.eq("blogId", blogId))
+            .collect();
+
+          const postTags = blogTagEntries.map((e) => e.tag.toLowerCase());
+
+          const hasAllTags = tags.every((selectedTag) =>
+            postTags.includes(selectedTag)
+          );
+
+          return hasAllTags ? blogId : null;
+        })
+      );
+
+      const validBlogIds = matchingBlogIds.filter(
+        (id): id is Id<"blogs"> => id !== null
+      );
+
+      const blogs = await Promise.all(
+        validBlogIds.map((id) => ctx.db.get(id))
+      );
+
+      return {
+        page: blogs.filter((b): b is NonNullable<typeof b> => b !== null),
+        isDone: true,
+        continueCursor: "",
+      };
+    }
 
     return await ctx.db
       .query("blogs")
-      .withIndex(indexName, (q) => q.eq("postType", args.postType))
+      .withIndex(getBlogIndexName(), (q) => q.eq("postType", args.postType))
       .order("desc")
       .paginate(args.paginationOpts);
   },

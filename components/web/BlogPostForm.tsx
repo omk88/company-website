@@ -19,7 +19,7 @@ import { Textarea } from "../ui/textarea";
 import { Image, Paperclip, X } from "lucide-react";
 import imageCompression from "browser-image-compression";
 
-const AVAILABLE_TAGS = ["Product", "Research", "Design", "Technology", "Opinion", "Tutorials"];
+const AVAILABLE_TAGS = ["product", "research", "design", "technology", "opinion", "tutorials"];
 
 interface BlogFormValues {
     title: string;
