@@ -5,7 +5,7 @@ import { LiveMetrics } from "./LiveMetrics";
 import { api } from "@/convex/_generated/api";
 import { FunctionReturnType } from "convex/server";
 import { SidebarGroupLabel } from "../ui/sidebar";
-import { Library } from "lucide-react";
+import { Eye, Library, MessageSquare, ThumbsUp } from "lucide-react";
 import { ProfileHoverCard } from "./ProfileHoverCard";
 import Image from "next/image";
 
@@ -16,6 +16,12 @@ interface MoreFromClientProps {
     displayName: string | undefined;
     username: string;
 }
+
+const compactFormatter = new Intl.NumberFormat("en", {
+  notation: "compact",
+  compactDisplay: "short",
+  maximumFractionDigits: 1,
+});
 
 export function MoreFromClient({ initialBlogs, displayName, username }: MoreFromClientProps) {
     if (initialBlogs.length === 0) {
@@ -43,18 +49,26 @@ export function MoreFromClient({ initialBlogs, displayName, username }: MoreFrom
                             <div className="w-full flex flex-row items-center justify-between gap-3">
                                 <div className="w-full flex flex-col gap-1">
                                     <div className="overflow-hidden">
-                                        <h3 className="break-words text-sm font-semibold tracking-tight line-clamp-2 text-foreground transition-colors duration-100 group-hover/trending:text-blue-600 leading-snug">
+                                        <h3 className="break-words text-[13px] font-semibold tracking-tight line-clamp-2 text-foreground/90 transition-colors duration-150 group-hover/trending:text-blue-600 leading-snug">
                                             {blog.title}
                                         </h3>
                                     </div>
                                     
-                                    <div className="-ml-5 scale-90 origin-left opacity-80 group-hover/trending:opacity-100 transition-opacity duration-200 transform-gpu will-change-opacity">
-                                        <LiveMetrics 
-                                            views={blog.totalViews} 
-                                            likes={blog.likes} 
-                                            comments={blog.commentCount}
-                                            showDislikes={false} 
-                                        />
+                                    <div className="text-muted-foreground opacity-75 group-hover/trending:opacity-100 transition-opacity duration-150">
+                                        <div className="flex items-center text-sm text-muted-foreground font-mono tracking-tight select-none">
+                                            <div className="flex items-center gap-1.5 min-w-[3rem]">
+                                                <Eye className="w-4 h-4 stroke-[2.3] shrink-0" />
+                                                <span>{compactFormatter.format(blog.totalViews)}</span>
+                                            </div>
+                                            <div className="flex items-center gap-1.5 min-w-[3rem]">
+                                                <ThumbsUp className="w-4 h-4 stroke-[2.3] shrink-0" />
+                                                <span>{compactFormatter.format(blog.likes)}</span>
+                                            </div>
+                                            <div className="flex items-center gap-1.5 min-w-[3rem]">
+                                                <MessageSquare className="w-4 h-4 stroke-[2.3] shrink-0" />
+                                                <span>{compactFormatter.format(blog.commentCount)}</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
