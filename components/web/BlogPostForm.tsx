@@ -228,7 +228,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                 toast.success("Blog article updated successfully!");
             } else {
                 await createBlog({
-                    title: data.title,
+                    title: formattedTitle,
                     subtitle: data.subtitle,
                     content: data.content,
                     author: userData?.userId || "",
@@ -325,7 +325,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                         <Controller
                             name="title"
                             control={control}
-                            rules={{ required: "A blog title is required" }}
+                            rules={{ required: "A blog title is required", minLength: 6 }}
                             render={({ field, fieldState }) => (
                                 <Field>
                                     <Input aria-invalid={fieldState.invalid} placeholder="Title" type="text" disabled={isLoading} {...field} />
@@ -337,7 +337,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                         <Controller
                             name="subtitle"
                             control={control}
-                            rules={{ required: "A subtitle summary is required" }}
+                            rules={{ required: "A subtitle summary is required", minLength: 100 }}
                             render={({ field, fieldState }) => (
                                 <Field>
                                     <Input aria-invalid={fieldState.invalid} placeholder="Summary" type="text" disabled={isLoading} {...field} />
