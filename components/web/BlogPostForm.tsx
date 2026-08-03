@@ -245,7 +245,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                 await fetch("/api/revalidate", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ tag: "featured-blogs" }),
+                    body: JSON.stringify({ tags: ["featured-blogs", "main-blogs", "morefrom-blogs", "trending-blogs"] }),
                 });
             } catch (err) {
                 console.error("Background revalidation failure:", err);

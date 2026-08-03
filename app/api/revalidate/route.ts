@@ -13,11 +13,24 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json().catch(() => ({}));
-    const tagToRevalidate = body.tag || 'blog';
 
-    revalidateTag(tagToRevalidate, { expire: 0 });
+    const rawTags = body.tags || body.tag;
 
-    return NextResponse.json({ revalidated: true, tag: tagToRevalidate });
+    const tagsToRevalidate: string[] = Array.isArray(rawTags)
+      ? rawTags
+      : [rawTags];
+
+    for (const tag of tagsToRevalidate) {
+      if (typeof tag === 'string' && tag.trim().length > 0) {
+        revalidateTag(tag, "max");
+      }
+    }
+
+    return NextResponse.json({
+      revalidated: true,
+      tags: tagsToRevalidate
+    });
+    
   } catch (error) {
     return NextResponse.json({ message: 'Error revalidating' }, { status: 500 });
   }

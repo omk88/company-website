@@ -551,7 +551,7 @@ export const getFeaturedPosts = query({
       posts = await ctx.db
         .query("blogs")
         .order("desc")
-        .take(5);
+        .take(3);
     }
 
     return posts.map(({ content, ...previewFields }) => previewFields);
@@ -738,7 +738,10 @@ export const getPaginatedPostsByType = query({
 });
 
 export const getPostsByAuthor = query({
-  args: { author: v.string() },
+  args: {
+    author: v.string(),
+    excludeId: v.optional(v.id("blogs")),
+  },
   handler: async (ctx, args) => {
     const blogs = await ctx.db
       .query("blogs")
@@ -746,7 +749,15 @@ export const getPostsByAuthor = query({
       .order("desc")
       .collect();
 
-    const matched = blogs.filter(b => b.author.toLowerCase() === args.author.toLowerCase()).slice(0, 9);
+    const targetAuthor = args.author.toLowerCase();
+
+    const matched = blogs
+      .filter(
+        (b) =>
+          b.author.toLowerCase() === targetAuthor &&
+          b._id !== args.excludeId
+      )
+      .slice(0, 9)
 
     return matched.map(({ content, ...previewFields }) => previewFields);
   },

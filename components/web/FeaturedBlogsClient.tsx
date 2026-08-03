@@ -80,11 +80,11 @@ export function FeaturedBlogsClient({ initialFeaturedBlogs }: FeaturedBlogsClien
                 <div className="flex flex-col justify-between flex-1 min-w-0">
                     <div>
                         <div className="flex items-center gap-1.5 text-xs font-mono tracking-wider uppercase text-muted-foreground mb-1.5">
-                        <ProfileHoverCard authorUsername={currentPost.username} displayName={currentPost.displayName}>
-                            <span className="cursor-pointer">{currentPost.displayName || currentPost.username}</span>
-                        </ProfileHoverCard>
-                            <span>•</span>
-                            <span className="shrink-0">{formattedDate}</span>
+                            <ProfileHoverCard authorUsername={currentPost.username} displayName={currentPost.displayName}>
+                                <span className="cursor-pointer">{currentPost.displayName || currentPost.username}</span>
+                            </ProfileHoverCard>
+                                <span>•</span>
+                                <span className="shrink-0">{formattedDate}</span>
                         </div>
 
                         <h3 className="text-sm font-semibold leading-snug tracking-tight text-foreground transition-colors duration-100 group-hover/card:text-blue-600 line-clamp-3">

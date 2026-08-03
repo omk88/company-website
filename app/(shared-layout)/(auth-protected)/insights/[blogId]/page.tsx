@@ -15,7 +15,7 @@ import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BlogEmojiReactions } from "@/components/web/BlogEmojiReactions";
 import Link from "next/link";
-import { formatSmartDate, ProfileHoverCard } from "@/components/web/ProfileHoverCard";
+import { ProfileHoverCard } from "@/components/web/ProfileHoverCard";
 
 interface blogIdRouteProps {
     params: Promise<{
@@ -56,7 +56,7 @@ export default async function blogIdRoute({ params }: blogIdRouteProps) {
                 </Suspense>
             </div>
 
-            <RightSidebarArticles author={blog.author} displayName={blog.displayName} username={blog.username}  />
+            <RightSidebarArticles author={blog.author} displayName={blog.displayName} username={blog.username} blogId={blogId}  />
         </SidebarProvider>
     )
 }
