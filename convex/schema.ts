@@ -17,6 +17,7 @@ const schema = defineSchema({
     likes: v.number(),
     featured: v.boolean(),
     commentCount: v.number(),
+    isPopular: v.boolean(),
 
     heartCount: v.number(),
     insightfulCount: v.number(),
@@ -29,6 +30,12 @@ const schema = defineSchema({
     readTime: v.number(),
     postType: v.union(v.literal("community"), v.literal("team")),
   })
+    .index("by_popular_createdAt", ["isPopular", "createdAt"])
+    .index("by_popular_likes", ["isPopular", "likes"])
+    .index("by_popular_hot", ["isPopular", "hotScore"])
+    .index("by_type_popular_createdAt", ["postType", "isPopular", "createdAt"])
+    .index("by_type_popular_likes", ["postType", "isPopular", "likes"])
+
     .index("by_createdAt", ["createdAt"])
     .index("by_totalViews", ["totalViews"])
     .index("by_likes", ["likes"])

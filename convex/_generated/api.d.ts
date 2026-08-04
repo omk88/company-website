@@ -17,6 +17,7 @@ import type * as comments from "../comments.js";
 import type * as contact from "../contact.js";
 import type * as crons from "../crons.js";
 import type * as http from "../http.js";
+import type * as markAsPopular from "../markAsPopular.js";
 import type * as profiles from "../profiles.js";
 import type * as scoreAlgorithm from "../scoreAlgorithm.js";
 import type * as subscribers from "../subscribers.js";
@@ -37,6 +38,7 @@ declare const fullApi: ApiFromModules<{
   contact: typeof contact;
   crons: typeof crons;
   http: typeof http;
+  markAsPopular: typeof markAsPopular;
   profiles: typeof profiles;
   scoreAlgorithm: typeof scoreAlgorithm;
   subscribers: typeof subscribers;

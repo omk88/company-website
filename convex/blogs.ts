@@ -58,6 +58,7 @@ export const createPost = mutation({
       createdAt: now,
       readTime: readTimeMinutes,
       postType: args.postType,
+      isPopular: false,
     });
 
     const tagPromises = args.tags.map((tag) =>
@@ -674,6 +675,7 @@ export const getPaginatedPostsByUsername = query({
 export const getPaginatedPostsByType = query({
   args: {
     postType: v.optional(v.union(v.literal("team"), v.literal("community"))),
+    isPopularOnly: v.optional(v.boolean()),
     activeTags: v.optional(v.array(v.string())),
     searchTerm: v.optional(v.string()),
     sortOrder: v.optional(v.string()),
@@ -681,47 +683,11 @@ export const getPaginatedPostsByType = query({
   },
   handler: async (ctx, args) => {
     const cleanSearchTerm = args.searchTerm?.trim();
-    const sortOrder = args.sortOrder || "new"
+    const sortOrder = args.sortOrder || "new";
 
     const tags = (args.activeTags || [])
       .filter((t) => t && t !== "all")
       .map((t) => t.trim().toLowerCase());
-
-    const getBlogIndexName = () => {
-      if (args.postType) {
-        switch (sortOrder) {
-          case "hot": return "by_type_hot" as const;
-          case "controversial": return "by_type_controversial" as const;
-          case "top": return "by_type_likes" as const;
-          default: return "by_type" as const;
-        }
-      } else {
-        switch (sortOrder) {
-          case "hot": return "by_hot" as const;
-          case "controversial": return "by_controversial" as const;
-          case "top": return "by_likes" as const;
-          default: return "by_createdAt" as const;
-        }
-      }
-    };
-
-    const getTagIndexName = () => {
-      if (args.postType) {
-        switch (sortOrder) {
-          case "hot": return "by_tag_type_hot" as const;
-          case "controversial": return "by_tag_type_controversial" as const;
-          case "top": return "by_tag_type_likes" as const;
-          default: return "by_tag_type_createdAt" as const;
-        }
-      } else {
-        switch (sortOrder) {
-          case "hot": return "by_tag_hot" as const;
-          case "controversial": return "by_tag_controversial" as const;
-          case "top": return "by_tag_likes" as const;
-          default: return "by_tag_and_created" as const;
-        }
-      }
-    };
 
     if (cleanSearchTerm) {
       const searchResults = await ctx.db
@@ -730,90 +696,141 @@ export const getPaginatedPostsByType = query({
           args.postType ? "search_title_by_type" : "search_title",
           (q) => {
             const search = q.search("title", cleanSearchTerm);
-            return args.postType ? search.eq("postType", args.postType) : search;
+            return args.postType ? search.eq("postType", args.postType!) : search;
           }
         )
         .paginate(args.paginationOpts);
 
-      if (tags.length === 0) return searchResults;
+      const filteredPage = searchResults.page.filter((blog) => {
+        if (args.isPopularOnly && !blog.isPopular) return false;
+
+        if (tags.length > 0) {
+          const blogTagsLower = (blog.tags || []).map((t) => t.toLowerCase());
+          return tags.every((selectedTag) => blogTagsLower.includes(selectedTag));
+        }
+
+        return true;
+      });
 
       return {
         ...searchResults,
-        page: searchResults.page.filter((blog) => {
-          const blogTagsLower = (blog.tags || []).map((t) => t.toLowerCase());
-          return tags.every((selectedTag) => blogTagsLower.includes(selectedTag));
-        }),
+        page: filteredPage,
       };
     }
 
     if (tags.length > 0) {
       const primaryTag = tags[0];
+
+      const getTagIndexName = () => {
+        if (args.postType) {
+          switch (sortOrder) {
+            case "hot": return "by_tag_type_hot" as const;
+            case "controversial": return "by_tag_type_controversial" as const;
+            case "top": return "by_tag_type_likes" as const;
+            default: return "by_tag_type_createdAt" as const;
+          }
+        }
+        switch (sortOrder) {
+          case "hot": return "by_tag_hot" as const;
+          case "controversial": return "by_tag_controversial" as const;
+          case "top": return "by_tag_likes" as const;
+          default: return "by_tag_and_created" as const;
+        }
+      };
+
       const tagIndexName = getTagIndexName();
 
       const queryRef = args.postType
         ? ctx.db.query("blogTags").withIndex(tagIndexName, (q) =>
             q.eq("tag", primaryTag).eq("postType", args.postType!)
           )
-        : ctx.db.query("blogTags").withIndex(tagIndexName, (q) => 
+        : ctx.db.query("blogTags").withIndex(tagIndexName, (q) =>
             q.eq("tag", primaryTag)
           );
 
-      const primaryTagEntries = await queryRef
-        .order("desc")
-        .take(100);
+      const primaryTagEntries = await queryRef.order("desc").take(100);
 
-      const candidateBlogIds = primaryTagEntries.map((entry) => entry.blogId);
+      const matchingBlogs = await Promise.all(
+        primaryTagEntries.map(async (entry) => {
+          const blog = await ctx.db.get(entry.blogId);
+          if (!blog) return null;
 
-      const matchingBlogIds = await Promise.all(
-        candidateBlogIds.map(async (blogId) => {
-          if (tags.length === 1) return blogId;
+          if (args.isPopularOnly && !blog.isPopular) return null;
 
-          const blogTagEntries = await ctx.db
-            .query("blogTags")
-            .withIndex("by_blogId", (q) => q.eq("blogId", blogId))
-            .collect();
+          if (tags.length > 1) {
+            const blogTagsLower = (blog.tags || []).map((t) => t.toLowerCase());
+            const hasAllTags = tags.every((t) => blogTagsLower.includes(t));
+            if (!hasAllTags) return null;
+          }
 
-          const postTags = blogTagEntries.map((e) => e.tag.toLowerCase());
-          const hasAllTags = tags.every((selectTag) => 
-            postTags.includes(selectTag)
-          );
-
-          return hasAllTags ? blogId : null;
+          return blog;
         })
       );
 
-      const validBlogIds = matchingBlogIds.filter(
-        (id): id is Id<"blogs"> => id !== null
-      );
-
-      const blogs = await Promise.all(
-        validBlogIds.map((id) => ctx.db.get(id))
+      const validBlogs = matchingBlogs.filter(
+        (b): b is NonNullable<typeof b> => b !== null
       );
 
       return {
-        page: blogs.filter((b): b is NonNullable<typeof b> => b !== null),
+        page: validBlogs,
         isDone: true,
         continueCursor: "",
       };
     }
 
-    const indexName = getBlogIndexName();
+    const buildQuery = () => {
+      if (args.isPopularOnly) {
+        if (args.postType) {
+          if (sortOrder === "top") {
+            return ctx.db.query("blogs").withIndex("by_type_popular_likes", (q) =>
+              q.eq("postType", args.postType!).eq("isPopular", true)
+            );
+          }
+          return ctx.db.query("blogs").withIndex("by_type_popular_createdAt", (q) =>
+            q.eq("postType", args.postType!).eq("isPopular", true)
+          );
+        }
 
-    if (args.postType) {
-      return await ctx.db
-        .query("blogs")
-        .withIndex(indexName, (q) => q.eq("postType", args.postType!))
-        .order("desc")
-        .paginate(args.paginationOpts);
-    }
+        if (sortOrder === "top") {
+          return ctx.db.query("blogs").withIndex("by_popular_likes", (q) =>
+            q.eq("isPopular", true)
+          );
+        }
+        return ctx.db.query("blogs").withIndex("by_popular_createdAt", (q) =>
+          q.eq("isPopular", true)
+        );
+      }
 
-    return await ctx.db
-      .query("blogs")
-      .withIndex(indexName)
-      .order("desc")
-      .paginate(args.paginationOpts);
-  }
-})
+      if (args.postType) {
+        switch (sortOrder) {
+          case "hot":
+            return ctx.db.query("blogs").withIndex("by_type_hot", (q) =>
+              q.eq("postType", args.postType!)
+            );
+          case "top":
+            return ctx.db.query("blogs").withIndex("by_type_likes", (q) =>
+              q.eq("postType", args.postType!)
+            );
+          default:
+            return ctx.db.query("blogs").withIndex("by_type", (q) =>
+              q.eq("postType", args.postType!)
+            );
+        }
+      }
+
+      switch (sortOrder) {
+        case "hot":
+          return ctx.db.query("blogs").withIndex("by_hot");
+        case "top":
+          return ctx.db.query("blogs").withIndex("by_likes");
+        default:
+          return ctx.db.query("blogs").withIndex("by_createdAt");
+      }
+    };
+
+    return await buildQuery().order("desc").paginate(args.paginationOpts);
+  },
+});
 
 export const getPostsByAuthor = query({
   args: {

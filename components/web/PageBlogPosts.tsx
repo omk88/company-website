@@ -27,6 +27,8 @@ export function PageBlogPosts({ initialBlogs }: PageBlogPostsProps) {
         ? feedType
         : undefined;
 
+    const isPopularOnly = feedType === "popular" || undefined;
+
     const [blogs, setBlogs] = useState(initialBlogs.page);
     const [cursor, setCursor] = useState<string | null>(initialBlogs.continueCursor);
     const [isDone, setIsDone] = useState(initialBlogs.isDone);
@@ -42,6 +44,7 @@ export function PageBlogPosts({ initialBlogs }: PageBlogPostsProps) {
             try {
                 const result = await convex.query(api.blogs.getPaginatedPostsByType, {
                     postType: dbPostType,
+                    isPopularOnly,
                     searchTerm: searchTerm.trim() || undefined,
                     activeTags: activeTags.length > 0 ? activeTags : undefined,
                     sortOrder,
@@ -78,6 +81,7 @@ export function PageBlogPosts({ initialBlogs }: PageBlogPostsProps) {
         try {
             const result = await convex.query(api.blogs.getPaginatedPostsByType, {
                 postType: dbPostType,
+                isPopularOnly,
                 searchTerm: searchTerm.trim() || undefined,
                 activeTags: activeTags.length > 0 ? activeTags : undefined,
                 sortOrder,
