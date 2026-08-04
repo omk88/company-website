@@ -16,16 +16,17 @@ import { SidebarSearch } from "./SidebarSearch";
 import { SidebarSort } from "./SidebarSort";
 import { SidebarTags } from "./SidebarTags";
 import Link from "next/link";
-import { useLocalSearch } from "./SearchContext";
-import { PostType } from "./SearchContext";
+import { FeedType, useLocalSearch } from "./SearchContext";
 
 const NAV_ITEMS = [
-  { id: "team" as PostType, label: "Team", icon: Users2 },
-  { id: "community" as PostType, label: "Community", icon: Globe },
+  { id: "home", label: "Home", icon: Home },
+  { id: "popular", label: "Popular", icon: TrendingUp },
+  { id: "team", label: "Team", icon: Users2 },
+  { id: "community", label: "Community", icon: Globe },
 ];
 
 export function LeftSidebar() {
-  const { postType, setPostType } = useLocalSearch();
+  const { feedType, setFeedType } = useLocalSearch();
 
   return (
     <Sidebar 
@@ -39,13 +40,13 @@ export function LeftSidebar() {
           <SidebarMenu className="w-full flex flex-col gap-1">
             {NAV_ITEMS.map((item) => {
               const Icon = item.icon;
-              const isActive = postType === item.id;
+              const isActive = feedType === item.id;
 
               return (
                 <SidebarMenuItem key={item.id} className="w-full">
                   <SidebarMenuButton
                     isActive={isActive}
-                    onClick={() => setPostType(item.id)}
+                    onClick={() => setFeedType(item.id as FeedType)}
                     className={`
                       w-full cursor-pointer justify-start px-3 py-2 rounded-xl text-sm font-medium transition-colors
                       data-[active=true]:hover:bg-zinc-200/50 data-[active=true]:text-foreground data-[active=true]:font-semibold

@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, ReactNode } from "react";
 
-export type PostType = "team" | "community";
+export type FeedType = "home" | "popular" |"team" | "community";
 
 interface SearchContextType {
   searchTerm: string;
@@ -11,8 +11,8 @@ interface SearchContextType {
   setActiveTags: (tags: string[] | ((prev: string[]) => string[])) => void;
   sortOrder: string;
   setSortOrder: (order: string) => void;
-  postType: PostType;
-  setPostType: (type: PostType) => void;
+  feedType: FeedType;
+  setFeedType: (type: FeedType) => void;
 }
 
 const SearchContext = createContext<SearchContextType | undefined>(undefined);
@@ -21,7 +21,7 @@ export function SearchProvider({ children }: { children: ReactNode }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTags, setActiveTags] = useState<string[]>([]);
   const [sortOrder, setSortOrder] = useState("new");
-  const [postType, setPostType] = useState<PostType>("team");
+  const [feedType, setFeedType] = useState<FeedType>("home");
 
   return (
     <SearchContext.Provider 
@@ -29,7 +29,7 @@ export function SearchProvider({ children }: { children: ReactNode }) {
         searchTerm, setSearchTerm, 
         activeTags, setActiveTags, 
         sortOrder, setSortOrder,
-        postType, setPostType,
+        feedType, setFeedType,
       }}
     >
       {children}

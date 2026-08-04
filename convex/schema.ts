@@ -32,18 +32,18 @@ const schema = defineSchema({
     .index("by_createdAt", ["createdAt"])
     .index("by_totalViews", ["totalViews"])
     .index("by_likes", ["likes"])
+    .index("by_hot", ["hotScore"])
+    .index("by_controversial", ["controversialScore"])
     .index("by_featured", ["featured"])
     .index("by_author", ["author"])
     .index("by_username", ["username"])
-    .index("by_username_likes", ["username", "likes"])
-    .index("by_username_hot", ["username", "hotScore"])
-    .index("by_username_controversial", ["username", "controversialScore"])
-    .searchIndex("search_title", { searchField: "title", filterFields: ["username"] })
 
     .index("by_type", ["postType"])
     .index("by_type_hot", ["postType", "hotScore"])
     .index("by_type_controversial", ["postType", "controversialScore"])
     .index("by_type_likes", ["postType", "likes"])
+
+    .searchIndex("search_title", { searchField: "title", filterFields: ["username"] })
     .searchIndex("search_title_by_type", { searchField: "title", filterFields: ["postType"] }),
 
   blogTags: defineTable({
@@ -56,20 +56,19 @@ const schema = defineSchema({
     controversialScore: v.number(),
     postType: v.union(v.literal("community"), v.literal("team")),
   })
-
     .index("by_tag_type_createdAt", ["tag", "postType", "createdAt"])
     .index("by_tag_type_hot", ["tag", "postType", "hotScore"])
     .index("by_tag_type_controversial", ["tag", "postType", "controversialScore"])
     .index("by_tag_type_likes", ["tag", "postType", "likes"])
 
-    .index("by_blogId", ["blogId"])
-    .index("by_tag_username", ["tag", "username"])
-    .index("by_tag_username_createdAt", ["tag", "username", "createdAt"])
-    .index("by_tag_username_likes", ["tag", "username", "likes"])
-    .index("by_tag_username_hot", ["tag", "username", "hotScore"])
-    .index("by_tag_username_controversial", ["tag", "username", "controversialScore"])
     .index("by_tag", ["tag"])
-    .index("by_tag_and_created", ["tag", "createdAt"]),
+    .index("by_tag_and_created", ["tag", "createdAt"])
+    .index("by_tag_hot", ["tag", "hotScore"])
+    .index("by_tag_controversial", ["tag", "controversialScore"])
+    .index("by_tag_likes", ["tag", "likes"])
+
+    .index("by_blogId", ["blogId"])
+    .index("by_tag_username", ["tag", "username"]),
   
   viewLogs: defineTable({
     blogId: v.string(),

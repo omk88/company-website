@@ -673,7 +673,7 @@ export const getPaginatedPostsByUsername = query({
 
 export const getPaginatedPostsByType = query({
   args: {
-    postType: v.union(v.literal("community"), v.literal("team")),
+    postType: v.optional(v.union(v.literal("team"), v.literal("community"))),
     activeTags: v.optional(v.array(v.string())),
     searchTerm: v.optional(v.string()),
     sortOrder: v.optional(v.string()),
@@ -681,35 +681,57 @@ export const getPaginatedPostsByType = query({
   },
   handler: async (ctx, args) => {
     const cleanSearchTerm = args.searchTerm?.trim();
-    const sortOrder = args.sortOrder || "new";
-    
+    const sortOrder = args.sortOrder || "new"
+
     const tags = (args.activeTags || [])
       .filter((t) => t && t !== "all")
       .map((t) => t.trim().toLowerCase());
 
-    const getTagIndexName = () => {
-      switch (sortOrder) {
-        case "hot": return "by_tag_type_hot" as const;
-        case "controversial": return "by_tag_type_controversial" as const;
-        case "top": return "by_tag_type_likes" as const;
-        default: return "by_tag_type_createdAt" as const;
+    const getBlogIndexName = () => {
+      if (args.postType) {
+        switch (sortOrder) {
+          case "hot": return "by_type_hot" as const;
+          case "controversial": return "by_type_controversial" as const;
+          case "top": return "by_type_likes" as const;
+          default: return "by_type" as const;
+        }
+      } else {
+        switch (sortOrder) {
+          case "hot": return "by_hot" as const;
+          case "controversial": return "by_controversial" as const;
+          case "top": return "by_likes" as const;
+          default: return "by_createdAt" as const;
+        }
       }
     };
 
-    const getBlogIndexName = () => {
-      switch (sortOrder) {
-        case "hot": return "by_type_hot" as const;
-        case "controversial": return "by_type_controversial" as const;
-        case "top": return "by_type_likes" as const;
-        default: return "by_type" as const;
+    const getTagIndexName = () => {
+      if (args.postType) {
+        switch (sortOrder) {
+          case "hot": return "by_tag_type_hot" as const;
+          case "controversial": return "by_tag_type_controversial" as const;
+          case "top": return "by_tag_type_likes" as const;
+          default: return "by_tag_type_createdAt" as const;
+        }
+      } else {
+        switch (sortOrder) {
+          case "hot": return "by_tag_hot" as const;
+          case "controversial": return "by_tag_controversial" as const;
+          case "top": return "by_tag_likes" as const;
+          default: return "by_tag_and_created" as const;
+        }
       }
     };
 
     if (cleanSearchTerm) {
       const searchResults = await ctx.db
         .query("blogs")
-        .withSearchIndex("search_title_by_type", (q) =>
-          q.search("title", cleanSearchTerm).eq("postType", args.postType)
+        .withSearchIndex(
+          args.postType ? "search_title_by_type" : "search_title",
+          (q) => {
+            const search = q.search("title", cleanSearchTerm);
+            return args.postType ? search.eq("postType", args.postType) : search;
+          }
         )
         .paginate(args.paginationOpts);
 
@@ -725,14 +747,18 @@ export const getPaginatedPostsByType = query({
     }
 
     if (tags.length > 0) {
-      const tagIndexName = getTagIndexName();
-      
       const primaryTag = tags[0];
-      const primaryTagEntries = await ctx.db
-        .query("blogTags")
-        .withIndex(tagIndexName, (q) =>
-          q.eq("tag", primaryTag).eq("postType", args.postType)
-        )
+      const tagIndexName = getTagIndexName();
+
+      const queryRef = args.postType
+        ? ctx.db.query("blogTags").withIndex(tagIndexName, (q) =>
+            q.eq("tag", primaryTag).eq("postType", args.postType!)
+          )
+        : ctx.db.query("blogTags").withIndex(tagIndexName, (q) => 
+            q.eq("tag", primaryTag)
+          );
+
+      const primaryTagEntries = await queryRef
         .order("desc")
         .take(100);
 
@@ -748,9 +774,8 @@ export const getPaginatedPostsByType = query({
             .collect();
 
           const postTags = blogTagEntries.map((e) => e.tag.toLowerCase());
-
-          const hasAllTags = tags.every((selectedTag) =>
-            postTags.includes(selectedTag)
+          const hasAllTags = tags.every((selectTag) => 
+            postTags.includes(selectTag)
           );
 
           return hasAllTags ? blogId : null;
@@ -772,13 +797,23 @@ export const getPaginatedPostsByType = query({
       };
     }
 
+    const indexName = getBlogIndexName();
+
+    if (args.postType) {
+      return await ctx.db
+        .query("blogs")
+        .withIndex(indexName, (q) => q.eq("postType", args.postType!))
+        .order("desc")
+        .paginate(args.paginationOpts);
+    }
+
     return await ctx.db
       .query("blogs")
-      .withIndex(getBlogIndexName(), (q) => q.eq("postType", args.postType))
+      .withIndex(indexName)
       .order("desc")
       .paginate(args.paginationOpts);
-  },
-});
+  }
+})
 
 export const getPostsByAuthor = query({
   args: {

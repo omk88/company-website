@@ -21,7 +21,11 @@ export function PageBlogPosts({ initialBlogs }: PageBlogPostsProps) {
     const searchTerm = searchContext?.searchTerm ?? "";
     const sortOrder = searchContext?.sortOrder ?? "new";
     const activeTags = searchContext?.activeTags ?? [];
-    const postType = searchContext?.postType ?? "team"
+    const feedType = searchContext?.feedType ?? "home"
+
+    const dbPostType = (feedType === "team" || feedType === "community")
+        ? feedType
+        : undefined;
 
     const [blogs, setBlogs] = useState(initialBlogs.page);
     const [cursor, setCursor] = useState<string | null>(initialBlogs.continueCursor);
@@ -37,7 +41,7 @@ export function PageBlogPosts({ initialBlogs }: PageBlogPostsProps) {
             setIsLoading(true);
             try {
                 const result = await convex.query(api.blogs.getPaginatedPostsByType, {
-                    postType: postType,
+                    postType: dbPostType,
                     searchTerm: searchTerm.trim() || undefined,
                     activeTags: activeTags.length > 0 ? activeTags : undefined,
                     sortOrder,
@@ -65,7 +69,7 @@ export function PageBlogPosts({ initialBlogs }: PageBlogPostsProps) {
         return () => {
             isMounted = false;
         };
-    }, [postType, searchTerm, sortOrder, activeTags, username, convex, initialBlogs]);
+    }, [feedType, searchTerm, sortOrder, activeTags, username, convex, initialBlogs]);
 
     const loadMore = async () => {
         if (isDone || isLoading || !cursor) return;
@@ -73,7 +77,7 @@ export function PageBlogPosts({ initialBlogs }: PageBlogPostsProps) {
 
         try {
             const result = await convex.query(api.blogs.getPaginatedPostsByType, {
-                postType: postType,
+                postType: dbPostType,
                 searchTerm: searchTerm.trim() || undefined,
                 activeTags: activeTags.length > 0 ? activeTags : undefined,
                 sortOrder,
@@ -114,7 +118,7 @@ export function PageBlogPosts({ initialBlogs }: PageBlogPostsProps) {
         return () => {
             if (currentTarget) observer.unobserve(currentTarget);
         };
-    }, [cursor, isDone, isLoading, postType, searchTerm, sortOrder, activeTags]);
+    }, [cursor, isDone, isLoading, feedType, searchTerm, sortOrder, activeTags]);
 
     return (
         <div className="space-y-4 p-2">
