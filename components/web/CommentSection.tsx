@@ -95,7 +95,7 @@ export function CommentSection(props: { preloadedComments: Preloaded<typeof api.
                                 
                                 <div className="flex-1 space-y-2">
                                     <div className="flex items-center justify-between">
-                                        <p className="font-semibold text-sm">{comment.authorName}</p>
+                                        <p className="font-semibold text-sm">{comment.displayName || comment.username}</p>
                                         <p className="text-muted-foreground text-xs">
                                             {new Date(comment._creationTime).toLocaleDateString("en-US")}
                                         </p>

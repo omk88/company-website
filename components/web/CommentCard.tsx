@@ -16,7 +16,7 @@ export function CommentCard({ comment, index }: CommentProps) {
                 <h1 className="text-sm text-muted-foreground font-bold tracking-tight line-clamp-1 md:line-clamp-2 text-foreground transition-colors duration-200 group-hover:text-blue-600 uppercase break-words">
                     { comment.blogTitle }
                 </h1>
-                <h2 className="font-bold">{comment.displayName} • {new Date(comment._creationTime).toLocaleDateString("en-US")}</h2>
+                <h2 className="font-bold">{comment.displayName || comment.username} • {new Date(comment._creationTime).toLocaleDateString("en-US")}</h2>
                 <span>{comment.body}</span>
                 <IncrementCommentLikesDislikes comment={comment} />
                 <Separator />
