@@ -71,10 +71,6 @@ export function FollowsDialog({ profileId, trigger, onMouseEnter }: FollowsDialo
                 ) : (
                     results.map((follower) => {
                     if (!follower) return null;
-                    const displayName =
-                        follower.firstName && follower.lastName
-                        ? `${follower.firstName} ${follower.lastName}`
-                        : follower.username;
 
                     return (
                         <Link
@@ -85,12 +81,12 @@ export function FollowsDialog({ profileId, trigger, onMouseEnter }: FollowsDialo
                             >
                             <img
                                 src={follower.profilePicUrl || follower.defaultProfilePic || ""}
-                                alt={displayName}
+                                alt={follower.displayName || follower.username}
                                 className="h-10 w-10 rounded-full object-cover shrink-0 bg-muted"
                             />
                             <div className="flex flex-col overflow-hidden">
                                 <span className="text-sm font-semibold truncate leading-none">
-                                {displayName}
+                                {follower.displayName || follower.username}
                                 </span>
                                 <span className="text-xs text-muted-foreground truncate mt-1">
                                 @{follower.username}
