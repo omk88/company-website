@@ -5,6 +5,7 @@ import { usePaginatedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
+import Image from "next/image";
 
 interface FollowsDialogProps {
     profileId: Id<"profiles">;
@@ -70,30 +71,30 @@ export function FollowsDialog({ profileId, trigger, onMouseEnter }: FollowsDialo
                     </p>
                 ) : (
                     results.map((follower) => {
-                    if (!follower) return null;
+                        if (!follower) return null;
 
-                    return (
-                        <Link
-                            key={follower._id}
-                            href={`/profile/${follower.username}`}
-                            onClick={() => setIsOpen(false)}
-                            className="flex items-center gap-3 p-2 rounded-lg hover:bg-zinc-100 transition-colors"
-                            >
-                            <img
-                                src={follower.profilePicUrl || follower.defaultProfilePic || ""}
-                                alt={follower.displayName || follower.username}
-                                className="h-10 w-10 rounded-full object-cover shrink-0 bg-muted"
-                            />
-                            <div className="flex flex-col overflow-hidden">
-                                <span className="text-sm font-semibold truncate leading-none">
-                                {follower.displayName || follower.username}
-                                </span>
-                                <span className="text-xs text-muted-foreground truncate mt-1">
-                                @{follower.username}
-                                </span>
-                            </div>
-                        </Link>
-                    );
+                        return (
+                            <Link
+                                key={follower._id}
+                                href={`/profile/${follower.username}`}
+                                onClick={() => setIsOpen(false)}
+                                className="flex items-center gap-3 p-2 rounded-lg hover:bg-zinc-100 transition-colors"
+                                >
+                                <Image
+                                    src={follower.profilePicUrl || follower.defaultProfilePic || ""}
+                                    alt={follower.displayName || follower.username}
+                                    className="h-10 w-10 rounded-full object-cover shrink-0 bg-muted"
+                                />
+                                <div className="flex flex-col overflow-hidden">
+                                    <span className="text-sm font-semibold truncate leading-none">
+                                    {follower.displayName || follower.username}
+                                    </span>
+                                    <span className="text-xs text-muted-foreground truncate mt-1">
+                                    @{follower.username}
+                                    </span>
+                                </div>
+                            </Link>
+                        );
                     })
                 )}
 
