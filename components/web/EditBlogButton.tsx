@@ -12,10 +12,9 @@ import { toast } from "sonner";
 
 interface EditBlogButtonProps {
     blogId: string;
-    storageId?: string;
 }
 
-export function EditBlogButton({ blogId, storageId }: EditBlogButtonProps) {
+export function EditBlogButton({ blogId }: EditBlogButtonProps) {
     const [isDeleting, setIsDeleting] = useState(false);
     const router = useRouter(); 
     
@@ -24,7 +23,7 @@ export function EditBlogButton({ blogId, storageId }: EditBlogButtonProps) {
     const companyDomain = "@taqtiq.tech";
     const isCompanyUser = userEmail.endsWith(companyDomain);
 
-    const deleteBlog = useMutation(api.blogs.deletePost);
+    const deleteBlog = useMutation(api.blogs.deleteBlogs);
 
     if (!isCompanyUser) return null;
 
@@ -36,8 +35,7 @@ export function EditBlogButton({ blogId, storageId }: EditBlogButtonProps) {
             setIsDeleting(true);
             
             await deleteBlog({ 
-                id: blogId as Id<"blogs">, 
-                storageId: storageId 
+                blogIds: [blogId as Id<"blogs">], 
             });
 
             toast.success("Blog article deleted successfully!");
