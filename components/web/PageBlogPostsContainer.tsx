@@ -9,7 +9,6 @@ export async function PageBlogPostsContainer() {
     cacheLife("days"); 
 
     const initialBlogs = await fetchQuery(api.blogs.getPaginatedPostsByType, {
-        postType: "community",
         paginationOpts: {
             numItems: 6,    
             cursor: null,   
