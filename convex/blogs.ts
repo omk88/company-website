@@ -579,7 +579,10 @@ export const getPaginatedPostsByUsername = query({
   handler: async (ctx, args) => {
     const cleanSearchTerm = args.searchTerm?.trim();
     const sortOrder = args.sortOrder || "new";
-    const tags = args.activeTags || [];
+
+    const tags = (args.activeTags || [])
+      .filter((t) => t && t !== "all")
+      .map((t) => t.trim().toLowerCase());
 
     if (cleanSearchTerm) {
       const searchResults = await ctx.db
@@ -592,83 +595,84 @@ export const getPaginatedPostsByUsername = query({
       if (tags.length > 0) {
         return {
           ...searchResults,
-          page: searchResults.page.filter((blog) =>
-            tags.some((tag) => blog.tags?.includes(tag))
-          ),
+          page: searchResults.page.filter((blog) => {
+            const blogTagsLower = (blog.tags || []).map((t) => t.toLowerCase());
+            return tags.some((tag) => blogTagsLower.includes(tag));
+          }),
         };
       }
 
       return searchResults;
     }
 
-
     if (tags.length > 0) {
       const primaryTag = tags[0];
-      let tagQuery;
 
-      if (sortOrder === "hot") {
-        tagQuery = ctx.db
-          .query("blogTags")
-          .withIndex("by_tag_username_hot", (q) => q.eq("tag", primaryTag).eq("username", args.username))
-          .order("desc");
-      } else if (sortOrder === "controversial") {
-        tagQuery = ctx.db
-          .query("blogTags")
-          .withIndex("by_tag_username_controversial", (q) => q.eq("tag", primaryTag).eq("username", args.username))
-          .order("desc");
-      } else if (sortOrder === "top") {
-        tagQuery = ctx.db
-          .query("blogTags")
-          .withIndex("by_tag_username_likes", (q) => q.eq("tag", primaryTag).eq("username", args.username))
-          .order("desc");
-      } else {
-        tagQuery = ctx.db
-          .query("blogTags")
-          .withIndex("by_tag_username_createdAt", (q) => q.eq("tag", primaryTag).eq("username", args.username))
-          .order("desc");
-      }
+      const getTagIndexName = () => {
+        switch (sortOrder) {
+          case "hot": return "by_tag_hot" as const;
+          case "controversial": return "by_tag_controversial" as const;
+          case "top": return "by_tag_likes" as const;
+          default: return "by_tag_and_created" as const;
+        }
+      };
 
-      const paginatedTagEntries = await tagQuery.paginate(args.paginationOpts);
+      const primaryTagEntries = await ctx.db
+        .query("blogTags")
+        .withIndex(getTagIndexName(), (q) => q.eq("tag", primaryTag))
+        .order("desc")
+        .take(100);
 
-      const blogPromises = paginatedTagEntries.page.map((item) => ctx.db.get(item.blogId));
-      const blogs = await Promise.all(blogPromises);
+      const matchingBlogs = await Promise.all(
+        primaryTagEntries.map(async (entry) => {
+          if (entry.username !== args.username) return null;
+
+          const blog = await ctx.db.get(entry.blogId);
+          if (!blog) return null;
+
+          if (tags.length > 1) {
+            const blogTagsLower = (blog.tags || []).map((t) => t.toLowerCase());
+            const hasAllTags = tags.every((t) => blogTagsLower.includes(t));
+            if (!hasAllTags) return null;
+          }
+
+          return blog;
+        })
+      );
+
+      const validBlogs = matchingBlogs.filter(
+        (b): b is NonNullable<typeof b> => b !== null
+      );
 
       return {
-        ...paginatedTagEntries,
-        page: blogs.filter((b): b is NonNullable<typeof b> => b !== null)
+        page: validBlogs,
+        isDone: true,
+        continueCursor: "",
       };
     }
 
+    const getBlogQuery = () => {
+      switch (sortOrder) {
+        case "hot":
+          return ctx.db
+            .query("blogs")
+            .withIndex("by_username_hot", (q) => q.eq("username", args.username));
+        case "controversial":
+          return ctx.db
+            .query("blogs")
+            .withIndex("by_username_controversial", (q) => q.eq("username", args.username));
+        case "top":
+          return ctx.db
+            .query("blogs")
+            .withIndex("by_username_likes", (q) => q.eq("username", args.username));
+        default:
+          return ctx.db
+            .query("blogs")
+            .withIndex("by_username", (q) => q.eq("username", args.username));
+      }
+    };
 
-    if (sortOrder === "hot") {
-      return await ctx.db
-        .query("blogs")
-        .withIndex("by_username_hot", (q) => q.eq("username", args.username))
-        .order("desc")
-        .paginate(args.paginationOpts);
-    }
-
-    if (sortOrder === "controversial") {
-      return await ctx.db
-        .query("blogs")
-        .withIndex("by_username_controversial", (q) => q.eq("username", args.username))
-        .order("desc")
-        .paginate(args.paginationOpts);
-    }
-
-    if (sortOrder === "top") {
-      return await ctx.db
-        .query("blogs")
-        .withIndex("by_username_likes", (q) => q.eq("username", args.username))
-        .order("desc")
-        .paginate(args.paginationOpts);
-    }
-
-    return await ctx.db
-      .query("blogs")
-      .withIndex("by_username", (q) => q.eq("username", args.username))
-      .order("desc")
-      .paginate(args.paginationOpts);
+    return await getBlogQuery().order("desc").paginate(args.paginationOpts);
   },
 });
 

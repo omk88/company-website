@@ -43,7 +43,11 @@ const schema = defineSchema({
     .index("by_controversial", ["controversialScore"])
     .index("by_featured", ["featured"])
     .index("by_author", ["author"])
+
     .index("by_username", ["username"])
+    .index("by_username_hot", ["username", "hotScore"])
+    .index("by_username_controversial", ["username", "controversialScore"])
+    .index("by_username_likes", ["username", "likes"])
 
     .index("by_type", ["postType"])
     .index("by_type_hot", ["postType", "hotScore"])
