@@ -45,18 +45,11 @@ export function NavbarAuthClient({ initialIsAuth, initialImage }: NavbarAuthClie
     const defaultAvatarUrl = "/default.svg";
     const profileUsername = userData?.profile?.username;
     
-    const profileLink = profileUsername ? `/${profileUsername}` : "/profile";
-
     const clientSessionImage = session?.user?.image && !session.user.image.includes("googleusercontent.com")
         ? session.user.image
         : null;
 
     const avatarSrc = userData?.profile?.profilePicUrl || clientSessionImage || initialImage || defaultAvatarUrl;
-
-    const firstName = userData?.profile?.firstName;
-    const lastName = userData?.profile?.lastName;
-    
-    const displayName = (firstName && lastName) ? `${firstName} ${lastName}` : userData?.username;
 
     return (
         <TooltipProvider delayDuration={200}>
@@ -110,7 +103,7 @@ export function NavbarAuthClient({ initialIsAuth, initialImage }: NavbarAuthClie
                                                 </div>
                                                 <div className="flex flex-col min-w-0">
                                                     <span className="text-sm font-semibold truncate leading-tight">
-                                                        {`${displayName}`}
+                                                        {`${userData?.profile?.displayName || userData?.profile?.username}`}
                                                     </span>
                                                     <span className="text-xs text-muted-foreground group-hover:text-accent-foreground/80 truncate mt-0.5">
                                                         @{userData?.profile?.username}
