@@ -5,21 +5,19 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { FaFacebook, FaXTwitter } from "react-icons/fa6";
 import { toast } from "sonner";
 import { RxLinkedinLogo } from "react-icons/rx";
-import { ProfileHoverCard } from "./ProfileHoverCard";
-import { api } from "@/convex/_generated/api";
-import { Preloaded } from "convex/react";
+import { ProfileHoverCard, formatSmartDate } from "./ProfileHoverCard";
 
 interface ProfileCommentCardProps {
     id: string;
-    authorName: string;
+    displayName: string | undefined;
+    username: string;
     blogTitle: string;
     body: string;
     likes: number;
     date: number;
-    preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
 }
 
-export function ProfileCommentCard({ id, authorName, blogTitle, body, likes, date, preloadedProfile }: ProfileCommentCardProps) {
+export function ProfileCommentCard({ id, displayName, username, blogTitle, body, likes, date }: ProfileCommentCardProps) {
 
     return (
         <div className="group flex flex-col md:flex-row h-auto md:h-[130px] border border-border/50 rounded-none transition-colors duration-100 hover:bg-muted/50 dark:bg-muted/30">
@@ -27,7 +25,13 @@ export function ProfileCommentCard({ id, authorName, blogTitle, body, likes, dat
             <div className="flex flex-col flex-1 justify-start px-12 py-2 min-w-0">
                 <div className="min-w-0">
                     <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-muted-foreground">
-                        <ProfileHoverCard authorName={authorName} date={date} preloadedProfile={preloadedProfile}/> 
+                        <div className="flex items-center gap-2 min-w-0">
+                            <ProfileHoverCard authorUsername={username} displayName={displayName || username}>
+                                <span className="cursor-pointer truncate">{displayName || username}</span>
+                            </ProfileHoverCard>
+                            <span>•</span>
+                            <span className="shrink-0">{formatSmartDate(date, false)}</span>
+                        </div>
                         
                         <div className="flex flex-row items-center gap-8">
                             <span className="font-bold group-hover:text-blue-600 transition-colors duration-100">{blogTitle}</span>

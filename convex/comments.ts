@@ -99,7 +99,7 @@ export const createComment = mutation({
         blogId: args.blogId,
         body: args.body,
         authorId: user._id,
-        authorName: user.name ?? profile.username,
+        displayName: user.displayUsername ?? undefined,
         username: profile.username,
         blogTitle: blog.title,
         likes: 0,

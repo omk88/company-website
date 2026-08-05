@@ -155,7 +155,7 @@ export function ProfileComments({ username, preloadedInitialComments, selectedId
                                         onSelectChange={handleSelectChange}
                                         isOwnProfile={isOwnProfile}
                                     >
-                                        <ProfileCommentCard id={comment._id} authorName={comment.displayName || comment.username} blogTitle={comment.blogTitle} body={comment.body} likes={comment.likes} date={comment._creationTime} preloadedProfile={preloadedProfile} />
+                                        <ProfileCommentCard id={comment._id} displayName={comment.displayName} username={comment.username} blogTitle={comment.blogTitle} body={comment.body} likes={comment.likes} date={comment._creationTime}  />
                                     </SelectableCardWrapper>
                                 </li>
                             ))}
