@@ -36,7 +36,7 @@ export function PageBlogPosts({ initialBlogs }: PageBlogPostsProps) {
             isInitialMount.current = false;
             return;
         }
-        
+
         let isMounted = true;
 
         const fetchFilteredBlogs = async () => {
@@ -54,7 +54,7 @@ export function PageBlogPosts({ initialBlogs }: PageBlogPostsProps) {
                         id: 0,
                     },
                 });
-
+                
                 if (isMounted) {
                     setBlogs(result.page);
                     setCursor(result.continueCursor);
