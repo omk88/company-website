@@ -17,16 +17,9 @@ interface PageBlogPostsProps {
 export function PageBlogPosts({ initialBlogs }: PageBlogPostsProps) {
     const convex = useConvex();
 
-    const searchContext = useLocalSearch();
-    const searchTerm = searchContext?.searchTerm ?? "";
-    const sortOrder = searchContext?.sortOrder ?? "new";
-    const activeTags = searchContext?.activeTags ?? [];
-    const feedType = searchContext?.feedType ?? "home"
+    const { searchTerm, sortOrder, activeTags, feedType } = useLocalSearch();
 
-    const dbPostType = (feedType === "team" || feedType === "community")
-        ? feedType
-        : undefined;
-
+    const dbPostType = (feedType === "team" || feedType === "community") ? feedType : undefined;
     const isPopularOnly = feedType === "popular" || undefined;
 
     const [blogs, setBlogs] = useState(initialBlogs.page);
@@ -34,9 +27,16 @@ export function PageBlogPosts({ initialBlogs }: PageBlogPostsProps) {
     const [isDone, setIsDone] = useState(initialBlogs.isDone);
     const [isLoading, setIsLoading] = useState(false);
 
+    const isInitialMount = useRef(true);
     const loadMoreRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
+
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
+            return;
+        }
+        
         let isMounted = true;
 
         const fetchFilteredBlogs = async () => {
