@@ -1,4 +1,3 @@
-import { Sparkles, TrendingUp } from "lucide-react";
 import { 
   Sidebar, 
   SidebarHeader, 

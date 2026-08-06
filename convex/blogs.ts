@@ -610,23 +610,23 @@ export const getPaginatedPostsByUsername = query({
 
       const getTagIndexName = () => {
         switch (sortOrder) {
-          case "hot": return "by_tag_hot" as const;
-          case "controversial": return "by_tag_controversial" as const;
-          case "top": return "by_tag_likes" as const;
-          default: return "by_tag_and_created" as const;
+          case "hot": return "by_tag_username_hot" as const;
+          case "controversial": return "by_tag_username_controversial" as const;
+          case "top": return "by_tag_username_likes" as const;
+          default: return "by_tag_username_createdAt" as const;
         }
       };
 
-      const primaryTagEntries = await ctx.db
+      const paginatedTagEntries = await ctx.db
         .query("blogTags")
-        .withIndex(getTagIndexName(), (q) => q.eq("tag", primaryTag))
+        .withIndex(getTagIndexName(), (q) => 
+          q.eq("tag", primaryTag).eq("username", args.username)
+        )
         .order("desc")
-        .take(100);
+        .paginate(args.paginationOpts);
 
       const matchingBlogs = await Promise.all(
-        primaryTagEntries.map(async (entry) => {
-          if (entry.username !== args.username) return null;
-
+        paginatedTagEntries.page.map(async (entry) => {
           const blog = await ctx.db.get(entry.blogId);
           if (!blog) return null;
 
@@ -640,14 +640,9 @@ export const getPaginatedPostsByUsername = query({
         })
       );
 
-      const validBlogs = matchingBlogs.filter(
-        (b): b is NonNullable<typeof b> => b !== null
-      );
-
       return {
-        page: validBlogs,
-        isDone: true,
-        continueCursor: "",
+        ...paginatedTagEntries,
+        page: matchingBlogs.filter((b): b is NonNullable<typeof b> => b !== null),
       };
     }
 
@@ -752,10 +747,10 @@ export const getPaginatedPostsByType = query({
             q.eq("tag", primaryTag)
           );
 
-      const primaryTagEntries = await queryRef.order("desc").take(100);
+      const paginatedTagEntries = await queryRef.order("desc").paginate(args.paginationOpts);
 
       const matchingBlogs = await Promise.all(
-        primaryTagEntries.map(async (entry) => {
+        paginatedTagEntries.page.map(async (entry) => {
           const blog = await ctx.db.get(entry.blogId);
           if (!blog) return null;
 
@@ -771,14 +766,9 @@ export const getPaginatedPostsByType = query({
         })
       );
 
-      const validBlogs = matchingBlogs.filter(
-        (b): b is NonNullable<typeof b> => b !== null
-      );
-
       return {
-        page: validBlogs,
-        isDone: true,
-        continueCursor: "",
+        ...paginatedTagEntries,
+        page: matchingBlogs.filter((b): b is NonNullable<typeof b> => b !== null),
       };
     }
 

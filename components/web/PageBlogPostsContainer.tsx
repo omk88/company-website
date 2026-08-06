@@ -1,4 +1,4 @@
-import { fetchQuery, preloadQuery } from "convex/nextjs";
+import { fetchQuery } from "convex/nextjs";
 import { api } from "@/convex/_generated/api";
 import { cacheLife, cacheTag } from "next/cache";
 import { PageBlogPosts } from "@/components/web/PageBlogPosts";
