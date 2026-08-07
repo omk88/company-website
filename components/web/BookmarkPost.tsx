@@ -35,7 +35,7 @@ export function BookmarkPost({ blogId }: BookmarkPostProps) {
       variant="ghost"
       disabled={isPending}
       onClick={handleToggle}
-      className="..."
+      className="cursor-pointer"
     >
       <Bookmark 
         className={`... ${
