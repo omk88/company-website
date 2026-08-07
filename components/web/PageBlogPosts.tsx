@@ -19,9 +19,6 @@ export function PageBlogPosts({ initialBlogs }: PageBlogPostsProps) {
   const dbPostType = (feedType === "team" || feedType === "community") ? feedType : undefined;
   const isPopularOnly = feedType === "popular" || undefined;
 
-  // 1. Reactive live subscription using Convex's build-in pagination hook.
-  // When active on the client, Convex automatically includes the logged-in user's
-  // authentication identity to fetch live `isBookmarked` states.
   const { results, status, loadMore, isLoading: isQueryLoading } = usePaginatedQuery(
     api.blogs.getPaginatedPostsByType,
     {
@@ -34,14 +31,12 @@ export function PageBlogPosts({ initialBlogs }: PageBlogPostsProps) {
     { initialNumItems: 6 }
   );
 
-  // 2. Fallback to SSR static HTML (initialBlogs) until the live WebSocket populates `results`
   const blogs = results.length > 0 ? results : initialBlogs.page;
   const isDone = status === "Exhausted";
   const isLoading = status === "LoadingMore" || status === "LoadingFirstPage";
 
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
-  // 3. Infinite Scroll IntersectionObserver
   useEffect(() => {
     if (isDone || isLoading) return;
 
@@ -92,15 +87,6 @@ export function PageBlogPosts({ initialBlogs }: PageBlogPostsProps) {
               </li>
             ))}
           </ul>
-
-          {!isDone && (
-            <div
-              ref={loadMoreRef}
-              className="py-6 text-center text-sm text-muted-foreground"
-            >
-              {isLoading ? "Loading more blogs..." : "Scroll down to load more"}
-            </div>
-          )}
         </>
       )}
     </div>

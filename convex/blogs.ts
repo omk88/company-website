@@ -1062,9 +1062,6 @@ export const toggleBookmark = mutation({
 
     const userId = identity.subject; 
 
-    // DIAGNOSTIC LOG
-    console.log("MUTATION USER ID:", userId);
-
     const existing = await ctx.db
       .query("bookmarks")
       .withIndex("by_user_and_blog", (q) =>
@@ -1082,5 +1079,22 @@ export const toggleBookmark = mutation({
       });
       return true;
     }
+  },
+});
+
+export const getUserBookmarkIds = query({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      return [];
+    }
+
+    const bookmarks = await ctx.db
+      .query("bookmarks")
+      .withIndex("by_user", (q) => q.eq("userId", identity.subject))
+      .collect();
+
+    return bookmarks.map((bookmark) => bookmark.blogId);
   },
 });

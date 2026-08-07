@@ -5,6 +5,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "next-themes";
 import GridBackground from "@/components/web/GridBackground"; 
 import { Suspense } from "react";
+import { ConvexClientProvider } from "./ConvexClientProvider";
+import { BookmarksProvider } from "@/providers/BookmarksProvider";
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -43,7 +45,11 @@ export default function RootLayout({
           <GridBackground>
             <main className="w-full flex-1 flex flex-col pt-16">
               <Suspense>
-                {children}
+                <ConvexClientProvider>
+                  <BookmarksProvider>
+                    {children}
+                  </BookmarksProvider>
+                </ConvexClientProvider>
               </Suspense>
             </main>
           </GridBackground>

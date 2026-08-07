@@ -209,7 +209,8 @@ const schema = defineSchema({
     blogId: v.id("blogs"),
   })
     .index("by_user_and_blog", ["userId", "blogId"])
-    .index("by_blog", ["blogId"]),
+    .index("by_blog", ["blogId"])
+    .index("by_user", ["userId"]),
 
 });
 

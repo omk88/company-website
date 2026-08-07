@@ -67,7 +67,7 @@ export function BlogCard({ id, imageUrl, displayName, title, subtitle, totalView
                                                 <Ellipsis className="w-4 h-4 stroke-[2.3]" />
                                             </Button>
                                         </DropdownMenuTrigger>
-                                        <BookmarkPost blogId={id as Id<"blogs">} initialIsBookmarked={isInitialBookmarked} />
+                                        <BookmarkPost blogId={id as Id<"blogs">} />
                                     </div>
                                 <DropdownMenuContent className="w-48">
                                     <DropdownMenuLabel>Share</DropdownMenuLabel>
