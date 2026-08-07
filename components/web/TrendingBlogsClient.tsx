@@ -65,7 +65,7 @@ export function TrendingBlogsClient({ initialTrendingBlogs }: TrendingBlogsClien
                                     </div>
                                 </div>
 
-                                <div className="relative w-12 h-12 shrink-0 overflow-hidden rounded-lg bg-muted border border-border/40">
+                                <div className="relative w-12 h-12 shrink-0 overflow-hidden rounded-lg bg-muted">
                                     <Image
                                         src={blog.imageUrl}
                                         alt={blog.title}

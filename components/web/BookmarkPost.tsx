@@ -4,55 +4,47 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
 import { Bookmark } from "lucide-react";
-import { useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { Button } from "../ui/button";
 
 interface BookmarkPostProps {
   blogId: Id<"blogs">;
+  initialIsBookmarked: boolean;
 }
 
-export function BookmarkPost({ blogId }: BookmarkPostProps) {
+export function BookmarkPost({ blogId, initialIsBookmarked }: BookmarkPostProps) {
   const [isPending, startTransition] = useTransition();
+  const [isBookmarked, setIsBookmarked] = useState(initialIsBookmarked);
 
-  const blogState = useQuery(api.blogs.getBlogBookmarkedState, { blogId });
-  const isBookmarked = blogState?.isBookmarked ?? false;
+  useEffect(() => {
+    setIsBookmarked(initialIsBookmarked);
+  }, [initialIsBookmarked]);
 
-  const toggleBookmarkMutation = useMutation(api.blogs.toggleBookmark)
-    .withOptimisticUpdate((localStore, args) => {
-      const previous = localStore.getQuery(api.blogs.getBlogBookmarkedState, { blogId });
-      
-      if (previous !== undefined) {
-        localStore.setQuery(
-          api.blogs.getBlogFeaturedState,
-          { blogId },
-          {
-            ...previous,
-            isFeatured: !previous?.isBookmarked,
-          }
-        );
-      }
-    });
+  const toggleBookmark = useMutation(api.blogs.toggleBookmark);
 
   const handleToggle = () => {
+    const nextState = !isBookmarked;
+    setIsBookmarked(nextState);
+
     startTransition(async () => {
-      await toggleBookmarkMutation({ blogId });
+      try {
+        await toggleBookmark({ blogId });
+      } catch (error) {
+        setIsBookmarked(!nextState);
+      }
     });
   };
 
   return (
-    <div>
-      <Button 
-        variant="ghost"
-        disabled={isPending || blogState === undefined}
-        onClick={handleToggle}
-        className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground pointer-events-auto cursor-pointer"
-      >
-        <Bookmark 
-          className={`w-4 h-4 stroke-[2.3] transition-colors ${
-            isBookmarked ? "fill-current text-primary" : "fill-none"
-          }`} 
-        />
-      </Button>
-    </div>
+    <Button 
+      variant="ghost"
+      disabled={isPending}
+      onClick={handleToggle}
+      className="..."
+    >
+      <Bookmark 
+        className={`... ${isBookmarked ? "fill-current text-primary" : "fill-none"}`} 
+      />
+    </Button>
   );
 }

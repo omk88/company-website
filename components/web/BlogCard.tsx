@@ -24,10 +24,12 @@ interface BlogCardProps {
     commentCount: number;
     date: number;
     readTime: number;
-    tags: Array<string>;    
+    tags: Array<string>;   
+    isInitialBookmarked: boolean; 
 }
 
-export function BlogCard({ id, imageUrl, displayName, title, subtitle, totalViews, likes, commentCount, date, readTime, tags, username }: BlogCardProps) {
+export function BlogCard({ id, imageUrl, displayName, title, subtitle, totalViews, likes, commentCount, date, readTime, tags, username, isInitialBookmarked }: BlogCardProps) {
+        
     return (
         <div className="group flex flex-col md:flex-row h-auto md:h-[190px] border border-border/50 rounded-none transition-colors duration-100 hover:bg-muted dark:bg-muted/30">
             
@@ -65,7 +67,7 @@ export function BlogCard({ id, imageUrl, displayName, title, subtitle, totalView
                                                 <Ellipsis className="w-4 h-4 stroke-[2.3]" />
                                             </Button>
                                         </DropdownMenuTrigger>
-                                        <BookmarkPost blogId={id as Id<"blogs">} />
+                                        <BookmarkPost blogId={id as Id<"blogs">} initialIsBookmarked={isInitialBookmarked} />
                                     </div>
                                 <DropdownMenuContent className="w-48">
                                     <DropdownMenuLabel>Share</DropdownMenuLabel>

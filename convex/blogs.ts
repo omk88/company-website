@@ -682,6 +682,30 @@ export const getPaginatedPostsByType = query({
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
+    const addBookmarks = async <T extends { _id: Id<"blogs"> }>(blogs: T[]) => {
+      const identity = await ctx.auth.getUserIdentity();
+
+      if (!identity) {
+        return blogs.map((blog) => ({ ...blog, isBookmarked: false }));
+      }
+
+      const userId = identity.subject;
+
+      const userBookmarks = await ctx.db
+        .query("bookmarks")
+        .withIndex("by_user_and_blog", (q) => q.eq("userId", userId))
+        .collect();
+
+      const bookmarkedBlogIds = new Set(
+        userBookmarks.map((bookmark) => bookmark.blogId)
+      );
+
+      return blogs.map((blog) => ({
+        ...blog,
+        isBookmarked: bookmarkedBlogIds.has(blog._id),
+      }));
+    };
+
     const cleanSearchTerm = args.searchTerm?.trim();
     const sortOrder = args.sortOrder || "new";
 
@@ -714,7 +738,7 @@ export const getPaginatedPostsByType = query({
 
       return {
         ...searchResults,
-        page: filteredPage,
+        page: await addBookmarks(filteredPage),
       };
     }
 
@@ -748,7 +772,9 @@ export const getPaginatedPostsByType = query({
             q.eq("tag", primaryTag)
           );
 
-      const paginatedTagEntries = await queryRef.order("desc").paginate(args.paginationOpts);
+      const paginatedTagEntries = await queryRef
+        .order("desc")
+        .paginate(args.paginationOpts);
 
       const matchingBlogs = await Promise.all(
         paginatedTagEntries.page.map(async (entry) => {
@@ -769,7 +795,9 @@ export const getPaginatedPostsByType = query({
 
       return {
         ...paginatedTagEntries,
-        page: matchingBlogs.filter((b): b is NonNullable<typeof b> => b !== null),
+        page: await addBookmarks(
+          matchingBlogs.filter((b): b is NonNullable<typeof b> => b !== null)
+        ),
       };
     }
 
@@ -823,7 +851,14 @@ export const getPaginatedPostsByType = query({
       }
     };
 
-    return await buildQuery().order("desc").paginate(args.paginationOpts);
+    const paginatedBlogs = await buildQuery()
+      .order("desc")
+      .paginate(args.paginationOpts);
+
+    return {
+      ...paginatedBlogs,
+      page: await addBookmarks(paginatedBlogs.page),
+    };
   },
 });
 
@@ -1020,61 +1055,32 @@ export const toggleBlogReaction = mutation({
 });
 
 export const toggleBookmark = mutation({
-  args: { 
-    blogId: v.id("blogs")
-  },
+  args: { blogId: v.id("blogs") },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return null;
-    const userId = identity.subject as Id<"profiles">;
+    if (!identity) throw new Error("Unauthenticated");
 
-    const blog = await ctx.db.get(args.blogId);
-    if (!blog) return null;
+    const userId = identity.subject; 
 
-    const existingFeatured = await ctx.db
+    // DIAGNOSTIC LOG
+    console.log("MUTATION USER ID:", userId);
+
+    const existing = await ctx.db
       .query("bookmarks")
       .withIndex("by_user_and_blog", (q) =>
         q.eq("userId", userId).eq("blogId", args.blogId)
       )
       .unique();
 
-    if (existingFeatured) {
-      await ctx.db.delete(existingFeatured._id);
+    if (existing) {
+      await ctx.db.delete(existing._id);
+      return false;
     } else {
       await ctx.db.insert("bookmarks", {
-        userId: userId,
-        blogId: blog._id,
-      })
+        userId,
+        blogId: args.blogId,
+      });
+      return true;
     }
-
-    const currentFeatured = blog.featured ?? false; 
-    await ctx.db.patch(args.blogId, { featured: !currentFeatured });
-    
-    return { feature: !currentFeatured };
-  },
-});
-
-export const getBlogBookmarkedState = query({
-  args: { blogId: v.id("blogs") },
-  handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    
-    const blog = await ctx.db.get(args.blogId);
-    if (!blog) return null;
-
-    let isBookmarked = false;
-    if (identity) {
-      const vote = await ctx.db
-        .query("bookmarks")
-        .withIndex("by_user_and_blog", (q) =>
-          q.eq("userId", identity.subject as Id<"profiles">).eq("blogId", args.blogId)
-        )
-        .unique();
-      isBookmarked = !!vote;
-    }
-
-    return {
-      isBookmarked
-    };
   },
 });
