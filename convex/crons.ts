@@ -10,10 +10,4 @@ crons.daily(
     api.avatarCleanup.purgeOrphanedFiles
 );
 
-crons.interval(
-    "recalculate popular posts",
-    { minutes: 30 },
-    internal.markAsPopular.recalculatePopularPosts
-);
-
 export default crons;
