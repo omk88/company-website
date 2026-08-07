@@ -203,6 +203,14 @@ const schema = defineSchema({
     .index("by_follower_and_following", ["followerId", "followingId"])
     .index("by_following", ["followingId"])
     .index("by_follower", ["followerId"]),
+
+  bookmarks: defineTable({
+    userId: v.string(),
+    blogId: v.id("blogs"),
+  })
+    .index("by_user_and_blog", ["userId", "blogId"])
+    .index("by_blog", ["blogId"]),
+
 });
 
 export default schema;

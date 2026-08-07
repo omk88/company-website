@@ -9,6 +9,8 @@ import { FaFacebook, FaXTwitter } from "react-icons/fa6";
 import { toast } from "sonner";
 import { RxLinkedinLogo } from "react-icons/rx";
 import { ProfileHoverCard, formatSmartDate } from "./ProfileHoverCard";
+import { BookmarkPost } from "./BookmarkPost";
+import { Id } from "@/convex/_generated/dataModel";
 
 interface BlogCardProps {
     id: string;
@@ -54,7 +56,7 @@ export function BlogCard({ id, imageUrl, displayName, title, subtitle, totalView
                         <div className="flex flex-row items-center gap-8">
                             <span>{readTime} min read</span>
                             <DropdownMenu>
-                                    <div className="gap-4">
+                                    <div className="flex flex-row">
                                         <DropdownMenuTrigger asChild>
                                             <Button 
                                                 variant="ghost"
@@ -63,12 +65,7 @@ export function BlogCard({ id, imageUrl, displayName, title, subtitle, totalView
                                                 <Ellipsis className="w-4 h-4 stroke-[2.3]" />
                                             </Button>
                                         </DropdownMenuTrigger>
-                                        <Button 
-                                            variant="ghost"
-                                            className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground pointer-events-auto cursor-pointer"
-                                        >
-                                            <Bookmark className="w-4 h-4 stroke-[2.3]" />
-                                        </Button>
+                                        <BookmarkPost blogId={id as Id<"blogs">} />
                                     </div>
                                 <DropdownMenuContent className="w-48">
                                     <DropdownMenuLabel>Share</DropdownMenuLabel>

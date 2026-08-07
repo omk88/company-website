@@ -1018,3 +1018,63 @@ export const toggleBlogReaction = mutation({
     }
   },
 });
+
+export const toggleBookmark = mutation({
+  args: { 
+    blogId: v.id("blogs")
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return null;
+    const userId = identity.subject as Id<"profiles">;
+
+    const blog = await ctx.db.get(args.blogId);
+    if (!blog) return null;
+
+    const existingFeatured = await ctx.db
+      .query("bookmarks")
+      .withIndex("by_user_and_blog", (q) =>
+        q.eq("userId", userId).eq("blogId", args.blogId)
+      )
+      .unique();
+
+    if (existingFeatured) {
+      await ctx.db.delete(existingFeatured._id);
+    } else {
+      await ctx.db.insert("bookmarks", {
+        userId: userId,
+        blogId: blog._id,
+      })
+    }
+
+    const currentFeatured = blog.featured ?? false; 
+    await ctx.db.patch(args.blogId, { featured: !currentFeatured });
+    
+    return { feature: !currentFeatured };
+  },
+});
+
+export const getBlogBookmarkedState = query({
+  args: { blogId: v.id("blogs") },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    
+    const blog = await ctx.db.get(args.blogId);
+    if (!blog) return null;
+
+    let isBookmarked = false;
+    if (identity) {
+      const vote = await ctx.db
+        .query("bookmarks")
+        .withIndex("by_user_and_blog", (q) =>
+          q.eq("userId", identity.subject as Id<"profiles">).eq("blogId", args.blogId)
+        )
+        .unique();
+      isBookmarked = !!vote;
+    }
+
+    return {
+      isBookmarked
+    };
+  },
+});
