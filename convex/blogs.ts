@@ -59,6 +59,7 @@ export const createPost = mutation({
       readTime: readTimeMinutes,
       postType: args.postType,
       isPopular: false,
+      isTrending: false,
     });
 
     const tagPromises = args.tags.map((tag) =>

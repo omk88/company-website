@@ -1,4 +1,4 @@
-import { Eye, ThumbsUp, MessageSquare, Ellipsis, Copy } from "lucide-react";
+import { Eye, ThumbsUp, MessageSquare, Ellipsis, Copy, Bookmark } from "lucide-react";
 import Image from "next/image";
 import { HoverCard, HoverCardTrigger, HoverCardContent } from "../ui/hover-card";
 import { Badge } from "../ui/badge";
@@ -54,14 +54,22 @@ export function BlogCard({ id, imageUrl, displayName, title, subtitle, totalView
                         <div className="flex flex-row items-center gap-8">
                             <span>{readTime} min read</span>
                             <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button 
-                                        variant="ghost"
-                                        className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground pointer-events-auto cursor-pointer"
-                                    >
-                                        <Ellipsis className="w-4 h-4 stroke-[2.3]" />
-                                    </Button>
-                                </DropdownMenuTrigger>
+                                    <div className="gap-4">
+                                        <DropdownMenuTrigger asChild>
+                                            <Button 
+                                                variant="ghost"
+                                                className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground pointer-events-auto cursor-pointer"
+                                            >
+                                                <Ellipsis className="w-4 h-4 stroke-[2.3]" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <Button 
+                                            variant="ghost"
+                                            className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground pointer-events-auto cursor-pointer"
+                                        >
+                                            <Bookmark className="w-4 h-4 stroke-[2.3]" />
+                                        </Button>
+                                    </div>
                                 <DropdownMenuContent className="w-48">
                                     <DropdownMenuLabel>Share</DropdownMenuLabel>
                                     

@@ -17,7 +17,9 @@ const schema = defineSchema({
     likes: v.number(),
     featured: v.boolean(),
     commentCount: v.number(),
+    
     isPopular: v.boolean(),
+    isTrending: v.boolean(),
 
     heartCount: v.number(),
     insightfulCount: v.number(),

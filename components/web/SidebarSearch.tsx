@@ -4,15 +4,26 @@ import { Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useLocalSearch } from "@/components/web/SearchContext";
 import { useState, useEffect } from "react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverAnchor,
+} from "@/components/ui/popover";
 
 interface SidebarSearchProps {
   placeholder: string;
   fullWidth?: boolean;
+  showDropdown?: boolean;
 }
 
-export function SidebarSearch({ placeholder, fullWidth = false }: SidebarSearchProps) {
+export function SidebarSearch({
+  placeholder,
+  fullWidth = false,
+  showDropdown = false,
+}: SidebarSearchProps) {
   const { searchTerm, setSearchTerm } = useLocalSearch();
   const [localValue, setLocalValue] = useState(searchTerm);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -29,29 +40,64 @@ export function SidebarSearch({ placeholder, fullWidth = false }: SidebarSearchP
   const fullPlaceholder = `Search ${placeholder}…`;
   const rightPaddingClass = localValue ? "pr-8" : "pr-3";
 
+  const handleFocus = () => {
+    if (showDropdown) setIsOpen(true);
+  };
+
   return (
-    <div className="relative inline-block">
-      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 stroke-[1.5] text-muted-foreground pointer-events-none" />
-      
-      <Input
-        type="text"
-        placeholder={fullPlaceholder}
-        value={localValue}
-        onChange={(e) => setLocalValue(e.target.value)}
-        className={`pl-9 ${rightPaddingClass} text-xs bg-background border-border/50 rounded-md focus-visible:ring-1 focus-visible:ring-primary ${
-          fullWidth ? "w-full" : "w-auto [field-sizing:content]"
-        }`}
-      />
-      
-      {localValue && (
-        <button 
-          onClick={() => setLocalValue("")} 
-          type="button" 
-          className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted"
+    <Popover open={isOpen && showDropdown} onOpenChange={setIsOpen}>
+      <PopoverAnchor asChild>
+        <div className={`relative ${fullWidth ? "w-full" : "inline-block"}`}>
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 stroke-[1.5] text-muted-foreground pointer-events-none z-10" />
+
+          <Input
+            type="text"
+            placeholder={fullPlaceholder}
+            value={localValue}
+            onChange={(e) => {
+              setLocalValue(e.target.value);
+              if (showDropdown && !isOpen) setIsOpen(true);
+            }}
+            onFocus={handleFocus}
+            className={`pl-9 ${rightPaddingClass} text-xs bg-background border-border/50 rounded-md focus-visible:ring-1 focus-visible:ring-primary ${
+              fullWidth ? "w-full" : "w-auto [field-sizing:content]"
+            }`}
+          />
+
+          {localValue && (
+            <button
+              onClick={() => {
+                setLocalValue("");
+                setSearchTerm("");
+              }}
+              type="button"
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted z-10"
+            >
+              <X className="h-3.5 w-3.5 stroke-[2]" />
+            </button>
+          )}
+        </div>
+      </PopoverAnchor>
+
+      {showDropdown && (
+        <PopoverContent
+          className="w-[var(--radix-popover-trigger-width)] p-2 text-xs"
+          align="start"
+          onOpenAutoFocus={(e) => e.preventDefault()}
         >
-          <X className="h-3.5 w-3.5 stroke-[2]" />
-        </button>
+          <div className="space-y-1">
+            <div
+              className="px-2 py-1.5 hover:bg-accent rounded-sm cursor-pointer"
+              onClick={() => {
+                setLocalValue("Example query");
+                setIsOpen(false);
+              }}
+            >
+              Example Search Result
+            </div>
+          </div>
+        </PopoverContent>
       )}
-    </div>
+    </Popover>
   );
 }

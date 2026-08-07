@@ -65,7 +65,7 @@ export function LeftSidebar() {
             <div className="w-full px-2 py-1">
               <Separator />
             </div>
-            <SidebarSearch placeholder="insights" fullWidth={true} />
+            <SidebarSearch placeholder="insights" fullWidth={true} showDropdown={true} />
             <SidebarSort fullWidth={true} />
             <SidebarTags fullWidth={true} />
 
