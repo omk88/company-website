@@ -71,7 +71,7 @@ export function LeftSidebar() {
 
             <div className="w-full">
               <Link
-                href={`/company/blog`}
+                href={`/create-post`}
               >
                 <SidebarMenuButton
                   className={`
