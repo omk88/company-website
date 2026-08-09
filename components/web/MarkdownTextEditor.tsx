@@ -22,7 +22,6 @@ import {
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { cn } from "@/lib/utils";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -42,7 +41,7 @@ import {
 export function MarkdownTextEditor() {
   const [content, setContent] = useState("");
   const [isDragging, setIsDragging] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
 
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -379,7 +378,7 @@ export function MarkdownTextEditor() {
   ];
 
   return (
-    <div className="flex flex-col gap-2 w-full max-w-2xl">
+    <div className="w-full max-w-2xl">
       <input
         type="file"
         ref={fileInputRef}
@@ -388,134 +387,141 @@ export function MarkdownTextEditor() {
         className="hidden"
       />
 
-      <TooltipProvider delayDuration={200}>
-        <div className="flex items-center justify-between p-1 bg-muted/50 border rounded-md">
-          <div className="flex items-center gap-1">
-            {toolbarActions.map((item, index) => {
-              const Icon = item.icon;
-              return (
-                <Tooltip key={index}>
-                  <TooltipTrigger asChild>
+      <div
+        className={cn(
+          "flex flex-col w-full rounded-md border border-input bg-background overflow-hidden transition-all",
+          isFocused && "ring-2 ring-ring ring-offset-2 border-transparent",
+          isDragging && "border-primary bg-primary/5 ring-2 ring-primary"
+        )}
+      >
+        <TooltipProvider delayDuration={200}>
+          <div className="flex items-center justify-between p-1 bg-muted/30 border-b border-border/60">
+            <div className="flex items-center gap-0.5">
+              {toolbarActions.map((item, index) => {
+                const Icon = item.icon;
+                return (
+                  <Tooltip key={index}>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 cursor-pointer text-muted-foreground hover:text-foreground"
+                        onClick={item.action}
+                      >
+                        <Icon className="h-4 w-4" />
+                        <span className="sr-only">{item.label}</span>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top">
+                      <p className="text-xs">{item.label}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                );
+              })}
+            </div>
+
+            <DropdownMenu>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <DropdownMenuTrigger asChild>
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 cursor-pointer"
-                      onClick={item.action}
+                      className="h-8 w-8 cursor-pointer text-muted-foreground hover:text-foreground"
                     >
-                      <Icon className="h-4 w-4" />
-                      <span className="sr-only">{item.label}</span>
+                      <MoreHorizontal className="h-4 w-4" />
+                      <span className="sr-only">More formatting</span>
                     </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top">
-                    <p className="text-xs">{item.label}</p>
-                  </TooltipContent>
-                </Tooltip>
-              );
-            })}
-          </div>
-
-        <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                <DropdownMenuTrigger asChild>
-                    <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 cursor-pointer"
-                    >
-                    <MoreHorizontal className="h-4 w-4" />
-                    <span className="sr-only">More formatting</span>
-                    </Button>
-                </DropdownMenuTrigger>
+                  </DropdownMenuTrigger>
                 </TooltipTrigger>
                 <TooltipContent side="top">
-                <p className="text-xs">More options</p>
+                  <p className="text-xs">More options</p>
                 </TooltipContent>
-            </Tooltip>
+              </Tooltip>
 
-            <DropdownMenuContent
+              <DropdownMenuContent
                 align="end"
                 className="w-52"
                 onCloseAutoFocus={(e) => e.preventDefault()}
-            >
-            <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground">
-                Extended Formatting
-            </DropdownMenuLabel>
+              >
+                <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground">
+                  Extended Formatting
+                </DropdownMenuLabel>
+                
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => insertInlineMarkdown("~~", "~~", "strikethrough text")}
+                >
+                  <Strikethrough className="mr-2 h-4 w-4" />
+                  <span>Strikethrough</span>
+                </DropdownMenuItem>
 
-            <DropdownMenuItem
-                className="cursor-pointer"
-                onClick={() => insertInlineMarkdown("~~", "~~", "strikethrough text")}
-            >
-                <Asterisk className="mr-2 h-4 w-4" />
-                <span>Strikethrough</span>
-            </DropdownMenuItem>
+                <DropdownMenuSeparator />
 
-            <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => insertTextAtCursor(codeBlockSnippet)}
+                >
+                  <Code2 className="mr-2 h-4 w-4" />
+                  <span>Code Block</span>
+                </DropdownMenuItem>
 
-            <DropdownMenuItem
-                className="cursor-pointer"
-                onClick={() => insertTextAtCursor(codeBlockSnippet)}
-            >
-                <Code2 className="mr-2 h-4 w-4" />
-                <span>Code Block</span>
-            </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => insertTextAtCursor(tableSnippet)}
+                >
+                  <Table className="mr-2 h-4 w-4" />
+                  <span>Table</span>
+                </DropdownMenuItem>
 
-            <DropdownMenuItem
-                className="cursor-pointer"
-                onClick={() => insertTextAtCursor(tableSnippet)}
-            >
-                <Table className="mr-2 h-4 w-4" />
-                <span>Table</span>
-            </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => insertLinePrefix("- [ ] ", "Task item")}
+                >
+                  <CheckSquare className="mr-2 h-4 w-4" />
+                  <span>Task List</span>
+                </DropdownMenuItem>
 
-            <DropdownMenuItem
-                className="cursor-pointer"
-                onClick={() => insertLinePrefix("- [ ] ", "Task item")}
-            >
-                <CheckSquare className="mr-2 h-4 w-4" />
-                <span>Task List</span>
-            </DropdownMenuItem>
+                <DropdownMenuSeparator />
 
-            <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => insertTextAtCursor(footnoteSnippet)}
+                >
+                  <Asterisk className="mr-2 h-4 w-4" />
+                  <span>Footnote</span>
+                </DropdownMenuItem>
 
-            <DropdownMenuItem
-                className="cursor-pointer"
-                onClick={() => insertTextAtCursor(footnoteSnippet)}
-            >
-                <Asterisk className="mr-2 h-4 w-4" />
-                <span>Footnote</span>
-            </DropdownMenuItem>
-
-            <DropdownMenuItem
-                className="cursor-pointer"
-                onClick={() => insertTextAtCursor(defListItemSnippet)}
-            >
-                <BookOpen className="mr-2 h-4 w-4" />
-                <span>Definition List</span>
-            </DropdownMenuItem>
-            </DropdownMenuContent>
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => insertTextAtCursor(defListItemSnippet)}
+                >
+                  <BookOpen className="mr-2 h-4 w-4" />
+                  <span>Definition List</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
             </DropdownMenu>
-        </div>
-      </TooltipProvider>
+          </div>
+        </TooltipProvider>
 
-      <Textarea
-        ref={textareaRef}
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        onKeyDown={handleKeyDown}
-        onPaste={handlePaste}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-        placeholder="Post Content (Markdown) — Drop or paste images here"
-        rows={10}
-        className={cn(
-          "flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 resize-y min-h-[300px] transition-colors",
-          isDragging && "border-primary bg-primary/5 ring-2 ring-primary"
-        )}
-      />
+        <textarea
+          ref={textareaRef}
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          onKeyDown={handleKeyDown}
+          onPaste={handlePaste}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          placeholder="Post Content (Markdown) — Drop or paste images here"
+          rows={10}
+          className="w-full bg-transparent p-3 text-sm focus:outline-none disabled:opacity-50 resize-y min-h-[300px]"
+        />
+      </div>
     </div>
   );
 }
