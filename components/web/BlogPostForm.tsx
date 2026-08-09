@@ -337,17 +337,23 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                             rules={{ required: "A blog title is required", minLength: 6 }}
                             render={({ field, fieldState }) => (
                                 <Field>
-                                    <Input 
-                                        aria-invalid={fieldState.invalid} 
-                                        placeholder="Title" 
-                                        type="text" 
-                                        disabled={isLoading} 
+                                    <div
                                         className={cn(
-                                            "h-8 px-2.5 py-1 text-xs placeholder:text-xs",
-                                            fieldState.invalid && "border-destructive focus-visible:ring-destructive"
+                                            "flex items-center w-full h-8 rounded-md border border-input bg-background overflow-hidden transition-all",
+                                            "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-transparent",
+                                            fieldState.invalid && "border-destructive focus-within:ring-destructive",
+                                            isLoading && "opacity-50 pointer-events-none"
                                         )}
-                                        {...field} 
-                                    />
+                                    >
+                                        <input 
+                                            aria-invalid={fieldState.invalid} 
+                                            placeholder="Title" 
+                                            type="text" 
+                                            disabled={isLoading} 
+                                            className="w-full h-full bg-transparent px-2.5 text-xs placeholder:text-xs focus:outline-none"
+                                            {...field} 
+                                        />
+                                    </div>
                                     {fieldState.error && (
                                         <p className="text-xs text-destructive mt-1">{fieldState.error.message}</p>
                                     )}
@@ -361,15 +367,26 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                             rules={{ required: "A subtitle summary is required", minLength: 100 }}
                             render={({ field, fieldState }) => (
                                 <Field>
-                                    <Textarea 
-                                        aria-invalid={fieldState.invalid} 
-                                        placeholder="Summary" 
-                                        rows={4} 
-                                        disabled={isLoading} 
-                                        className="text-xs placeholder:text-xs"
-                                        {...field} 
+                                <div
+                                    className={cn(
+                                    "flex w-full rounded-md border border-input bg-background overflow-hidden transition-all",
+                                    "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-transparent",
+                                    fieldState.invalid && "border-destructive focus-within:ring-destructive",
+                                    isLoading && "opacity-50 pointer-events-none"
+                                    )}
+                                >
+                                    <textarea
+                                    aria-invalid={fieldState.invalid}
+                                    placeholder="Summary"
+                                    rows={3}
+                                    disabled={isLoading}
+                                    className="w-full bg-transparent p-3 text-xs placeholder:text-xs focus:outline-none resize-y min-h-[25px]"
+                                    {...field}
                                     />
-                                    {fieldState.error && <p className="text-xs text-destructive mt-1">{fieldState.error.message}</p>}
+                                </div>
+                                {fieldState.error && (
+                                    <p className="mt-1 text-xs text-destructive">{fieldState.error.message}</p>
+                                )}
                                 </Field>
                             )}
                         />
