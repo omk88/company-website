@@ -274,7 +274,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
     
     return (
         <div className="w-full max-w-7xl mx-auto py-4 grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-            <div className="relative w-full border border-border rounded-md p-4 pt-5">
+            <div className="relative w-full border border-border rounded-md p-2 pt-5">
                 <span className="absolute -top-2.5 left-3 bg-background px-1.5 text-xs font-medium text-muted-foreground">
                     Post content
                 </span>
@@ -325,7 +325,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                             clearImage();
                                         }}
                                         disabled={isLoading}
-                                        className="text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted shrink-0 transition-colors relative z-10"
+                                        className="text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted shrink-0 transition-colors relative z-10 cursor-pointer"
                                     >
                                         <X className="h-3.5 w-3.5 stroke-[2]" />
                                     </button>
@@ -366,7 +366,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                     <Textarea 
                                         aria-invalid={fieldState.invalid} 
                                         placeholder="Summary" 
-                                        rows={3} 
+                                        rows={4} 
                                         disabled={isLoading} 
                                         className="text-xs placeholder:text-xs"
                                         {...field} 
@@ -415,7 +415,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                                                     e.stopPropagation();
                                                                     field.onChange([]); 
                                                                 }}
-                                                                className="text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted"
+                                                                className="text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted cursor-pointer"
                                                             >
                                                                 <X className="h-3 w-3 stroke-[2]" />
                                                             </button>
@@ -451,7 +451,6 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                         onChange={field.onChange}
                                         onBlur={field.onBlur}
                                         disabled={isLoading}
-                                        placeholder="Post Content..."
                                         error={fieldState.invalid}
                                     />
                                     {fieldState.error && (

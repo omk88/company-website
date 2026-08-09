@@ -52,7 +52,7 @@ export function MarkdownTextEditor({
   onChange,
   onBlur,
   disabled = false,
-  placeholder = "Post Content (Markdown) — Drop or paste images here",
+  placeholder = "Post Content (Markdown)",
   error = false,
 }: MarkdownTextEditorProps) {
   const [internalContent, setInternalContent] = useState("");
@@ -551,7 +551,7 @@ export function MarkdownTextEditor({
           onDrop={handleDrop}
           placeholder={placeholder}
           rows={10}
-          className="w-full bg-transparent p-3 text-sm focus:outline-none disabled:opacity-50 resize-y min-h-[250px]"
+          className="w-full bg-transparent p-3 text-xs focus:outline-none disabled:opacity-50 resize-y min-h-[230px]"
         />
       </div>
     </div>
