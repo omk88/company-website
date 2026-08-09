@@ -551,7 +551,7 @@ export function MarkdownTextEditor({
           onDrop={handleDrop}
           placeholder={placeholder}
           rows={10}
-          className="w-full bg-transparent p-3 text-sm focus:outline-none disabled:opacity-50 resize-y min-h-[300px]"
+          className="w-full bg-transparent p-3 text-sm focus:outline-none disabled:opacity-50 resize-y min-h-[250px]"
         />
       </div>
     </div>

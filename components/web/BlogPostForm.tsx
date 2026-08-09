@@ -274,7 +274,10 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
     
     return (
         <div className="w-full max-w-7xl mx-auto py-4 grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-            <div className="w-full">
+            <div className="relative w-full border border-border rounded-md p-4 pt-5">
+                <span className="absolute -top-2.5 left-3 bg-background px-1.5 text-xs font-medium text-muted-foreground">
+                    Post content
+                </span>
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <FieldGroup className="gap-y-2">
                         <Field className="w-full">
@@ -460,12 +463,12 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                             )}
                         />
 
-                        <div className="flex items-center justify-end pt-2">
+                        <div className="flex items-center justify-end">
                             <button
                                 type="submit"
                                 disabled={isLoading}
                                 className={cn(
-                                    "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-neutral-900 text-neutral-50 hover:bg-neutral-900/90 dark:bg-neutral-50 dark:text-neutral-900 dark:hover:bg-neutral-50/90 h-10 px-4 py-2 w-full sm:w-auto",
+                                    "inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-neutral-900 text-neutral-50 hover:bg-neutral-900/90 dark:bg-neutral-50 dark:text-neutral-900 dark:hover:bg-neutral-50/90 p-2 w-full sm:w-auto cursor-pointer",
                                     isLoading && "cursor-not-allowed opacity-70"
                                 )}
                             >
