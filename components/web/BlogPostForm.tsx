@@ -16,9 +16,12 @@ import { Id } from "@/convex/_generated/dataModel";
 import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import { Textarea } from "../ui/textarea";
-import { Image, Paperclip, X } from "lucide-react";
+import { AArrowUp, Image, Paperclip, X } from "lucide-react";
 import imageCompression from "browser-image-compression";
 import { FunctionReturnType } from "convex/server";
+import { Button } from "../ui/button";
+import { ButtonGroup } from "../ui/button-group";
+import { MarkdownTextEditor } from "./MarkdownTextEditor";
 
 const AVAILABLE_TAGS = ["product", "research", "design", "technology", "opinion", "tutorials"];
 
@@ -415,27 +418,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                             }}
                         />
 
-                        <Controller
-                            name="content"
-                            control={control}
-                            rules={{ required: "Blog content cannot be empty" }}
-                            render={({ field, fieldState }) => (
-                                <Field className="w-full">
-                                    <Textarea
-                                        aria-invalid={fieldState.invalid}
-                                        placeholder="Post Content"
-                                        disabled={isLoading}
-                                        rows={10}
-                                        className={cn(
-                                            "flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 resize-y min-h-[300px]",
-                                            fieldState.invalid && "border-destructive focus-visible:ring-destructive"
-                                        )}
-                                        {...field}
-                                    />
-                                    {fieldState.error && <p className="text-xs text-destructive mt-1">{fieldState.error.message}</p>}
-                                </Field>
-                            )}
-                        />
+                        <MarkdownTextEditor />
 
                         <div className="flex items-center justify-end pt-2">
                             <button
