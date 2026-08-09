@@ -38,15 +38,42 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export function MarkdownTextEditor() {
-  const [content, setContent] = useState("");
+interface MarkdownTextEditorProps {
+  value?: string;
+  onChange?: (value: string) => void;
+  onBlur?: () => void;
+  disabled?: boolean;
+  placeholder?: string;
+  error?: boolean;
+}
+
+export function MarkdownTextEditor({
+  value,
+  onChange,
+  onBlur,
+  disabled = false,
+  placeholder = "Post Content (Markdown) — Drop or paste images here",
+  error = false,
+}: MarkdownTextEditorProps) {
+  const [internalContent, setInternalContent] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+
+  // Controlled or uncontrolled content source
+  const content = value !== undefined ? value : internalContent;
 
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const generateUploadUrl = useMutation(api.files.generateUploadUrl);
+
+  const handleContentChange = (newContent: string) => {
+    if (onChange) {
+      onChange(newContent);
+    } else {
+      setInternalContent(newContent);
+    }
+  };
 
   const insertTextAtCursor = (textToInsert: string) => {
     const textarea = textareaRef.current;
@@ -60,7 +87,7 @@ export function MarkdownTextEditor() {
       textToInsert +
       content.substring(end);
 
-    setContent(newText);
+    handleContentChange(newText);
 
     setTimeout(() => {
       textarea.focus();
@@ -75,9 +102,9 @@ export function MarkdownTextEditor() {
     if (!file.type.startsWith("image/")) return;
 
     const altText = file.name.replace(/\.[^/.]+$/, "");
-    const placeholder = `![Uploading ${file.name}...]()`;
+    const placeholderText = `![Uploading ${file.name}...]()`;
 
-    insertTextAtCursor(placeholder);
+    insertTextAtCursor(placeholderText);
 
     try {
       const postUrl = await generateUploadUrl();
@@ -94,12 +121,10 @@ export function MarkdownTextEditor() {
       const imageUrl = `${process.env.NEXT_PUBLIC_CONVEX_URL}/api/storage/${storageId}`;
       const finalMarkdown = `![${altText}](${imageUrl})`;
 
-      setContent((prevContent) => prevContent.replace(placeholder, finalMarkdown));
-    } catch (error) {
-      console.error("Image upload failed:", error);
-      setContent((prevContent) =>
-        prevContent.replace(placeholder, `![Upload failed: ${file.name}]()`)
-      );
+      handleContentChange(content.replace(placeholderText, finalMarkdown));
+    } catch (err) {
+      console.error("Image upload failed:", err);
+      handleContentChange(content.replace(placeholderText, `![Upload failed: ${file.name}]()`));
     }
   };
 
@@ -178,7 +203,7 @@ export function MarkdownTextEditor() {
       suffix +
       content.substring(end);
 
-    setContent(newText);
+    handleContentChange(newText);
 
     setTimeout(() => {
       textarea.focus();
@@ -193,7 +218,6 @@ export function MarkdownTextEditor() {
     if (!textarea) return;
 
     const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
 
     const lineStart = content.lastIndexOf("\n", start - 1) + 1;
     let lineEnd = content.indexOf("\n", start);
@@ -217,7 +241,7 @@ export function MarkdownTextEditor() {
           lineWithoutPrefix +
           content.substring(lineEnd);
 
-        setContent(newText);
+        handleContentChange(newText);
         setTimeout(() => {
           textarea.focus();
           const newPos = Math.max(lineStart, start - existingPrefix.length);
@@ -235,7 +259,7 @@ export function MarkdownTextEditor() {
         textToKeep +
         content.substring(lineEnd);
 
-      setContent(newText);
+      handleContentChange(newText);
 
       setTimeout(() => {
         textarea.focus();
@@ -252,7 +276,7 @@ export function MarkdownTextEditor() {
 
     const newText = beforeLine + prefix + selectedText + afterLine;
 
-    setContent(newText);
+    handleContentChange(newText);
 
     setTimeout(() => {
       textarea.focus();
@@ -283,7 +307,7 @@ export function MarkdownTextEditor() {
 
       if (!text.trim()) {
         const newText = content.substring(0, lineStart) + content.substring(start);
-        setContent(newText);
+        handleContentChange(newText);
         setTimeout(() => {
           textarea.setSelectionRange(lineStart, lineStart);
         }, 0);
@@ -292,7 +316,7 @@ export function MarkdownTextEditor() {
 
       const prefix = `\n${indent}${num + 1}. `;
       const newText = content.substring(0, start) + prefix + content.substring(start);
-      setContent(newText);
+      handleContentChange(newText);
 
       setTimeout(() => {
         const nextPos = start + prefix.length;
@@ -306,7 +330,7 @@ export function MarkdownTextEditor() {
 
       if (!text.trim()) {
         const newText = content.substring(0, lineStart) + content.substring(start);
-        setContent(newText);
+        handleContentChange(newText);
         setTimeout(() => {
           textarea.setSelectionRange(lineStart, lineStart);
         }, 0);
@@ -315,7 +339,7 @@ export function MarkdownTextEditor() {
 
       const prefix = `\n${indent}${bullet} `;
       const newText = content.substring(0, start) + prefix + content.substring(start);
-      setContent(newText);
+      handleContentChange(newText);
 
       setTimeout(() => {
         const nextPos = start + prefix.length;
@@ -385,13 +409,16 @@ export function MarkdownTextEditor() {
         onChange={handleFileChange}
         accept="image/*"
         className="hidden"
+        disabled={disabled}
       />
 
       <div
         className={cn(
           "flex flex-col w-full rounded-md border border-input bg-background overflow-hidden transition-all",
           isFocused && "ring-2 ring-ring ring-offset-2 border-transparent",
-          isDragging && "border-primary bg-primary/5 ring-2 ring-primary"
+          isDragging && "border-primary bg-primary/5 ring-2 ring-primary",
+          error && "border-destructive focus-within:ring-destructive",
+          disabled && "opacity-50 pointer-events-none"
         )}
       >
         <TooltipProvider delayDuration={200}>
@@ -406,6 +433,7 @@ export function MarkdownTextEditor() {
                         type="button"
                         variant="ghost"
                         size="icon"
+                        disabled={disabled}
                         className="h-8 w-8 cursor-pointer text-muted-foreground hover:text-foreground"
                         onClick={item.action}
                       >
@@ -429,6 +457,7 @@ export function MarkdownTextEditor() {
                       type="button"
                       variant="ghost"
                       size="icon"
+                      disabled={disabled}
                       className="h-8 w-8 cursor-pointer text-muted-foreground hover:text-foreground"
                     >
                       <MoreHorizontal className="h-4 w-4" />
@@ -509,15 +538,19 @@ export function MarkdownTextEditor() {
         <textarea
           ref={textareaRef}
           value={content}
-          onChange={(e) => setContent(e.target.value)}
+          disabled={disabled}
+          onChange={(e) => handleContentChange(e.target.value)}
           onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
+          onBlur={() => {
+            setIsFocused(false);
+            onBlur?.();
+          }}
           onKeyDown={handleKeyDown}
           onPaste={handlePaste}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          placeholder="Post Content (Markdown) — Drop or paste images here"
+          placeholder={placeholder}
           rows={10}
           className="w-full bg-transparent p-3 text-sm focus:outline-none disabled:opacity-50 resize-y min-h-[300px]"
         />

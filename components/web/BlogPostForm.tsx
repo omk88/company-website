@@ -418,7 +418,28 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                             }}
                         />
 
-                        <MarkdownTextEditor />
+                        <Controller
+                            name="content"
+                            control={control}
+                            rules={{ required: "Blog content cannot be empty" }}
+                            render={({ field, fieldState }) => (
+                                <Field className="w-full">
+                                    <MarkdownTextEditor
+                                        value={field.value || ""}
+                                        onChange={field.onChange}
+                                        onBlur={field.onBlur}
+                                        disabled={isLoading}
+                                        placeholder="Post Content..."
+                                        error={fieldState.invalid}
+                                    />
+                                    {fieldState.error && (
+                                        <p className="text-xs text-destructive mt-1">
+                                            {fieldState.error.message}
+                                        </p>
+                                    )}
+                                </Field>
+                            )}
+                        />
 
                         <div className="flex items-center justify-end pt-2">
                             <button
