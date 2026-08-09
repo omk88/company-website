@@ -421,7 +421,7 @@ export function MarkdownTextEditor({
         )}
       >
         <TooltipProvider delayDuration={200}>
-          <div className="flex items-center justify-between p-1 bg-muted/30 border-b border-border/60">
+          <div className="flex items-center justify-between p-1 border-b border-border/60">
             <div className="flex items-center gap-0.5">
               {toolbarActions.map((item, index) => {
                 const Icon = item.icon;

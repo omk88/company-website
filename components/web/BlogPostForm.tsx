@@ -16,11 +16,9 @@ import { Id } from "@/convex/_generated/dataModel";
 import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import { Textarea } from "../ui/textarea";
-import { AArrowUp, ChevronDown, Image, Paperclip, X } from "lucide-react";
+import { ChevronDown, Image, Paperclip, X } from "lucide-react";
 import imageCompression from "browser-image-compression";
 import { FunctionReturnType } from "convex/server";
-import { Button } from "../ui/button";
-import { ButtonGroup } from "../ui/button-group";
 import { MarkdownTextEditor } from "./MarkdownTextEditor";
 
 const AVAILABLE_TAGS = ["product", "research", "design", "technology", "opinion", "tutorials"];
@@ -311,7 +309,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                             ? selectedImage.name 
                                             : existingPost?.imageUrl 
                                                 ? "Change cover image..." 
-                                                : "Choose file..."
+                                                : "Cover image..."
                                         }
                                     </span>
                                 </span>
@@ -387,55 +385,55 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                 };
 
                                 return (
-                                    <Field>
-                                        <Popover>
-                                            <PopoverTrigger asChild disabled={isLoading}>
-                                                <div className={cn(
-                                                    "flex min-h-8 w-full flex-wrap gap-1 rounded-md border border-input bg-background px-2.5 py-1 text-xs cursor-pointer items-center justify-between relative",
-                                                    fieldState.invalid && "border-destructive"
-                                                )}>
-                                                    {value.length === 0 ? (
-                                                        <span className="text-muted-foreground">Select tags...</span>
-                                                    ) : (
-                                                        <div className="flex flex-wrap gap-1 pr-12">
-                                                            {value.map((tag) => (
-                                                                <Badge key={tag} variant="secondary" className="text-[11px] px-1.5 py-0 h-5 font-normal">
-                                                                    {tag}
-                                                                </Badge>
-                                                            ))}
-                                                        </div>
-                                                    )}
-                                                    
-                                                    <div className="flex items-center space-x-1 absolute right-2.5 top-1/2 -translate-y-1/2">
-                                                        {value.length > 0 && (
-                                                            <button
-                                                                type="button"
-                                                                disabled={isLoading}
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    field.onChange([]); 
-                                                                }}
-                                                                className="text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted cursor-pointer"
-                                                            >
-                                                                <X className="h-3 w-3 stroke-[2]" />
-                                                            </button>
-                                                        )}
-                                                        <ChevronDown className="text-muted-foreground h-3.5 w-3.5 stroke-[2]" />
+                                <Field>
+                                    <Popover>
+                                        <PopoverTrigger asChild disabled={isLoading}>
+                                            <div className={cn(
+                                                "flex min-h-8 w-full flex-wrap gap-1 rounded-md border border-input bg-background px-2.5 py-1 text-xs cursor-pointer items-center justify-between relative",
+                                                fieldState.invalid && "border-destructive"
+                                            )}>
+                                                {value.length === 0 ? (
+                                                    <span className="text-muted-foreground">Tags...</span>
+                                                ) : (
+                                                    <div className="flex flex-wrap gap-1 pr-12">
+                                                        {value.map((tag) => (
+                                                            <Badge key={tag} variant="secondary" className="text-[11px] px-1.5 py-0 h-5 font-normal capitalize">
+                                                                {tag}
+                                                            </Badge>
+                                                        ))}
                                                     </div>
+                                                )}
+                                                
+                                                <div className="flex items-center space-x-1 absolute right-2.5 top-1/2 -translate-y-1/2">
+                                                    {value.length > 0 && (
+                                                        <button
+                                                            type="button"
+                                                            disabled={isLoading}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                field.onChange([]); 
+                                                            }}
+                                                            className="text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted cursor-pointer"
+                                                        >
+                                                            <X className="h-3 w-3 stroke-[2]" />
+                                                        </button>
+                                                    )}
+                                                    <ChevronDown className="text-muted-foreground h-3.5 w-3.5 stroke-[2]" />
                                                 </div>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-[300px] p-2" align="start">
-                                                <div className="space-y-2">
-                                                    {AVAILABLE_TAGS.map((tag) => (
-                                                        <div key={tag} className="flex items-center space-x-2 p-1 hover:bg-muted rounded-md cursor-pointer" onClick={() => toggleTag(tag)}>
-                                                            <Checkbox checked={value.includes(tag)} onCheckedChange={() => toggleTag(tag)} />
-                                                            <span className="text-sm font-medium select-none cursor-pointer">{tag}</span>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </PopoverContent>
-                                        </Popover>
-                                    </Field>
+                                            </div>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-fit p-2" align="start">
+                                            <div className="space-y-1">
+                                                {AVAILABLE_TAGS.map((tag) => (
+                                                    <div key={tag} className="flex items-center space-x-2 p-1.5 hover:bg-muted rounded-md cursor-pointer" onClick={() => toggleTag(tag)}>
+                                                        <Checkbox checked={value.includes(tag)} onCheckedChange={() => toggleTag(tag)} />
+                                                        <span className="text-xs font-medium select-none cursor-pointer capitalize">{tag}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </PopoverContent>
+                                    </Popover>
+                                </Field>
                                 );
                             }}
                         />
