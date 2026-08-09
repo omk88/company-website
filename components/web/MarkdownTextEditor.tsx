@@ -59,7 +59,6 @@ export function MarkdownTextEditor({
   const [isDragging, setIsDragging] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
 
-  // Controlled or uncontrolled content source
   const content = value !== undefined ? value : internalContent;
 
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);

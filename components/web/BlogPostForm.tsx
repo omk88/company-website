@@ -16,7 +16,7 @@ import { Id } from "@/convex/_generated/dataModel";
 import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import { Textarea } from "../ui/textarea";
-import { AArrowUp, Image, Paperclip, X } from "lucide-react";
+import { AArrowUp, ChevronDown, Image, Paperclip, X } from "lucide-react";
 import imageCompression from "browser-image-compression";
 import { FunctionReturnType } from "convex/server";
 import { Button } from "../ui/button";
@@ -297,12 +297,12 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                             <label 
                                 htmlFor="cover-image-upload"
                                 className={cn(
-                                    "flex items-center justify-between w-full h-10 px-3 rounded-md border border-input bg-background text-sm cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors select-none",
+                                    "group flex items-center justify-between w-full h-8 px-2.5 rounded-md border border-input bg-background text-xs cursor-pointer hover:bg-accent/50 transition-colors select-none",
                                     isLoading && "opacity-50 cursor-not-allowed pointer-events-none"
                                 )}
                             >
-                                <span className="flex flex-row items-center gap-2 text-muted-foreground hover:text-foreground transition-colors truncate max-w-[85%]">
-                                    <Paperclip className="h-4 w-4 shrink-0 stroke-[1.5]" />
+                                <span className="flex flex-row items-center gap-1.5 text-muted-foreground group-hover:text-foreground transition-colors truncate max-w-[85%]">
+                                    <Paperclip className="h-3.5 w-3.5 shrink-0 stroke-[1.5]" />
                                     <span className="truncate">
                                         {selectedImage 
                                             ? selectedImage.name 
@@ -322,9 +322,9 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                             clearImage();
                                         }}
                                         disabled={isLoading}
-                                        className="text-muted-foreground hover:text-foreground p-1 rounded-sm hover:bg-muted shrink-0 transition-colors relative z-10"
+                                        className="text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted shrink-0 transition-colors relative z-10"
                                     >
-                                        <X className="h-4 w-4 stroke-[2]" />
+                                        <X className="h-3.5 w-3.5 stroke-[2]" />
                                     </button>
                                 )}
                             </label>
@@ -336,8 +336,20 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                             rules={{ required: "A blog title is required", minLength: 6 }}
                             render={({ field, fieldState }) => (
                                 <Field>
-                                    <Input aria-invalid={fieldState.invalid} placeholder="Title" type="text" disabled={isLoading} {...field} />
-                                    {fieldState.error && <p className="text-xs text-destructive mt-1">{fieldState.error.message}</p>}
+                                    <Input 
+                                        aria-invalid={fieldState.invalid} 
+                                        placeholder="Title" 
+                                        type="text" 
+                                        disabled={isLoading} 
+                                        className={cn(
+                                            "h-8 px-2.5 py-1 text-xs placeholder:text-xs",
+                                            fieldState.invalid && "border-destructive focus-visible:ring-destructive"
+                                        )}
+                                        {...field} 
+                                    />
+                                    {fieldState.error && (
+                                        <p className="text-xs text-destructive mt-1">{fieldState.error.message}</p>
+                                    )}
                                 </Field>
                             )}
                         />
@@ -348,7 +360,14 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                             rules={{ required: "A subtitle summary is required", minLength: 100 }}
                             render={({ field, fieldState }) => (
                                 <Field>
-                                    <Input aria-invalid={fieldState.invalid} placeholder="Summary" type="text" disabled={isLoading} {...field} />
+                                    <Textarea 
+                                        aria-invalid={fieldState.invalid} 
+                                        placeholder="Summary" 
+                                        rows={3} 
+                                        disabled={isLoading} 
+                                        className="text-xs placeholder:text-xs"
+                                        {...field} 
+                                    />
                                     {fieldState.error && <p className="text-xs text-destructive mt-1">{fieldState.error.message}</p>}
                                 </Field>
                             )}
@@ -369,22 +388,22 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                         <Popover>
                                             <PopoverTrigger asChild disabled={isLoading}>
                                                 <div className={cn(
-                                                    "flex min-h-10 w-full flex-wrap gap-1.5 rounded-md border border-input bg-background px-3 py-2 text-sm cursor-pointer items-center justify-between relative",
+                                                    "flex min-h-8 w-full flex-wrap gap-1 rounded-md border border-input bg-background px-2.5 py-1 text-xs cursor-pointer items-center justify-between relative",
                                                     fieldState.invalid && "border-destructive"
                                                 )}>
                                                     {value.length === 0 ? (
                                                         <span className="text-muted-foreground">Select tags...</span>
                                                     ) : (
-                                                        <div className="flex flex-wrap gap-1 pr-14">
+                                                        <div className="flex flex-wrap gap-1 pr-12">
                                                             {value.map((tag) => (
-                                                                <Badge key={tag} variant="secondary" className="text-xs">
+                                                                <Badge key={tag} variant="secondary" className="text-[11px] px-1.5 py-0 h-5 font-normal">
                                                                     {tag}
                                                                 </Badge>
                                                             ))}
                                                         </div>
                                                     )}
                                                     
-                                                    <div className="flex items-center space-x-1 absolute right-3 top-1/2 -translate-y-1/2">
+                                                    <div className="flex items-center space-x-1 absolute right-2.5 top-1/2 -translate-y-1/2">
                                                         {value.length > 0 && (
                                                             <button
                                                                 type="button"
@@ -395,10 +414,10 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                                                 }}
                                                                 className="text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted"
                                                             >
-                                                                <X className="h-3.5 w-3.5 stroke-[2]" />
+                                                                <X className="h-3 w-3 stroke-[2]" />
                                                             </button>
                                                         )}
-                                                        <span className="text-muted-foreground text-xs select-none">▼</span>
+                                                        <ChevronDown className="text-muted-foreground h-3.5 w-3.5 stroke-[2]" />
                                                     </div>
                                                 </div>
                                             </PopoverTrigger>
