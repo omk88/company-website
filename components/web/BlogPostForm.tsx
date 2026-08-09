@@ -2,9 +2,8 @@
 
 import { Controller, useForm, useWatch, Control } from "react-hook-form";
 import { FieldGroup, Field } from "../ui/field";
-import { Input } from "../ui/input";
 import { toast } from "sonner";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { api } from "@/convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
@@ -65,18 +64,22 @@ function toTitleCase(str: string): string {
 }
 
 function LivePostPreview({ control, previewImage, currentUser }: { control: Control<BlogFormValues>; previewImage: string | null; currentUser: User | undefined }) {
-    const formValues = useWatch({control});
+    const formValues = useWatch({ control });
 
-    const title = formValues.title || "[TITLE]";
-    const subtitle = formValues.subtitle || "[SUBTITLE]";
-    const content = formValues.content || "[POST CONTENT]";
+    const title = formValues.title;
+    const subtitle = formValues.subtitle;
+    const content = formValues.content;
     const author = currentUser?.profile?.displayName || currentUser?.profile?.username;
-    const tags = formValues.tags || [];
+
+    const formattedTitle = useMemo(() => {
+        if (!title) return "";
+        return toTitleCase(title);
+    }, [title]);
 
     return (
-        <div>
+        <div className="sticky top-4 h-[calc(100vh-2rem)] overflow-y-auto pr-2">
             <div className="w-full">
-                <div className="relative w-full h-[240px] mb-4 overflow-hidden rounded-lg bg-neutral-100 dark:bg-neutral-900 flex items-center justify-center border border-dashed">
+                <div className="relative w-full h-[240px] mb-2 overflow-hidden rounded-lg flex items-center justify-center border">
                     {previewImage ? (
                         <img 
                             src={previewImage} 
@@ -84,35 +87,39 @@ function LivePostPreview({ control, previewImage, currentUser }: { control: Cont
                             className="w-full h-full object-cover"
                         />
                     ) : (
-                        <div className="text-center p-4">
-                            <span className="flex justify-center text-2xl mb-1"><Image /></span>
-                            <span className="text-xs text-muted-foreground block">No Cover Image Uploaded</span>
+                        <div className="text-muted-foreground">
+                            <span>
+                                <Image className="h-6 w-6 stroke-[1.5]" />
+                            </span>
                         </div>
                     )}
                 </div>
                 
                 <div className="flex flex-col">
-                    <div className="flex flex-wrap gap-1 mb-2">
-                        {tags.map(tag => (
-                            <Badge key={tag} variant="secondary" className="text-[10px] px-1.5 py-0">
-                                {tag}
-                            </Badge>
-                        ))}
-                    </div>
-                    <h1 className="uppercase text-2xl font-bold tracking-tight text-neutral-950 dark:text-neutral-50 line-clamp-3">
-                        {title}
+                    <h1 className="text-2xl font-bold tracking-tight text-neutral-950 dark:text-neutral-50 line-clamp-3">
+                        {formattedTitle}
                     </h1>
-                    <div className="flex flex-col gap-2 mt-2">
-                        <p className="text-sm text-muted-foreground">
-                            Posted by <span className="font-semibold">{author}</span> on {new Date().toLocaleDateString("en-US")}
-                        </p>
-                        <p className="text-base text-neutral-600 dark:text-neutral-400 font-medium">
-                            {subtitle}
-                        </p>
+                    <div className="flex flex-col gap-2">
+                        <div className="text-muted-foreground font-light">
+                            <span>{author}</span>
+                            <span>
+                                {" • "}
+                                {new Date().toLocaleDateString("en-US", {
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                })}
+                            </span>
+                        </div>
+                        {subtitle && (
+                            <p className="text-lg text-neutral-600 dark:text-neutral-400 font-medium">
+                                {subtitle}
+                            </p>
+                        )}
                     </div>
                 </div>
 
-                <Separator className="my-4" />
+                {content?.trim() && <Separator className="my-4" />}
 
                 <div className="prose prose-neutral dark:prose-invert max-w-none text-base leading-relaxed text-neutral-800 dark:text-neutral-200 break-words">
                     <ReactMarkdown>{content}</ReactMarkdown>
@@ -298,11 +305,13 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                             <label 
                                 htmlFor="cover-image-upload"
                                 className={cn(
-                                    "group flex items-center justify-between w-full h-8 px-2.5 rounded-md border border-input bg-background text-xs cursor-pointer hover:bg-accent/50 transition-colors select-none",
+                                    "group flex items-center justify-between w-full h-8 px-2.5 rounded-md border border-input bg-background text-xs cursor-pointer hover:bg-accent/50 transition-all select-none",
+                                    "has-[button:hover]:bg-background",
+                                    "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-transparent",
                                     isLoading && "opacity-50 cursor-not-allowed pointer-events-none"
                                 )}
                             >
-                                <span className="flex flex-row items-center gap-1.5 text-muted-foreground group-hover:text-foreground transition-colors truncate max-w-[85%]">
+                                <span className="flex flex-row items-center gap-1.5 text-muted-foreground group-hover:text-foreground group-has-[button:hover]:text-muted-foreground transition-colors truncate max-w-[85%]">
                                     <Paperclip className="h-3.5 w-3.5 shrink-0 stroke-[1.5]" />
                                     <span className="truncate">
                                         {selectedImage 
