@@ -279,7 +279,6 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
     return (
         <div className="w-full max-w-7xl mx-auto min-h-[calc(100vh-4rem)]">
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] items-stretch min-h-full">
-                {/* Form Column */}
                 <div className="py-4 pr-0 lg:pr-8">
                     <div className="relative w-full border border-border rounded-md p-2">
                         <span className="absolute -top-2.5 left-3 bg-background px-1.5 text-xs font-medium text-muted-foreground">
