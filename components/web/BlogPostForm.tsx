@@ -277,10 +277,11 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
     };
     
     return (
-        <div className="w-full max-w-7xl mx-auto min-h-[calc(100vh-4rem)]">
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] items-stretch min-h-full">
-                <div className="py-4 pr-0 lg:pr-8">
-                    <div className="relative w-full border border-border rounded-md p-2">
+        <div className="w-full h-[calc(100vh-4rem)] overflow-hidden">
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] items-stretch h-full overflow-hidden">
+                
+                <div className="py-6 pl-4 sm:pl-8 lg:pl-12 pr-6 max-h-full">
+                    <div className="relative w-full border border-border rounded-md p-2 max-w-xl ml-auto">
                         <span className="absolute -top-2.5 left-3 bg-background px-1.5 text-xs font-medium text-muted-foreground">
                             Post content
                         </span>
@@ -511,8 +512,10 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                     <Separator orientation="vertical" className="h-full w-[1px]" />
                 </div>
 
-                <div className="w-full py-4 pl-0 lg:pl-8">
-                    <LivePostPreview control={control} previewImage={imagePreviewUrl} currentUser={userData}/>
+                <div className="w-full py-6 pl-6 pr-4 sm:pr-8 lg:pr-12 overflow-y-auto max-h-full">
+                    <div className="max-w-xl mr-auto">
+                        <LivePostPreview control={control} previewImage={imagePreviewUrl} currentUser={userData}/>
+                    </div>
                 </div>
             </div>
         </div>
