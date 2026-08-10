@@ -19,6 +19,7 @@ import {
   Asterisk,
   BookOpen,
   X,
+  AlertCircle,
 } from "lucide-react";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -46,6 +47,7 @@ interface MarkdownTextEditorProps {
   disabled?: boolean;
   placeholder?: string;
   error?: boolean;
+  errorMessage?: string;
   minLength?: number;
 }
 
@@ -56,6 +58,7 @@ export function MarkdownTextEditor({
   disabled = false,
   placeholder = "Post Content (Markdown)",
   error = false,
+  errorMessage,
   minLength = 500,
 }: MarkdownTextEditorProps) {
   const [internalContent, setInternalContent] = useState("");
@@ -425,9 +428,9 @@ export function MarkdownTextEditor({
       <div
         className={cn(
           "flex flex-col w-full rounded-md border border-input bg-background overflow-hidden transition-all",
-          isFocused && "ring-2 ring-ring ring-offset-2 border-transparent",
+          isFocused && !error && "ring-2 ring-ring ring-offset-2 border-transparent",
           isDragging && "border-primary bg-primary/5 ring-2 ring-primary",
-          error && "border-destructive focus-within:ring-destructive",
+          error && "border-destructive focus-within:ring-2 focus-within:ring-destructive focus-within:ring-offset-2 focus-within:border-transparent",
           disabled && "opacity-50 pointer-events-none"
         )}
       >
@@ -563,7 +566,7 @@ export function MarkdownTextEditor({
             onDrop={handleDrop}
             placeholder={placeholder}
             rows={9}
-            className="w-full bg-transparent p-3 pr-12 text-xs focus:outline-none disabled:opacity-50 resize-y min-h-[150px]"
+            className="w-full bg-transparent p-3 pr-14 text-xs focus:outline-none disabled:opacity-50 resize-y min-h-[150px]"
           />
 
           {content && (
@@ -574,22 +577,40 @@ export function MarkdownTextEditor({
                 handleContentChange("");
                 textareaRef.current?.focus();
               }}
-              className="absolute top-2 right-6 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted cursor-pointer transition-colors z-10"
+              className={cn(
+                "absolute top-2.5 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted cursor-pointer transition-colors z-10",
+                errorMessage ? "right-7" : "right-2"
+              )}
               title="Clear content"
             >
               <X className="h-3.5 w-3.5 stroke-[2]" />
             </button>
           )}
+
+          {errorMessage && (
+            <TooltipProvider>
+              <Tooltip delayDuration={100}>
+                <TooltipTrigger asChild>
+                  <div className="absolute top-2.5 right-2 flex items-center justify-center text-destructive cursor-help z-10">
+                    <AlertCircle className="h-4 w-4" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="top" variant="destructive">
+                  <p>{errorMessage}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
         </div>
 
         <div className="flex items-center justify-end px-2.5 py-1 bg-muted/20 border-t border-border/40 text-[10px]">
-            <span className={cn("font-mono transition-colors", getCounterColor(content.length, minLength))}>
+          <span className={cn("font-mono transition-colors", getCounterColor(content.length, minLength))}>
             {isMet ? (
-                <span>✓ {content.length}</span>
+              <span>✓ {content.length}</span>
             ) : (
-                <span>{content.length}/{minLength}</span>
+              <span>{content.length}/{minLength}</span>
             )}
-            </span>
+          </span>
         </div>
       </div>
     </div>

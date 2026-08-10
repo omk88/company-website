@@ -14,10 +14,11 @@ import { Separator } from "../ui/separator";
 import { Id } from "@/convex/_generated/dataModel";
 import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
-import { ChevronDown, Image, Paperclip, X } from "lucide-react";
+import { AlertCircle, ChevronDown, Image, Paperclip, X } from "lucide-react";
 import imageCompression from "browser-image-compression";
 import { FunctionReturnType } from "convex/server";
 import { MarkdownTextEditor } from "./MarkdownTextEditor";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 
 const AVAILABLE_TAGS = ["product", "research", "design", "technology", "opinion", "tutorials"];
 
@@ -349,68 +350,27 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                 <Controller
                                     name="title"
                                     control={control}
-                                    rules={{ required: "A blog title is required", minLength: 6 }}
-                                    render={({ field, fieldState }) => (
-                                        <Field>
-                                            <div
-                                                className={cn(
-                                                    "relative flex items-center w-full h-8 rounded-md border border-input bg-background overflow-hidden transition-all",
-                                                    "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-transparent",
-                                                    fieldState.invalid && "border-destructive focus-within:ring-destructive",
-                                                    isLoading && "opacity-50 pointer-events-none"
-                                                )}
-                                            >
-                                                <input 
-                                                    aria-invalid={fieldState.invalid} 
-                                                    placeholder="Title" 
-                                                    type="text" 
-                                                    disabled={isLoading} 
-                                                    className="w-full h-full bg-transparent pl-2.5 pr-7 text-xs placeholder:text-xs focus:outline-none"
-                                                    {...field} 
-                                                />
-                                                {field.value && (
-                                                    <button
-                                                        type="button"
-                                                        disabled={isLoading}
-                                                        onClick={() => field.onChange("")}
-                                                        className="absolute right-2 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted cursor-pointer transition-colors"
-                                                    >
-                                                        <X className="h-3.5 w-3.5 stroke-[2]" />
-                                                    </button>
-                                                )}
-                                            </div>
-                                            {fieldState.error && (
-                                                <p className="text-xs text-destructive mt-1">{fieldState.error.message}</p>
-                                            )}
-                                        </Field>
-                                    )}
-                                />
-
-                                <Controller
-                                    name="subtitle"
-                                    control={control}
-                                    rules={{ required: "A subtitle summary is required", minLength: 100 }}
-                                    render={({ field, fieldState }) => {
-                                        const currentLength = field.value?.length || 0;
-                                        const minLength = 100;
-                                        const isMet = currentLength >= minLength;
-
-                                        return (
+                                    rules={{ 
+                                        required: "A blog title is required", 
+                                        minLength: { value: 6, message: "Title must be at least 6 characters" } 
+                                    }}
+                                        render={({ field, fieldState }) => (
                                             <Field>
-                                                <div
-                                                    className={cn(
-                                                        "relative flex flex-col w-full rounded-md border border-input bg-background overflow-hidden transition-all",
-                                                        "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-transparent",
-                                                        fieldState.invalid && "border-destructive focus-within:ring-destructive",
-                                                        isLoading && "opacity-50 pointer-events-none"
-                                                    )}
-                                                >
-                                                    <textarea
+                                                <div className="relative flex items-center w-full">
+                                                    <div
+                                                        className={cn(
+                                                            "relative flex items-center w-full h-8 rounded-md border border-input bg-background overflow-hidden transition-all",
+                                                            "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-transparent",
+                                                            fieldState.invalid && "border-destructive focus-within:ring-destructive",
+                                                            isLoading && "opacity-50 pointer-events-none"
+                                                        )}
+                                                    >
+                                                    <input
                                                         aria-invalid={fieldState.invalid}
-                                                        placeholder="Summary"
-                                                        rows={3}
+                                                        placeholder="Title"
+                                                        type="text"
                                                         disabled={isLoading}
-                                                        className="w-full bg-transparent p-3 pr-12 text-xs placeholder:text-xs focus:outline-none resize-y min-h-[40px]"
+                                                        className="w-full h-full bg-transparent pl-2.5 pr-14 text-xs placeholder:text-xs focus:outline-none"
                                                         {...field}
                                                     />
 
@@ -419,31 +379,113 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                                             type="button"
                                                             disabled={isLoading}
                                                             onClick={() => field.onChange("")}
-                                                            className="absolute top-2 right-6 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted cursor-pointer transition-colors z-10"
+                                                            className={cn(
+                                                                "absolute text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted cursor-pointer transition-colors",
+                                                                fieldState.invalid ? "right-7" : "right-2"
+                                                            )}
                                                         >
                                                             <X className="h-3.5 w-3.5 stroke-[2]" />
                                                         </button>
                                                     )}
 
-                                                    <div className="flex items-center justify-end px-2.5 py-1 bg-muted/20 border-t border-border/40 text-[10px]">
-                                                        <span className={cn("font-mono transition-colors", getCounterColor(currentLength))}>
-                                                            {isMet ? (
-                                                                <span>✓ {currentLength}</span>
-                                                            ) : (
-                                                                <span>{currentLength}/{minLength}</span>
-                                                            )}
-                                                        </span>
-                                                    </div>
+                                                    {fieldState.error && (
+                                                        <TooltipProvider>
+                                                            <Tooltip delayDuration={100}>
+                                                                <TooltipTrigger asChild>
+                                                                    <div className="absolute right-2 flex items-center justify-center text-destructive cursor-help">
+                                                                        <AlertCircle className="h-4 w-4" />
+                                                                    </div>
+                                                                </TooltipTrigger>
+                                                                <TooltipContent 
+                                                                        side="top"
+                                                                        variant="destructive"
+                                                                    >
+                                                                        <p>{fieldState.error.message}</p>
+                                                                </TooltipContent>
+                                                            </Tooltip>
+                                                        </TooltipProvider>
+                                                    )}
                                                 </div>
+                                            </div>
+                                        </Field>
+                                    )}
+                                />
 
-                                                {fieldState.error && (
-                                                    <p className="mt-1 text-xs text-destructive">{fieldState.error.message}</p>
+                                <Controller
+                                    name="subtitle"
+                                    control={control}
+                                    rules={{ 
+                                        required: "A subtitle summary is required", 
+                                        minLength: { value: 100, message: "Summary must be at least 100 characters" } 
+                                    }}
+                                    render={({ field, fieldState }) => {
+                                        const currentLength = field.value?.length || 0;
+                                        const minLength = 100;
+                                        const isMet = currentLength >= minLength;
+
+                                        return (
+                                        <Field>
+                                            <div
+                                            className={cn(
+                                                "relative flex flex-col w-full rounded-md border border-input bg-background overflow-hidden transition-all",
+                                                "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-transparent",
+                                                fieldState.invalid && "border-destructive focus-within:ring-destructive",
+                                                isLoading && "opacity-50 pointer-events-none"
+                                            )}
+                                            >
+                                            <textarea
+                                                aria-invalid={fieldState.invalid}
+                                                placeholder="Summary"
+                                                rows={3}
+                                                disabled={isLoading}
+                                                className="w-full bg-transparent p-3 pr-14 text-xs placeholder:text-xs focus:outline-none resize-y min-h-[40px]"
+                                                {...field}
+                                            />
+
+                                            {field.value && (
+                                                <button
+                                                type="button"
+                                                disabled={isLoading}
+                                                onClick={() => field.onChange("")}
+                                                className={cn(
+                                                    "absolute top-2.5 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted cursor-pointer transition-colors z-10",
+                                                    fieldState.invalid ? "right-7" : "right-2"
                                                 )}
-                                            </Field>
+                                                >
+                                                <X className="h-3.5 w-3.5 stroke-[2]" />
+                                                </button>
+                                            )}
+
+                                            {fieldState.error && (
+                                                <TooltipProvider>
+                                                <Tooltip delayDuration={100}>
+                                                    <TooltipTrigger asChild>
+                                                    <div className="absolute top-2.5 right-2 flex items-center justify-center text-destructive cursor-help z-10">
+                                                        <AlertCircle className="h-4 w-4" />
+                                                    </div>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent side="top" variant="destructive">
+                                                    <p>{fieldState.error.message}</p>
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                                </TooltipProvider>
+                                            )}
+
+                                            <div className="flex items-center justify-end px-2.5 py-1 bg-muted/20 border-t border-border/40 text-[10px]">
+                                                <span className={cn("font-mono transition-colors", getCounterColor(currentLength))}>
+                                                {isMet ? (
+                                                    <span>✓ {currentLength}</span>
+                                                ) : (
+                                                    <span>{currentLength}/{minLength}</span>
+                                                )}
+                                                </span>
+                                            </div>
+                                            </div>
+                                        </Field>
                                         );
                                     }}
                                 />
-                                
+
                                 <Controller
                                     name="tags"
                                     control={control}
@@ -511,7 +553,10 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                 <Controller
                                     name="content"
                                     control={control}
-                                    rules={{ required: "Blog content cannot be empty" }}
+                                    rules={{ 
+                                        required: "Blog content cannot be empty",
+                                        minLength: { value: 500, message: "Blog content must be at least 500 characters" }
+                                    }}
                                     render={({ field, fieldState }) => (
                                         <Field className="w-full">
                                             <MarkdownTextEditor
@@ -520,12 +565,8 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                                 onBlur={field.onBlur}
                                                 disabled={isLoading}
                                                 error={fieldState.invalid}
+                                                errorMessage={fieldState.error?.message}
                                             />
-                                            {fieldState.error && (
-                                                <p className="text-xs text-destructive mt-1">
-                                                    {fieldState.error.message}
-                                                </p>
-                                            )}
                                         </Field>
                                     )}
                                 />
