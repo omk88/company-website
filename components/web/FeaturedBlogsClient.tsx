@@ -110,18 +110,20 @@ export function FeaturedBlogsClient({ initialFeaturedBlogs }: FeaturedBlogsClien
                 </div>
             </Link>
 
-            <div className="flex items-center gap-6 pt-3 text-xs text-muted-foreground font-mono tracking-tight select-none">
-                <div className="flex items-center gap-1.5">
-                    <Eye className="w-3.5 h-3.5 stroke-[2.3] shrink-0" />
-                    <span>{compactFormatter.format(currentPost.totalViews)}</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                    <ThumbsUp className="w-3.5 h-3.5 stroke-[2.3] shrink-0" />
-                    <span>{compactFormatter.format(currentPost.likes)}</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                    <MessageSquare className="w-3.5 h-3.5 stroke-[2.3] shrink-0" />
-                    <span>{compactFormatter.format(currentPost.commentCount)}</span>
+            <div className="text-muted-foreground opacity-75 group-hover/trending:opacity-100 transition-opacity duration-150">
+                <div className="flex items-center text-sm text-muted-foreground font-mono tracking-tight select-none">
+                    <div className="flex items-center gap-1.5 min-w-[3rem]">
+                        <Eye className="w-4 h-4 stroke-[2.3] shrink-0" />
+                        <span>{compactFormatter.format(currentPost.totalViews)}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 min-w-[3rem]">
+                        <ThumbsUp className="w-4 h-4 stroke-[2.3] shrink-0" />
+                        <span>{compactFormatter.format(currentPost.likes)}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 min-w-[3rem]">
+                        <MessageSquare className="w-4 h-4 stroke-[2.3] shrink-0" />
+                        <span>{compactFormatter.format(currentPost.commentCount)}</span>
+                    </div>
                 </div>
             </div>
         </div>

@@ -17,6 +17,8 @@ import { SidebarSort } from "./SidebarSort";
 import { SidebarTags } from "./SidebarTags";
 import Link from "next/link";
 import { FeedType, useLocalSearch } from "./SearchContext";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 const NAV_ITEMS = [
   { id: "home", label: "Home", icon: Home },
@@ -27,6 +29,7 @@ const NAV_ITEMS = [
 
 export function LeftSidebar() {
   const { feedType, setFeedType } = useLocalSearch();
+  const userData = useQuery(api.auth.getCurrentUser);
 
   return (
     <Sidebar 
@@ -70,9 +73,7 @@ export function LeftSidebar() {
             <SidebarTags fullWidth={true} />
 
             <div className="w-full">
-              <Link
-                href={`/create-blog`}
-              >
+              <Link href={userData ? "/create-blog" : "/sign-in"}>
                 <SidebarMenuButton
                   className={`
                     group w-full justify-center !h-auto !rounded-md text-xs font-semibold
