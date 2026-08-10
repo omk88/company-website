@@ -18,6 +18,7 @@ import {
   CheckSquare,
   Asterisk,
   BookOpen,
+  X,
 } from "lucide-react";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -534,25 +535,42 @@ export function MarkdownTextEditor({
           </div>
         </TooltipProvider>
 
-        <textarea
-          ref={textareaRef}
-          value={content}
-          disabled={disabled}
-          onChange={(e) => handleContentChange(e.target.value)}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => {
-            setIsFocused(false);
-            onBlur?.();
-          }}
-          onKeyDown={handleKeyDown}
-          onPaste={handlePaste}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-          placeholder={placeholder}
-          rows={10}
-          className="w-full bg-transparent p-3 text-xs focus:outline-none disabled:opacity-50 resize-y min-h-[230px]"
-        />
+        <div className="relative w-full">
+          <textarea
+            ref={textareaRef}
+            value={content}
+            disabled={disabled}
+            onChange={(e) => handleContentChange(e.target.value)}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => {
+              setIsFocused(false);
+              onBlur?.();
+            }}
+            onKeyDown={handleKeyDown}
+            onPaste={handlePaste}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            placeholder={placeholder}
+            rows={10}
+            className="w-full bg-transparent p-3 pr-8 text-xs focus:outline-none disabled:opacity-50 resize-y min-h-[230px]"
+          />
+
+          {content && (
+            <button
+              type="button"
+              disabled={disabled}
+              onClick={() => {
+                handleContentChange("");
+                textareaRef.current?.focus();
+              }}
+              className="absolute top-2 right-2 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted cursor-pointer transition-colors"
+              title="Clear content"
+            >
+              <X className="h-3.5 w-3.5 stroke-[2]" />
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

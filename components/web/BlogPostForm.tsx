@@ -350,7 +350,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                         <Field>
                                             <div
                                                 className={cn(
-                                                    "flex items-center w-full h-8 rounded-md border border-input bg-background overflow-hidden transition-all",
+                                                    "relative flex items-center w-full h-8 rounded-md border border-input bg-background overflow-hidden transition-all",
                                                     "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-transparent",
                                                     fieldState.invalid && "border-destructive focus-within:ring-destructive",
                                                     isLoading && "opacity-50 pointer-events-none"
@@ -361,9 +361,19 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                                     placeholder="Title" 
                                                     type="text" 
                                                     disabled={isLoading} 
-                                                    className="w-full h-full bg-transparent px-2.5 text-xs placeholder:text-xs focus:outline-none"
+                                                    className="w-full h-full bg-transparent pl-2.5 pr-7 text-xs placeholder:text-xs focus:outline-none"
                                                     {...field} 
                                                 />
+                                                {field.value && (
+                                                    <button
+                                                        type="button"
+                                                        disabled={isLoading}
+                                                        onClick={() => field.onChange("")}
+                                                        className="absolute right-2 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted cursor-pointer transition-colors"
+                                                    >
+                                                        <X className="h-3.5 w-3.5 stroke-[2]" />
+                                                    </button>
+                                                )}
                                             </div>
                                             {fieldState.error && (
                                                 <p className="text-xs text-destructive mt-1">{fieldState.error.message}</p>
@@ -378,26 +388,36 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                     rules={{ required: "A subtitle summary is required", minLength: 100 }}
                                     render={({ field, fieldState }) => (
                                         <Field>
-                                        <div
-                                            className={cn(
-                                            "flex w-full rounded-md border border-input bg-background overflow-hidden transition-all",
-                                            "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-transparent",
-                                            fieldState.invalid && "border-destructive focus-within:ring-destructive",
-                                            isLoading && "opacity-50 pointer-events-none"
+                                            <div
+                                                className={cn(
+                                                    "relative flex w-full rounded-md border border-input bg-background overflow-hidden transition-all",
+                                                    "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-transparent",
+                                                    fieldState.invalid && "border-destructive focus-within:ring-destructive",
+                                                    isLoading && "opacity-50 pointer-events-none"
+                                                )}
+                                            >
+                                                <textarea
+                                                    aria-invalid={fieldState.invalid}
+                                                    placeholder="Summary"
+                                                    rows={3}
+                                                    disabled={isLoading}
+                                                    className="w-full bg-transparent p-3 pr-8 text-xs placeholder:text-xs focus:outline-none resize-y min-h-[25px]"
+                                                    {...field}
+                                                />
+                                                {field.value && (
+                                                    <button
+                                                        type="button"
+                                                        disabled={isLoading}
+                                                        onClick={() => field.onChange("")}
+                                                        className="absolute top-2 right-2 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted cursor-pointer transition-colors"
+                                                    >
+                                                        <X className="h-3.5 w-3.5 stroke-[2]" />
+                                                    </button>
+                                                )}
+                                            </div>
+                                            {fieldState.error && (
+                                                <p className="mt-1 text-xs text-destructive">{fieldState.error.message}</p>
                                             )}
-                                        >
-                                            <textarea
-                                            aria-invalid={fieldState.invalid}
-                                            placeholder="Summary"
-                                            rows={3}
-                                            disabled={isLoading}
-                                            className="w-full bg-transparent p-3 text-xs placeholder:text-xs focus:outline-none resize-y min-h-[25px]"
-                                            {...field}
-                                            />
-                                        </div>
-                                        {fieldState.error && (
-                                            <p className="mt-1 text-xs text-destructive">{fieldState.error.message}</p>
-                                        )}
                                         </Field>
                                     )}
                                 />
