@@ -50,7 +50,7 @@ export default async function blogIdRoute({ params }: blogIdRouteProps) {
         <SidebarProvider className="bg-white dark:bg-zinc-950 w-full min-h-screen relative block">
             <LeftSidebarControls blog={blog} />
             
-            <div className="w-full pl-40 pr-75">
+            <div className="w-full pl-40 pr-75 pt-16 min-h-[calc(100vh-4rem)]">
                 <Suspense fallback={<MainContentSkeleton />}>
                     <BlogContent blogPromise={blogPromise} preloadedCommentsPromise={preloadedCommentsPromise} />
                 </Suspense>
