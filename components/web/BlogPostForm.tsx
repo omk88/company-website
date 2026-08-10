@@ -14,11 +14,12 @@ import { Separator } from "../ui/separator";
 import { Id } from "@/convex/_generated/dataModel";
 import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
-import { AlertCircle, ChevronDown, Image, Paperclip, X } from "lucide-react";
+import { AlertCircle, Check, ChevronDown, Image, Paperclip, X } from "lucide-react";
 import imageCompression from "browser-image-compression";
 import { FunctionReturnType } from "convex/server";
 import { MarkdownTextEditor } from "./MarkdownTextEditor";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
+import { Button } from "../ui/button";
 
 const AVAILABLE_TAGS = ["product", "research", "design", "technology", "opinion", "tutorials"];
 
@@ -154,9 +155,12 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
     const updateBlog = useMutation(api.blogs.updatePost);
     const generateUploadUrl = useMutation(api.blogs.generateUploadUrl);
     
-    const { control, handleSubmit, reset } = useForm<BlogFormValues>({
+    const { control, handleSubmit, clearErrors, formState: { errors }, reset } = useForm<BlogFormValues>({
         defaultValues: { title: "", subtitle: "", content: "", author: "", tags: [], coverImage: null, }
     });
+
+    const errorCount = Object.keys(errors).length;
+    const hasErrors = errorCount > 0;
 
     useEffect(() => {
         if (existingPost) {
@@ -288,10 +292,21 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
         <div className="w-full h-[calc(100vh-4rem)] overflow-hidden">
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] items-stretch h-full overflow-hidden">
                 <div className="py-4 px-4 sm:px-6 h-full overflow-y-auto [scrollbar-gutter:stable] min-h-0 w-full">
-                    <div className="relative w-full border border-border rounded-md p-2 mt-2 my-auto">
-                        <span className="absolute -top-2.5 left-3 bg-background px-1.5 text-xs font-medium text-muted-foreground">
+                    <div
+                        className={cn(
+                        "relative w-full rounded-md border p-2 mt-2 my-auto transition-colors",
+                        hasErrors ? "border-destructive" : "border-border"
+                        )}
+                    >
+                        <span
+                        className={cn(
+                            "absolute -top-2.5 left-3 bg-background px-1.5 text-xs font-medium transition-colors",
+                            hasErrors ? "text-destructive" : "text-muted-foreground"
+                        )}
+                        >
                             Post content
                         </span>
+
                         <form onSubmit={handleSubmit(onSubmit)}>
                             <FieldGroup className="gap-y-2">
                                 <Controller
@@ -660,7 +675,49 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                     )}
                                 />
 
-                                <div className="flex items-center justify-end">
+                                <div className="flex items-center justify-end gap-4">
+                                    {hasErrors && (
+                                        <div className="flex flex-row items-center justify-center gap-1">
+                                            <TooltipProvider>
+                                                <Tooltip delayDuration={200}>
+                                                    <TooltipTrigger asChild>
+                                                        <span className="text-xs text-destructive underline decoration-dotted underline-offset-2 cursor-help font-medium">
+                                                            {errorCount} {errorCount === 1 ? "error" : "errors"} found
+                                                        </span>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent 
+                                                            side="top" 
+                                                            variant="destructive" 
+                                                            className="w-auto max-w-none whitespace-nowrap"
+                                                        >
+                                                        <ul className="list-disc list-inside space-y-1 text-xs">
+                                                            {Object.entries(errors).map(([fieldName, error]) => {
+                                                                const message = (error as { message?: string })?.message;
+                                                                if (!message) return null;
+
+                                                                return (
+                                                                    <li key={fieldName}>
+                                                                        <span className="font-semibold capitalize">{fieldName}:</span> {message}
+                                                                    </li>
+                                                                );
+                                                            })}
+                                                        </ul>
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
+
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => clearErrors()}
+                                                className="h-6 w-6 p-0 hover:bg-destructive/10 rounded-sm cursor-pointer transition-colors"
+                                            >
+                                                <Check className="h-3.5 w-3.5 stroke-[2] text-destructive" />
+                                            </Button>
+                                        </div>
+                                    )}
+                                    
                                     <button
                                         type="submit"
                                         disabled={isLoading}
