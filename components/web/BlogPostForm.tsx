@@ -410,7 +410,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                                         placeholder="Summary"
                                                         rows={3}
                                                         disabled={isLoading}
-                                                        className="w-full bg-transparent p-3 pr-8 text-xs placeholder:text-xs focus:outline-none resize-y min-h-[40px]"
+                                                        className="w-full bg-transparent p-3 pr-12 text-xs placeholder:text-xs focus:outline-none resize-y min-h-[40px]"
                                                         {...field}
                                                     />
 
@@ -419,7 +419,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                                             type="button"
                                                             disabled={isLoading}
                                                             onClick={() => field.onChange("")}
-                                                            className="absolute top-2 right-2 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted cursor-pointer transition-colors"
+                                                            className="absolute top-2 right-6 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted cursor-pointer transition-colors z-10"
                                                         >
                                                             <X className="h-3.5 w-3.5 stroke-[2]" />
                                                         </button>
@@ -427,15 +427,15 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
 
                                                     <div className="flex items-center justify-end px-2.5 py-1 bg-muted/20 border-t border-border/40 text-[10px]">
                                                         <span className={cn("font-mono transition-colors", getCounterColor(currentLength))}>
-                                                        {isMet ? (
-                                                            <span>✓ {currentLength}</span>
-                                                        ) : (
-                                                            <span>{currentLength}/{minLength}</span>
-                                                        )}
+                                                            {isMet ? (
+                                                                <span>✓ {currentLength}</span>
+                                                            ) : (
+                                                                <span>{currentLength}/{minLength}</span>
+                                                            )}
                                                         </span>
                                                     </div>
                                                 </div>
-                                                
+
                                                 {fieldState.error && (
                                                     <p className="mt-1 text-xs text-destructive">{fieldState.error.message}</p>
                                                 )}
@@ -443,6 +443,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                         );
                                     }}
                                 />
+                                
                                 <Controller
                                     name="tags"
                                     control={control}

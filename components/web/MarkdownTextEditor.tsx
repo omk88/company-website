@@ -563,7 +563,7 @@ export function MarkdownTextEditor({
             onDrop={handleDrop}
             placeholder={placeholder}
             rows={9}
-            className="w-full bg-transparent p-3 pr-8 text-xs focus:outline-none disabled:opacity-50 resize-y min-h-[150px]"
+            className="w-full bg-transparent p-3 pr-12 text-xs focus:outline-none disabled:opacity-50 resize-y min-h-[150px]"
           />
 
           {content && (
@@ -574,7 +574,7 @@ export function MarkdownTextEditor({
                 handleContentChange("");
                 textareaRef.current?.focus();
               }}
-              className="absolute top-2 right-2 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted cursor-pointer transition-colors"
+              className="absolute top-2 right-6 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted cursor-pointer transition-colors z-10"
               title="Clear content"
             >
               <X className="h-3.5 w-3.5 stroke-[2]" />
