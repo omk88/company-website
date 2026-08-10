@@ -28,6 +28,7 @@ interface BlogFormValues {
     content: string;
     author: string;
     tags: string[];
+    coverImage?: File | string | null;
 }
 
 interface BlogPostFormProps {
@@ -154,7 +155,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
     const generateUploadUrl = useMutation(api.blogs.generateUploadUrl);
     
     const { control, handleSubmit, reset } = useForm<BlogFormValues>({
-        defaultValues: { title: "", subtitle: "", content: "", author: "", tags: [] }
+        defaultValues: { title: "", subtitle: "", content: "", author: "", tags: [], coverImage: null, }
     });
 
     useEffect(() => {
@@ -164,7 +165,8 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                 subtitle: existingPost.subtitle,
                 content: existingPost.content,
                 author: existingPost.author,
-                tags: existingPost.tags || []
+                tags: existingPost.tags || [],
+                coverImage: existingPost.imageUrl || null,
             });
         }
     }, [existingPost, reset]);
@@ -292,60 +294,99 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                         </span>
                         <form onSubmit={handleSubmit(onSubmit)}>
                             <FieldGroup className="gap-y-2">
-                                <Field className="w-full">
-                                    <input 
-                                        id="cover-image-upload"
-                                        ref={fileInputRef}
-                                        type="file" 
-                                        accept="image/*" 
-                                        disabled={isLoading}
-                                        className="hidden"
-                                        onChange={(e) => {
-                                            if (e.target.files && e.target.files[0]) {
-                                                const file = e.target.files[0];
-                                                setSelectedImage(file);
-                                                setImagePreviewUrl(URL.createObjectURL(file));
-                                            }
-                                        }}
-                                    />
-                                    
-                                    <label 
-                                        htmlFor="cover-image-upload"
-                                        className={cn(
-                                            "group flex items-center justify-between w-full h-8 px-2.5 rounded-md border border-input bg-background text-xs cursor-pointer hover:bg-accent/50 transition-all select-none",
-                                            "has-[button:hover]:bg-background",
-                                            "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-transparent",
-                                            isLoading && "opacity-50 cursor-not-allowed pointer-events-none"
-                                        )}
-                                    >
-                                        <span className="flex flex-row items-center gap-1.5 text-muted-foreground group-hover:text-foreground group-has-[button:hover]:text-muted-foreground transition-colors truncate max-w-[85%]">
-                                            <Paperclip className="h-3.5 w-3.5 shrink-0 stroke-[1.5]" />
-                                            <span className="truncate">
-                                                {selectedImage 
-                                                    ? selectedImage.name 
-                                                    : existingPost?.imageUrl 
-                                                        ? "Change cover image..." 
-                                                        : "Cover image..."
-                                                }
-                                            </span>
-                                        </span>
+                                <Controller
+                                    name="coverImage"
+                                    control={control}
+                                    rules={{
+                                        validate: (value) => {
+                                        if (value || existingPost?.imageUrl) return true;
+                                        return "A cover image is required";
+                                        },
+                                    }}
+                                    render={({ field, fieldState }) => {
+                                        const isInvalid = fieldState.invalid;
+                                        const errorMessage = fieldState.error?.message;
 
-                                        {imagePreviewUrl && (
-                                            <button 
-                                                type="button" 
-                                                onClick={(e) => {
-                                                    e.preventDefault(); 
-                                                    e.stopPropagation(); 
-                                                    clearImage();
-                                                }}
-                                                disabled={isLoading}
-                                                className="text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted shrink-0 transition-colors relative z-10 cursor-pointer"
-                                            >
-                                                <X className="h-3.5 w-3.5 stroke-[2]" />
-                                            </button>
-                                        )}
-                                    </label>
-                                </Field>
+                                        return (
+                                            <Field className="w-full">
+                                                <input
+                                                    id="cover-image-upload"
+                                                    ref={fileInputRef}
+                                                    type="file"
+                                                    accept="image/*"
+                                                    disabled={isLoading}
+                                                    className="hidden"
+                                                    onChange={(e) => {
+                                                        if (e.target.files && e.target.files[0]) {
+                                                        const file = e.target.files[0];
+                                                        setSelectedImage(file);
+                                                        setImagePreviewUrl(URL.createObjectURL(file));
+                                                        field.onChange(file); 
+                                                        }
+                                                    }}
+                                                />
+
+                                                <label
+                                                    htmlFor="cover-image-upload"
+                                                    className={cn(
+                                                        "group flex items-center justify-between w-full h-8 px-2.5 rounded-md border border-input bg-background text-xs cursor-pointer hover:bg-accent/50 transition-all select-none relative",
+                                                        "has-[button:hover]:bg-background",
+                                                        !isInvalid &&
+                                                        "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-transparent",
+                                                        isInvalid &&
+                                                        "border-destructive focus-within:ring-2 focus-within:ring-destructive focus-within:ring-offset-2 focus-within:border-transparent",
+                                                        isLoading && "opacity-50 cursor-not-allowed pointer-events-none"
+                                                    )}
+                                                >
+                                                    <span className="flex flex-row items-center gap-1.5 text-muted-foreground group-hover:text-foreground group-has-[button:hover]:text-muted-foreground transition-colors truncate max-w-[80%]">
+                                                        <Paperclip className="h-3.5 w-3.5 shrink-0 stroke-[1.5]" />
+                                                        <span className="truncate">
+                                                        {selectedImage
+                                                            ? selectedImage.name
+                                                            : existingPost?.imageUrl
+                                                            ? "Change cover image..."
+                                                            : "Cover image..."}
+                                                        </span>
+                                                    </span>
+
+                                                    <div className="flex items-center gap-1.5 shrink-0">
+                                                        {imagePreviewUrl && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={(e) => {
+                                                                e.preventDefault();
+                                                                e.stopPropagation();
+                                                                clearImage();
+                                                                field.onChange(null);
+                                                                }}
+                                                                disabled={isLoading}
+                                                                className="text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted shrink-0 transition-colors relative z-10 cursor-pointer"
+                                                                title="Remove image"
+                                                            >
+                                                                <X className="h-3.5 w-3.5 stroke-[2]" />
+                                                        </button>
+                                                        )}
+
+                                                        {errorMessage && (
+                                                            <TooltipProvider>
+                                                                <Tooltip delayDuration={100}>
+                                                                    <TooltipTrigger asChild>
+                                                                        <div className="flex items-center justify-center text-destructive cursor-help z-10">
+                                                                            <AlertCircle className="h-4 w-4" />
+                                                                        </div>
+                                                                    </TooltipTrigger>
+                                                                    <TooltipContent side="top" variant="destructive">
+                                                                        <p>{errorMessage}</p>
+                                                                    </TooltipContent>
+                                                                </Tooltip>
+                                                            </TooltipProvider>
+                                                        )}
+                                                    </div>
+                                                </label>
+                                            </Field>
+                                        );
+                                    }}
+                                />
 
                                 <Controller
                                     name="title"
@@ -424,64 +465,64 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                         const isMet = currentLength >= minLength;
 
                                         return (
-                                        <Field>
-                                            <div
-                                            className={cn(
-                                                "relative flex flex-col w-full rounded-md border border-input bg-background overflow-hidden transition-all",
-                                                "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-transparent",
-                                                fieldState.invalid && "border-destructive focus-within:ring-destructive",
-                                                isLoading && "opacity-50 pointer-events-none"
-                                            )}
-                                            >
-                                            <textarea
-                                                aria-invalid={fieldState.invalid}
-                                                placeholder="Summary"
-                                                rows={3}
-                                                disabled={isLoading}
-                                                className="w-full bg-transparent p-3 pr-14 text-xs placeholder:text-xs focus:outline-none resize-y min-h-[40px]"
-                                                {...field}
-                                            />
-
-                                            {field.value && (
-                                                <button
-                                                type="button"
-                                                disabled={isLoading}
-                                                onClick={() => field.onChange("")}
-                                                className={cn(
-                                                    "absolute top-2.5 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted cursor-pointer transition-colors z-10",
-                                                    fieldState.invalid ? "right-7" : "right-2"
-                                                )}
+                                            <Field>
+                                                <div
+                                                    className={cn(
+                                                        "relative flex flex-col w-full rounded-md border border-input bg-background overflow-hidden transition-all",
+                                                        "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-transparent",
+                                                        fieldState.invalid && "border-destructive focus-within:ring-destructive",
+                                                        isLoading && "opacity-50 pointer-events-none"
+                                                    )}
                                                 >
-                                                <X className="h-3.5 w-3.5 stroke-[2]" />
-                                                </button>
-                                            )}
+                                                    <textarea
+                                                        aria-invalid={fieldState.invalid}
+                                                        placeholder="Summary"
+                                                        rows={3}
+                                                        disabled={isLoading}
+                                                        className="w-full bg-transparent p-3 pr-14 text-xs placeholder:text-xs focus:outline-none resize-y min-h-[40px]"
+                                                        {...field}
+                                                    />
 
-                                            {fieldState.error && (
-                                                <TooltipProvider>
-                                                <Tooltip delayDuration={100}>
-                                                    <TooltipTrigger asChild>
-                                                    <div className="absolute top-2.5 right-2 flex items-center justify-center text-destructive cursor-help z-10">
-                                                        <AlertCircle className="h-4 w-4" />
+                                                    {field.value && (
+                                                        <button
+                                                        type="button"
+                                                        disabled={isLoading}
+                                                        onClick={() => field.onChange("")}
+                                                        className={cn(
+                                                            "absolute top-2.5 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted cursor-pointer transition-colors z-10",
+                                                            fieldState.invalid ? "right-7" : "right-2"
+                                                        )}
+                                                        >
+                                                        <X className="h-3.5 w-3.5 stroke-[2]" />
+                                                        </button>
+                                                    )}
+
+                                                    {fieldState.error && (
+                                                        <TooltipProvider>
+                                                            <Tooltip delayDuration={100}>
+                                                                <TooltipTrigger asChild>
+                                                                <div className="absolute top-2.5 right-2 flex items-center justify-center text-destructive cursor-help z-10">
+                                                                    <AlertCircle className="h-4 w-4" />
+                                                                </div>
+                                                                </TooltipTrigger>
+                                                                <TooltipContent side="top" variant="destructive">
+                                                                <p>{fieldState.error.message}</p>
+                                                                </TooltipContent>
+                                                            </Tooltip>
+                                                        </TooltipProvider>
+                                                    )}
+
+                                                    <div className="flex items-center justify-end px-2.5 py-1 bg-muted/20 border-t border-border/40 text-[10px]">
+                                                        <span className={cn("font-mono transition-colors", getCounterColor(currentLength))}>
+                                                            {isMet ? (
+                                                                <span>✓ {currentLength}</span>
+                                                            ) : (
+                                                                <span>{currentLength}/{minLength}</span>
+                                                            )}
+                                                        </span>
                                                     </div>
-                                                    </TooltipTrigger>
-                                                    <TooltipContent side="top" variant="destructive">
-                                                    <p>{fieldState.error.message}</p>
-                                                    </TooltipContent>
-                                                </Tooltip>
-                                                </TooltipProvider>
-                                            )}
-
-                                            <div className="flex items-center justify-end px-2.5 py-1 bg-muted/20 border-t border-border/40 text-[10px]">
-                                                <span className={cn("font-mono transition-colors", getCounterColor(currentLength))}>
-                                                {isMet ? (
-                                                    <span>✓ {currentLength}</span>
-                                                ) : (
-                                                    <span>{currentLength}/{minLength}</span>
-                                                )}
-                                                </span>
-                                            </div>
-                                            </div>
-                                        </Field>
+                                                </div>
+                                            </Field>
                                         );
                                     }}
                                 />
@@ -489,63 +530,108 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                 <Controller
                                     name="tags"
                                     control={control}
+                                    rules={{
+                                        validate: (value) =>
+                                        value && value.length > 0 ? true : "Please select at least one tag",
+                                    }}
                                     render={({ field, fieldState }) => {
                                         const value = field.value || [];
+                                        const isInvalid = fieldState.invalid;
+                                        const errorMessage = fieldState.error?.message;
+
                                         const toggleTag = (tag: string) => {
-                                            const newValue = value.includes(tag) ? value.filter((t) => t !== tag) : [...value, tag];
-                                            field.onChange(newValue);
+                                        const newValue = value.includes(tag)
+                                            ? value.filter((t) => t !== tag)
+                                            : [...value, tag];
+                                        field.onChange(newValue);
                                         };
 
                                         return (
-                                        <Field>
-                                            <Popover>
+                                            <Field>
+                                                <Popover>
                                                 <PopoverTrigger asChild disabled={isLoading}>
-                                                    <div className={cn(
-                                                        "flex min-h-8 w-full flex-wrap gap-1 rounded-md border border-input bg-background px-2.5 py-1 text-xs cursor-pointer items-center justify-between relative",
-                                                        fieldState.invalid && "border-destructive"
-                                                    )}>
+                                                    <div
+                                                        className={cn(
+                                                            "flex min-h-8 w-full flex-wrap gap-1 rounded-md border border-input bg-background px-2.5 py-1 text-xs cursor-pointer items-center justify-between relative transition-all",
+                                                            !isInvalid &&
+                                                            "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-transparent",
+                                                            isInvalid &&
+                                                            "border-destructive focus-within:ring-2 focus-within:ring-destructive focus-within:ring-offset-2 focus-within:border-transparent"
+                                                            )}
+                                                        >
                                                         {value.length === 0 ? (
                                                             <span className="text-muted-foreground">Tags...</span>
                                                         ) : (
-                                                            <div className="flex flex-wrap gap-1 pr-12">
+                                                            <div className="flex flex-wrap gap-1 pr-14">
                                                                 {value.map((tag) => (
-                                                                    <Badge key={tag} variant="secondary" className="text-[11px] px-1.5 py-0 h-5 font-normal capitalize">
+                                                                    <Badge
+                                                                        key={tag}
+                                                                        variant="secondary"
+                                                                        className="text-[11px] px-1.5 py-0 h-5 font-normal capitalize"
+                                                                    >
                                                                         {tag}
                                                                     </Badge>
                                                                 ))}
                                                             </div>
                                                         )}
-                                                        
-                                                        <div className="flex items-center space-x-1 absolute right-2.5 top-1/2 -translate-y-1/2">
+
+                                                        <div className="flex items-center space-x-1 absolute right-2.5 top-1/2 -translate-y-1/2 shrink-0">
                                                             {value.length > 0 && (
                                                                 <button
                                                                     type="button"
                                                                     disabled={isLoading}
                                                                     onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        field.onChange([]); 
+                                                                    e.stopPropagation();
+                                                                    field.onChange([]);
                                                                     }}
-                                                                    className="text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted cursor-pointer"
+                                                                    className="text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted cursor-pointer transition-colors"
+                                                                    title="Clear tags"
                                                                 >
                                                                     <X className="h-3 w-3 stroke-[2]" />
                                                                 </button>
                                                             )}
+
                                                             <ChevronDown className="text-muted-foreground h-3.5 w-3.5 stroke-[2]" />
+
+                                                            {errorMessage && (
+                                                                <TooltipProvider>
+                                                                    <Tooltip delayDuration={100}>
+                                                                        <TooltipTrigger asChild>
+                                                                            <div className="flex items-center justify-center text-destructive cursor-help">
+                                                                                <AlertCircle className="h-3.5 w-3.5" />
+                                                                            </div>
+                                                                        </TooltipTrigger>
+                                                                        <TooltipContent side="top" variant="destructive">
+                                                                            <p>{errorMessage}</p>
+                                                                        </TooltipContent>
+                                                                    </Tooltip>
+                                                                </TooltipProvider>
+                                                            )}
+
                                                         </div>
                                                     </div>
                                                 </PopoverTrigger>
                                                 <PopoverContent className="w-fit p-2" align="start">
                                                     <div className="space-y-1">
-                                                        {AVAILABLE_TAGS.map((tag) => (
-                                                            <div key={tag} className="flex items-center space-x-2 p-1.5 hover:bg-muted rounded-md cursor-pointer" onClick={() => toggleTag(tag)}>
-                                                                <Checkbox checked={value.includes(tag)} onCheckedChange={() => toggleTag(tag)} />
-                                                                <span className="text-xs font-medium select-none cursor-pointer capitalize">{tag}</span>
-                                                            </div>
-                                                        ))}
+                                                    {AVAILABLE_TAGS.map((tag) => (
+                                                        <div
+                                                        key={tag}
+                                                        className="flex items-center space-x-2 p-1.5 hover:bg-muted rounded-md cursor-pointer"
+                                                        onClick={() => toggleTag(tag)}
+                                                        >
+                                                        <Checkbox
+                                                            checked={value.includes(tag)}
+                                                            onCheckedChange={() => toggleTag(tag)}
+                                                        />
+                                                        <span className="text-xs font-medium select-none cursor-pointer capitalize">
+                                                            {tag}
+                                                        </span>
+                                                        </div>
+                                                    ))}
                                                     </div>
                                                 </PopoverContent>
-                                            </Popover>
-                                        </Field>
+                                                </Popover>
+                                            </Field>
                                         );
                                     }}
                                 />
