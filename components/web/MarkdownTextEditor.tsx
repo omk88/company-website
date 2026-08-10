@@ -46,6 +46,7 @@ interface MarkdownTextEditorProps {
   disabled?: boolean;
   placeholder?: string;
   error?: boolean;
+  minLength?: number;
 }
 
 export function MarkdownTextEditor({
@@ -55,6 +56,7 @@ export function MarkdownTextEditor({
   disabled = false,
   placeholder = "Post Content (Markdown)",
   error = false,
+  minLength = 500,
 }: MarkdownTextEditorProps) {
   const [internalContent, setInternalContent] = useState("");
   const [isDragging, setIsDragging] = useState(false);
@@ -401,6 +403,14 @@ export function MarkdownTextEditor({
     },
   ];
 
+  const getCounterColor = (length: number, min: number) => {
+    if (length < min * 0.5) return "text-destructive font-medium";
+    if (length < min) return "text-amber-500 dark:text-amber-400";
+    return "text-emerald-500 dark:text-emerald-400";
+  };
+
+  const isMet = content.length >= minLength;
+
   return (
     <div className="w-full max-w-2xl">
       <input
@@ -552,8 +562,8 @@ export function MarkdownTextEditor({
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             placeholder={placeholder}
-            rows={10}
-            className="w-full bg-transparent p-3 pr-8 text-xs focus:outline-none disabled:opacity-50 resize-y min-h-[230px]"
+            rows={9}
+            className="w-full bg-transparent p-3 pr-8 text-xs focus:outline-none disabled:opacity-50 resize-y min-h-[150px]"
           />
 
           {content && (
@@ -570,6 +580,16 @@ export function MarkdownTextEditor({
               <X className="h-3.5 w-3.5 stroke-[2]" />
             </button>
           )}
+        </div>
+
+        <div className="flex items-center justify-end px-2.5 py-1 bg-muted/20 border-t border-border/40 text-[10px]">
+            <span className={cn("font-mono transition-colors", getCounterColor(content.length, minLength))}>
+            {isMet ? (
+                <span>✓ {content.length}</span>
+            ) : (
+                <span>{content.length}/{minLength}</span>
+            )}
+            </span>
         </div>
       </div>
     </div>

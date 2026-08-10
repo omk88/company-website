@@ -176,8 +176,13 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
         }
     };
 
-    const onSubmit = async (data: BlogFormValues) => {
+    const getCounterColor = (length: number) => {
+        if (length < 50) return "text-destructive";
+        if (length < 100) return "text-amber-500 dark:text-amber-400";
+        return "text-emerald-500 dark:text-emerald-400";
+    };
 
+    const onSubmit = async (data: BlogFormValues) => {
         if (!userData) {
             console.error("No user data.");
             return;
@@ -279,9 +284,8 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
     return (
         <div className="w-full h-[calc(100vh-4rem)] overflow-hidden">
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] items-stretch h-full overflow-hidden">
-                
-                <div className="py-6 px-4 sm:px-6 max-h-full w-full">
-                    <div className="relative w-full border border-border rounded-md p-2">
+                <div className="py-4 px-4 sm:px-6 h-full overflow-y-auto [scrollbar-gutter:stable] min-h-0 w-full">
+                    <div className="relative w-full border border-border rounded-md p-2 my-auto">
                         <span className="absolute -top-2.5 left-3 bg-background px-1.5 text-xs font-medium text-muted-foreground">
                             Post content
                         </span>
@@ -386,42 +390,59 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                     name="subtitle"
                                     control={control}
                                     rules={{ required: "A subtitle summary is required", minLength: 100 }}
-                                    render={({ field, fieldState }) => (
-                                        <Field>
-                                            <div
-                                                className={cn(
-                                                    "relative flex w-full rounded-md border border-input bg-background overflow-hidden transition-all",
-                                                    "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-transparent",
-                                                    fieldState.invalid && "border-destructive focus-within:ring-destructive",
-                                                    isLoading && "opacity-50 pointer-events-none"
-                                                )}
-                                            >
-                                                <textarea
-                                                    aria-invalid={fieldState.invalid}
-                                                    placeholder="Summary"
-                                                    rows={3}
-                                                    disabled={isLoading}
-                                                    className="w-full bg-transparent p-3 pr-8 text-xs placeholder:text-xs focus:outline-none resize-y min-h-[25px]"
-                                                    {...field}
-                                                />
-                                                {field.value && (
-                                                    <button
-                                                        type="button"
-                                                        disabled={isLoading}
-                                                        onClick={() => field.onChange("")}
-                                                        className="absolute top-2 right-2 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted cursor-pointer transition-colors"
-                                                    >
-                                                        <X className="h-3.5 w-3.5 stroke-[2]" />
-                                                    </button>
-                                                )}
-                                            </div>
-                                            {fieldState.error && (
-                                                <p className="mt-1 text-xs text-destructive">{fieldState.error.message}</p>
-                                            )}
-                                        </Field>
-                                    )}
-                                />
+                                    render={({ field, fieldState }) => {
+                                        const currentLength = field.value?.length || 0;
+                                        const minLength = 100;
+                                        const isMet = currentLength >= minLength;
 
+                                        return (
+                                            <Field>
+                                                <div
+                                                    className={cn(
+                                                        "relative flex flex-col w-full rounded-md border border-input bg-background overflow-hidden transition-all",
+                                                        "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-transparent",
+                                                        fieldState.invalid && "border-destructive focus-within:ring-destructive",
+                                                        isLoading && "opacity-50 pointer-events-none"
+                                                    )}
+                                                >
+                                                    <textarea
+                                                        aria-invalid={fieldState.invalid}
+                                                        placeholder="Summary"
+                                                        rows={3}
+                                                        disabled={isLoading}
+                                                        className="w-full bg-transparent p-3 pr-8 text-xs placeholder:text-xs focus:outline-none resize-y min-h-[40px]"
+                                                        {...field}
+                                                    />
+
+                                                    {field.value && (
+                                                        <button
+                                                            type="button"
+                                                            disabled={isLoading}
+                                                            onClick={() => field.onChange("")}
+                                                            className="absolute top-2 right-2 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted cursor-pointer transition-colors"
+                                                        >
+                                                            <X className="h-3.5 w-3.5 stroke-[2]" />
+                                                        </button>
+                                                    )}
+
+                                                    <div className="flex items-center justify-end px-2.5 py-1 bg-muted/20 border-t border-border/40 text-[10px]">
+                                                        <span className={cn("font-mono transition-colors", getCounterColor(currentLength))}>
+                                                        {isMet ? (
+                                                            <span>✓ {currentLength}</span>
+                                                        ) : (
+                                                            <span>{currentLength}/{minLength}</span>
+                                                        )}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                
+                                                {fieldState.error && (
+                                                    <p className="mt-1 text-xs text-destructive">{fieldState.error.message}</p>
+                                                )}
+                                            </Field>
+                                        );
+                                    }}
+                                />
                                 <Controller
                                     name="tags"
                                     control={control}
@@ -532,7 +553,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                     <Separator orientation="vertical" className="h-full w-[1px]" />
                 </div>
 
-                <div className="w-full py-6 px-4 sm:px-6 overflow-y-auto max-h-full">
+                <div className="w-full py-4 px-4 sm:px-6 overflow-y-auto [scrollbar-gutter:stable] h-full min-h-0">
                     <div className="w-full">
                         <LivePostPreview control={control} previewImage={imagePreviewUrl} currentUser={userData}/>
                     </div>
