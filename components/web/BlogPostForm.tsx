@@ -321,35 +321,35 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                                         const file = e.target.files[0];
                                                         setSelectedImage(file);
                                                         setImagePreviewUrl(URL.createObjectURL(file));
-                                                        field.onChange(file); 
+                                                        field.onChange(file);
                                                         }
                                                     }}
                                                 />
 
-                                                <label
-                                                    htmlFor="cover-image-upload"
-                                                    className={cn(
-                                                        "group flex items-center justify-between w-full h-8 px-2.5 rounded-md border border-input bg-background text-xs cursor-pointer hover:bg-accent/50 transition-all select-none relative",
+                                                <div className="relative flex items-center w-full">
+                                                    <label
+                                                        htmlFor="cover-image-upload"
+                                                        className={cn(
+                                                        "group flex items-center justify-between w-full h-8 pl-2.5 pr-8 rounded-md border border-input bg-background text-xs cursor-pointer hover:bg-accent/50 transition-all select-none relative",
                                                         "has-[button:hover]:bg-background",
                                                         !isInvalid &&
-                                                        "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-transparent",
+                                                            "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-transparent",
                                                         isInvalid &&
-                                                        "border-destructive focus-within:ring-2 focus-within:ring-destructive focus-within:ring-offset-2 focus-within:border-transparent",
+                                                            "border-destructive focus-within:ring-2 focus-within:ring-destructive focus-within:ring-offset-2 focus-within:border-transparent",
                                                         isLoading && "opacity-50 cursor-not-allowed pointer-events-none"
-                                                    )}
-                                                >
-                                                    <span className="flex flex-row items-center gap-1.5 text-muted-foreground group-hover:text-foreground group-has-[button:hover]:text-muted-foreground transition-colors truncate max-w-[80%]">
-                                                        <Paperclip className="h-3.5 w-3.5 shrink-0 stroke-[1.5]" />
-                                                        <span className="truncate">
-                                                        {selectedImage
-                                                            ? selectedImage.name
-                                                            : existingPost?.imageUrl
-                                                            ? "Change cover image..."
-                                                            : "Cover image..."}
+                                                        )}
+                                                    >
+                                                        <span className="flex flex-row items-center gap-1.5 text-muted-foreground group-hover:text-foreground group-has-[button:hover]:text-muted-foreground transition-colors truncate max-w-[75%]">
+                                                            <Paperclip className="h-3.5 w-3.5 shrink-0 stroke-[1.5]" />
+                                                            <span className="truncate">
+                                                                {selectedImage
+                                                                ? selectedImage.name
+                                                                : existingPost?.imageUrl
+                                                                ? "Change cover image..."
+                                                                : "Cover image..."}
+                                                            </span>
                                                         </span>
-                                                    </span>
 
-                                                    <div className="flex items-center gap-1.5 shrink-0">
                                                         {imagePreviewUrl && (
                                                             <button
                                                                 type="button"
@@ -360,29 +360,32 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                                                 field.onChange(null);
                                                                 }}
                                                                 disabled={isLoading}
-                                                                className="text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted shrink-0 transition-colors relative z-10 cursor-pointer"
+                                                                className={cn(
+                                                                "text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted shrink-0 transition-colors relative z-10 cursor-pointer absolute",
+                                                                errorMessage ? "right-7" : "right-2"
+                                                                )}
                                                                 title="Remove image"
                                                             >
                                                                 <X className="h-3.5 w-3.5 stroke-[2]" />
-                                                        </button>
+                                                            </button>
                                                         )}
+                                                    </label>
 
-                                                        {errorMessage && (
-                                                            <TooltipProvider>
-                                                                <Tooltip delayDuration={100}>
-                                                                    <TooltipTrigger asChild>
-                                                                        <div className="flex items-center justify-center text-destructive cursor-help z-10">
-                                                                            <AlertCircle className="h-4 w-4" />
-                                                                        </div>
-                                                                    </TooltipTrigger>
-                                                                    <TooltipContent side="top" variant="destructive">
-                                                                        <p>{errorMessage}</p>
-                                                                    </TooltipContent>
-                                                                </Tooltip>
-                                                            </TooltipProvider>
-                                                        )}
-                                                    </div>
-                                                </label>
+                                                    {errorMessage && (
+                                                        <TooltipProvider>
+                                                        <Tooltip delayDuration={100}>
+                                                            <TooltipTrigger asChild>
+                                                            <div className="absolute right-2 flex items-center justify-center text-destructive cursor-help z-10 pointer-events-auto">
+                                                                <AlertCircle className="h-4 w-4" />
+                                                            </div>
+                                                            </TooltipTrigger>
+                                                            <TooltipContent side="top" variant="destructive">
+                                                            <p>{errorMessage}</p>
+                                                            </TooltipContent>
+                                                        </Tooltip>
+                                                        </TooltipProvider>
+                                                    )}
+                                                </div>
                                             </Field>
                                         );
                                     }}
