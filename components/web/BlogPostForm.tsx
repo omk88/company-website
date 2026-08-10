@@ -280,8 +280,8 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
         <div className="w-full h-[calc(100vh-4rem)] overflow-hidden">
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] items-stretch h-full overflow-hidden">
                 
-                <div className="py-6 pl-4 sm:pl-8 lg:pl-12 pr-6 max-h-full">
-                    <div className="relative w-full border border-border rounded-md p-2 max-w-xl ml-auto">
+                <div className="py-6 px-4 sm:px-6 max-h-full w-full">
+                    <div className="relative w-full border border-border rounded-md p-2">
                         <span className="absolute -top-2.5 left-3 bg-background px-1.5 text-xs font-medium text-muted-foreground">
                             Post content
                         </span>
@@ -512,8 +512,8 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                     <Separator orientation="vertical" className="h-full w-[1px]" />
                 </div>
 
-                <div className="w-full py-6 pl-6 pr-4 sm:pr-8 lg:pr-12 overflow-y-auto max-h-full">
-                    <div className="max-w-xl mr-auto">
+                <div className="w-full py-6 px-4 sm:px-6 overflow-y-auto max-h-full">
+                    <div className="w-full">
                         <LivePostPreview control={control} previewImage={imagePreviewUrl} currentUser={userData}/>
                     </div>
                 </div>
