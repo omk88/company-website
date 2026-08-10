@@ -11,7 +11,7 @@ export default function GridBackground({ children }: { children: React.ReactNode
 
   return (
     <div 
-      className="min-h-screen w-full bg-white dark:bg-[#030712] transition-colors duration-300 relative [--line-color:rgba(148,163,184,0.3)] dark:[--line-color:rgba(51,65,85,0.3)]"
+      className="w-full bg-white dark:bg-[#030712] relative [--line-color:rgba(148,163,184,0.3)] dark:[--line-color:rgba(51,65,85,0.3)]"
     >
       
       <div 

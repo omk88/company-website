@@ -7,6 +7,14 @@ import GridBackground from "@/components/web/GridBackground";
 import { Suspense } from "react";
 import { ConvexClientProvider } from "./ConvexClientProvider";
 import { BookmarksProvider } from "@/providers/BookmarksProvider";
+import { authClient } from "@/lib/auth-client";
+import { headers } from "next/headers";
+import dynamic from "next/dynamic";
+
+
+const Navbar = dynamic(() => import("@/components/web/Navbar").then((mod) => mod.Navbar), {
+  ssr: true,
+});
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -28,14 +36,22 @@ export const metadata: Metadata = {
   description: "Description"
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
+  const session = await authClient.getSession({
+    fetchOptions: { headers: await headers() },
+  });
+
+  const userIsAuthenticated = !!session?.data?.user;
+  const initialImage = session?.data?.user?.image || null;
+
   return (
-    <html lang="en" suppressHydrationWarning className="h-full">
-      <body className={`${jetBrainsMono.variable} ${poppins.variable} min-h-full flex flex-col bg-background text-foreground transition-colors duration-300 font-sans antialiased`}>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${jetBrainsMono.variable} ${poppins.variable} flex flex-col bg-background text-foreground font-sans`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -43,10 +59,11 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <GridBackground>
-            <main className="w-full flex-1 flex flex-col pt-16">
+            <main>
               <Suspense>
                 <ConvexClientProvider>
                   <BookmarksProvider>
+                    <Navbar isAuth={userIsAuthenticated} initialImage={initialImage} />
                     {children}
                   </BookmarksProvider>
                 </ConvexClientProvider>

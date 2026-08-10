@@ -21,7 +21,7 @@ export default async function InsightsPage() {
           <LeftSidebar />
         </aside>
 
-        <div className="w-full min-w-0 flex flex-col min-h-screen">
+        <div className="w-full min-w-0 flex flex-col min-h-[calc(100vh-4rem)] pt-16">
 
           <section 
             id="blog-grid-section" 

@@ -18,9 +18,8 @@ const HOME_MODELS = ['/cube2.glb', '/cube4.glb', '/cube5.glb', '/cube7.glb', '/c
 
 export default function Home() {
   return (
-    <div className="w-full relative overflow-x-hidden py-12 lg:py-0">
-      
-      <section className="min-h-screen h-screen w-full flex items-center justify-center">
+    <div className="w-full relative">
+      <section className="w-full flex items-center justify-center pt-16 min-h-[calc(100vh-4rem)]">
         <div className="w-full max-w-6xl mx-auto px-6 box-border">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-center w-full justify-items-center">
             

@@ -5,12 +5,11 @@ interface PageProps {
 }
 
 export default async function Blog({ searchParams }: PageProps) {
-  
   const resolvedParams = await searchParams;
   const blogId = typeof resolvedParams.id === "string" ? resolvedParams.id : undefined;
 
   return (
-    <div className="bg-white dark:bg-zinc-900 min-h-screen flex flex-col">
+    <div className="w-full bg-white dark:bg-zinc-900 pt-16 min-h-[calc(100vh-4rem)]">
       <BlogPostForm key={blogId ?? "new"} editingBlogId={blogId} />
     </div>
   );

@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 export default async function ProductsLayout({ children }: { children: ReactNode }) {
   
   return (
-    <div>
+    <div className="pt-16 min-h-[calc(100vh-4rem)]">
         {children} 
         <Footer />
     </div>
