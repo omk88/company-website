@@ -14,7 +14,6 @@ import { Separator } from "../ui/separator";
 import { Id } from "@/convex/_generated/dataModel";
 import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
-import { Textarea } from "../ui/textarea";
 import { ChevronDown, Image, Paperclip, X } from "lucide-react";
 import imageCompression from "browser-image-compression";
 import { FunctionReturnType } from "convex/server";
@@ -278,234 +277,245 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
     };
     
     return (
-        <div className="w-full max-w-7xl mx-auto py-4 grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-            <div className="relative w-full border border-border rounded-md p-2">
-                <span className="absolute -top-2.5 left-3 bg-background px-1.5 text-xs font-medium text-muted-foreground">
-                    Post content
-                </span>
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <FieldGroup className="gap-y-2">
-                        <Field className="w-full">
-                            <input 
-                                id="cover-image-upload"
-                                ref={fileInputRef}
-                                type="file" 
-                                accept="image/*" 
-                                disabled={isLoading}
-                                className="hidden"
-                                onChange={(e) => {
-                                    if (e.target.files && e.target.files[0]) {
-                                        const file = e.target.files[0];
-                                        setSelectedImage(file);
-                                        setImagePreviewUrl(URL.createObjectURL(file));
-                                    }
-                                }}
-                            />
-                            
-                            <label 
-                                htmlFor="cover-image-upload"
-                                className={cn(
-                                    "group flex items-center justify-between w-full h-8 px-2.5 rounded-md border border-input bg-background text-xs cursor-pointer hover:bg-accent/50 transition-all select-none",
-                                    "has-[button:hover]:bg-background",
-                                    "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-transparent",
-                                    isLoading && "opacity-50 cursor-not-allowed pointer-events-none"
-                                )}
-                            >
-                                <span className="flex flex-row items-center gap-1.5 text-muted-foreground group-hover:text-foreground group-has-[button:hover]:text-muted-foreground transition-colors truncate max-w-[85%]">
-                                    <Paperclip className="h-3.5 w-3.5 shrink-0 stroke-[1.5]" />
-                                    <span className="truncate">
-                                        {selectedImage 
-                                            ? selectedImage.name 
-                                            : existingPost?.imageUrl 
-                                                ? "Change cover image..." 
-                                                : "Cover image..."
-                                        }
-                                    </span>
-                                </span>
-
-                                {imagePreviewUrl && (
-                                    <button 
-                                        type="button" 
-                                        onClick={(e) => {
-                                            e.preventDefault(); 
-                                            e.stopPropagation(); 
-                                            clearImage();
-                                        }}
+        <div className="w-full max-w-7xl mx-auto min-h-[calc(100vh-4rem)]">
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] items-stretch min-h-full">
+                {/* Form Column */}
+                <div className="py-4 pr-0 lg:pr-8">
+                    <div className="relative w-full border border-border rounded-md p-2">
+                        <span className="absolute -top-2.5 left-3 bg-background px-1.5 text-xs font-medium text-muted-foreground">
+                            Post content
+                        </span>
+                        <form onSubmit={handleSubmit(onSubmit)}>
+                            <FieldGroup className="gap-y-2">
+                                <Field className="w-full">
+                                    <input 
+                                        id="cover-image-upload"
+                                        ref={fileInputRef}
+                                        type="file" 
+                                        accept="image/*" 
                                         disabled={isLoading}
-                                        className="text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted shrink-0 transition-colors relative z-10 cursor-pointer"
-                                    >
-                                        <X className="h-3.5 w-3.5 stroke-[2]" />
-                                    </button>
-                                )}
-                            </label>
-                        </Field>
-
-                        <Controller
-                            name="title"
-                            control={control}
-                            rules={{ required: "A blog title is required", minLength: 6 }}
-                            render={({ field, fieldState }) => (
-                                <Field>
-                                    <div
+                                        className="hidden"
+                                        onChange={(e) => {
+                                            if (e.target.files && e.target.files[0]) {
+                                                const file = e.target.files[0];
+                                                setSelectedImage(file);
+                                                setImagePreviewUrl(URL.createObjectURL(file));
+                                            }
+                                        }}
+                                    />
+                                    
+                                    <label 
+                                        htmlFor="cover-image-upload"
                                         className={cn(
-                                            "flex items-center w-full h-8 rounded-md border border-input bg-background overflow-hidden transition-all",
+                                            "group flex items-center justify-between w-full h-8 px-2.5 rounded-md border border-input bg-background text-xs cursor-pointer hover:bg-accent/50 transition-all select-none",
+                                            "has-[button:hover]:bg-background",
+                                            "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-transparent",
+                                            isLoading && "opacity-50 cursor-not-allowed pointer-events-none"
+                                        )}
+                                    >
+                                        <span className="flex flex-row items-center gap-1.5 text-muted-foreground group-hover:text-foreground group-has-[button:hover]:text-muted-foreground transition-colors truncate max-w-[85%]">
+                                            <Paperclip className="h-3.5 w-3.5 shrink-0 stroke-[1.5]" />
+                                            <span className="truncate">
+                                                {selectedImage 
+                                                    ? selectedImage.name 
+                                                    : existingPost?.imageUrl 
+                                                        ? "Change cover image..." 
+                                                        : "Cover image..."
+                                                }
+                                            </span>
+                                        </span>
+
+                                        {imagePreviewUrl && (
+                                            <button 
+                                                type="button" 
+                                                onClick={(e) => {
+                                                    e.preventDefault(); 
+                                                    e.stopPropagation(); 
+                                                    clearImage();
+                                                }}
+                                                disabled={isLoading}
+                                                className="text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted shrink-0 transition-colors relative z-10 cursor-pointer"
+                                            >
+                                                <X className="h-3.5 w-3.5 stroke-[2]" />
+                                            </button>
+                                        )}
+                                    </label>
+                                </Field>
+
+                                <Controller
+                                    name="title"
+                                    control={control}
+                                    rules={{ required: "A blog title is required", minLength: 6 }}
+                                    render={({ field, fieldState }) => (
+                                        <Field>
+                                            <div
+                                                className={cn(
+                                                    "flex items-center w-full h-8 rounded-md border border-input bg-background overflow-hidden transition-all",
+                                                    "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-transparent",
+                                                    fieldState.invalid && "border-destructive focus-within:ring-destructive",
+                                                    isLoading && "opacity-50 pointer-events-none"
+                                                )}
+                                            >
+                                                <input 
+                                                    aria-invalid={fieldState.invalid} 
+                                                    placeholder="Title" 
+                                                    type="text" 
+                                                    disabled={isLoading} 
+                                                    className="w-full h-full bg-transparent px-2.5 text-xs placeholder:text-xs focus:outline-none"
+                                                    {...field} 
+                                                />
+                                            </div>
+                                            {fieldState.error && (
+                                                <p className="text-xs text-destructive mt-1">{fieldState.error.message}</p>
+                                            )}
+                                        </Field>
+                                    )}
+                                />
+
+                                <Controller
+                                    name="subtitle"
+                                    control={control}
+                                    rules={{ required: "A subtitle summary is required", minLength: 100 }}
+                                    render={({ field, fieldState }) => (
+                                        <Field>
+                                        <div
+                                            className={cn(
+                                            "flex w-full rounded-md border border-input bg-background overflow-hidden transition-all",
                                             "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-transparent",
                                             fieldState.invalid && "border-destructive focus-within:ring-destructive",
                                             isLoading && "opacity-50 pointer-events-none"
+                                            )}
+                                        >
+                                            <textarea
+                                            aria-invalid={fieldState.invalid}
+                                            placeholder="Summary"
+                                            rows={3}
+                                            disabled={isLoading}
+                                            className="w-full bg-transparent p-3 text-xs placeholder:text-xs focus:outline-none resize-y min-h-[25px]"
+                                            {...field}
+                                            />
+                                        </div>
+                                        {fieldState.error && (
+                                            <p className="mt-1 text-xs text-destructive">{fieldState.error.message}</p>
                                         )}
-                                    >
-                                        <input 
-                                            aria-invalid={fieldState.invalid} 
-                                            placeholder="Title" 
-                                            type="text" 
-                                            disabled={isLoading} 
-                                            className="w-full h-full bg-transparent px-2.5 text-xs placeholder:text-xs focus:outline-none"
-                                            {...field} 
-                                        />
-                                    </div>
-                                    {fieldState.error && (
-                                        <p className="text-xs text-destructive mt-1">{fieldState.error.message}</p>
+                                        </Field>
                                     )}
-                                </Field>
-                            )}
-                        />
+                                />
 
-                        <Controller
-                            name="subtitle"
-                            control={control}
-                            rules={{ required: "A subtitle summary is required", minLength: 100 }}
-                            render={({ field, fieldState }) => (
-                                <Field>
-                                <div
-                                    className={cn(
-                                    "flex w-full rounded-md border border-input bg-background overflow-hidden transition-all",
-                                    "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-transparent",
-                                    fieldState.invalid && "border-destructive focus-within:ring-destructive",
-                                    isLoading && "opacity-50 pointer-events-none"
-                                    )}
-                                >
-                                    <textarea
-                                    aria-invalid={fieldState.invalid}
-                                    placeholder="Summary"
-                                    rows={3}
-                                    disabled={isLoading}
-                                    className="w-full bg-transparent p-3 text-xs placeholder:text-xs focus:outline-none resize-y min-h-[25px]"
-                                    {...field}
-                                    />
-                                </div>
-                                {fieldState.error && (
-                                    <p className="mt-1 text-xs text-destructive">{fieldState.error.message}</p>
-                                )}
-                                </Field>
-                            )}
-                        />
+                                <Controller
+                                    name="tags"
+                                    control={control}
+                                    render={({ field, fieldState }) => {
+                                        const value = field.value || [];
+                                        const toggleTag = (tag: string) => {
+                                            const newValue = value.includes(tag) ? value.filter((t) => t !== tag) : [...value, tag];
+                                            field.onChange(newValue);
+                                        };
 
-                        <Controller
-                            name="tags"
-                            control={control}
-                            render={({ field, fieldState }) => {
-                                const value = field.value || [];
-                                const toggleTag = (tag: string) => {
-                                    const newValue = value.includes(tag) ? value.filter((t) => t !== tag) : [...value, tag];
-                                    field.onChange(newValue);
-                                };
-
-                                return (
-                                <Field>
-                                    <Popover>
-                                        <PopoverTrigger asChild disabled={isLoading}>
-                                            <div className={cn(
-                                                "flex min-h-8 w-full flex-wrap gap-1 rounded-md border border-input bg-background px-2.5 py-1 text-xs cursor-pointer items-center justify-between relative",
-                                                fieldState.invalid && "border-destructive"
-                                            )}>
-                                                {value.length === 0 ? (
-                                                    <span className="text-muted-foreground">Tags...</span>
-                                                ) : (
-                                                    <div className="flex flex-wrap gap-1 pr-12">
-                                                        {value.map((tag) => (
-                                                            <Badge key={tag} variant="secondary" className="text-[11px] px-1.5 py-0 h-5 font-normal capitalize">
-                                                                {tag}
-                                                            </Badge>
+                                        return (
+                                        <Field>
+                                            <Popover>
+                                                <PopoverTrigger asChild disabled={isLoading}>
+                                                    <div className={cn(
+                                                        "flex min-h-8 w-full flex-wrap gap-1 rounded-md border border-input bg-background px-2.5 py-1 text-xs cursor-pointer items-center justify-between relative",
+                                                        fieldState.invalid && "border-destructive"
+                                                    )}>
+                                                        {value.length === 0 ? (
+                                                            <span className="text-muted-foreground">Tags...</span>
+                                                        ) : (
+                                                            <div className="flex flex-wrap gap-1 pr-12">
+                                                                {value.map((tag) => (
+                                                                    <Badge key={tag} variant="secondary" className="text-[11px] px-1.5 py-0 h-5 font-normal capitalize">
+                                                                        {tag}
+                                                                    </Badge>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                        
+                                                        <div className="flex items-center space-x-1 absolute right-2.5 top-1/2 -translate-y-1/2">
+                                                            {value.length > 0 && (
+                                                                <button
+                                                                    type="button"
+                                                                    disabled={isLoading}
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        field.onChange([]); 
+                                                                    }}
+                                                                    className="text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted cursor-pointer"
+                                                                >
+                                                                    <X className="h-3 w-3 stroke-[2]" />
+                                                                </button>
+                                                            )}
+                                                            <ChevronDown className="text-muted-foreground h-3.5 w-3.5 stroke-[2]" />
+                                                        </div>
+                                                    </div>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="w-fit p-2" align="start">
+                                                    <div className="space-y-1">
+                                                        {AVAILABLE_TAGS.map((tag) => (
+                                                            <div key={tag} className="flex items-center space-x-2 p-1.5 hover:bg-muted rounded-md cursor-pointer" onClick={() => toggleTag(tag)}>
+                                                                <Checkbox checked={value.includes(tag)} onCheckedChange={() => toggleTag(tag)} />
+                                                                <span className="text-xs font-medium select-none cursor-pointer capitalize">{tag}</span>
+                                                            </div>
                                                         ))}
                                                     </div>
-                                                )}
-                                                
-                                                <div className="flex items-center space-x-1 absolute right-2.5 top-1/2 -translate-y-1/2">
-                                                    {value.length > 0 && (
-                                                        <button
-                                                            type="button"
-                                                            disabled={isLoading}
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                field.onChange([]); 
-                                                            }}
-                                                            className="text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted cursor-pointer"
-                                                        >
-                                                            <X className="h-3 w-3 stroke-[2]" />
-                                                        </button>
-                                                    )}
-                                                    <ChevronDown className="text-muted-foreground h-3.5 w-3.5 stroke-[2]" />
-                                                </div>
-                                            </div>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-fit p-2" align="start">
-                                            <div className="space-y-1">
-                                                {AVAILABLE_TAGS.map((tag) => (
-                                                    <div key={tag} className="flex items-center space-x-2 p-1.5 hover:bg-muted rounded-md cursor-pointer" onClick={() => toggleTag(tag)}>
-                                                        <Checkbox checked={value.includes(tag)} onCheckedChange={() => toggleTag(tag)} />
-                                                        <span className="text-xs font-medium select-none cursor-pointer capitalize">{tag}</span>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </PopoverContent>
-                                    </Popover>
-                                </Field>
-                                );
-                            }}
-                        />
+                                                </PopoverContent>
+                                            </Popover>
+                                        </Field>
+                                        );
+                                    }}
+                                />
 
-                        <Controller
-                            name="content"
-                            control={control}
-                            rules={{ required: "Blog content cannot be empty" }}
-                            render={({ field, fieldState }) => (
-                                <Field className="w-full">
-                                    <MarkdownTextEditor
-                                        value={field.value || ""}
-                                        onChange={field.onChange}
-                                        onBlur={field.onBlur}
-                                        disabled={isLoading}
-                                        error={fieldState.invalid}
-                                    />
-                                    {fieldState.error && (
-                                        <p className="text-xs text-destructive mt-1">
-                                            {fieldState.error.message}
-                                        </p>
+                                <Controller
+                                    name="content"
+                                    control={control}
+                                    rules={{ required: "Blog content cannot be empty" }}
+                                    render={({ field, fieldState }) => (
+                                        <Field className="w-full">
+                                            <MarkdownTextEditor
+                                                value={field.value || ""}
+                                                onChange={field.onChange}
+                                                onBlur={field.onBlur}
+                                                disabled={isLoading}
+                                                error={fieldState.invalid}
+                                            />
+                                            {fieldState.error && (
+                                                <p className="text-xs text-destructive mt-1">
+                                                    {fieldState.error.message}
+                                                </p>
+                                            )}
+                                        </Field>
                                     )}
-                                </Field>
-                            )}
-                        />
+                                />
 
-                        <div className="flex items-center justify-end">
-                            <button
-                                type="submit"
-                                disabled={isLoading}
-                                className={cn(
-                                    "inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-neutral-900 text-neutral-50 hover:bg-neutral-900/90 dark:bg-neutral-50 dark:text-neutral-900 dark:hover:bg-neutral-50/90 p-2 w-full sm:w-auto cursor-pointer",
-                                    isLoading && "cursor-not-allowed opacity-70"
-                                )}
-                            >
-                                {isLoading 
-                                    ? (editingBlogId ? "Updating..." : "Publishing...") 
-                                    : (editingBlogId ? "Update Post" : "Publish Post")
-                                }
-                            </button>
-                        </div>
-                        
-                    </FieldGroup>
-                </form>
+                                <div className="flex items-center justify-end">
+                                    <button
+                                        type="submit"
+                                        disabled={isLoading}
+                                        className={cn(
+                                            "inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-neutral-900 text-neutral-50 hover:bg-neutral-900/90 dark:bg-neutral-50 dark:text-neutral-900 dark:hover:bg-neutral-50/90 p-2 w-full sm:w-auto cursor-pointer",
+                                            isLoading && "cursor-not-allowed opacity-70"
+                                        )}
+                                    >
+                                        {isLoading 
+                                            ? (editingBlogId ? "Updating..." : "Publishing...") 
+                                            : (editingBlogId ? "Update Post" : "Publish Post")
+                                        }
+                                    </button>
+                                </div>
+                            </FieldGroup>
+                        </form>
+                    </div>
+                </div>
+
+                <div className="hidden lg:flex items-stretch justify-center h-full">
+                    <Separator orientation="vertical" className="h-full w-[1px]" />
+                </div>
+
+                <div className="w-full py-4 pl-0 lg:pl-8">
+                    <LivePostPreview control={control} previewImage={imagePreviewUrl} currentUser={userData}/>
+                </div>
             </div>
-            <LivePostPreview control={control} previewImage={imagePreviewUrl} currentUser={userData}/>
         </div>
     );
 }
