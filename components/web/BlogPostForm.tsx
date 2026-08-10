@@ -78,7 +78,7 @@ function LivePostPreview({ control, previewImage, currentUser }: { control: Cont
     return (
         <div>
             <div className="w-full">
-                <div className="relative w-full h-[240px] mb-2 overflow-hidden rounded-lg flex items-center justify-center border">
+                <div className="relative w-full h-[240px] mb-2 overflow-hidden rounded-lg flex items-center justify-center border mt-2">
                     {previewImage ? (
                         <img 
                             src={previewImage} 
@@ -285,7 +285,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
         <div className="w-full h-[calc(100vh-4rem)] overflow-hidden">
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] items-stretch h-full overflow-hidden">
                 <div className="py-4 px-4 sm:px-6 h-full overflow-y-auto [scrollbar-gutter:stable] min-h-0 w-full">
-                    <div className="relative w-full border border-border rounded-md p-2 my-auto">
+                    <div className="relative w-full border border-border rounded-md p-2 mt-2 my-auto">
                         <span className="absolute -top-2.5 left-3 bg-background px-1.5 text-xs font-medium text-muted-foreground">
                             Post content
                         </span>
