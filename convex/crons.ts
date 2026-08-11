@@ -10,4 +10,10 @@ crons.daily(
     api.avatarCleanup.purgeOrphanedFiles
 );
 
+crons.daily(
+  "cleanup-orphaned-post-images",
+  { hourUTC: 1, minuteUTC: 0 },
+  api.postImageCleanup.purgeOrphanedPostImages
+);
+
 export default crons;

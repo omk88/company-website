@@ -196,6 +196,16 @@ const schema = defineSchema({
   })
   .index("by_storageId", ["storageId"]),
 
+  uploadedPostImage: defineTable({
+    storageId: v.id("_storage"),
+    fullUrl: v.string(),
+    isClaimed: v.boolean(),
+    postId: v.optional(v.id("posts")),
+  })
+    .index("by_claimed", ["isClaimed"])
+    .index("by_fullUrl", ["fullUrl"])
+    .index("by_storageId", ["storageId"]),
+
   follows: defineTable({
     followerId: v.id("profiles"),
     followingId: v.id("profiles"),

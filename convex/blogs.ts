@@ -27,6 +27,9 @@ export const createPost = mutation({
     postType: v.union(v.literal("community"), v.literal("team")),
   },
   handler: async (ctx, args) => {
+
+    await claimMarkdownImages(ctx, args.content);
+
     const generatedImageUrl = await ctx.storage.getUrl(args.storageId);
 
     const words = args.content.trim().split(/\s+/);
@@ -410,6 +413,9 @@ export const updatePost = mutation({
     storageId: v.string(), 
   },
   handler: async (ctx, args) => {
+
+    await claimMarkdownImages(ctx, args.content);
+
     const { blogId, ...fieldsToUpdate } = args;
     const currentPost = await ctx.db.get(blogId);
     if (!currentPost) return null;
@@ -1125,3 +1131,17 @@ export const getSearchSuggestions = query({
     }));
   },
 });
+
+async function claimMarkdownImages(ctx: any, content: string) {
+  const unclaimedRecords = await ctx.db
+    .query("uploadedPostImage")
+    .withIndex("by_claimed", (q: any) => q.eq("isClaimed", false))
+    .collect();
+
+  for (const record of unclaimedRecords) {
+    if (content.includes(record.fullUrl)) {
+      await ctx.db.patch(record._id, { isClaimed: true });
+      console.log(`Successfully claimed image: ${record.fullUrl}`);
+    }
+  }
+}

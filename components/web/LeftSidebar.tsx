@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, TrendingUp, Users2, Globe, Plus } from "lucide-react";
+import { TrendingUp, Users2, Globe, Plus, Library } from "lucide-react";
 import { Separator } from "../ui/separator";
 import { 
   Sidebar, 
@@ -21,7 +21,7 @@ import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 
 const NAV_ITEMS = [
-  { id: "home", label: "Home", icon: Home },
+  { id: "all", label: "All Insights", icon: Library },
   { id: "popular", label: "Popular", icon: TrendingUp },
   { id: "team", label: "Team", icon: Users2 },
   { id: "community", label: "Community", icon: Globe },

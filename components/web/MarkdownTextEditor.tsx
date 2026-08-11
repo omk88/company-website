@@ -98,7 +98,9 @@ export function MarkdownTextEditor({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const convex = useConvex();
-  const generateUploadUrl = useMutation(api.files.generateUploadUrl);
+  const generateUploadUrlMutation = useMutation(api.files.generateUploadUrl);
+
+  const trackUploadMutation = useMutation(api.postImageCleanup.trackUpload);
 
   const handleContentChange = (newContent: string) => {
     if (onChange) {
@@ -142,7 +144,7 @@ export function MarkdownTextEditor({
     try {
       const fileToUpload = await compressImage(file);
 
-      const postUrl = await generateUploadUrl();
+      const postUrl = await generateUploadUrlMutation();
 
       const result = await fetch(postUrl, {
         method: "POST",
@@ -157,6 +159,11 @@ export function MarkdownTextEditor({
       const imageUrl = await convex.query(api.files.getImageUrl, { storageId });
 
       if (!imageUrl) throw new Error("Could not retrieve image URL from Convex");
+
+      await trackUploadMutation({ 
+        storageId, 
+        fullUrl: imageUrl 
+      });
 
       const finalMarkdown = `![${altText}](${imageUrl})`;
 
