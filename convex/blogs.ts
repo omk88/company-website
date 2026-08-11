@@ -903,7 +903,7 @@ export const getTrendingPosts = query({
       recentViews = await ctx.db
         .query("viewLogs")
         .withIndex("by_viewedAt", (q) => q.gte("viewedAt", timeCutoff))
-        .take(1000);
+        .take(10);
 
       if (recentViews.length === 0) {
         currentDays += STEP_DAYS;
@@ -1096,5 +1096,32 @@ export const getUserBookmarkIds = query({
       .collect();
 
     return bookmarks.map((bookmark) => bookmark.blogId);
+  },
+});
+
+export const getSearchSuggestions = query({
+  args: {
+    searchTerm: v.string(),
+    postType: v.optional(v.union(v.literal("team"), v.literal("community"))),
+  },
+  handler: async (ctx, args) => {
+    const cleanSearchTerm = args.searchTerm.trim();
+    if (!cleanSearchTerm) return [];
+
+    const results = await ctx.db
+      .query("blogs")
+      .withSearchIndex(
+        args.postType ? "search_title_by_type" : "search_title",
+        (q) => {
+          const search = q.search("title", cleanSearchTerm);
+          return args.postType ? search.eq("postType", args.postType) : search;
+        }
+      )
+      .take(8);
+
+    return results.map((blog) => ({
+      _id: blog._id,
+      title: blog.title,
+    }));
   },
 });

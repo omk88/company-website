@@ -21,7 +21,7 @@ import {
   X,
   AlertCircle,
 } from "lucide-react";
-import { useMutation } from "convex/react";
+import { useConvex, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -39,6 +39,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Id } from "@/convex/_generated/dataModel";
 
 interface MarkdownTextEditorProps {
   value?: string;
@@ -70,6 +71,7 @@ export function MarkdownTextEditor({
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  const convex = useConvex();
   const generateUploadUrl = useMutation(api.files.generateUploadUrl);
 
   const handleContentChange = (newContent: string) => {
@@ -107,7 +109,7 @@ export function MarkdownTextEditor({
     if (!file.type.startsWith("image/")) return;
 
     const altText = file.name.replace(/\.[^/.]+$/, "");
-    const placeholderText = `![Uploading ${file.name}...]()`;
+    const placeholderText = `![Uploading ${file.name}...](#)`;
 
     insertTextAtCursor(placeholderText);
 
@@ -122,14 +124,28 @@ export function MarkdownTextEditor({
 
       if (!result.ok) throw new Error("Failed to upload image.");
 
-      const { storageId } = await result.json();
-      const imageUrl = `${process.env.NEXT_PUBLIC_CONVEX_URL}/api/storage/${storageId}`;
+      const { storageId } = (await result.json()) as { storageId: Id<"_storage"> };
+
+      const imageUrl = await convex.query(api.files.getImageUrl, { storageId });
+
+      if (!imageUrl) {
+        throw new Error("Could not retrieve image URL from Convex");
+      }
+
       const finalMarkdown = `![${altText}](${imageUrl})`;
 
-      handleContentChange(content.replace(placeholderText, finalMarkdown));
+      if (textareaRef.current) {
+        const currentText = textareaRef.current.value;
+        handleContentChange(currentText.replace(placeholderText, finalMarkdown));
+      }
     } catch (err) {
       console.error("Image upload failed:", err);
-      handleContentChange(content.replace(placeholderText, `![Upload failed: ${file.name}]()`));
+      if (textareaRef.current) {
+        const currentText = textareaRef.current.value;
+        handleContentChange(
+          currentText.replace(placeholderText, `![Upload failed: ${file.name}](#)`)
+        );
+      }
     }
   };
 
