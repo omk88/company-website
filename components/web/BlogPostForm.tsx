@@ -388,16 +388,16 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
 
                                                     {errorMessage && (
                                                         <TooltipProvider>
-                                                        <Tooltip delayDuration={100}>
-                                                            <TooltipTrigger asChild>
-                                                            <div className="absolute right-2 flex items-center justify-center text-destructive cursor-help z-10 pointer-events-auto">
-                                                                <AlertCircle className="h-4 w-4" />
-                                                            </div>
-                                                            </TooltipTrigger>
-                                                            <TooltipContent side="top" variant="destructive">
-                                                            <p>{errorMessage}</p>
-                                                            </TooltipContent>
-                                                        </Tooltip>
+                                                            <Tooltip delayDuration={100}>
+                                                                <TooltipTrigger asChild>
+                                                                    <div className="absolute right-2 flex items-center justify-center text-destructive cursor-help z-10 pointer-events-auto">
+                                                                        <AlertCircle className="h-4 w-4" />
+                                                                    </div>
+                                                                </TooltipTrigger>
+                                                                <TooltipContent side="top" variant="destructive">
+                                                                    <p>{errorMessage}</p>
+                                                                </TooltipContent>
+                                                            </Tooltip>
                                                         </TooltipProvider>
                                                     )}
                                                 </div>
@@ -567,87 +567,87 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                         return (
                                             <Field>
                                                 <Popover>
-                                                <PopoverTrigger asChild disabled={isLoading}>
-                                                    <div
-                                                        className={cn(
-                                                            "flex min-h-8 w-full flex-wrap gap-1 rounded-md border border-input bg-background px-2.5 py-1 text-xs cursor-pointer items-center justify-between relative transition-all",
-                                                            !isInvalid &&
-                                                            "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-transparent",
-                                                            isInvalid &&
-                                                            "border-destructive focus-within:ring-2 focus-within:ring-destructive focus-within:ring-offset-2 focus-within:border-transparent"
-                                                            )}
-                                                        >
-                                                        {value.length === 0 ? (
-                                                            <span className="text-muted-foreground">Tags...</span>
-                                                        ) : (
-                                                            <div className="flex flex-wrap gap-1 pr-14">
-                                                                {value.map((tag) => (
-                                                                    <Badge
-                                                                        key={tag}
-                                                                        variant="secondary"
-                                                                        className="text-[11px] px-1.5 py-0 h-5 font-normal capitalize"
-                                                                    >
-                                                                        {tag}
-                                                                    </Badge>
-                                                                ))}
-                                                            </div>
-                                                        )}
-
-                                                        <div className="flex items-center space-x-1 absolute right-2.5 top-1/2 -translate-y-1/2 shrink-0">
-                                                            {value.length > 0 && (
-                                                                <button
-                                                                    type="button"
-                                                                    disabled={isLoading}
-                                                                    onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    field.onChange([]);
-                                                                    }}
-                                                                    className="text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted cursor-pointer transition-colors"
-                                                                    title="Clear tags"
-                                                                >
-                                                                    <X className="h-3 w-3 stroke-[2]" />
-                                                                </button>
-                                                            )}
-
-                                                            <ChevronDown className="text-muted-foreground h-3.5 w-3.5 stroke-[2]" />
-
-                                                            {errorMessage && (
-                                                                <TooltipProvider>
-                                                                    <Tooltip delayDuration={100}>
-                                                                        <TooltipTrigger asChild>
-                                                                            <div className="flex items-center justify-center text-destructive cursor-help">
-                                                                                <AlertCircle className="h-3.5 w-3.5" />
-                                                                            </div>
-                                                                        </TooltipTrigger>
-                                                                        <TooltipContent side="top" variant="destructive">
-                                                                            <p>{errorMessage}</p>
-                                                                        </TooltipContent>
-                                                                    </Tooltip>
-                                                                </TooltipProvider>
-                                                            )}
-
-                                                        </div>
-                                                    </div>
-                                                </PopoverTrigger>
-                                                <PopoverContent className="w-fit p-2" align="start">
-                                                    <div className="space-y-1">
-                                                    {AVAILABLE_TAGS.map((tag) => (
+                                                    <PopoverTrigger asChild disabled={isLoading}>
                                                         <div
-                                                        key={tag}
-                                                        className="flex items-center space-x-2 p-1.5 hover:bg-muted rounded-md cursor-pointer"
-                                                        onClick={() => toggleTag(tag)}
-                                                        >
-                                                        <Checkbox
-                                                            checked={value.includes(tag)}
-                                                            onCheckedChange={() => toggleTag(tag)}
-                                                        />
-                                                        <span className="text-xs font-medium select-none cursor-pointer capitalize">
-                                                            {tag}
-                                                        </span>
+                                                            className={cn(
+                                                                "flex min-h-8 w-full flex-wrap gap-1 rounded-md border border-input bg-background px-2.5 py-1 text-xs cursor-pointer items-center justify-between relative transition-all",
+                                                                !isInvalid &&
+                                                                "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-transparent",
+                                                                isInvalid &&
+                                                                "border-destructive focus-within:ring-2 focus-within:ring-destructive focus-within:ring-offset-2 focus-within:border-transparent"
+                                                                )}
+                                                            >
+                                                            {value.length === 0 ? (
+                                                                <span className="text-muted-foreground">Tags...</span>
+                                                            ) : (
+                                                                <div className="flex flex-wrap gap-1 pr-14">
+                                                                    {value.map((tag) => (
+                                                                        <Badge
+                                                                            key={tag}
+                                                                            variant="secondary"
+                                                                            className="text-[11px] px-1.5 py-0 h-5 font-normal capitalize"
+                                                                        >
+                                                                            {tag}
+                                                                        </Badge>
+                                                                    ))}
+                                                                </div>
+                                                            )}
+
+                                                            <div className="flex items-center space-x-1 absolute right-2.5 top-1/2 -translate-y-1/2 shrink-0">
+                                                                {value.length > 0 && (
+                                                                    <button
+                                                                        type="button"
+                                                                        disabled={isLoading}
+                                                                        onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        field.onChange([]);
+                                                                        }}
+                                                                        className="text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted cursor-pointer transition-colors"
+                                                                        title="Clear tags"
+                                                                    >
+                                                                        <X className="h-3 w-3 stroke-[2]" />
+                                                                    </button>
+                                                                )}
+
+                                                                <ChevronDown className="text-muted-foreground h-3.5 w-3.5 stroke-[2]" />
+
+                                                                {errorMessage && (
+                                                                    <TooltipProvider>
+                                                                        <Tooltip delayDuration={100}>
+                                                                            <TooltipTrigger asChild>
+                                                                                <div className="flex items-center justify-center text-destructive cursor-help">
+                                                                                    <AlertCircle className="h-3.5 w-3.5" />
+                                                                                </div>
+                                                                            </TooltipTrigger>
+                                                                            <TooltipContent side="top" variant="destructive">
+                                                                                <p>{errorMessage}</p>
+                                                                            </TooltipContent>
+                                                                        </Tooltip>
+                                                                    </TooltipProvider>
+                                                                )}
+
+                                                            </div>
                                                         </div>
-                                                    ))}
-                                                    </div>
-                                                </PopoverContent>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent className="w-fit p-2" align="start">
+                                                        <div className="space-y-1">
+                                                            {AVAILABLE_TAGS.map((tag) => (
+                                                                <div
+                                                                key={tag}
+                                                                className="flex items-center space-x-2 p-1.5 hover:bg-muted rounded-md cursor-pointer"
+                                                                onClick={() => toggleTag(tag)}
+                                                                >
+                                                                <Checkbox
+                                                                    checked={value.includes(tag)}
+                                                                    onCheckedChange={() => toggleTag(tag)}
+                                                                />
+                                                                <span className="text-xs font-medium select-none cursor-pointer capitalize">
+                                                                    {tag}
+                                                                </span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </PopoverContent>
                                                 </Popover>
                                             </Field>
                                         );

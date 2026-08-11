@@ -40,6 +40,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Id } from "@/convex/_generated/dataModel";
+import imageCompression from "browser-image-compression";
 
 interface MarkdownTextEditorProps {
   value?: string;
@@ -51,6 +52,31 @@ interface MarkdownTextEditorProps {
   errorMessage?: string;
   minLength?: number;
 }
+
+const compressImage = async (file: File): Promise<File> => {
+  if (file.type === "image/gif") return file;
+
+  const options = {
+    maxSizeMB: 1.0,
+    maxWidthOrHeight: 1920,
+    useWebWorker: true,
+    fileType: "image/webp" as const,
+    initialQuality: 0.85,
+  };
+
+  try {
+    const compressedBlob = await imageCompression(file, options);
+    const originalNameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
+    const newFileName = `${originalNameWithoutExt}.webp`;
+
+    return new File([compressedBlob], newFileName, {
+      type: "image/webp",
+    });
+  } catch (error) {
+    console.warn("Image compression failed, using original file:", error);
+    return file; 
+  }
+};
 
 export function MarkdownTextEditor({
   value,
@@ -114,12 +140,14 @@ export function MarkdownTextEditor({
     insertTextAtCursor(placeholderText);
 
     try {
+      const fileToUpload = await compressImage(file);
+
       const postUrl = await generateUploadUrl();
 
       const result = await fetch(postUrl, {
         method: "POST",
-        headers: { "Content-Type": file.type },
-        body: file,
+        headers: { "Content-Type": fileToUpload.type },
+        body: fileToUpload,
       });
 
       if (!result.ok) throw new Error("Failed to upload image.");
@@ -128,9 +156,7 @@ export function MarkdownTextEditor({
 
       const imageUrl = await convex.query(api.files.getImageUrl, { storageId });
 
-      if (!imageUrl) {
-        throw new Error("Could not retrieve image URL from Convex");
-      }
+      if (!imageUrl) throw new Error("Could not retrieve image URL from Convex");
 
       const finalMarkdown = `![${altText}](${imageUrl})`;
 
