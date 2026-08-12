@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, ReactNode, useState, useEffect } from "react";
+import { createContext, useContext, ReactNode, useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 
 export type FeedType = "all" | "popular" | "team" | "community";
@@ -36,6 +36,12 @@ export function SearchProvider({ children }: { children: ReactNode }) {
 
   const updateUrlParam = (key: string, value: string | null) => {
     const params = new URLSearchParams(window.location.search);
+    const currentValue = params.get(key);
+
+    if ((value === null && !params.has(key)) || currentValue === value) {
+      return;
+    }
+
     if (!value) {
       params.delete(key);
     } else {
@@ -47,10 +53,13 @@ export function SearchProvider({ children }: { children: ReactNode }) {
     window.history.replaceState(null, "", newUrl);
   };
 
-  const setFeedType = (type: FeedType) => {
-    setFeedTypeState(type);
-    updateUrlParam("feed", type === "all" ? null : type);
-  };
+  const setFeedType = useCallback((type: FeedType) => {
+    setFeedTypeState((prev) => {
+      if (prev === type) return prev; 
+      updateUrlParam("feed", type === "all" ? null : type);
+      return type;
+    });
+  }, []);
 
   const setSearchTerm = (term: string) => {
     setSearchTermState(term);

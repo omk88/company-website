@@ -51,7 +51,7 @@ export function LeftSidebar() {
                     isActive={isActive}
                     onClick={() => setFeedType(item.id as FeedType)}
                     className={`
-                      w-full cursor-pointer justify-start px-3 py-2 rounded-xl text-sm font-medium transition-colors
+                      w-full !cursor-pointer justify-start px-3 py-2 rounded-xl text-sm font-medium transition-colors
                       data-[active=true]:hover:bg-zinc-200/50 data-[active=true]:text-foreground data-[active=true]:font-semibold
                       hover:bg-muted
                     `}
