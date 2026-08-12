@@ -56,42 +56,43 @@ function StandardBlogFeed({
     );
 
     const isFirstLoad = status === "LoadingFirstPage";
-
     const hasActiveFilters = 
         trimmedSearch.length > 0 ||
         activeTags.length > 0 || 
         sortOrder !== "new";
-
     const canUsePreloadedData = preloadedData && !hasActiveFilters;
 
-    const displayResults =
-        isFirstLoad && canUsePreloadedData ? preloadedData.page : results;
+    const lastResultsRef = useRef<any[]>([]);
+    if (results.length > 0) {
+        lastResultsRef.current = results;
+    }
 
-    const showLoadingSpinner = isFirstLoad && !canUsePreloadedData;
+    const displayResults =
+        results.length > 0
+        ? results
+        : isFirstLoad && canUsePreloadedData
+        ? preloadedData.page
+        : lastResultsRef.current;
 
     const loadMoreRef = useRef<HTMLDivElement>(null);
     const isDone = status === "Exhausted";
     const isLoadingMore = status === "LoadingMore";
 
     useEffect(() => {
-    if (!isActive || isDone || isLoadingMore || showLoadingSpinner) return;
+        if (!isActive || isDone || isLoadingMore || isFirstLoad) return;
 
-    const observer = new IntersectionObserver(
-        (entries) => {
-            if (entries[0].isIntersecting && status === "CanLoadMore") {
-                loadMore(6);
-            }
-        },
-        { rootMargin: "200px" }
-    );
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting && status === "CanLoadMore") {
+                    loadMore(6);
+                }
+            },
+            { rootMargin: "200px" }
+        );
 
-    if (loadMoreRef.current) observer.observe(loadMoreRef.current);
-    return () => observer.disconnect();
-    }, [isActive, isDone, isLoadingMore, showLoadingSpinner, status, loadMore]);
-
-    if (showLoadingSpinner) {
-        return <div className="p-4 text-center text-muted-foreground">Loading insights...</div>;
-    }
+        if (loadMoreRef.current) observer.observe(loadMoreRef.current);
+        return () => observer.disconnect();
+    }, [isActive, isDone, isLoadingMore, status, loadMore]);
 
     return (
         <>
@@ -120,10 +121,6 @@ function StandardBlogFeed({
                         ))}
                 </ul>
             )}
-
-            <div ref={loadMoreRef} className="h-10 flex items-center justify-center">
-                {isLoadingMore && <span className="text-xs text-muted-foreground">Loading more...</span>}
-            </div>
         </>
     );
 }

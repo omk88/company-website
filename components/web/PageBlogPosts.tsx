@@ -36,8 +36,8 @@ export function PageBlogPosts({ preloadedInitialFeed }: PageBlogPostsProps) {
               preloadedFeed={isActive ? preloadedInitialFeed : undefined}
             />
           </div>
-        )
+        );
       })}
     </div>
-  )
+  );
 }
