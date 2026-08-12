@@ -6,113 +6,124 @@ import { useEffect, useRef } from "react";
 import { BlogCard } from "./BlogCard";
 
 interface BlogFeedProps {
-  postType?: "community" | "team";
-  isPopularOnly?: boolean;
-  searchTerm: string;
-  activeTags: string[];
-  sortOrder: string;
-  isActive: boolean;
-  preloadedFeed?: Preloaded<typeof api.blogs.getPaginatedPostsByType>;
+    postType?: "community" | "team";
+    isPopularOnly?: boolean;
+    searchTerm: string;
+    activeTags: string[];
+    sortOrder: string;
+    isActive: boolean;
+    preloadedFeed?: Preloaded<typeof api.blogs.getPaginatedPostsByType>;
 }
 
 export function BlogFeed(props: BlogFeedProps) {
-  if (props.preloadedFeed) {
-    return <PreloadedBlogFeed {...props} preloadedFeed={props.preloadedFeed} />;
-  }
+    if (props.preloadedFeed) {
+        return <PreloadedBlogFeed {...props} preloadedFeed={props.preloadedFeed} />;
+    }
 
-  return <StandardBlogFeed {...props} />;
+    return <StandardBlogFeed {...props} />;
 }
 
 function PreloadedBlogFeed({
-  preloadedFeed,
-  ...props
+    preloadedFeed,
+    ...props
 }: BlogFeedProps & { preloadedFeed: Preloaded<typeof api.blogs.getPaginatedPostsByType> }) {
-  const preloadedData = usePreloadedQuery(preloadedFeed);
+    const preloadedData = usePreloadedQuery(preloadedFeed);
 
-  return <StandardBlogFeed {...props} preloadedData={preloadedData} />;
+    return <StandardBlogFeed {...props} preloadedData={preloadedData} />;
 }
 
 function StandardBlogFeed({
-  postType,
-  isPopularOnly,
-  searchTerm,
-  activeTags,
-  sortOrder,
-  isActive,
-  preloadedData,
+    postType,
+    isPopularOnly,
+    searchTerm,
+    activeTags,
+    sortOrder,
+    isActive,
+    preloadedData,
 }: BlogFeedProps & { preloadedData?: any }) {
-  const { results, status, loadMore } = usePaginatedQuery(
-    api.blogs.getPaginatedPostsByType,
-    {
-      postType,
-      isPopularOnly,
-      searchTerm: searchTerm.trim() || undefined,
-      activeTags: activeTags.length > 0 ? activeTags : undefined,
-      sortOrder,
-    },
-    { initialNumItems: 6 }
-  );
+    const trimmedSearch = searchTerm.trim();
+    
+    const { results, status, loadMore } = usePaginatedQuery(
+        api.blogs.getPaginatedPostsByType,
+        {
+            postType,
+            isPopularOnly,
+            searchTerm: searchTerm.trim() || undefined,
+            activeTags: activeTags.length > 0 ? activeTags : undefined,
+            sortOrder,
+        },
+        { initialNumItems: 6 }
+    );
 
-  const isFirstLoad = status === "LoadingFirstPage";
-  
-  const displayResults = isFirstLoad && preloadedData ? preloadedData.page : results;
-  const showLoadingSpinner = isFirstLoad && !preloadedData;
+    const isFirstLoad = status === "LoadingFirstPage";
 
-  const loadMoreRef = useRef<HTMLDivElement>(null);
-  const isDone = status === "Exhausted";
-  const isLoadingMore = status === "LoadingMore";
+    const hasActiveFilters = 
+        trimmedSearch.length > 0 ||
+        activeTags.length > 0 || 
+        sortOrder !== "new";
 
-  useEffect(() => {
+    const canUsePreloadedData = preloadedData && !hasActiveFilters;
+
+    const displayResults =
+        isFirstLoad && canUsePreloadedData ? preloadedData.page : results;
+
+    const showLoadingSpinner = isFirstLoad && !canUsePreloadedData;
+
+    const loadMoreRef = useRef<HTMLDivElement>(null);
+    const isDone = status === "Exhausted";
+    const isLoadingMore = status === "LoadingMore";
+
+    useEffect(() => {
     if (!isActive || isDone || isLoadingMore || showLoadingSpinner) return;
 
     const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && status === "CanLoadMore") {
-          loadMore(6);
-        }
-      },
-      { rootMargin: "200px" }
+        (entries) => {
+            if (entries[0].isIntersecting && status === "CanLoadMore") {
+                loadMore(6);
+            }
+        },
+        { rootMargin: "200px" }
     );
 
     if (loadMoreRef.current) observer.observe(loadMoreRef.current);
     return () => observer.disconnect();
-  }, [isActive, isDone, isLoadingMore, showLoadingSpinner, status, loadMore]);
+    }, [isActive, isDone, isLoadingMore, showLoadingSpinner, status, loadMore]);
 
-  if (showLoadingSpinner) {
-    return <div className="p-4 text-center text-muted-foreground">Loading insights...</div>;
-  }
+    if (showLoadingSpinner) {
+        return <div className="p-4 text-center text-muted-foreground">Loading insights...</div>;
+    }
 
-  return (
-    <>
-      {displayResults.length === 0 ? (
-        <p className="text-muted-foreground">No insights found.</p>
-      ) : (
-        <ul className="flex flex-col gap-2">
-          {displayResults.map((blog: any) => (
-            <li key={blog._id}>
-              <BlogCard
-                id={blog._id}
-                imageUrl={blog.imageUrl}
-                displayName={blog.displayName}
-                username={blog.username}
-                title={blog.title}
-                subtitle={blog.subtitle}
-                totalViews={blog.totalViews}
-                likes={blog.likes}
-                commentCount={blog.commentCount}
-                date={blog._creationTime}
-                readTime={blog.readTime}
-                tags={blog.tags}
-                isInitialBookmarked={blog.isBookmarked}
-              />
-            </li>
-          ))}
-        </ul>
-      )}
+    return (
+        <>
+            {displayResults.length === 0 ? (
+                <p className="text-muted-foreground">No insights found.</p>
+            ) : (
+                <ul className="flex flex-col gap-2">
+                    {displayResults.map((blog: any) => (
+                        <li key={blog._id}>
+                            <BlogCard
+                            id={blog._id}
+                            imageUrl={blog.imageUrl}
+                            displayName={blog.displayName}
+                            username={blog.username}
+                            title={blog.title}
+                            subtitle={blog.subtitle}
+                            totalViews={blog.totalViews}
+                            likes={blog.likes}
+                            commentCount={blog.commentCount}
+                            date={blog._creationTime}
+                            readTime={blog.readTime}
+                            tags={blog.tags}
+                            isInitialBookmarked={blog.isBookmarked}
+                            />
+                        </li>
+                        ))}
+                </ul>
+            )}
 
-      <div ref={loadMoreRef} className="h-10 flex items-center justify-center">
-        {isLoadingMore && <span className="text-xs text-muted-foreground">Loading more...</span>}
-      </div>
-    </>
-  );
+            <div ref={loadMoreRef} className="h-10 flex items-center justify-center">
+                {isLoadingMore && <span className="text-xs text-muted-foreground">Loading more...</span>}
+            </div>
+        </>
+    );
 }
