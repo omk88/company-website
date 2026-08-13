@@ -1,6 +1,14 @@
 "use client";
 
-import { createContext, useContext, ReactNode, useState, useEffect, useCallback } from "react";
+import {
+  createContext,
+  useContext,
+  ReactNode,
+  useState,
+  useEffect,
+  useCallback,
+  Suspense,
+} from "react";
 import { useSearchParams } from "next/navigation";
 
 export type FeedType = "all" | "popular" | "team" | "community";
@@ -16,9 +24,28 @@ interface SearchContextType {
   setFeedType: (type: FeedType) => void;
 }
 
-const SearchContext = createContext<SearchContextType | undefined>(undefined);
+const defaultContext: SearchContextType = {
+  searchTerm: "",
+  setSearchTerm: () => {},
+  activeTags: [],
+  setActiveTags: () => {},
+  sortOrder: "new",
+  setSortOrder: () => {},
+  feedType: "all",
+  setFeedType: () => {},
+};
+
+const SearchContext = createContext<SearchContextType>(defaultContext);
 
 export function SearchProvider({ children }: { children: ReactNode }) {
+  return (
+    <Suspense fallback={<SearchContext.Provider value={defaultContext}>{children}</SearchContext.Provider>}>
+      <SearchProviderInner>{children}</SearchProviderInner>
+    </Suspense>
+  );
+}
+
+function SearchProviderInner({ children }: { children: ReactNode }) {
   const searchParams = useSearchParams();
 
   const [feedType, setFeedTypeState] = useState<FeedType>(
@@ -48,14 +75,16 @@ export function SearchProvider({ children }: { children: ReactNode }) {
       params.set(key, value);
     }
     const newSearch = params.toString();
-    const newUrl = newSearch ? `${window.location.pathname}?${newSearch}` : window.location.pathname;
-    
+    const newUrl = newSearch
+      ? `${window.location.pathname}?${newSearch}`
+      : window.location.pathname;
+
     window.history.replaceState(null, "", newUrl);
   };
 
   const setFeedType = useCallback((type: FeedType) => {
     setFeedTypeState((prev) => {
-      if (prev === type) return prev; 
+      if (prev === type) return prev;
       updateUrlParam("feed", type === "all" ? null : type);
       return type;
     });
@@ -83,7 +112,9 @@ export function SearchProvider({ children }: { children: ReactNode }) {
       setFeedTypeState((params.get("feed") as FeedType) || "all");
       setSearchTermState(params.get("q") || "");
       setSortOrderState(params.get("sort") || "new");
-      setActiveTagsState(params.get("tags") ? params.get("tags")!.split(",") : []);
+      setActiveTagsState(
+        params.get("tags") ? params.get("tags")!.split(",") : []
+      );
     };
 
     window.addEventListener("popstate", handlePopState);
@@ -110,6 +141,8 @@ export function SearchProvider({ children }: { children: ReactNode }) {
 
 export function useLocalSearch() {
   const context = useContext(SearchContext);
-  if (!context) throw new Error("useLocalSearch must be used within a SearchProvider");
+  if (!context) {
+    throw new Error("useLocalSearch must be used within a SearchProvider");
+  }
   return context;
 }

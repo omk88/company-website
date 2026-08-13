@@ -4,8 +4,6 @@ import { LeftSidebar } from "@/components/web/LeftSidebar";
 import { RightSidebar } from "@/components/web/RightSidebar";
 import { SearchProvider } from "@/components/web/SearchContext";
 import { PageBlogPosts } from "@/components/web/PageBlogPosts";
-import { api } from "@/convex/_generated/api";
-import { preloadQuery } from "convex/nextjs";
 
 export const metadata: Metadata = {
   title: "Insights",
