@@ -13,6 +13,7 @@ interface BlogFeedProps {
     sortOrder: string;
     isActive: boolean;
     preloadedFeed?: Preloaded<typeof api.blogs.getPaginatedPostsByType>;
+    isInitialFeed?: boolean;
 }
 
 export function BlogFeed(props: BlogFeedProps) {
@@ -40,6 +41,7 @@ function StandardBlogFeed({
     sortOrder,
     isActive,
     preloadedData,
+    isInitialFeed,
 }: BlogFeedProps & { preloadedData?: any }) {
     const trimmedSearch = searchTerm.trim();
     
@@ -60,7 +62,8 @@ function StandardBlogFeed({
         trimmedSearch.length > 0 ||
         activeTags.length > 0 || 
         sortOrder !== "new";
-    const canUsePreloadedData = preloadedData && !hasActiveFilters;
+    const canUsePreloadedData =
+        Boolean(isInitialFeed) && Boolean(preloadedData) && !hasActiveFilters;
 
     const lastResultsRef = useRef<any[]>([]);
     if (results.length > 0) {

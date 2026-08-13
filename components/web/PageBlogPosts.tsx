@@ -23,6 +23,7 @@ export function PageBlogPosts({ preloadedInitialFeed }: PageBlogPostsProps) {
     <div className="space-y-4 p-2">
       {FEEDS.map((feed) => {
         const isActive = feedType === feed.id;
+        const isInitialFeed = feed.id === "all";
 
         return (
           <div key={feed.id} className={isActive ? "block" : "hidden"}>
@@ -33,7 +34,8 @@ export function PageBlogPosts({ preloadedInitialFeed }: PageBlogPostsProps) {
               activeTags={activeTags}
               sortOrder={sortOrder}
               isActive={isActive}
-              preloadedFeed={isActive ? preloadedInitialFeed : undefined}
+              isInitialFeed={isInitialFeed}
+              preloadedFeed={isInitialFeed ? preloadedInitialFeed : undefined}
             />
           </div>
         );
