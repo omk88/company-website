@@ -7,14 +7,16 @@ import { cn } from "@/lib/utils";
 import { FaXTwitter } from "react-icons/fa6";
 import { MobileMenu } from "./MobileMenu";
 import { NavbarAuthClient } from "./NavbarAuthClient";
-import { ConvexClientProvider } from "@/app/ConvexClientProvider";
+import { Suspense } from "react";
+import { getServerAuth } from "@/lib/auth-server";
 
-interface NavBarProps {
-    isAuth: boolean;
-    initialImage?: string | null;
+async function NavbarAuthServer() {
+  const { isAuth, initialImage } = await getServerAuth();
+
+  return <NavbarAuthClient initialIsAuth={isAuth} initialImage={initialImage} />;
 }
 
-export function Navbar({ isAuth, initialImage }: NavBarProps) { 
+export function Navbar() { 
     const anim = "relative no-underline hover:no-underline after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100";
 
     return (
@@ -53,9 +55,9 @@ export function Navbar({ isAuth, initialImage }: NavBarProps) {
                     
                     <div className="flex items-center gap-2">
                         <ThemeToggle />
-                        <ConvexClientProvider>
-                            <NavbarAuthClient initialIsAuth={isAuth} initialImage={initialImage} /> 
-                        </ConvexClientProvider>
+                        <Suspense fallback={<div className="h-8 w-8 rounded-full bg-muted animate-pulse" />}>
+                            <NavbarAuthServer />
+                        </Suspense>
                     </div>
                 </div>
 
@@ -64,11 +66,12 @@ export function Navbar({ isAuth, initialImage }: NavBarProps) {
                     <MobileMenu 
                         anim={anim} 
                         navbarAuth={ 
-                            <NavbarAuthClient initialIsAuth={isAuth} initialImage={initialImage} /> 
+                            <Suspense fallback={<div className="h-8 w-8 rounded-full bg-muted animate-pulse" />}>
+                                <NavbarAuthServer />
+                            </Suspense> 
                         } 
                     />
                 </div>
-                
             </nav>
         </header>
     );

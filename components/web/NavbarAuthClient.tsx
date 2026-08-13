@@ -11,7 +11,7 @@ import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Separator } from "../ui/separator";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface NavbarAuthClientProps {
     initialIsAuth: boolean;
@@ -22,6 +22,13 @@ export function NavbarAuthClient({ initialIsAuth, initialImage }: NavbarAuthClie
     const router = useRouter();
     const { data: session, isPending } = authClient.useSession();
     const [open, setOpen] = useState(false);
+
+    // Track client hydration to prevent server/client HTML mismatches
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     const handleSignOut = async () => {
         setOpen(false);
@@ -40,7 +47,12 @@ export function NavbarAuthClient({ initialIsAuth, initialImage }: NavbarAuthClie
     };
 
     const isLoggedIn = isPending ? initialIsAuth : !!session;
-    const userData = useQuery(api.auth.getCurrentUser, isLoggedIn ? {} : "skip");
+    
+    // Defer the client Convex query until after hydration complete
+    const userData = useQuery(
+        api.auth.getCurrentUser, 
+        isMounted && isLoggedIn ? {} : "skip"
+    );
     
     const defaultAvatarUrl = "/default.svg";
     const profileUsername = userData?.profile?.username;
@@ -49,7 +61,10 @@ export function NavbarAuthClient({ initialIsAuth, initialImage }: NavbarAuthClie
         ? session.user.image
         : null;
 
-    const avatarSrc = userData?.profile?.profilePicUrl || clientSessionImage || initialImage || defaultAvatarUrl;
+    // Force exact server prop fallback during hydration to ensure initial HTML match
+    const avatarSrc = !isMounted
+        ? (initialImage || defaultAvatarUrl)
+        : (userData?.profile?.profilePicUrl || clientSessionImage || initialImage || defaultAvatarUrl);
 
     return (
         <TooltipProvider delayDuration={200}>
@@ -71,16 +86,16 @@ export function NavbarAuthClient({ initialIsAuth, initialImage }: NavbarAuthClie
                             <TooltipTrigger asChild>
                                 <Popover open={open} onOpenChange={setOpen}>
                                     <PopoverTrigger asChild>
-                                            <Button variant="ghost" size="icon" className="cursor-pointer">
-                                                <div className="h-5 w-5 rounded-full overflow-hidden border border-muted flex items-center justify-center bg-transparent">
-                                                    <img
-                                                        src={avatarSrc}
-                                                        alt={profileUsername || "User Profile"}
-                                                        loading="eager"
-                                                        className="h-full w-full object-cover"
-                                                    />
-                                                </div>
-                                            </Button>
+                                        <Button variant="ghost" size="icon" className="cursor-pointer">
+                                            <div className="h-5 w-5 rounded-full overflow-hidden border border-muted flex items-center justify-center bg-transparent">
+                                                <img
+                                                    src={avatarSrc}
+                                                    alt={profileUsername || "User Profile"}
+                                                    loading="eager"
+                                                    className="h-full w-full object-cover"
+                                                />
+                                            </div>
+                                        </Button>
                                     </PopoverTrigger>
 
                                     <PopoverContent 
@@ -103,7 +118,7 @@ export function NavbarAuthClient({ initialIsAuth, initialImage }: NavbarAuthClie
                                                 </div>
                                                 <div className="flex flex-col min-w-0">
                                                     <span className="text-sm font-semibold truncate leading-tight">
-                                                        {`${userData?.profile?.displayName || userData?.profile?.username}`}
+                                                        {`${userData?.profile?.displayName || userData?.profile?.username || ""}`}
                                                     </span>
                                                     <span className="text-xs text-muted-foreground group-hover:text-accent-foreground/80 truncate mt-0.5">
                                                         @{userData?.profile?.username}

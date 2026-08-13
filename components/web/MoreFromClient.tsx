@@ -49,7 +49,7 @@ export function MoreFromClient({ initialBlogs, displayName, username }: MoreFrom
                             <div className="w-full flex flex-row items-center justify-between gap-3">
                                 <div className="w-full flex flex-col gap-1">
                                     <div className="overflow-hidden">
-                                        <h3 className="break-words text-[13px] font-semibold tracking-tight line-clamp-2 text-foreground/90 transition-colors duration-150 group-hover/trending:text-blue-600 leading-snug">
+                                        <h3 className="break-words text-[13px] font-semibold tracking-tight line-clamp-1 text-foreground/90 transition-colors duration-150 group-hover/trending:text-blue-600 leading-snug">
                                             {blog.title}
                                         </h3>
                                     </div>

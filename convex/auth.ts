@@ -44,6 +44,9 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
         },
       },
     },
+    session: {
+      cookieCache: { enabled: true, maxAge: 5 * 60 },
+    },
   });
 };
 

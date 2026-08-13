@@ -43,7 +43,7 @@ export function TrendingBlogsClient({ initialTrendingBlogs }: TrendingBlogsClien
                             <div className="w-full flex flex-row items-center justify-between gap-3">
                                 
                                 <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
-                                    <h3 className="break-words text-[13px] font-semibold tracking-tight line-clamp-2 text-foreground/90 transition-colors duration-150 group-hover/trending:text-blue-600 leading-snug">
+                                    <h3 className="break-words text-[13px] font-semibold tracking-tight line-clamp-1 text-foreground/90 transition-colors duration-150 group-hover/trending:text-blue-600 leading-snug">
                                         {blog.title}
                                     </h3>
                                     

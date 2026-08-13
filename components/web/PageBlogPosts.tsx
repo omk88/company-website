@@ -2,12 +2,6 @@
 
 import { useLocalSearch, FeedType } from "./SearchContext";
 import { BlogFeed } from "./BlogFeed";
-import { api } from "@/convex/_generated/api";
-import { Preloaded } from "convex/react";
-
-interface PageBlogPostsProps {
-  preloadedInitialFeed?: Preloaded<typeof api.blogs.getPaginatedPostsByType>;
-}
 
 const FEEDS: { id: FeedType; dbPostType?: "community" | "team"; isPopularOnly?: boolean }[] = [
   { id: "all" },
@@ -16,14 +10,13 @@ const FEEDS: { id: FeedType; dbPostType?: "community" | "team"; isPopularOnly?: 
   { id: "community", dbPostType: "community" },
 ];
 
-export function PageBlogPosts({ preloadedInitialFeed }: PageBlogPostsProps) {
+export function PageBlogPosts() {
   const { feedType, searchTerm, activeTags, sortOrder } = useLocalSearch();
 
   return (
     <div className="space-y-4 p-2">
       {FEEDS.map((feed) => {
         const isActive = feedType === feed.id;
-        const isInitialFeed = feed.id === "all";
 
         return (
           <div key={feed.id} className={isActive ? "block" : "hidden"}>
@@ -34,8 +27,6 @@ export function PageBlogPosts({ preloadedInitialFeed }: PageBlogPostsProps) {
               activeTags={activeTags}
               sortOrder={sortOrder}
               isActive={isActive}
-              isInitialFeed={isInitialFeed}
-              preloadedFeed={isInitialFeed ? preloadedInitialFeed : undefined}
             />
           </div>
         );

@@ -11,39 +11,7 @@ export const metadata: Metadata = {
   title: "Insights",
 };
 
-interface PageProps {
-  searchParams: Promise<{
-    feed?: string;
-    q?: string;
-    sort?: string;
-    tags?: string;  
-  }>;
-}
-
-export default async function InsightsPage({ searchParams }: PageProps) {
-  const params = await searchParams;
-
-  const feedType = params.feed || "all";
-  const dbPostType = feedType === "team" || feedType === "community" ? feedType : undefined;
-  const isPopularOnly = feedType === "popular" ? true : undefined;
-  const searchTerm = params.q?.trim() || undefined;
-  const activeTags = params.tags ? params.tags.split(",") : undefined;
-  const sortOrder = params.sort || "new";
-
-  const preloadedInitialFeed = await preloadQuery(
-    api.blogs.getPaginatedPostsByType,
-    {
-      postType: dbPostType as "team" | "community" | undefined,
-      isPopularOnly,
-      searchTerm,
-      activeTags,
-      sortOrder,
-      paginationOpts: {
-        numItems: 6,
-        cursor: null,
-      }
-    },
-  );
+export default async function InsightsPage() {
   
   return (
     <SidebarProvider>
@@ -62,7 +30,7 @@ export default async function InsightsPage({ searchParams }: PageProps) {
             className="w-full h-full bg-white dark:bg-zinc-950"
           >
             <div>
-              <PageBlogPosts preloadedInitialFeed={preloadedInitialFeed} />
+              <PageBlogPosts />
             </div>
           </section>
         </div>

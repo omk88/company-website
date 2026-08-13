@@ -12,25 +12,12 @@ interface BlogFeedProps {
     activeTags: string[];
     sortOrder: string;
     isActive: boolean;
-    preloadedFeed?: Preloaded<typeof api.blogs.getPaginatedPostsByType>;
     isInitialFeed?: boolean;
 }
 
 export function BlogFeed(props: BlogFeedProps) {
-    if (props.preloadedFeed) {
-        return <PreloadedBlogFeed {...props} preloadedFeed={props.preloadedFeed} />;
-    }
 
     return <StandardBlogFeed {...props} />;
-}
-
-function PreloadedBlogFeed({
-    preloadedFeed,
-    ...props
-}: BlogFeedProps & { preloadedFeed: Preloaded<typeof api.blogs.getPaginatedPostsByType> }) {
-    const preloadedData = usePreloadedQuery(preloadedFeed);
-
-    return <StandardBlogFeed {...props} preloadedData={preloadedData} />;
 }
 
 function StandardBlogFeed({
@@ -106,22 +93,22 @@ function StandardBlogFeed({
                     {displayResults.map((blog: any) => (
                         <li key={blog._id}>
                             <BlogCard
-                            id={blog._id}
-                            imageUrl={blog.imageUrl}
-                            displayName={blog.displayName}
-                            username={blog.username}
-                            title={blog.title}
-                            subtitle={blog.subtitle}
-                            totalViews={blog.totalViews}
-                            likes={blog.likes}
-                            commentCount={blog.commentCount}
-                            date={blog._creationTime}
-                            readTime={blog.readTime}
-                            tags={blog.tags}
-                            isInitialBookmarked={blog.isBookmarked}
+                                id={blog._id}
+                                imageUrl={blog.imageUrl}
+                                displayName={blog.displayName}
+                                username={blog.username}
+                                title={blog.title}
+                                subtitle={blog.subtitle}
+                                totalViews={blog.totalViews}
+                                likes={blog.likes}
+                                commentCount={blog.commentCount}
+                                date={blog._creationTime}
+                                readTime={blog.readTime}
+                                tags={blog.tags}
+                                isInitialBookmarked={blog.isBookmarked}
                             />
                         </li>
-                        ))}
+                    ))}
                 </ul>
             )}
         </>

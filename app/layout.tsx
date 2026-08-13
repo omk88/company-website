@@ -36,18 +36,11 @@ export const metadata: Metadata = {
   description: "Description"
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
-  const session = await authClient.getSession({
-    fetchOptions: { headers: await headers() },
-  });
-
-  const userIsAuthenticated = !!session?.data?.user;
-  const initialImage = session?.data?.user?.image || null;
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -60,14 +53,12 @@ export default async function RootLayout({
         >
           <GridBackground>
             <main>
-              <Suspense>
-                <ConvexClientProvider>
-                  <BookmarksProvider>
-                    <Navbar isAuth={userIsAuthenticated} initialImage={initialImage} />
-                    {children}
-                  </BookmarksProvider>
-                </ConvexClientProvider>
-              </Suspense>
+              <ConvexClientProvider>
+                <BookmarksProvider>
+                  <Navbar />
+                  {children}
+                </BookmarksProvider>
+              </ConvexClientProvider>
             </main>
           </GridBackground>
           <Toaster />
