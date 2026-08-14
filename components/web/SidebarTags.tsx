@@ -4,8 +4,8 @@ import { ChevronDown, Tag } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
 import { Checkbox } from "../ui/checkbox";
-import { useLocalSearch } from "./SearchContext";
 import { cn } from "@/lib/utils";
+import { useSearchStore } from "@/stores/useSearchStore";
 
 const TAG_ITEMS = [
   { id: "all", label: "All Topics" },
@@ -23,7 +23,8 @@ interface SidebarTagsProps {
 }
 
 export function SidebarTags({ fullWidth, className }: SidebarTagsProps) {
-  const { activeTags, setActiveTags } = useLocalSearch();
+  const activeTags = useSearchStore((state) => state.activeTags);
+  const setActiveTags = useSearchStore((state) => state.setActiveTags);
 
   const isAllSelected = activeTags.length === 0 || activeTags.includes("all");
 

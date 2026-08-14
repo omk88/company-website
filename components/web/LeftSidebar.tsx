@@ -16,9 +16,9 @@ import { SidebarSearch } from "./SidebarSearch";
 import { SidebarSort } from "./SidebarSort";
 import { SidebarTags } from "./SidebarTags";
 import Link from "next/link";
-import { FeedType, useLocalSearch } from "./SearchContext";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { useSearchStore, FeedType } from "@/stores/useSearchStore";
 
 const NAV_ITEMS = [
   { id: "all", label: "All Insights", icon: Library },
@@ -28,7 +28,9 @@ const NAV_ITEMS = [
 ];
 
 export function LeftSidebar() {
-  const { feedType, setFeedType } = useLocalSearch();
+  const feedType = useSearchStore((state) => state.feedType);
+  const setFeedType = useSearchStore((state) => state.setFeedType);
+
   const userData = useQuery(api.auth.getCurrentUser);
 
   return (

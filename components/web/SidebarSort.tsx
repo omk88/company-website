@@ -1,9 +1,9 @@
 "use client";
 
-import { useLocalSearch } from "@/components/web/SearchContext";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowUp, CalendarArrowUp, Flame, Swords } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useSearchStore } from "@/stores/useSearchStore";
 
 interface SidebarSortProps {
   fullWidth?: boolean;
@@ -11,7 +11,8 @@ interface SidebarSortProps {
 }
 
 export function SidebarSort({ fullWidth = false, className }: SidebarSortProps) {
-  const { sortOrder, setSortOrder } = useLocalSearch();
+  const sortOrder = useSearchStore((state) => state.sortOrder);
+  const setSortOrder = useSearchStore((state) => state.setSortOrder);
 
   return (
     <Select

@@ -1,7 +1,7 @@
 "use client";
 
-import { useLocalSearch, FeedType } from "./SearchContext";
 import { BlogFeed } from "./BlogFeed";
+import { useSearchStore, FeedType } from "@/stores/useSearchStore";
 
 const FEEDS: { id: FeedType; dbPostType?: "community" | "team"; isPopularOnly?: boolean }[] = [
   { id: "all" },
@@ -11,7 +11,10 @@ const FEEDS: { id: FeedType; dbPostType?: "community" | "team"; isPopularOnly?: 
 ];
 
 export function PageBlogPosts() {
-  const { feedType, searchTerm, activeTags, sortOrder } = useLocalSearch();
+  const feedType = useSearchStore((state) => state.feedType);
+  const searchTerm = useSearchStore((state) => state.searchTerm);
+  const activeTags = useSearchStore((state) => state.activeTags);
+  const sortOrder = useSearchStore((state) => state.sortOrder);
 
   return (
     <div className="space-y-4 p-2">

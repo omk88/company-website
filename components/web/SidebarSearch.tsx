@@ -2,7 +2,7 @@
 
 import { Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { useLocalSearch } from "@/components/web/SearchContext";
+import { useSearchStore } from "@/stores/useSearchStore";
 import { useState, useEffect } from "react";
 
 interface SidebarSearchProps {
@@ -15,7 +15,9 @@ export function SidebarSearch({
   placeholder,
   fullWidth = false,
 }: SidebarSearchProps) {
-  const { searchTerm, setSearchTerm } = useLocalSearch();
+  const searchTerm = useSearchStore((state) => state.searchTerm);
+  const setSearchTerm = useSearchStore((state) => state.setSearchTerm);
+
   const [localValue, setLocalValue] = useState(searchTerm);
 
   useEffect(() => {
