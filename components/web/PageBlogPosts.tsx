@@ -17,12 +17,15 @@ export function PageBlogPosts() {
   const sortOrder = useSearchStore((state) => state.sortOrder);
 
   return (
-    <div className="space-y-4 p-2">
+    <div className="flex flex-col flex-1 h-full min-h-0 p-2">
       {FEEDS.map((feed) => {
         const isActive = feedType === feed.id;
 
         return (
-          <div key={feed.id} className={isActive ? "block" : "hidden"}>
+          <div 
+            key={feed.id} 
+            className={isActive ? "flex flex-col flex-1 h-full min-h-0" : "hidden"}
+          >
             <BlogFeed
               postType={feed.dbPostType}
               isPopularOnly={feed.isPopularOnly}

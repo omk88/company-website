@@ -9,7 +9,6 @@ export const metadata: Metadata = {
 };
 
 export default async function InsightsPage() {
-  
   return (
     <SidebarProvider>
       <aside 
@@ -19,16 +18,17 @@ export default async function InsightsPage() {
         <LeftSidebar />
       </aside>
 
-      <div className="w-full min-w-0 flex flex-col min-h-[calc(100vh-4rem)] pt-16">
+      <div className="w-full min-w-0 flex flex-col flex-1 min-h-[calc(100vh-4rem)] pt-16">
 
         <section 
           id="blog-grid-section" 
-          className="w-full h-full bg-white dark:bg-zinc-950"
+          className="w-full flex-1 flex flex-col h-full min-h-0 bg-white dark:bg-zinc-950"
         >
-          <div>
+          <div className="flex flex-col flex-1 h-full min-h-0">
             <PageBlogPosts />
           </div>
         </section>
+
       </div>
 
       <aside 
