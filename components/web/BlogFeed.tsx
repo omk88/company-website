@@ -1,9 +1,10 @@
 "use client";
 
 import { api } from "@/convex/_generated/api";
-import { Preloaded, usePaginatedQuery, usePreloadedQuery } from "convex/react";
+import { usePaginatedQuery } from "convex/react";
 import { useEffect, useRef } from "react";
 import { BlogCard } from "./BlogCard";
+import { BlogCardSkeleton } from "./LoadingSkeletons/BlogCardSkeleton";
 
 interface BlogFeedProps {
     postType?: "community" | "team";
@@ -84,33 +85,47 @@ function StandardBlogFeed({
         return () => observer.disconnect();
     }, [isActive, isDone, isLoadingMore, status, loadMore]);
 
+    if (isFirstLoad && displayResults.length === 0) {
+        return (
+            <ul className="flex flex-col gap-2">
+                {[1, 2, 3].map((i) => (
+                    <li key={i}>
+                        <BlogCardSkeleton />
+                    </li>
+                ))}
+            </ul>
+        )
+    }
+
+    if (displayResults.length === 0) {
+        return (
+            <div className="p-8 text-center border border-dashed rounded-lg">
+                <p className="text-sm text-muted-foreground">No insights found.</p>
+            </div>
+        )
+    }
+
     return (
-        <>
-            {displayResults.length === 0 ? (
-                <p className="text-muted-foreground">No insights found.</p>
-            ) : (
-                <ul className="flex flex-col gap-2">
-                    {displayResults.map((blog: any) => (
-                        <li key={blog._id}>
-                            <BlogCard
-                                id={blog._id}
-                                imageUrl={blog.imageUrl}
-                                displayName={blog.displayName}
-                                username={blog.username}
-                                title={blog.title}
-                                subtitle={blog.subtitle}
-                                totalViews={blog.totalViews}
-                                likes={blog.likes}
-                                commentCount={blog.commentCount}
-                                date={blog._creationTime}
-                                readTime={blog.readTime}
-                                tags={blog.tags}
-                                isInitialBookmarked={blog.isBookmarked}
-                            />
-                        </li>
-                    ))}
-                </ul>
-            )}
-        </>
+        <ul className="flex flex-col gap-2">
+            {displayResults.map((blog: any) => (
+                <li key={blog._id}>
+                    <BlogCard
+                        id={blog._id}
+                        imageUrl={blog.imageUrl}
+                        displayName={blog.displayName}
+                        username={blog.username}
+                        title={blog.title}
+                        subtitle={blog.subtitle}
+                        totalViews={blog.totalViews}
+                        likes={blog.likes}
+                        commentCount={blog.commentCount}
+                        date={blog._creationTime}
+                        readTime={blog.readTime}
+                        tags={blog.tags}
+                        isInitialBookmarked={blog.isBookmarked}
+                    />
+                </li>
+            ))}
+        </ul>
     );
 }
