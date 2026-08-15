@@ -41,11 +41,11 @@ export function IncrementBlogLikesDislikes({ blog }: IncrementBlogLikesProps) {
   const likesCount = voteState?.likes ?? blog.likes;
   const isFeatured = featuredState?.isFeatured;
 
-  const prefetchBlog = () => {
+  /*const prefetchBlog = () => {
     convex.query(api.blogs.getBlogById, { blogId: blog._id }).catch((err) => {
       console.error("Prefetch failed:", err);
     });
-  };
+  };*/
 
   const toggleReactionMutation = useMutation(api.blogs.toggleBlogReaction).withOptimisticUpdate(
     (localStore, args) => {
@@ -334,7 +334,7 @@ export function IncrementBlogLikesDislikes({ blog }: IncrementBlogLikesProps) {
             className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground disabled:opacity-100 cursor-pointer"
             asChild
           >
-            <Link href={`/company/blog?id=${blog._id}`} onMouseEnter={prefetchBlog}>
+            <Link href={`/company/blog?id=${blog._id}`}>
               <SquarePen className="!h-5 !w-5 transition-transform active:scale-90" />
             </Link>
           </Button>
