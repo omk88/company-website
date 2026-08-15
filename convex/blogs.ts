@@ -964,6 +964,23 @@ export const getBlogReactions = query({
   },
 });
 
+export const getBlogById = query({
+  args: { blogId: v.id("blogs") },
+  handler: async (ctx, args) => {
+    const blog = await ctx.db.get(args.blogId);
+    if (!blog) return null;
+
+    const resolvedImageUrl = blog.storageId !== undefined
+      ? await ctx.storage.getUrl(blog.storageId)
+      : null;
+
+    return {
+      ...blog,
+      imageUrl: resolvedImageUrl ?? "/noImage.png",
+    };
+  }
+});
+
 export const getBlogWithAuthorPosts = query({
   args: { blogId: v.id("blogs") },
   handler: async (ctx, args) => {

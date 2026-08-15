@@ -37,7 +37,7 @@ export function MoreFromAuthor({ displayName, username, blogs }: MoreFromAuthorP
       <SidebarGroupLabel className="w-full justify-center">
         <h1 className="flex justify-center gap-2 p-4 text-sm font-medium text-foreground whitespace-nowrap">
           <Library className="size-4 stroke-[2.3] shrink-0 mt-0.5" />
-          <span>More from </span>
+          <span>More from</span>
           <ProfileHoverCard authorUsername={username} displayName={displayName}>
             <span className="cursor-pointer">{displayName || username}</span>
           </ProfileHoverCard>
