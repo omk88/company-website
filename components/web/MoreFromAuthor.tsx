@@ -2,17 +2,23 @@
 
 import Link from "next/link"; 
 import Image from "next/image";
-import { api } from "@/convex/_generated/api";
-import { useQuery } from "convex/react";
 import { SidebarGroupLabel } from "../ui/sidebar";
 import { Eye, Library, MessageSquare, ThumbsUp } from "lucide-react";
 import { ProfileHoverCard } from "./ProfileHoverCard";
-import { MoreFromSkeleton } from "./LoadingSkeletons/MoreFromAuthorSkeleton";
 
-interface MoreFromClientProps {
+interface AuthorPost {
+  _id: string;
+  title: string;
+  imageUrl: string;
+  totalViews: number;
+  likes: number;
+  commentCount: number;
+}
+
+interface MoreFromAuthorProps {
   displayName?: string;
   username: string;
-  author: string;
+  blogs: AuthorPost[];
 }
 
 const compactFormatter = new Intl.NumberFormat("en", {
@@ -21,14 +27,8 @@ const compactFormatter = new Intl.NumberFormat("en", {
   maximumFractionDigits: 1,
 });
 
-export function MoreFromAuthor({ displayName, username, author }: MoreFromClientProps) {
-  const blogs = useQuery(api.blogs.getPostsByAuthor, { author: author });
-
-  if (blogs === undefined) {
-    return <MoreFromSkeleton count={3} displayName={displayName} username={username} />;
-  }
-
-  if (blogs.length === 0) {
+export function MoreFromAuthor({ displayName, username, blogs }: MoreFromAuthorProps) {
+  if (!blogs || blogs.length === 0) {
     return null;
   }
 

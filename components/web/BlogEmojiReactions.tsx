@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { EMOJI_REACTIONS } from "@/app/constants/reactions";
 import { Badge } from "../ui/badge";
 import { Doc } from "@/convex/_generated/dataModel";
@@ -7,38 +8,48 @@ import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
 
 interface BlogEmojiReactionsProps {
-    initialBlog: Doc<"blogs">,
+  initialBlog: Doc<"blogs">;
 }
 
 export function BlogEmojiReactions({ initialBlog }: BlogEmojiReactionsProps) {
+  const [isMounted, setIsMounted] = useState(false);
 
-    const blog = useQuery(api.blogs.getBlogById, { blogId: initialBlog._id }) ?? initialBlog;
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
-    const hasReactions = EMOJI_REACTIONS.some(
-        ({ field }) => ((blog[field] ?? 0) as number) > 0
-    );
+  const liveReactions = useQuery(
+    api.blogs.getBlogReactions,
+    isMounted ? { blogId: initialBlog._id } : "skip"
+  );
 
-    return (
-        <div className="flex flex-wrap items-center gap-1.5 min-h-[20px]">
-            {hasReactions ? (
-                EMOJI_REACTIONS.map(({ type, field, emoji, label }) => {
-                    const count = (blog[field] ?? 0) as number;
+  const reactionsData = liveReactions ?? initialBlog;
 
-                    if (count === 0) return null;
+  const hasReactions = EMOJI_REACTIONS.some(
+    ({ field }) => ((reactionsData[field as keyof typeof reactionsData] ?? 0) as number) > 0
+  );
 
-                    return (
-                        <Badge
-                            key={type}
-                            variant="secondary"
-                            className="flex items-center gap-1.5 py-1 text-md font-medium"
-                            title={label}
-                        >
-                            <span>{emoji}</span>
-                            <span className="text-muted-foreground">{count}</span>
-                        </Badge>
-                    );
-                })
-            ) : null}
-        </div>
-    )
+  if (!hasReactions) return null;
+
+  return (
+    <div className="flex flex-wrap items-center gap-1.5 min-h-[20px]">
+      {EMOJI_REACTIONS.map(({ type, field, emoji, label }) => {
+        const count = (reactionsData[field as keyof typeof reactionsData] ?? 0) as number;
+
+        if (count === 0) return null;
+
+        return (
+          <Badge
+            key={type}
+            variant="secondary"
+            className="flex items-center gap-1.5 py-1 text-md font-medium transition-all"
+            title={label}
+          >
+            <span>{emoji}</span>
+            <span className="text-muted-foreground">{count}</span>
+          </Badge>
+        );
+      })}
+    </div>
+  );
 }

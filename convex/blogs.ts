@@ -948,21 +948,67 @@ export const getTrendingPosts = query({
   },
 });
 
-export const getBlogById = query({
+export const getBlogReactions = query({
   args: { blogId: v.id("blogs") },
   handler: async (ctx, args) => {
     const blog = await ctx.db.get(args.blogId);
     if (!blog) return null;
 
-    const resolvedImageUrl = blog.storageId !== undefined 
-      ? await ctx.storage.getUrl(blog.storageId) 
-      : null;
+    return {
+      heartCount: blog.heartCount,
+      insightfulCount: blog.insightfulCount,
+      mindblownCount: blog.mindblownCount,
+      fireCount: blog.fireCount,
+      thinkingCount: blog.thinkingCount,
+    };
+  },
+});
+
+export const getBlogWithAuthorPosts = query({
+  args: { blogId: v.id("blogs") },
+  handler: async (ctx, args) => {
+    const blog = await ctx.db.get(args.blogId);
+    if (!blog) return null;
+
+    const rawAuthorPosts = await ctx.db
+      .query("blogs")
+      .withIndex("by_username", (q) => q.eq("username", blog.username))
+      .order("desc")
+      .take(9);
+
+    const filteredAuthorPosts = rawAuthorPosts
+      .filter((post) => post._id !== blog._id)
+      .slice(0, 8);
+
+    const [blogImageUrl, authorPostsWithImages] = await Promise.all([
+      blog.storageId
+        ? ctx.storage.getUrl(blog.storageId)
+        : Promise.resolve(null),
+
+      Promise.all(
+        filteredAuthorPosts.map(async (post) => {
+          const resolvedUrl = post.storageId
+            ? await ctx.storage.getUrl(post.storageId)
+            : null;
+
+          const { content, ...previewFields } = post;
+
+          return {
+            ...previewFields,
+            imageUrl: resolvedUrl ?? "/noImage.png",
+          };
+        })
+      ),
+    ]);
 
     return {
-      ...blog,
-      imageUrl: resolvedImageUrl ?? "/noImage.png" 
+      blog: {
+        ...blog,
+        imageUrl: blogImageUrl ?? "/noImage.png",
+      },
+      authorPosts: authorPostsWithImages,
     };
-  }
+  },
 });
 
 const REACTION_FIELD_MAP = {
