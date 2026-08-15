@@ -12,6 +12,7 @@ import { MoreFromSkeleton } from "./LoadingSkeletons/MoreFromAuthorSkeleton";
 interface MoreFromClientProps {
   displayName?: string;
   username: string;
+  author: string;
 }
 
 const compactFormatter = new Intl.NumberFormat("en", {
@@ -20,8 +21,8 @@ const compactFormatter = new Intl.NumberFormat("en", {
   maximumFractionDigits: 1,
 });
 
-export function MoreFromAuthor({ displayName, username }: MoreFromClientProps) {
-  const blogs = useQuery(api.blogs.getPostsByAuthor, { author: username });
+export function MoreFromAuthor({ displayName, username, author }: MoreFromClientProps) {
+  const blogs = useQuery(api.blogs.getPostsByAuthor, { author: author });
 
   if (blogs === undefined) {
     return <MoreFromSkeleton count={3} displayName={displayName} username={username} />;

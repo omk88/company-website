@@ -42,7 +42,7 @@ export default async function BlogPage({ params }: BlogPageProps) {
                 <BlogContent blog={blog} preloadedComments={preloadedComments} />
             </div>
 
-            <RightSidebarArticles username={blog.username} displayName={blog.displayName} />
+            <RightSidebarArticles author={blog.author} username={blog.username} displayName={blog.displayName} />
         </SidebarProvider>
     )
 }
