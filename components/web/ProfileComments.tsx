@@ -4,9 +4,9 @@ import { api } from "@/convex/_generated/api";
 import { Preloaded, useConvex, usePreloadedQuery } from "convex/react";
 import { useEffect, useRef, useState } from "react";
 import { ProfileCommentCard } from "./ProfileCommentCard";
-import { useLocalSearch } from "./SearchContext";
 import { SelectableCardWrapper } from "./SelectableCardWrapper";
 import { Id } from "@/convex/_generated/dataModel";
+import { useSearchStore } from "@/stores/useSearchStore";
 
 interface ProfileCommentsProps {
     username: string;
@@ -18,7 +18,15 @@ interface ProfileCommentsProps {
     onLoadedIdsChange: (ids: Id<"comments">[]) => void;
 }
 
-export function ProfileComments({ username, preloadedInitialComments, selectedIds, setSelectedIds, preloadedProfile, preloadedCurrentUser, onLoadedIdsChange }: ProfileCommentsProps) {
+export function ProfileComments({
+    username,
+    preloadedInitialComments,
+    selectedIds,
+    setSelectedIds,
+    preloadedProfile,
+    preloadedCurrentUser,
+    onLoadedIdsChange,
+}: ProfileCommentsProps) {
     const convex = useConvex();
 
     const initialData = usePreloadedQuery(preloadedInitialComments);
@@ -26,16 +34,16 @@ export function ProfileComments({ username, preloadedInitialComments, selectedId
     const profileData = usePreloadedQuery(preloadedProfile);
     const profile = profileData.profile;
 
-    const searchContext = useLocalSearch();
-    const searchTerm = searchContext?.searchTerm ?? "";
-    const sortOrder = searchContext?.sortOrder ?? "new";
+    const searchTerm = useSearchStore((s) => s.searchTerm);
+    const sortOrder = useSearchStore((s) => s.sortOrder);
 
     const [comments, setComments] = useState(initialData.page);
     const [cursor, setCursor] = useState<string | null>(initialData.continueCursor);
     const [isDone, setIsDone] = useState(initialData.isDone);
     const [isLoading, setIsLoading] = useState(false);
 
-    const isOwnProfile = currentUser?.userId && profile?.userId && currentUser.userId === profile.userId;
+    const isOwnProfile =
+        currentUser?.userId && profile?.userId && currentUser.userId === profile.userId;
 
     const loadMoreRef = useRef<HTMLDivElement>(null);
 
@@ -50,18 +58,21 @@ export function ProfileComments({ username, preloadedInitialComments, selectedId
         let isMounted = true;
         setIsLoading(true);
 
-        const fetchFilteredBlogs = async () => {
+        const fetchFilteredComments = async () => {
             try {
-                const result = await convex.query(api.comments.getPaginatedCommentsByUsername, {
-                    username,
-                    searchTerm: searchTerm.trim(),
-                    sortOrder,
-                    paginationOpts: {
-                        numItems: 6,
-                        cursor: null,
-                        id: 0,
-                    },
-                });
+                const result = await convex.query(
+                    api.comments.getPaginatedCommentsByUsername,
+                    {
+                        username,
+                        searchTerm: searchTerm.trim() || undefined,
+                        sortOrder,
+                        paginationOpts: {
+                            numItems: 6,
+                            cursor: null,
+                            id: 0,
+                        },
+                    }
+                );
 
                 if (isMounted) {
                     setComments(result.page);
@@ -69,13 +80,13 @@ export function ProfileComments({ username, preloadedInitialComments, selectedId
                     setIsDone(result.isDone);
                 }
             } catch (error) {
-                console.error("Error searching blogs:", error);
+                console.error("Error searching comments:", error);
             } finally {
                 if (isMounted) setIsLoading(false);
             }
         };
 
-        fetchFilteredBlogs();
+        fetchFilteredComments();
 
         return () => {
             isMounted = false;
@@ -87,26 +98,29 @@ export function ProfileComments({ username, preloadedInitialComments, selectedId
         setIsLoading(true);
 
         try {
-            const result = await convex.query(api.comments.getPaginatedCommentsByUsername, {
-                username,
-                searchTerm: searchTerm.trim() || undefined,
-                sortOrder,
-                paginationOpts: {
-                    numItems: 6,
-                    cursor: cursor,
-                    id: 0,
+            const result = await convex.query(
+                api.comments.getPaginatedCommentsByUsername,
+                {
+                    username,
+                    searchTerm: searchTerm.trim() || undefined,
+                    sortOrder,
+                    paginationOpts: {
+                        numItems: 6,
+                        cursor: cursor,
+                        id: 0,
+                    },
                 }
-            });
+            );
 
             setComments((prev) => [...prev, ...result.page]);
             setCursor(result.continueCursor);
             setIsDone(result.isDone);
         } catch (error) {
-            console.error("Error loading more blogs:", error);
+            console.error("Error loading more comments:", error);
         } finally {
             setIsLoading(false);
         }
-    }
+    };
 
     useEffect(() => {
         if (isDone || isLoading) return;
@@ -114,7 +128,7 @@ export function ProfileComments({ username, preloadedInitialComments, selectedId
         const observer = new IntersectionObserver(
             (entries) => {
                 if (entries[0].isIntersecting) {
-                    loadMore()
+                    loadMore();
                 }
             },
             { rootMargin: "200px" }
@@ -143,31 +157,44 @@ export function ProfileComments({ username, preloadedInitialComments, selectedId
     return (
         <div className="w-full space-y-4">
             {comments.length === 0 ? (
-                <p className="text-muted-foreground">{username} has not posted any comments yet.</p>
-                ) : (
-                    <>
-                        <ul className="w-full flex flex-col gap-4">
-                            {comments.map((comment) => (
-                                <li key={comment._id} >
-                                    <SelectableCardWrapper
+                <p className="text-muted-foreground">
+                    {username} has not posted any comments yet.
+                </p>
+            ) : (
+                <>
+                    <ul className="w-full flex flex-col gap-4">
+                        {comments.map((comment) => (
+                            <li key={comment._id}>
+                                <SelectableCardWrapper
+                                    id={comment._id}
+                                    isSelected={selectedIds.includes(comment._id)}
+                                    onSelectChange={handleSelectChange}
+                                    isOwnProfile={isOwnProfile}
+                                >
+                                    <ProfileCommentCard
                                         id={comment._id}
-                                        isSelected={selectedIds.includes(comment._id)}
-                                        onSelectChange={handleSelectChange}
-                                        isOwnProfile={isOwnProfile}
-                                    >
-                                        <ProfileCommentCard id={comment._id} displayName={comment.displayName} username={comment.username} blogTitle={comment.blogTitle} body={comment.body} likes={comment.likes} date={comment._creationTime}  />
-                                    </SelectableCardWrapper>
-                                </li>
-                            ))}
-                        </ul>
+                                        displayName={comment.displayName}
+                                        username={comment.username}
+                                        blogTitle={comment.blogTitle}
+                                        body={comment.body}
+                                        likes={comment.likes}
+                                        date={comment._creationTime}
+                                    />
+                                </SelectableCardWrapper>
+                            </li>
+                        ))}
+                    </ul>
 
-                        {!isDone && (
-                            <div ref={loadMoreRef} className="py-6 text-center text-sm text-muted-foreground">
-                                {isLoading ? "Loading more blogs..." : "Loading..."}
-                            </div>
-                        )}
-                    </>
-                )}
+                    {!isDone && (
+                        <div
+                            ref={loadMoreRef}
+                            className="py-6 text-center text-sm text-muted-foreground"
+                        >
+                            {isLoading ? "Loading more comments..." : "Loading..."}
+                        </div>
+                    )}
+                </>
+            )}
         </div>
     );
 }

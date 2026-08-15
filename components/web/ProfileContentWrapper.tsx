@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { TabsSwitch, TabItem } from "@/components/web/TabsSwitch";
 import { SidebarSort } from "./SidebarSort";
 import { SidebarSearch } from "./SidebarSearch";
-import { useLocalSearch } from "./SearchContext";
 import { api } from "@/convex/_generated/api";
 import { Preloaded, usePreloadedQuery } from "convex/react";
 import { Selector } from "./Selector";
@@ -14,6 +13,7 @@ import { Id } from "@/convex/_generated/dataModel";
 import { SidebarTags } from "./SidebarTags";
 import { DeleteBlogDialog } from "./DeleteBlogDialog";
 import { DeleteCommentDialog } from "./DeleteCommentDialog";
+import { useSearchStore } from "@/stores/useSearchStore";
 
 interface ProfileContentWrapperProps {
   username: string;
@@ -23,8 +23,14 @@ interface ProfileContentWrapperProps {
   preloadedInitialComments: Preloaded<typeof api.comments.getPaginatedCommentsByUsername>;
 }
 
-export function ProfileContentWrapper({ username, preloadedProfile, preloadedCurrentUser, preloadedInitialBlogs, preloadedInitialComments }: ProfileContentWrapperProps) {
-  const [activeTab, setActiveTab] = useState("blog-articles"); 
+export function ProfileContentWrapper({
+  username,
+  preloadedProfile,
+  preloadedCurrentUser,
+  preloadedInitialBlogs,
+  preloadedInitialComments,
+}: ProfileContentWrapperProps) {
+  const [activeTab, setActiveTab] = useState("blog-articles");
 
   const [selectedBlogIds, setSelectedBlogIds] = useState<Id<"blogs">[]>([]);
   const [allBlogIds, setAllBlogIds] = useState<Id<"blogs">[]>([]);
@@ -32,13 +38,16 @@ export function ProfileContentWrapper({ username, preloadedProfile, preloadedCur
   const [selectedCommentIds, setSelectedCommentIds] = useState<Id<"comments">[]>([]);
   const [allCommentIds, setAllCommentIds] = useState<Id<"comments">[]>([]);
 
-  const { setSearchTerm, setSortOrder } = useLocalSearch();
+  const setSearchTerm = useSearchStore((s) => s.setSearchTerm);
+  const setSortOrder = useSearchStore((s) => s.setSortOrder);
+  const setActiveTags = useSearchStore((s) => s.setActiveTags);
 
   const currentUser = usePreloadedQuery(preloadedCurrentUser);
   const profileData = usePreloadedQuery(preloadedProfile);
   const profile = profileData.profile;
 
-  const isOwnProfile = currentUser?.userId && profile?.userId && currentUser.userId === profile.userId;
+  const isOwnProfile =
+    currentUser?.userId && profile?.userId && currentUser.userId === profile.userId;
 
   const isBlogTab = activeTab === "blog-articles";
 
@@ -46,7 +55,8 @@ export function ProfileContentWrapper({ username, preloadedProfile, preloadedCur
   const currentAllIds = isBlogTab ? allBlogIds : allCommentIds;
 
   const isSomeSelected = currentSelectedIds.length > 0;
-  const isAllSelected = currentAllIds.length > 0 && currentSelectedIds.length === currentAllIds.length;
+  const isAllSelected =
+    currentAllIds.length > 0 && currentSelectedIds.length === currentAllIds.length;
 
   const handleToggleAll = (checked: boolean) => {
     if (isBlogTab) {
@@ -54,7 +64,7 @@ export function ProfileContentWrapper({ username, preloadedProfile, preloadedCur
     } else {
       setSelectedCommentIds(checked ? [...allCommentIds] : []);
     }
-  }
+  };
 
   const tabs: TabItem[] = [
     { value: "blog-articles", label: "Blog Articles" },
@@ -64,26 +74,26 @@ export function ProfileContentWrapper({ username, preloadedProfile, preloadedCur
   useEffect(() => {
     setSearchTerm("");
     setSortOrder("new");
+    setActiveTags([]);
     setSelectedBlogIds([]);
     setSelectedCommentIds([]);
     window.scrollTo({ top: 0, behavior: "instant" });
-  }, [activeTab, setSearchTerm, setSortOrder]);
+  }, [activeTab, setSearchTerm, setSortOrder, setActiveTags]);
 
   const searchPlaceholder = activeTab === "blog-articles" ? "insights" : "comments";
 
   return (
     <div>
       <div className="sticky top-16 z-10 bg-background gap-4 py-4 px-4 flex flex-row items-center justify-between w-full">
-
         <div className="flex flex-row items-center gap-2 shrink-0">
-          <TabsSwitch 
-            tabs={tabs} 
-            value={activeTab} 
-            onTabChange={setActiveTab} 
+          <TabsSwitch
+            tabs={tabs}
+            value={activeTab}
+            onTabChange={setActiveTab}
           />
 
-          {isOwnProfile && (
-            isBlogTab ? (
+          {isOwnProfile &&
+            (isBlogTab ? (
               <Selector
                 isAllSelected={isAllSelected}
                 isSomeSelected={isSomeSelected}
@@ -111,8 +121,7 @@ export function ProfileContentWrapper({ username, preloadedProfile, preloadedCur
                   />
                 )}
               />
-            )
-          )}
+            ))}
         </div>
 
         <div className="flex flex-1 min-w-0 flex-row items-center justify-end gap-3">
@@ -128,7 +137,6 @@ export function ProfileContentWrapper({ username, preloadedProfile, preloadedCur
             <SidebarSearch placeholder={searchPlaceholder} />
           </div>
         </div>
-
       </div>
 
       <div className="w-full px-4 mb-8">

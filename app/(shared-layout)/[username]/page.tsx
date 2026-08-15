@@ -1,7 +1,6 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { LeftSidebarProfile } from "@/components/web/LeftSidebarProfile";
 import { ProfileContentWrapper } from "@/components/web/ProfileContentWrapper";
-import { SearchProvider } from "@/components/web/SearchContext";
 import { api } from "@/convex/_generated/api";
 import { preloadQuery } from "convex/nextjs";
 import { preloadAuthQuery } from "@/lib/auth-server";
@@ -51,15 +50,13 @@ export default async function Profile({ params }: profileRouteProps) {
                 </aside>
 
                 <div className="w-full bg-white">
-                    <SearchProvider >
-                        <ProfileContentWrapper
-                            username={username}
-                            preloadedProfile={preloadedProfile}
-                            preloadedCurrentUser={preloadedCurrentUser}
-                            preloadedInitialBlogs={preloadedInitialBlogs}
-                            preloadedInitialComments={preloadedInitialComments}
-                        />
-                    </SearchProvider>
+                    <ProfileContentWrapper
+                        username={username}
+                        preloadedProfile={preloadedProfile}
+                        preloadedCurrentUser={preloadedCurrentUser}
+                        preloadedInitialBlogs={preloadedInitialBlogs}
+                        preloadedInitialComments={preloadedInitialComments}
+                    />
                 </div>
             </SidebarProvider>
         </div>

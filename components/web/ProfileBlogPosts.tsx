@@ -4,12 +4,12 @@ import { api } from "@/convex/_generated/api";
 import { Preloaded, useConvex, usePreloadedQuery } from "convex/react";
 import { useEffect, useRef, useState } from "react";
 import { BlogCard } from "./BlogCard";
-import { useLocalSearch } from "./SearchContext";
 import { SelectableCardWrapper } from "./SelectableCardWrapper";
 import { Id } from "@/convex/_generated/dataModel";
 import { Pen } from "lucide-react";
 import { Button } from "../ui/button";
 import Link from "next/link";
+import { useSearchStore } from "@/stores/useSearchStore";
 
 interface ProfileBlogPostsProps {
     username: string;
@@ -21,7 +21,15 @@ interface ProfileBlogPostsProps {
     onLoadedIdsChange: (ids: Id<"blogs">[]) => void;
 }
 
-export function ProfileBlogPosts({ username, preloadedProfile, preloadedInitialBlogs, preloadedCurrentUser, selectedIds, setSelectedIds, onLoadedIdsChange }: ProfileBlogPostsProps) {
+export function ProfileBlogPosts({
+    username,
+    preloadedProfile,
+    preloadedInitialBlogs,
+    preloadedCurrentUser,
+    selectedIds,
+    setSelectedIds,
+    onLoadedIdsChange,
+}: ProfileBlogPostsProps) {
     const convex = useConvex();
 
     const initialData = usePreloadedQuery(preloadedInitialBlogs);
@@ -29,12 +37,12 @@ export function ProfileBlogPosts({ username, preloadedProfile, preloadedInitialB
     const profileData = usePreloadedQuery(preloadedProfile);
     const profile = profileData.profile;
 
-    const isOwnProfile = currentUser?.userId && profile?.userId && currentUser.userId === profile.userId;
+    const isOwnProfile =
+        currentUser?.userId && profile?.userId && currentUser.userId === profile.userId;
 
-    const searchContext = useLocalSearch();
-    const searchTerm = searchContext?.searchTerm ?? "";
-    const sortOrder = searchContext?.sortOrder ?? "new";
-    const activeTags = searchContext?.activeTags ?? [];
+    const searchTerm = useSearchStore((s) => s.searchTerm);
+    const sortOrder = useSearchStore((s) => s.sortOrder);
+    const activeTags = useSearchStore((s) => s.activeTags);
 
     const [blogs, setBlogs] = useState(initialData.page);
     const [cursor, setCursor] = useState<string | null>(initialData.continueCursor);
@@ -42,6 +50,8 @@ export function ProfileBlogPosts({ username, preloadedProfile, preloadedInitialB
     const [isLoading, setIsLoading] = useState(false);
 
     const loadMoreRef = useRef<HTMLDivElement>(null);
+
+    const activeTagsKey = activeTags.join(",");
 
     useEffect(() => {
         if (!searchTerm.trim() && sortOrder === "new" && activeTags.length === 0) {
@@ -85,7 +95,7 @@ export function ProfileBlogPosts({ username, preloadedProfile, preloadedInitialB
         return () => {
             isMounted = false;
         };
-    }, [searchTerm, sortOrder, activeTags, username, convex, initialData]);
+    }, [searchTerm, sortOrder, activeTagsKey, username, convex, initialData]);
 
     const loadMore = async () => {
         if (isDone || isLoading || !cursor) return;
@@ -101,7 +111,7 @@ export function ProfileBlogPosts({ username, preloadedProfile, preloadedInitialB
                     numItems: 6,
                     cursor: cursor,
                     id: 0,
-                }
+                },
             });
 
             setBlogs((prev) => [...prev, ...result.page]);
@@ -112,7 +122,7 @@ export function ProfileBlogPosts({ username, preloadedProfile, preloadedInitialB
         } finally {
             setIsLoading(false);
         }
-    }
+    };
 
     useEffect(() => {
         if (isDone || isLoading) return;
@@ -120,7 +130,7 @@ export function ProfileBlogPosts({ username, preloadedProfile, preloadedInitialB
         const observer = new IntersectionObserver(
             (entries) => {
                 if (entries[0].isIntersecting) {
-                    loadMore()
+                    loadMore();
                 }
             },
             { rootMargin: "200px" }
@@ -134,7 +144,7 @@ export function ProfileBlogPosts({ username, preloadedProfile, preloadedInitialB
         return () => {
             if (currentTarget) observer.unobserve(currentTarget);
         };
-    }, [cursor, isDone, isLoading, searchTerm, sortOrder, activeTags]);
+    }, [cursor, isDone, isLoading, searchTerm, sortOrder, activeTagsKey]);
 
     useEffect(() => {
         onLoadedIdsChange(blogs.map((b) => b._id));
@@ -149,62 +159,75 @@ export function ProfileBlogPosts({ username, preloadedProfile, preloadedInitialB
     return (
         <div className="space-y-4">
             {blogs.length === 0 ? (
-                <p className="text-muted-foreground">{username} has not posted any insights yet.</p>
-                ) : (
-                    <>
-                        <ul className="flex flex-col gap-2">
-                            {blogs.map((blog) => (
-                                <li key={blog._id}>
-                                    <SelectableCardWrapper
-                                        id={blog._id}
-                                        isSelected={selectedIds.includes(blog._id)}
-                                        onSelectChange={handleSelectChange}
-                                        isOwnProfile={isOwnProfile}
-                                        actions={
-                                            <Button
+                <p className="text-muted-foreground">
+                    {username} has not posted any insights yet.
+                </p>
+            ) : (
+                <>
+                    <ul className="flex flex-col gap-2">
+                        {blogs.map((blog) => (
+                            <li key={blog._id}>
+                                <SelectableCardWrapper
+                                    id={blog._id}
+                                    isSelected={selectedIds.includes(blog._id)}
+                                    onSelectChange={handleSelectChange}
+                                    isOwnProfile={isOwnProfile}
+                                    actions={
+                                        <Button
                                             variant="ghost"
                                             size="icon"
                                             className="h-6 w-6 rounded-sm cursor-pointer hover:bg-accent/50"
-                                            >
+                                        >
                                             <Link
                                                 href={`/company/blog?id=${blog._id}`}
                                                 onMouseEnter={() => {
-                                                convex.query(api.blogs.getBlogById, { blogId: blog._id }).catch((err) => {
-                                                    console.error("Prefetch failed:", err);
-                                                });
+                                                    convex
+                                                        .query(api.blogs.getBlogById, {
+                                                            blogId: blog._id,
+                                                        })
+                                                        .catch((err) => {
+                                                            console.error(
+                                                                "Prefetch failed:",
+                                                                err
+                                                            );
+                                                        });
                                                 }}
                                             >
                                                 <Pen className="h-3.5 w-3.5" />
                                             </Link>
-                                            </Button>
-                                        }
-                                    >
-                                        <BlogCard
-                                            id={blog._id}
-                                            imageUrl={blog.imageUrl}
-                                            displayName={blog.displayName}
-                                            username={blog.username}
-                                            title={blog.title}
-                                            subtitle={blog.subtitle}
-                                            totalViews={blog.totalViews}
-                                            likes={blog.likes}
-                                            commentCount={blog.commentCount}
-                                            date={blog._creationTime}
-                                            readTime={blog.readTime}
-                                            tags={blog.tags}
-                                        />
-                                    </SelectableCardWrapper>
-                                </li>
-                            ))}
-                        </ul>
+                                        </Button>
+                                    }
+                                >
+                                    <BlogCard
+                                        id={blog._id}
+                                        imageUrl={blog.imageUrl}
+                                        displayName={blog.displayName}
+                                        username={blog.username}
+                                        title={blog.title}
+                                        subtitle={blog.subtitle}
+                                        totalViews={blog.totalViews}
+                                        likes={blog.likes}
+                                        commentCount={blog.commentCount}
+                                        date={blog._creationTime}
+                                        readTime={blog.readTime}
+                                        tags={blog.tags}
+                                        isInitialBookmarked={false}
+                                    />
+                                </SelectableCardWrapper>
+                            </li>
+                        ))}
+                    </ul>
 
-                        {!isDone && (
-                            <div ref={loadMoreRef} className="py-6 text-center text-sm text-muted-foreground">
-                                {isLoading ? "Loading more blogs..." : "Loading..."}
-                            </div>
-                        )}
-                    </>
-                )}
+                    {!isDone && (
+                        <div
+                            ref={loadMoreRef}
+                            className="py-6 text-center text-sm text-muted-foreground"
+                        >
+                            {isLoading ? "Loading more blogs..." : "Loading..."}
+                        </div>
+                    )}
+                </>
+            )}
         </div>
     );
 }
