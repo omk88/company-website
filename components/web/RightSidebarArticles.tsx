@@ -1,39 +1,24 @@
-import { 
-  Sidebar, 
-  SidebarHeader, 
-  SidebarContent, 
-  SidebarGroup, 
-  SidebarGroupLabel,
-  SidebarGroupContent,
-  SidebarFooter 
-} from "../ui/sidebar";
-import { Separator } from "../ui/separator";
-import { MoreFromContainer } from "./MoreFromContainer";
-import { Suspense } from "react";
-import { TrendingBlogsSkeleton } from "./TrendingBlogsSkeleton";
-import { Id } from "@/convex/_generated/dataModel";
+"use client";
+
+import { MoreFromAuthor } from "./MoreFromAuthor";
+import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent } from "../ui/sidebar";
 
 interface RightSidebarArticlesProps {
-  author: string;
-  displayName: string | undefined;
   username: string;
-  blogId: Id<"blogs">;
+  displayName: string | undefined;
 }
 
-export function RightSidebarArticles({ author, displayName, username, blogId }: RightSidebarArticlesProps) {
+export function RightSidebarArticles({ username, displayName }: RightSidebarArticlesProps) {
+
   return (
-    <Sidebar bgClass="bg-white" showBorder={false} side="right" className="!w-75 !top-16 !z-40 h-[calc(100vh-4rem)] flex flex-col overflow-hidden">
-      <Separator/>
+    <Sidebar bgClass="bg-white" side="right" className="!w-75 !top-16 !z-40 h-[calc(100vh-4rem)]">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
-            <Suspense fallback={<TrendingBlogsSkeleton />}>
-                <MoreFromContainer author={author} displayName={displayName} username={username} blogId={blogId}  />
-            </Suspense>
+            <MoreFromAuthor username={username} displayName={displayName} />
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter/>
     </Sidebar>
   );
 }

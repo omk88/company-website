@@ -8,11 +8,8 @@ import {
   SidebarFooter, 
   SidebarProvider
 } from "../ui/sidebar";
-import { FeaturedBlogs } from "./FeaturedBlogsContainer";
-import { TrendingBlogs } from "./TrendingBlogsContainer";
-import { Suspense } from "react";
-import { FeaturedBlogsSkeleton } from "./FeaturedBlogsSkeleton";
-import { TrendingBlogsSkeleton } from "./TrendingBlogsSkeleton";
+import { FeaturedBlogs } from "./FeaturedBlogs";
+import { TrendingBlogs } from "./TrendingBlogs";
 
 export function RightSidebar() {
   return (
@@ -26,16 +23,12 @@ export function RightSidebar() {
       <SidebarContent className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-none">
         <SidebarGroup> 
           <SidebarGroupContent>
-            <Suspense fallback={<FeaturedBlogsSkeleton />}>
-              <FeaturedBlogs />
-            </Suspense>
+            <FeaturedBlogs />
           </SidebarGroupContent>
         </SidebarGroup>
         <SidebarGroup>
           <SidebarGroupContent>
-            <Suspense fallback={<TrendingBlogsSkeleton />}>
-                <TrendingBlogs />
-            </Suspense>
+            <TrendingBlogs />
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>

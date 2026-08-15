@@ -2,10 +2,8 @@
 
 import { api } from "@/convex/_generated/api";
 import { Doc } from "@/convex/_generated/dataModel";
-import { useConvex, useMutation, usePreloadedQuery } from "convex/react";
-import { usePreloadedAuthQuery } from "@convex-dev/better-auth/nextjs/client";
-import { Preloaded } from "convex/react";
-import { Copy, Ellipsis,  MessageSquare, SmilePlus, SquarePen, Star, ThumbsUp, Trash2, TriangleAlert } from "lucide-react";
+import { useConvex, useMutation, useQuery } from "convex/react";
+import { Copy, Ellipsis, MessageSquare, SmilePlus, SquarePen, Star, ThumbsUp, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
 import { useTransition } from "react";
 import { toast } from "sonner";
@@ -21,30 +19,17 @@ import { EMOJI_REACTIONS, ReactionType } from "@/app/constants/reactions";
 
 interface IncrementBlogLikesProps {
   blog: Doc<"blogs">;
-  preloadedUser: Preloaded<typeof api.auth.getCurrentUser>;
-  preloadedVoteState: Preloaded<typeof api.blogs.getBlogVoteState>;
-  preloadedCommentCount: Preloaded<typeof api.comments.getCommentNumber>;
-  preloadedFeaturedState: Preloaded<typeof api.blogs.getBlogFeaturedState>;
-  preloadedReactionState: Preloaded<typeof api.blogs.getBlogReactionState>;
 }
 
-export function IncrementBlogLikesDislikes({ 
-  blog, 
-  preloadedUser, 
-  preloadedVoteState, 
-  preloadedCommentCount,
-  preloadedFeaturedState,
-  preloadedReactionState,
-}: IncrementBlogLikesProps) {
-
+export function IncrementBlogLikesDislikes({ blog }: IncrementBlogLikesProps) {
   const convex = useConvex();
-  
-  const currentUser = usePreloadedAuthQuery(preloadedUser);
-  const voteState = usePreloadedQuery(preloadedVoteState);
-  const reactionState = usePreloadedQuery(preloadedReactionState);
-  const displayComments = usePreloadedQuery(preloadedCommentCount);
+  const router = useRouter();
 
-  const featuredState = usePreloadedQuery(preloadedFeaturedState);
+  const currentUser = useQuery(api.auth.getCurrentUser);
+  const voteState = useQuery(api.blogs.getBlogVoteState, { blogId: blog._id });
+  const reactionState = useQuery(api.blogs.getBlogReactionState, { blogId: blog._id });
+  const displayComments = useQuery(api.comments.getCommentNumber, { blogId: blog._id }) ?? 0;
+  const featuredState = useQuery(api.blogs.getBlogFeaturedState, { blogId: blog._id });
 
   const [isVotePending, startVoteTransition] = useTransition();
   const [isFeaturedPending, startFeaturedTransition] = useTransition();
@@ -52,11 +37,8 @@ export function IncrementBlogLikesDislikes({
   const userEmail = currentUser?.email;
   const isCompanyUser = userEmail?.endsWith("@taqtiq.tech");
 
-  const router = useRouter(); 
-  
   const hasLiked = voteState?.hasVoted;
-  const likesCount = voteState?.likes; 
-
+  const likesCount = voteState?.likes ?? blog.likes;
   const isFeatured = featuredState?.isFeatured;
 
   const prefetchBlog = () => {
@@ -65,10 +47,9 @@ export function IncrementBlogLikesDislikes({
     });
   };
 
-  const toggleReactionMutation = useMutation(api.blogs.toggleBlogReaction)
-    .withOptimisticUpdate((localStore, args) => {
+  const toggleReactionMutation = useMutation(api.blogs.toggleBlogReaction).withOptimisticUpdate(
+    (localStore, args) => {
       const { blogId, reactionType } = args;
-
       const previous = localStore.getQuery(api.blogs.getBlogReactionState, { blogId });
       if (!previous) return;
 
@@ -101,18 +82,18 @@ export function IncrementBlogLikesDislikes({
           },
         }
       );
-    });
-  
+    }
+  );
+
   const totalReactions = reactionState
     ? Object.values(reactionState.counts).reduce((acc, count) => acc + count, 0)
     : 0;
 
-  const toggleBlogVoteMutation = useMutation(api.blogs.toggleBlogVote)
-    .withOptimisticUpdate((localStore, args) => {
+  const toggleBlogVoteMutation = useMutation(api.blogs.toggleBlogVote).withOptimisticUpdate(
+    (localStore, args) => {
       const { blogId } = args;
-      
       const previous = localStore.getQuery(api.blogs.getBlogVoteState, { blogId });
-      
+
       const currentHasVoted = previous?.hasVoted ?? false;
       const currentLikes = previous?.likes ?? blog.likes;
 
@@ -127,14 +108,14 @@ export function IncrementBlogLikesDislikes({
           likes: nextLikes,
         }
       );
-  });
+    }
+  );
 
-  const toggleFeaturedMutation = useMutation(api.blogs.toggleFeatured)
-    .withOptimisticUpdate((localStore, args) => {
+  const toggleFeaturedMutation = useMutation(api.blogs.toggleFeatured).withOptimisticUpdate(
+    (localStore, args) => {
       const { blogId } = args;
-      
       const previous = localStore.getQuery(api.blogs.getBlogFeaturedState, { blogId });
-      
+
       const currentIsFeatured = previous?.isFeatured ?? false;
       const nextHasVoted = !currentIsFeatured;
 
@@ -145,12 +126,13 @@ export function IncrementBlogLikesDislikes({
           isFeatured: nextHasVoted,
         }
       );
-  });
+    }
+  );
 
   const handleLikeClick = async () => {
     if (isVotePending) return;
 
-    if (currentUser === null) {
+    if (!currentUser) {
       toast.error("You must be logged in to like an article.");
       return;
     }
@@ -168,7 +150,7 @@ export function IncrementBlogLikesDislikes({
   const handleFeaturedClick = async () => {
     if (isFeaturedPending) return;
 
-    if (currentUser === null) {
+    if (!currentUser) {
       toast.error("You must be logged in to feature an article.");
       return;
     }
@@ -206,176 +188,171 @@ export function IncrementBlogLikesDislikes({
 
   return (
     <div className="flex flex-col items-center gap-2 p-6 text-muted-foreground text-xs">
-      <Button 
-        variant="ghost" 
+      <Button
+        variant="ghost"
         onClick={handleLikeClick}
         className="h-12 w-12 rounded-full text-muted-foreground hover:text-foreground cursor-pointer"
       >
         <ThumbsUp
-          className={`!h-5 !w-5 transition-none ${
-            hasLiked ? "text-emerald-500" : ""
-          }`}
+          className={`!h-5 !w-5 transition-none ${hasLiked ? "text-emerald-500" : ""}`}
           fill={hasLiked ? "currentColor" : "none"}
         />
-        <span className={hasLiked ? "text-emerald-500 font-bold" : ""}>
-          {likesCount}
-        </span>
+        <span className={hasLiked ? "text-emerald-500 font-bold" : ""}>{likesCount}</span>
       </Button>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             className="h-12 w-12 rounded-full text-muted-foreground hover:text-foreground cursor-pointer"
           >
-            <SmilePlus
-              className="!h-5 !w-5 transition-transform active:scale-90"
-            />
+            <SmilePlus className="!h-5 !w-5 transition-transform active:scale-90" />
             <span>{totalReactions}</span>
           </Button>
         </DropdownMenuTrigger>
-          <DropdownMenuContent
-            side="right"
-            align="center"
-            sideOffset={12}
-            className="flex flex-row items-center gap-4 p-4 w-max min-w-0 z-50 overflow-visible"
-          >
-            {EMOJI_REACTIONS.map(({ type, emoji, label }) => {
-              const isSelected = reactionState?.userReactions.includes(type);
+        <DropdownMenuContent
+          side="right"
+          align="center"
+          sideOffset={12}
+          className="flex flex-row items-center gap-4 p-4 w-max min-w-0 z-50 overflow-visible"
+        >
+          {EMOJI_REACTIONS.map(({ type, emoji, label }) => {
+            const isSelected = reactionState?.userReactions.includes(type);
 
-              return (
-                <DropdownMenuItem
-                  key={type}
-                  onClick={() => handleSelectReaction(type)}
-                  className={`flex h-9 w-9 shrink-0 justify-center items-center rounded-full cursor-pointer text-3xl p-0 transition-transform hover:scale-120 focus:outline-none ${
-                    isSelected
-                      ? "bg-accent scale-110 font-bold"
-                      : "hover:bg-accent/50 hover:scale-110"
-                  }`}
-                  title={label}
-                >
-                  <span role="img" aria-label={label} className="flex items-center justify-center leading-none">
-                    {emoji}
-                  </span>
-                </DropdownMenuItem>
-              );
-            })}
-          </DropdownMenuContent>
+            return (
+              <DropdownMenuItem
+                key={type}
+                onClick={() => handleSelectReaction(type)}
+                className={`flex h-9 w-9 shrink-0 justify-center items-center rounded-full cursor-pointer text-3xl p-0 transition-transform hover:scale-120 focus:outline-none ${
+                  isSelected ? "bg-accent scale-110 font-bold" : "hover:bg-accent/50 hover:scale-110"
+                }`}
+                title={label}
+              >
+                <span role="img" aria-label={label} className="flex items-center justify-center leading-none">
+                  {emoji}
+                </span>
+              </DropdownMenuItem>
+            );
+          })}
+        </DropdownMenuContent>
       </DropdownMenu>
 
-      <Button 
-        variant="ghost" 
+      <Button
+        variant="ghost"
         className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground cursor-pointer"
         onClick={scrollToView}
       >
         <MessageSquare className="!h-5 !w-5 transition-transform active:scale-90" />
         <span>{displayComments}</span>
       </Button>
+
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-            <Button 
-                variant="ghost" 
-                className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground disabled:opacity-100 cursor-pointer"
-            >
-                <Ellipsis
-                    className="!h-5 !w-5 transition-transform active:scale-90"
-                />
-            </Button>
+          <Button
+            variant="ghost"
+            className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground disabled:opacity-100 cursor-pointer"
+          >
+            <Ellipsis className="!h-5 !w-5 transition-transform active:scale-90" />
+          </Button>
         </DropdownMenuTrigger>
 
         <DropdownMenuContent className="w-48">
-            <DropdownMenuLabel>Share</DropdownMenuLabel>
-            
-            <DropdownMenuItem 
-                className="font-bold cursor-pointer flex items-center gap-2 whitespace-nowrap"
-                onClick={() => {
-                    navigator.clipboard.writeText(window.location.href);
-                    toast.success("Link copied to clipboard!");
-                }}
-            >
-                <Copy className="h-4 w-4 shrink-0" strokeWidth={3} />
-                <span>Copy link</span>
-            </DropdownMenuItem>
+          <DropdownMenuLabel>Share</DropdownMenuLabel>
 
-            <DropdownMenuItem 
-                className="cursor-pointer flex items-center gap-2 whitespace-nowrap"
-                onClick={() => {
-                    const shareUrl = `https://x.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent("Check out this article!")}`;
-                    window.open(shareUrl, "_blank", "noopener,noreferrer");
-                }}
-            >
-                <FaXTwitter className="h-4 w-4 shrink-0" />
-                <span>X (Twitter)</span>
-            </DropdownMenuItem>
+          <DropdownMenuItem
+            className="font-bold cursor-pointer flex items-center gap-2 whitespace-nowrap"
+            onClick={() => {
+              navigator.clipboard.writeText(window.location.href);
+              toast.success("Link copied to clipboard!");
+            }}
+          >
+            <Copy className="h-4 w-4 shrink-0" strokeWidth={3} />
+            <span>Copy link</span>
+          </DropdownMenuItem>
 
-            <DropdownMenuItem 
-                className="cursor-pointer flex items-center gap-2 whitespace-nowrap"
-                onClick={() => {
-                    const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`;
-                    window.open(shareUrl, "_blank", "noopener,noreferrer");
-                }}
-            >
-                <RxLinkedinLogo className="h-4 w-4 shrink-0" />
-                <span>LinkedIn</span>
-            </DropdownMenuItem>
+          <DropdownMenuItem
+            className="cursor-pointer flex items-center gap-2 whitespace-nowrap"
+            onClick={() => {
+              const shareUrl = `https://x.com/intent/tweet?url=${encodeURIComponent(
+                window.location.href
+              )}&text=${encodeURIComponent("Check out this article!")}`;
+              window.open(shareUrl, "_blank", "noopener,noreferrer");
+            }}
+          >
+            <FaXTwitter className="h-4 w-4 shrink-0" />
+            <span>X (Twitter)</span>
+          </DropdownMenuItem>
 
-            <DropdownMenuItem 
-                className="cursor-pointer flex items-center gap-2 whitespace-nowrap"
-                onClick={() => {
-                    const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`;
-                    window.open(shareUrl, "_blank", "noopener,noreferrer");
-                }}
-            >
-                <FaFacebook className="h-4 w-4 shrink-0" />
-                <span>Facebook</span>
-            </DropdownMenuItem>
+          <DropdownMenuItem
+            className="cursor-pointer flex items-center gap-2 whitespace-nowrap"
+            onClick={() => {
+              const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
+                window.location.href
+              )}`;
+              window.open(shareUrl, "_blank", "noopener,noreferrer");
+            }}
+          >
+            <RxLinkedinLogo className="h-4 w-4 shrink-0" />
+            <span>LinkedIn</span>
+          </DropdownMenuItem>
+
+          <DropdownMenuItem
+            className="cursor-pointer flex items-center gap-2 whitespace-nowrap"
+            onClick={() => {
+              const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+                window.location.href
+              )}`;
+              window.open(shareUrl, "_blank", "noopener,noreferrer");
+            }}
+          >
+            <FaFacebook className="h-4 w-4 shrink-0" />
+            <span>Facebook</span>
+          </DropdownMenuItem>
         </DropdownMenuContent>
-    </DropdownMenu>
-    {isCompanyUser && (
+      </DropdownMenu>
+
+      {isCompanyUser && (
         <>
-            <div className="w-1/2 mx-auto">
-                <Separator />
-            </div>
+          <div className="w-1/2 mx-auto">
+            <Separator />
+          </div>
 
-            <Button 
-                variant="ghost" 
-                onClick={handleFeaturedClick} 
-                className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground disabled:opacity-100 cursor-pointer"
-            >
-                <Star
-                    className={`!h-5 !w-5 transition-all active:scale-90 ${
-                        isFeatured ? "text-amber-500 fill-amber-500" : ""
-                    }`}
-                />
-            </Button>
-
-            <Button 
-                variant="ghost" 
-                className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground disabled:opacity-100 cursor-pointer"
-                asChild
-            >
-                <Link
-                  href={`/company/blog?id=${blog._id}`}
-                  onMouseEnter={prefetchBlog}
-                >
-                    <SquarePen className="!h-5 !w-5 transition-transform active:scale-90" />
-                </Link>
-            </Button>
-
-            <DeleteBlogDialog
-              blogIds={[blog._id]}
-              onSuccess={() => {
-                router.push("/insights");
-              }}
-              trigger={
-                <Button 
-                    variant="ghost" 
-                    className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-destructive disabled:opacity-100 cursor-pointer"
-                >
-                  <Trash2 className="!h-5 !w-5 transition-transform active:scale-90" />
-                </Button>
-              }
+          <Button
+            variant="ghost"
+            onClick={handleFeaturedClick}
+            className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground disabled:opacity-100 cursor-pointer"
+          >
+            <Star
+              className={`!h-5 !w-5 transition-all active:scale-90 ${
+                isFeatured ? "text-amber-500 fill-amber-500" : ""
+              }`}
             />
+          </Button>
+
+          <Button
+            variant="ghost"
+            className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground disabled:opacity-100 cursor-pointer"
+            asChild
+          >
+            <Link href={`/company/blog?id=${blog._id}`} onMouseEnter={prefetchBlog}>
+              <SquarePen className="!h-5 !w-5 transition-transform active:scale-90" />
+            </Link>
+          </Button>
+
+          <DeleteBlogDialog
+            blogIds={[blog._id]}
+            onSuccess={() => {
+              router.push("/insights");
+            }}
+            trigger={
+              <Button
+                variant="ghost"
+                className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-destructive disabled:opacity-100 cursor-pointer"
+              >
+                <Trash2 className="!h-5 !w-5 transition-transform active:scale-90" />
+              </Button>
+            }
+          />
         </>
       )}
     </div>
