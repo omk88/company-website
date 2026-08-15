@@ -9,8 +9,7 @@ import {
   SidebarFooter, 
   SidebarMenu, 
   SidebarMenuItem, 
-  SidebarMenuButton, 
-  SidebarProvider
+  SidebarMenuButton,
 } from "../ui/sidebar";
 import { SidebarSearch } from "./SidebarSearch";
 import { SidebarSort } from "./SidebarSort";
@@ -19,6 +18,7 @@ import Link from "next/link";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useSearchStore, FeedType } from "@/stores/useSearchStore";
+import { Button } from "../ui/button";
 
 const NAV_ITEMS = [
   { id: "all", label: "All Insights", icon: Library },
@@ -40,9 +40,9 @@ export function LeftSidebar() {
       collapsible="icon"
     >
       <SidebarContent className="!p-0 w-full">
-        <SidebarGroup className="pt-4 !pl-2 !pr-2 w-full">
+        <SidebarGroup className="pt-3 !px-2 w-full">
           
-          <SidebarMenu className="w-full flex flex-col gap-1">
+          <SidebarMenu className="w-full flex flex-col gap-0.5">
             {NAV_ITEMS.map((item) => {
               const Icon = item.icon;
               const isActive = feedType === item.id;
@@ -53,12 +53,19 @@ export function LeftSidebar() {
                     isActive={isActive}
                     onClick={() => setFeedType(item.id as FeedType)}
                     className={`
-                      w-full !cursor-pointer justify-start px-3 py-2 rounded-xl text-sm font-medium transition-colors
-                      data-[active=true]:hover:bg-zinc-200/50 data-[active=true]:text-foreground data-[active=true]:font-semibold
-                      hover:bg-muted
+                      group w-full !cursor-pointer justify-start px-2.5 py-1.5 rounded-lg text-[13px] transition-colors
+                      ${
+                        isActive 
+                          ? "bg-zinc-100 text-foreground font-semibold" 
+                          : "text-zinc-600 hover:text-foreground hover:bg-zinc-50 font-medium"
+                      }
                     `}
                   >
-                    <Icon className="h-4 w-4 shrink-0" />
+                    <Icon 
+                      className={`h-4 w-4 shrink-0 transition-colors ${
+                        isActive ? "text-foreground" : "text-zinc-500 group-hover:text-foreground"
+                      }`} 
+                    />
                     <span>{item.label}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -66,27 +73,22 @@ export function LeftSidebar() {
             })}
           </SidebarMenu>
 
-          <div className="flex flex-col py-2 gap-3 items-start w-full">
-            <div className="w-full px-2 py-1">
+          <div className="flex flex-col py-2 gap-2.5 items-start w-full">
+            <div className="w-full px-1 py-1">
               <Separator />
             </div>
             <SidebarSearch placeholder="insights" fullWidth={true} showDropdown={true} />
             <SidebarSort fullWidth={true} />
             <SidebarTags fullWidth={true} />
 
-            <div className="w-full">
-              <Link href={userData ? "/create-blog" : "/sign-in"}>
-                <SidebarMenuButton
-                  className={`
-                    group w-full justify-center !h-auto !rounded-md text-xs font-semibold
-                    !bg-foreground hover:!bg-foreground/90 !text-background
-                    transition-all duration-100 active:scale-[0.99] cursor-pointer
-                    inline-flex items-center gap-2
-                  `}
+            <div className="w-full pt-2">
+              <Link href={userData ? "/create-blog" : "/sign-in"} className="block w-full">
+                <Button 
+                  className="w-full h-9 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-[13px] font-medium cursor-pointer flex items-center justify-center gap-1.5 transition-all active:scale-[0.98]"
                 >
-                  <Plus className="w-3 h-3 shrink-0 stroke-[2.3]" />
+                  <Plus className="w-4 h-4 shrink-0 stroke-[2.2]" />
                   <span>Create a Post</span>
-                </SidebarMenuButton>
+                </Button>
               </Link>
             </div>
           </div>

@@ -39,15 +39,15 @@ export function SidebarSearch({
 
   return (
     <div className={`relative ${fullWidth ? "w-full" : "inline-block"}`}>
-      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 stroke-[1.5] text-muted-foreground pointer-events-none z-10" />
+      <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500 pointer-events-none z-10" />
 
       <Input
         type="text"
         placeholder={fullPlaceholder}
         value={localValue}
         onChange={(e) => setLocalValue(e.target.value)}
-        className={`pl-9 ${rightPaddingClass} text-xs bg-background border-border/50 rounded-md focus-visible:ring-1 focus-visible:ring-primary ${
-          fullWidth ? "w-full" : "w-auto [field-sizing:content]"
+        className={`pl-8.5 ${rightPaddingClass} h-9 text-[13px] text-zinc-800 placeholder:text-zinc-500 bg-white border-zinc-200 rounded-lg hover:border-zinc-300 focus-visible:ring-1 focus-visible:ring-zinc-400 transition-colors ${
+          fullWidth ? "w-full" : "w-auto"
         }`}
       />
 
@@ -58,7 +58,7 @@ export function SidebarSearch({
             setSearchTerm("");
           }}
           type="button"
-          className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted z-10 cursor-pointer"
+          className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-800 p-1 rounded-md hover:bg-zinc-100 z-10 cursor-pointer transition-colors"
         >
           <X className="h-3.5 w-3.5 stroke-[2]" />
         </button>

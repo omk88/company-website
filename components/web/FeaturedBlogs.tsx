@@ -56,46 +56,46 @@ export function FeaturedBlogs() {
   });
 
   return (
-    <div className="flex flex-col justify-between w-full bg-muted/50 rounded-2xl p-4 transition-all duration-100 hover:bg-muted">
-      <div className="flex items-center justify-between mb-3">
-        <h1 className="flex items-center justify-center gap-2 text-xs font-medium text-muted-foreground">
-          <Sparkles className="w-3.5 h-3.5 stroke-[2.3] shrink-0" />
+    <div className="flex flex-col justify-between w-full bg-zinc-50/80 rounded-xl p-3.5 transition-all">
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-800">
+          <Sparkles className="w-3.5 h-3.5 shrink-0" />
           <span>Featured</span>
-        </h1>
-        <div className="flex items-center gap-1 text-muted-foreground">
-          <Button variant="ghost" size="icon" className="h-6 w-6 cursor-pointer" onClick={handlePrev}>
-            <ArrowLeft className="h-3.5 w-3.5" />
+        </div>
+        <div className="flex items-center gap-0.5 text-zinc-500">
+          <Button variant="ghost" size="icon" className="h-5 w-5 hover:bg-zinc-200/60 rounded" onClick={handlePrev}>
+            <ArrowLeft className="h-3 w-3" />
           </Button>
-          <span className="text-xs select-none px-1">
+          <span className="text-[11px] font-mono select-none px-1 text-zinc-500">
             {currentIndex + 1}/{blogs.length}
           </span>
-          <Button variant="ghost" size="icon" className="h-6 w-6 cursor-pointer" onClick={handleNext}>
-            <ArrowRight className="h-3.5 w-3.5" />
+          <Button variant="ghost" size="icon" className="h-5 w-5 hover:bg-zinc-200/60 rounded" onClick={handleNext}>
+            <ArrowRight className="h-3 w-3" />
           </Button>
         </div>
       </div>
 
       <Link 
         href={`/insights/${currentPost._id}`}
-        className="group/card flex items-start justify-between gap-4 w-full text-inherit no-underline cursor-pointer mb-4"
+        className="group/card flex items-start justify-between gap-3 w-full text-inherit no-underline cursor-pointer my-1"
       >
         <div className="flex flex-col justify-between flex-1 min-w-0">
           <div>
-            <div className="flex items-center gap-1.5 text-xs font-mono tracking-wider uppercase text-muted-foreground mb-1.5">
+            <div className="flex items-center gap-1.5 text-[11px] font-mono tracking-tight uppercase text-zinc-500 mb-1">
               <ProfileHoverCard authorUsername={currentPost.username} displayName={currentPost.displayName}>
-                <span className="cursor-pointer">{currentPost.displayName || currentPost.username}</span>
+                <span className="hover:underline cursor-pointer truncate max-w-[90px]">{currentPost.displayName || currentPost.username}</span>
               </ProfileHoverCard>
               <span>•</span>
               <span className="shrink-0">{formattedDate}</span>
             </div>
 
-            <h3 className="text-sm font-semibold leading-snug tracking-tight text-foreground transition-colors duration-100 group-hover/card:text-blue-600 line-clamp-3">
+            <h3 className="text-[13px] font-medium leading-snug text-zinc-900 group-hover/card:text-blue-600 transition-colors line-clamp-2">
               {currentPost.title}
             </h3>
           </div>
         </div>
 
-        <div className="relative h-20 w-20 shrink-0 rounded-xl overflow-hidden bg-background">
+        <div className="relative h-14 w-14 shrink-0 rounded-lg overflow-hidden bg-zinc-100 border border-zinc-200/60">
           {blogs.map((post, index) => (
             <Image
               key={post._id}
@@ -105,27 +105,25 @@ export function FeaturedBlogs() {
               className={`object-cover transition-opacity duration-100 ${
                 index === currentIndex ? "opacity-100 block" : "opacity-0 hidden"
               }`}
-              sizes="(max-width: 768px) 200px, 300px"
+              sizes="56px"
               priority={index === 0} 
             />
           ))}
         </div>
       </Link>
 
-      <div className="text-muted-foreground opacity-75 group-hover/trending:opacity-100 transition-opacity duration-150">
-        <div className="flex items-center text-sm text-muted-foreground font-mono tracking-tight select-none">
-          <div className="flex items-center gap-1.5 min-w-[3rem]">
-            <Eye className="w-4 h-4 stroke-[2.3] shrink-0" />
-            <span>{compactFormatter.format(currentPost.totalViews)}</span>
-          </div>
-          <div className="flex items-center gap-1.5 min-w-[3rem]">
-            <ThumbsUp className="w-4 h-4 stroke-[2.3] shrink-0" />
-            <span>{compactFormatter.format(currentPost.likes)}</span>
-          </div>
-          <div className="flex items-center gap-1.5 min-w-[3rem]">
-            <MessageSquare className="w-4 h-4 stroke-[2.3] shrink-0" />
-            <span>{compactFormatter.format(currentPost.commentCount)}</span>
-          </div>
+      <div className="flex items-center gap-3 text-[11px] text-zinc-500 font-mono pt-1">
+        <div className="flex items-center gap-1">
+          <Eye className="w-3 h-3 stroke-[2] shrink-0" />
+          <span>{compactFormatter.format(currentPost.totalViews)}</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <ThumbsUp className="w-3 h-3 stroke-[2] shrink-0" />
+          <span>{compactFormatter.format(currentPost.likes)}</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <MessageSquare className="w-3 h-3 stroke-[2] shrink-0" />
+          <span>{compactFormatter.format(currentPost.commentCount)}</span>
         </div>
       </div>
     </div>

@@ -48,7 +48,7 @@ export function BlogCard({ id, imageUrl, displayName, title, subtitle, totalView
 
             <div className="flex flex-col flex-1 justify-start px-4 py-2 min-w-0">
                 <div className="min-w-0">
-                    <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                    <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
                         <div>
                             <ProfileHoverCard authorUsername={username} displayName={displayName || username}>
                                 <span className="cursor-pointer">{displayName || username}</span>
@@ -126,7 +126,7 @@ export function BlogCard({ id, imageUrl, displayName, title, subtitle, totalView
                     <h3 className="leading-tight text-xl font-bold tracking-tight line-clamp-2 text-foreground transition-colors duration-100 group-hover:text-blue-600 break-words">
                         {title}
                     </h3>
-                    <p className="leading-tight text-muted-foreground line-clamp-3 leading-relaxed text-sm break-words">
+                    <p className="leading-tight text-zinc-600 dark:text-zinc-400 line-clamp-3 leading-relaxed text-sm break-words">
                         {subtitle}
                     </p>
                 </Link>
@@ -151,48 +151,55 @@ export function BlogCard({ id, imageUrl, displayName, title, subtitle, totalView
                     <div className="flex items-center gap-2 shrink-0 max-w-[55%] justify-end">
                         {tags && tags.length > 0 ? (
                             <>
-                                <div className="flex flex-row gap-1 items-center justify-end">
-                                    {tags.slice(0, 4).map((tag) => (
+                            <div className="flex flex-row gap-1 items-center justify-end">
+                                {tags.slice(0, 4).map((tag) => (
+                                <Badge 
+                                    key={tag} 
+                                    variant="outline" 
+                                    className="font-mono text-[10px] px-1.5 py-0.5 whitespace-nowrap border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                                >
+                                    <span className="capitalize">{tag}</span>
+                                </Badge>
+                                ))}
+                            </div>
+                            
+                            {tags.length > 4 && (
+                                <HoverCard openDelay={100} closeDelay={100}>
+                                <HoverCardTrigger asChild>
+                                    <Badge 
+                                    variant="outline" 
+                                    className="font-mono text-[10px] px-1.5 py-0.5 whitespace-nowrap border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 cursor-help hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors shrink-0"
+                                    >
+                                    +{tags.length - 4}
+                                    </Badge>
+                                </HoverCardTrigger>
+                                
+                                <HoverCardContent side="top" align="end" className="w-auto max-w-[220px] p-2.5">
+                                    <div className="space-y-1.5">
+                                    <h4 className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">More Topics</h4>
+                                    <div className="flex flex-wrap gap-1 max-h-[120px] overflow-y-auto">
+                                        {tags.slice(4).map((tag) => (
                                         <Badge 
                                             key={tag} 
                                             variant="outline" 
-                                            className="font-mono text-[10px] px-1.5 py-0.5 whitespace-nowrap border-black dark:border-white"
+                                            className="font-mono text-[10px] px-1.5 py-0.5 whitespace-nowrap border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300"
                                         >
-                                            <span className="capitalize">
-                                                {tag}
-                                            </span>
+                                            <span className="capitalize">{tag}</span>
                                         </Badge>
-                                    ))}
-                                </div>
-                                
-                                {tags.length > 4 && (
-                                    <HoverCard openDelay={100} closeDelay={100}>
-                                        <HoverCardTrigger asChild>
-                                            <Badge 
-                                                variant="outline" 
-                                                className="font-mono text-[10px] px-1.5 py-0.5 whitespace-nowrap border-black dark:border-white cursor-help hover:bg-muted transition-colors shrink-0"
-                                            >
-                                                +{tags.length - 4}
-                                            </Badge>
-                                        </HoverCardTrigger>
-                                        
-                                        <HoverCardContent side="top" align="end">
-                                            <div className="space-y-2">
-                                                <h4 className="text-[12px]">All Topics</h4>
-                                                <div className="flex flex-wrap gap-1.5 max-h-[120px] overflow-y-auto pt-0.5">
-                                                    {tags.map((tag) => (
-                                                        <Badge key={tag} variant="outline" className="font-mono text-[10px] px-1.5 py-0.5 whitespace-nowrap border-black dark:border-white cursor-help hover:bg-muted transition-colors shrink-0">
-                                                            {tag}
-                                                        </Badge>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        </HoverCardContent>
-                                    </HoverCard>
-                                )}
+                                        ))}
+                                    </div>
+                                    </div>
+                                </HoverCardContent>
+                                </HoverCard>
+                            )}
                             </>
                         ) : (
-                            <Badge variant="outline" className="shrink-0 text-[10px]">General</Badge>
+                            <Badge 
+                            variant="outline" 
+                            className="font-mono text-[10px] px-1.5 py-0.5 whitespace-nowrap border-zinc-200 dark:border-zinc-800 text-zinc-500"
+                            >
+                            General
+                            </Badge>
                         )}
                     </div>
                 </div>

@@ -35,13 +35,10 @@ export function SidebarTags({ fullWidth, className }: SidebarTagsProps) {
     }
 
     setActiveTags((prev) => {
-
       const cleanPrev = prev.filter((t) => t !== "all");
-      const currentWithoutAll = prev.filter((t) => t !== "all");
 
       if (cleanPrev.includes(id)) {
-        const updated = cleanPrev.filter((t) => t !== id);
-        return updated;
+        return cleanPrev.filter((t) => t !== id);
       } else {
         return [...cleanPrev, id];
       }
@@ -59,49 +56,49 @@ export function SidebarTags({ fullWidth, className }: SidebarTagsProps) {
         <button
           type="button"
           className={cn(
-            "flex h-8 shrink-0 items-center justify-between gap-2 rounded-lg border border-border/50 bg-background pl-3 pr-2 text-xs whitespace-nowrap placeholder:text-muted-foreground focus:ring-1 cursor-pointer",
+            "flex h-9 shrink-0 items-center justify-between gap-2 rounded-lg border border-zinc-200 bg-white px-2.5 text-[13px] font-medium text-zinc-700 whitespace-nowrap hover:bg-zinc-50 focus:ring-1 focus:ring-zinc-400 cursor-pointer transition-colors",
             fullWidth ? "w-full" : "w-fit",
             className
           )}
         >
-          <span className="flex flex-row items-center gap-1.5 whitespace-nowrap">
-            <Tag className="h-3.5 w-3.5 shrink-0" />
+          <span className="flex flex-row items-center gap-2 whitespace-nowrap">
+            <Tag className="h-4 w-4 shrink-0 text-zinc-500" />
             <span>Tags</span>
             {activeTags.length > 0 && !isAllSelected && (
-              <span className="text-muted-foreground">({activeTags.length})</span>
+              <span className="text-zinc-500 font-normal">({activeTags.length})</span>
             )}
           </span>
-          <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
+          <ChevronDown className="h-4 w-4 shrink-0 text-zinc-400" />
         </button>
       </PopoverTrigger>
 
       <PopoverContent 
-        align="end" 
-        className="w-[var(--radix-popover-trigger-width)] min-w-[8rem] p-0"
+        align="start" 
+        className="w-[var(--radix-popover-trigger-width)] min-w-[9rem] p-1.5 rounded-lg border-zinc-200 shadow-md"
       >
-        <FieldGroup className="gap-1 p-2">
-          <FieldLabel className="px-2 text-xs font-medium text-muted-foreground select-none">
-            Tags
+        <FieldGroup className="gap-0.5">
+          <FieldLabel className="px-2 py-1 text-xs font-semibold text-zinc-500 select-none">
+            Filter Tags
           </FieldLabel>
 
           {TAG_ITEMS.map((item) => (
             <Field
               key={item.id}
               orientation="horizontal"
-              className="flex items-center gap-2 px-2 py-1.5 rounded-sm hover:bg-accent hover:text-accent-foreground cursor-pointer transition-colors select-none"
+              className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-zinc-100 cursor-pointer transition-colors select-none"
               onClick={() => toggleTag(item.id)}
             >
               <Checkbox
                 id={item.id}
                 name={item.id}
                 checked={isChecked(item.id)}
-                className="pointer-events-none"
+                className="pointer-events-none rounded border-zinc-300"
                 tabIndex={-1}
               />
               <FieldLabel
                 className="font-normal cursor-pointer select-none pointer-events-none"
               >
-                <span className="!text-xs">{item.label}</span>
+                <span className="text-[13px] text-zinc-700">{item.label}</span>
               </FieldLabel>
             </Field>
           ))}

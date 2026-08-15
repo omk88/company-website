@@ -21,26 +21,26 @@ export function SidebarSort({ fullWidth = false, className }: SidebarSortProps) 
     >
       <SelectTrigger 
         className={cn(
-          "flex h-8 shrink-0 items-center justify-between gap-2 rounded-lg border border-border/50 bg-background pl-3 pr-2 text-xs whitespace-nowrap placeholder:text-muted-foreground focus:ring-1 cursor-pointer",
+          "flex h-9 shrink-0 items-center justify-between gap-2 rounded-lg border border-zinc-200 bg-white px-2.5 text-[13px] font-medium text-zinc-700 whitespace-nowrap hover:bg-zinc-50 focus:ring-1 focus:ring-zinc-400 cursor-pointer transition-colors",
           fullWidth ? "w-full" : "w-fit",
           className
         )}
       >
         <SelectValue placeholder="Sort order">
-          {sortOrder === "new" && <span className="flex items-center gap-1.5"><CalendarArrowUp className="size-3.5" />New</span>}
-          {sortOrder === "hot" && <span className="flex items-center gap-1.5"><Flame className="size-3.5" />Hot</span>}
-          {sortOrder === "top" && <span className="flex items-center gap-1.5"><ArrowUp className="size-3.5" />Top</span>}
-          {sortOrder === "controversial" && <span className="flex items-center gap-1.5"><Swords className="size-3.5" />Controversial</span>}
+          {sortOrder === "new" && <span className="flex items-center gap-2"><CalendarArrowUp className="h-4 w-4 text-zinc-500" />New</span>}
+          {sortOrder === "hot" && <span className="flex items-center gap-2"><Flame className="h-4 w-4 text-zinc-500" />Hot</span>}
+          {sortOrder === "top" && <span className="flex items-center gap-2"><ArrowUp className="h-4 w-4 text-zinc-500" />Top</span>}
+          {sortOrder === "controversial" && <span className="flex items-center gap-2"><Swords className="h-4 w-4 text-zinc-500" />Controversial</span>}
         </SelectValue>
       </SelectTrigger>
       
-      <SelectContent position="popper">
+      <SelectContent position="popper" className="rounded-lg border-zinc-200 shadow-md">
         <SelectGroup>
-          <SelectLabel>Sort</SelectLabel>
-          <SelectItem value="new" className="text-xs cursor-pointer p-2"><CalendarArrowUp />New</SelectItem>
-          <SelectItem value="hot" className="text-xs cursor-pointer p-2"><Flame />Hot</SelectItem>
-          <SelectItem value="top" className="text-xs cursor-pointer p-2"><ArrowUp />Top</SelectItem>
-          <SelectItem value="controversial" className="text-xs cursor-pointer p-2"><Swords />Controversial</SelectItem>
+          <SelectLabel className="px-2 py-1.5 text-xs text-zinc-500 font-semibold">Sort By</SelectLabel>
+          <SelectItem value="new" className="text-[13px] text-zinc-700 cursor-pointer rounded-md my-0.5"><CalendarArrowUp className="h-4 w-4 mr-2 text-zinc-500" />New</SelectItem>
+          <SelectItem value="hot" className="text-[13px] text-zinc-700 cursor-pointer rounded-md my-0.5"><Flame className="h-4 w-4 mr-2 text-zinc-500" />Hot</SelectItem>
+          <SelectItem value="top" className="text-[13px] text-zinc-700 cursor-pointer rounded-md my-0.5"><ArrowUp className="h-4 w-4 mr-2 text-zinc-500" />Top</SelectItem>
+          <SelectItem value="controversial" className="text-[13px] text-zinc-700 cursor-pointer rounded-md my-0.5"><Swords className="h-4 w-4 mr-2 text-zinc-500" />Controversial</SelectItem>
         </SelectGroup>
       </SelectContent>
     </Select>
