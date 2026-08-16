@@ -32,28 +32,47 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
         />
       </div>
 
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col">
         <h1 className="text-4xl font-bold tracking-tight text-neutral-950 dark:text-neutral-50">
           {blog.title}
         </h1>
         
-        <div className="text-muted-foreground font-light text-sm">
-          <ProfileHoverCard authorUsername={blog.username} displayName={blog.displayName}>
-            <Link href={`/${blog.username}`} className="cursor-pointer hover:underline">
-              {blog.displayName || blog.username}
-            </Link>
-          </ProfileHoverCard>
-          <span>
-            {" • "}
-            {new Date(blog._creationTime).toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-              year: "numeric",
-            })}
+        <div className="flex items-center justify-between text-sm text-zinc-600 dark:text-zinc-400 font-normal my-4">
+          <div className="flex items-center gap-2">
+            <img
+              src={blog.authorAvatarUrl}
+              alt={blog.displayName || blog.username}
+              className="w-5 h-5 rounded-full object-cover shrink-0"
+            />
+
+            <ProfileHoverCard authorUsername={blog.username} displayName={blog.displayName}>
+              <Link
+                href={`/${blog.username}`}
+                className="font-medium hover:underline cursor-pointer"
+              >
+                {blog.displayName || blog.username}
+              </Link>
+            </ProfileHoverCard>
+
+            <span>&middot;</span>
+
+            <time dateTime={new Date(blog._creationTime).toISOString()}>
+              {new Date(blog._creationTime).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })}
+            </time>
+          </div>
+
+          <span className="text-xs sm:text-sm text-zinc-500 font-medium">
+            {blog.readTime} min read
           </span>
         </div>
 
-        <BlogEmojiReactions initialBlog={blog} />
+        <div className="mb-4">
+          <BlogEmojiReactions initialBlog={blog} />
+        </div>
 
         <p className="text-lg text-neutral-600 dark:text-neutral-400 font-medium">
           {blog.subtitle}

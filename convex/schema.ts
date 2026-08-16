@@ -11,6 +11,7 @@ const schema = defineSchema({
     content: v.string(),
     displayName: v.optional(v.string()),
     username: v.string(),
+    authorAvatarUrl: v.optional(v.string()),
     tags: v.array(v.string()), 
     createdAt: v.number(),
     totalViews: v.number(),

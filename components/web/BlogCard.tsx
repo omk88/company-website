@@ -169,10 +169,10 @@ export function BlogCard({ id, imageUrl, displayName, title, subtitle, totalView
                                 <HoverCard openDelay={100} closeDelay={100}>
                                 <HoverCardTrigger asChild>
                                     <Badge 
-                                    variant="outline" 
-                                    className="font-mono text-[10px] px-1.5 py-0.5 whitespace-nowrap border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 cursor-help hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors shrink-0"
+                                        variant="outline" 
+                                        className="font-mono text-[10px] px-1.5 py-0.5 whitespace-nowrap border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 cursor-help hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors shrink-0"
                                     >
-                                    +{tags.length - 4}
+                                        +{tags.length - 4}
                                     </Badge>
                                 </HoverCardTrigger>
                                 

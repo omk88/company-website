@@ -64,8 +64,12 @@ export const getCurrentUser = query({
       .unique();
 
     let profilePicUrl = null;
-    if (profile?.profilePic) {
-      profilePicUrl = await ctx.storage.getUrl(profile.profilePic);
+
+    if (profile) {
+      const storageIdToFetch = profile.profilePic ?? profile.defaultProfilePic;
+      if (storageIdToFetch) {
+        profilePicUrl = await ctx.storage.getUrl(storageIdToFetch);
+      }
     }
 
     return {
@@ -74,8 +78,8 @@ export const getCurrentUser = query({
       username: identity.username,
       profile: profile ? {
         ...profile,
-        profilePicUrl
-      } : null
+        profilePicUrl,
+      } : null,
     };
   },
 });
