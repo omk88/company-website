@@ -24,17 +24,17 @@ export function Navbar() {
             <nav className="w-full px-12 h-16 flex items-center justify-between relative">
                 <div className="flex items-center gap-8">
                     <Link href="/">
-                        <h1 className="font-poppins-text text-xl font-bold tracking-tight text-foreground">
+                        <h1 className="font-poppins text-xl font-bold tracking-tight text-foreground">
                             TaQtiQ
                         </h1>
                     </Link>
 
                     <div className="hidden md:flex items-center gap-6">
-                        <Link className={cn(buttonVariants({ variant: "link" }), anim, "text-foreground hover:opacity-70 font-medium text-sm px-2")} href="/">Home</Link>
-                        <Link className={cn(buttonVariants({ variant: "link" }), anim, "text-foreground hover:opacity-70 font-medium text-sm px-2")} href="/vision">Vision</Link>
-                        <Link className={cn(buttonVariants({ variant: "link" }), anim, "text-foreground hover:opacity-70 font-medium text-sm px-2")} href="/insights">Insights</Link>
-                        <Link className={cn(buttonVariants({ variant: "link" }), anim, "text-foreground hover:opacity-70 font-medium text-sm px-2")} href="/contact">Contact</Link>
-                        <Link className={cn(buttonVariants({ variant: "link" }), anim, "text-foreground hover:opacity-70 font-medium text-sm px-2")} href="/products">Products</Link>
+                        <Link className={cn(buttonVariants({ variant: "link" }), anim, "font-mono text-foreground hover:opacity-70 font-medium text-sm px-2")} href="/">Home</Link>
+                        <Link className={cn(buttonVariants({ variant: "link" }), anim, "font-mono text-foreground hover:opacity-70 font-medium text-sm px-2")} href="/vision">Vision</Link>
+                        <Link className={cn(buttonVariants({ variant: "link" }), anim, "font-mono text-foreground hover:opacity-70 font-medium text-sm px-2")} href="/insights">Insights</Link>
+                        <Link className={cn(buttonVariants({ variant: "link" }), anim, "font-mono text-foreground hover:opacity-70 font-medium text-sm px-2")} href="/contact">Contact</Link>
+                        <Link className={cn(buttonVariants({ variant: "link" }), anim, "font-mono text-foreground hover:opacity-70 font-medium text-sm px-2")} href="/products">Products</Link>
                     </div>
                 </div>
 

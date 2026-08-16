@@ -100,7 +100,7 @@ export function FeaturedBlogs() {
       >
         <div className="flex flex-col justify-between flex-1 min-w-0">
           <div>
-            <div className="flex items-center gap-1.5 text-[11px] font-mono tracking-tight uppercase text-zinc-500 mb-1">
+            <div className="font-roboto flex items-center gap-1.5 text-[11px] font-mono tracking-tight uppercase text-zinc-500 mb-1">
               <ProfileHoverCard authorUsername={currentPost.username} displayName={currentPost.displayName}>
                 <span className="cursor-pointer truncate max-w-[90px]">{currentPost.displayName || currentPost.username}</span>
               </ProfileHoverCard>

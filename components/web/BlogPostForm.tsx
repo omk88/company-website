@@ -81,7 +81,7 @@ function LivePostPreview({ control, previewImage, currentUser }: { control: Cont
     return (
         <div>
             <div className="w-full">
-                <div className="relative w-full h-[240px] mb-2 overflow-hidden rounded-lg flex items-center justify-center border mt-2">
+                <div className="relative w-full h-[240px] mb-2 overflow-hidden rounded-lg flex items-center justify-center border">
                     {previewImage ? (
                         <img 
                             src={previewImage} 
@@ -295,7 +295,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                 <div className="py-4 px-4 sm:px-6 h-full overflow-y-auto [scrollbar-gutter:stable] min-h-0 w-full">
                     <div
                         className={cn(
-                        "relative w-full rounded-md border p-2 mt-2 my-auto transition-colors",
+                        "relative w-full rounded-md border p-2 my-auto transition-colors",
                         hasErrors ? "border-destructive" : "border-border"
                         )}
                     >
@@ -496,7 +496,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                                     <textarea
                                                         aria-invalid={fieldState.invalid}
                                                         placeholder="Summary"
-                                                        rows={3}
+                                                        rows={2}
                                                         disabled={isLoading}
                                                         className="w-full bg-transparent p-3 pr-14 text-xs placeholder:text-xs focus:outline-none resize-y min-h-[40px]"
                                                         {...field}
