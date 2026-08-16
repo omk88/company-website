@@ -11,6 +11,7 @@ import { ProfileHoverCard } from "@/components/web/ProfileHoverCard";
 import { Doc } from "@/convex/_generated/dataModel";
 import { Preloaded } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { BlogName } from "./BlogName";
 
 interface BlogContentProps {
     blog: Doc<"blogs">;
@@ -45,14 +46,7 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
               className="w-5 h-5 rounded-full object-cover shrink-0"
             />
 
-            <ProfileHoverCard authorUsername={blog.username} displayName={blog.displayName}>
-              <Link
-                href={`/${blog.username}`}
-                className="font-medium hover:underline cursor-pointer"
-              >
-                {blog.displayName || blog.username}
-              </Link>
-            </ProfileHoverCard>
+            <BlogName username={blog.username} displayName={blog.displayName} />
 
             <span>&middot;</span>
 

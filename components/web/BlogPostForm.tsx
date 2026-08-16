@@ -256,7 +256,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                     content: data.content,
                     author: userData?.userId || "",
                     displayName: userData.profile?.displayName,
-                    username: String(userData?.username || ""),
+                    username: userData?.profile?.username || "",
                     authorAvatarUrl: userData.profile?.profilePicUrl || undefined,
                     tags: data.tags,
                     storageId: storageId,
