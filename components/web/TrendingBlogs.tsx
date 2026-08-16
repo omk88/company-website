@@ -26,7 +26,7 @@ export function TrendingBlogs() {
 
   return (
     <div className="w-full flex flex-col pt-2">
-      <div className="flex items-center gap-1.5 px-1 mb-2.5 text-zinc-800 font-semibold text-xs tracking-tight">
+      <div className="flex items-center gap-1.5 px-3.5 mb-2.5 text-zinc-800 dark:text-zinc-200 font-semibold text-xs tracking-tight">
         <TrendingUp className="w-3.5 h-3.5 shrink-0" />
         <span>Trending</span>
       </div>

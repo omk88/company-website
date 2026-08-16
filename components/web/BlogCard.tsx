@@ -37,13 +37,15 @@ export function BlogCard({ id, imageUrl, displayName, title, subtitle, totalView
                 href={`/insights/${id}`}
                 className="relative aspect-video md:aspect-auto w-full md:w-2/5 md:h-full overflow-hidden bg-muted border-b md:border-b-0 md:border-r border-border/50 shrink-0 block"
             >
-                <Image
-                    src={imageUrl}
-                    alt={title}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 40vw"
-                />
+                <div className="relative w-full aspect-[16/9] overflow-hidden rounded-t-xl bg-zinc-100 dark:bg-zinc-800">
+                    <Image
+                        src={imageUrl}
+                        alt={title}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
+                </div>
             </Link>
 
             <div className="flex flex-col flex-1 justify-start px-4 py-2 min-w-0">

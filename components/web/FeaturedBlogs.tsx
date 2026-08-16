@@ -10,6 +10,29 @@ import { useQuery } from "convex/react";
 import { ProfileHoverCard } from "./ProfileHoverCard";
 import { FeaturedBlogsSkeleton } from "./LoadingSkeletons/FeaturedBlogsSkeleton";
 
+function formatRelativeDate(dateString: string | number | Date): string {
+  const now = new Date();
+  const date = new Date(dateString);
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+  if (diffInSeconds < 60) return "JUST NOW";
+
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  if (diffInMinutes < 60) return `${diffInMinutes}M AGO`;
+
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  if (diffInHours < 24) return `${diffInHours}H AGO`;
+
+  const diffInDays = Math.floor(diffInHours / 24);
+  if (diffInDays < 30) return `${diffInDays} ${diffInDays === 1 ? "DAY" : "DAYS"} AGO`;
+
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).toUpperCase();
+}
+
 export function FeaturedBlogs() {
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -43,11 +66,7 @@ export function FeaturedBlogs() {
   }
 
   const currentPost = blogs[currentIndex];
-  const formattedDate = new Date(currentPost.createdAt).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric"
-  });
+  const formattedDate = formatRelativeDate(currentPost.createdAt);
 
   const compactFormatter = new Intl.NumberFormat("en", {
     notation: "compact",
@@ -56,20 +75,20 @@ export function FeaturedBlogs() {
   });
 
   return (
-    <div className="flex flex-col justify-between w-full bg-zinc-50/80 rounded-xl p-3.5 transition-all">
+    <div className="flex flex-col justify-between w-full bg-zinc-50/80 dark:bg-zinc-900/50 rounded-xl p-3.5 transition-all">
       <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-800">
+        <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-800 dark:text-zinc-200">
           <Sparkles className="w-3.5 h-3.5 shrink-0" />
           <span>Featured</span>
         </div>
         <div className="flex items-center gap-0.5 text-zinc-500">
-          <Button variant="ghost" size="icon" className="h-5 w-5 hover:bg-zinc-200/60 rounded" onClick={handlePrev}>
+          <Button variant="ghost" size="icon" className="cursor-pointer h-5 w-5 hover:bg-zinc-200/60 dark:hover:bg-zinc-800 rounded" onClick={handlePrev}>
             <ArrowLeft className="h-3 w-3" />
           </Button>
           <span className="text-[11px] font-mono select-none px-1 text-zinc-500">
             {currentIndex + 1}/{blogs.length}
           </span>
-          <Button variant="ghost" size="icon" className="h-5 w-5 hover:bg-zinc-200/60 rounded" onClick={handleNext}>
+          <Button variant="ghost" size="icon" className="cursor-pointer h-5 w-5 hover:bg-zinc-200/60 dark:hover:bg-zinc-800 rounded" onClick={handleNext}>
             <ArrowRight className="h-3 w-3" />
           </Button>
         </div>
@@ -83,19 +102,19 @@ export function FeaturedBlogs() {
           <div>
             <div className="flex items-center gap-1.5 text-[11px] font-mono tracking-tight uppercase text-zinc-500 mb-1">
               <ProfileHoverCard authorUsername={currentPost.username} displayName={currentPost.displayName}>
-                <span className="hover:underline cursor-pointer truncate max-w-[90px]">{currentPost.displayName || currentPost.username}</span>
+                <span className="cursor-pointer truncate max-w-[90px]">{currentPost.displayName || currentPost.username}</span>
               </ProfileHoverCard>
               <span>•</span>
               <span className="shrink-0">{formattedDate}</span>
             </div>
 
-            <h3 className="text-[13px] font-medium leading-snug text-zinc-900 group-hover/card:text-blue-600 transition-colors line-clamp-2">
+            <h3 className="text-[13px] font-medium leading-snug text-zinc-900 dark:text-zinc-100 group-hover/card:text-blue-600 transition-colors line-clamp-2">
               {currentPost.title}
             </h3>
           </div>
         </div>
 
-        <div className="relative h-14 w-14 shrink-0 rounded-lg overflow-hidden bg-zinc-100 border border-zinc-200/60">
+        <div className="relative h-14 w-14 shrink-0 rounded-lg overflow-hidden bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/60 dark:border-zinc-800">
           {blogs.map((post, index) => (
             <Image
               key={post._id}
