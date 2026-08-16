@@ -85,7 +85,7 @@ export function NavbarAuthClient({ initialIsAuth, initialImage }: NavbarAuthClie
 
                 <PopoverContent
                   align="end"
-                  className="w-80 p-1.5 shadow-lg rounded-xl border border-border bg-popover"
+                  className="w-80 p-1.5 rounded-xl border border-border bg-popover"
                 >
                   <Link
                     href={`/${userData?.profile?.username || ""}`}
@@ -105,13 +105,13 @@ export function NavbarAuthClient({ initialIsAuth, initialImage }: NavbarAuthClie
                         <span className="text-sm font-semibold truncate leading-tight">
                           {`${userData?.profile?.displayName || userData?.profile?.username || ""}`}
                         </span>
-                        <span className="text-xs text-muted-foreground group-hover:text-accent-foreground/80 truncate mt-0.5">
+                        <span className="text-xs text-zinc-600 dark:text-zinc-400 group-hover:text-accent-foreground/80 truncate mt-0.5">
                           @{userData?.profile?.username}
                         </span>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1 text-xs font-medium text-muted-foreground group-hover:text-accent-foreground shrink-0 pl-2">
+                    <div className="flex items-center gap-1 text-xs font-medium text-zinc-600 dark:text-zinc-400 group-hover:text-accent-foreground shrink-0 pl-2">
                       <span className="hidden sm:inline">View</span>
                       <ArrowUpRight className="w-4 h-4 stroke-[2] transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                     </div>
@@ -125,7 +125,7 @@ export function NavbarAuthClient({ initialIsAuth, initialImage }: NavbarAuthClie
                     <Link
                       href={`/company/blog`}
                       onClick={() => setOpen(false)}
-                      className="flex items-center text-muted-foreground gap-2.5 px-2.5 py-2 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-colors duration-100 cursor-pointer"
+                      className="flex items-center text-zinc-600 dark:text-zinc-400 gap-2.5 px-2.5 py-2 text-xs rounded-md hover:bg-accent hover:text-accent-foreground transition-colors duration-100 cursor-pointer"
                     >
                       <Plus className="w-4 h-4 stroke-[2] shrink-0 group-hover:text-current" />
                       <span>Create a post</span>
@@ -133,7 +133,7 @@ export function NavbarAuthClient({ initialIsAuth, initialImage }: NavbarAuthClie
 
                     <button
                       type="button"
-                      className="w-full flex items-center gap-2.5 px-2.5 py-2 text-sm font-medium rounded-md text-destructive hover:bg-destructive/10 transition-colors duration-100 cursor-pointer text-left"
+                      className="w-full flex items-center gap-2.5 px-2.5 py-2 text-xs rounded-md text-destructive hover:bg-destructive/10 transition-colors duration-100 cursor-pointer text-left"
                       onClick={handleSignOut}
                     >
                       <LogOut className="w-4 h-4 stroke-[2] shrink-0" />
