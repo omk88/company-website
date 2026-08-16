@@ -20,6 +20,7 @@ import { FunctionReturnType } from "convex/server";
 import { MarkdownTextEditor } from "./MarkdownTextEditor";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { Button } from "../ui/button";
+import { useCurrentUser } from "@/app/ConvexClientProvider";
 
 const AVAILABLE_TAGS = ["product", "research", "design", "technology", "opinion", "tutorials"];
 
@@ -33,7 +34,7 @@ interface BlogFormValues {
 }
 
 interface BlogPostFormProps {
-    editingBlogId?: string; 
+  editingBlogId?: string; 
 }
 
 export type User = FunctionReturnType<typeof api.auth.getCurrentUser>;
@@ -65,13 +66,12 @@ function toTitleCase(str: string): string {
     .join(' ');
 }
 
-function LivePostPreview({ control, previewImage, currentUser }: { control: Control<BlogFormValues>; previewImage: string | null; currentUser: User | undefined }) {
+function LivePostPreview({ control, previewImage, currentUser }: { control: Control<BlogFormValues>; previewImage: string | null; currentUser: User | undefined; }) {
     const formValues = useWatch({ control });
 
     const title = formValues.title;
     const subtitle = formValues.subtitle;
     const content = formValues.content;
-    const author = currentUser?.profile?.displayName || currentUser?.profile?.username;
 
     const formattedTitle = useMemo(() => {
         if (!title) return "";
@@ -96,23 +96,22 @@ function LivePostPreview({ control, previewImage, currentUser }: { control: Cont
                         </div>
                     )}
                 </div>
+
+                <span>{currentUser?.profile?.username || currentUser?.profile?.displayName}</span>
+                <span>
+                    {" • "}
+                    {new Date().toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                    })}
+                </span>
                 
                 <div className="flex flex-col">
                     <h1 className="text-2xl font-bold tracking-tight text-neutral-950 dark:text-neutral-50 line-clamp-3">
                         {formattedTitle}
                     </h1>
                     <div className="flex flex-col gap-2">
-                        <div className="text-muted-foreground font-light">
-                            <span>{author}</span>
-                            <span>
-                                {" • "}
-                                {new Date().toLocaleDateString("en-US", {
-                                    month: "short",
-                                    day: "numeric",
-                                    year: "numeric",
-                                })}
-                            </span>
-                        </div>
                         {subtitle && (
                             <p className="text-lg text-neutral-600 dark:text-neutral-400 font-medium">
                                 {subtitle}
@@ -138,7 +137,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
     const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const userData = useQuery(api.auth.getCurrentUser);
+    const userData = useCurrentUser();
 
     const existingPost = useQuery(
         api.blogs.getBlogById,
@@ -300,10 +299,10 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                         )}
                     >
                         <span
-                        className={cn(
-                            "absolute -top-2.5 left-3 bg-background px-1.5 text-xs font-medium transition-colors",
-                            hasErrors ? "text-destructive" : "text-muted-foreground"
-                        )}
+                            className={cn(
+                                "absolute -top-2.5 left-3 bg-background px-1.5 text-xs font-medium transition-colors",
+                                hasErrors ? "text-destructive" : "text-muted-foreground"
+                            )}
                         >
                             Post content
                         </span>
@@ -744,7 +743,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
 
                 <div className="w-full py-4 px-4 sm:px-6 overflow-y-auto [scrollbar-gutter:stable] h-full min-h-0">
                     <div className="w-full">
-                        <LivePostPreview control={control} previewImage={imagePreviewUrl} currentUser={userData}/>
+                        <LivePostPreview control={control} previewImage={imagePreviewUrl} currentUser={userData} />
                     </div>
                 </div>
             </div>

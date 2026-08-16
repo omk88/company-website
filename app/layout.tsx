@@ -6,7 +6,10 @@ import { ThemeProvider } from "next-themes";
 import GridBackground from "@/components/web/GridBackground"; 
 import { ConvexClientProvider } from "./ConvexClientProvider";
 import dynamic from "next/dynamic";
-
+import { Suspense } from "react";
+import { api } from "@/convex/_generated/api";
+import { getToken, preloadAuthQuery } from "@/lib/auth-server";
+import { AuthProvider } from "@/components/web/AuthProvider";
 
 const Navbar = dynamic(() => import("@/components/web/Navbar").then((mod) => mod.Navbar), {
   ssr: true,
@@ -49,10 +52,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${lexend.variable} ${poppins.variable} ${jetBrainsMono.variable} ${roboto.variable}  font-sans flex flex-col bg-background text-foreground`}>
+      <body className={`${lexend.variable} ${poppins.variable} ${jetBrainsMono.variable} ${roboto.variable} font-sans flex flex-col bg-background text-foreground`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -61,10 +63,10 @@ export default function RootLayout({
         >
           <GridBackground>
             <main>
-              <ConvexClientProvider>
+              <AuthProvider>
                 <Navbar />
                 {children}
-              </ConvexClientProvider>
+              </AuthProvider>
             </main>
           </GridBackground>
           <Toaster />
