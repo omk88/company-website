@@ -114,7 +114,7 @@ export function FeaturedBlogs() {
           </div>
         </div>
 
-        <div className="relative h-14 w-14 shrink-0 rounded-lg overflow-hidden bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/60 dark:border-zinc-800">
+        <div className="relative h-14 w-14 shrink-0 rounded-lg overflow-hidden bg-zinc-100 dark:bg-zinc-800">
           {blogs.map((post, index) => (
             <Image
               key={post._id}

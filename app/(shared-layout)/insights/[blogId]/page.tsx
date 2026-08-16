@@ -61,7 +61,7 @@ export default async function BlogPage({ params }: BlogPageProps) {
     <SidebarProvider className="bg-white dark:bg-zinc-950 w-full min-h-screen relative flex">
       <LeftSidebarControls blog={blog} />
 
-      <main className="flex-1 min-w-0 px-4 sm:px-8 py-6">
+      <main className="flex-1 min-w-0 pt-16">
         <div className="max-w-3xl mx-auto">
           <BlogContent blog={blog} preloadedComments={preloadedComments} />
         </div>

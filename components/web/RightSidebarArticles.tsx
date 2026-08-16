@@ -15,7 +15,7 @@ export function RightSidebarArticles({ username, displayName, blogs }: RightSide
       className="shrink-0"
       style={{ "--sidebar-width": "18rem" } as React.CSSProperties}
     >
-      <Sidebar bgClass="bg-white dark:bg-zinc-950" side="right" showBorder={false} className="!top-16 !z-40">
+      <Sidebar bgClass="bg-white dark:bg-zinc-950" side="right" className="!top-16 !z-40">
         <SidebarContent>
           <SidebarGroup>
             <SidebarGroupContent>

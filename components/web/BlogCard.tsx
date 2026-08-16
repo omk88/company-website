@@ -37,7 +37,7 @@ export function BlogCard({ id, imageUrl, displayName, title, subtitle, totalView
                 href={`/insights/${id}`}
                 className="relative aspect-video md:aspect-auto w-full md:w-2/5 md:h-full overflow-hidden bg-muted border-b md:border-b-0 md:border-r border-border/50 shrink-0 block"
             >
-                <div className="relative w-full aspect-[16/9] overflow-hidden rounded-t-xl bg-zinc-100 dark:bg-zinc-800">
+                <div className="relative w-full aspect-[16/9] bg-zinc-100 dark:bg-zinc-800">
                     <Image
                         src={imageUrl}
                         alt={title}

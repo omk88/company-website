@@ -19,7 +19,7 @@ interface BlogContentProps {
 
 export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
   return (
-    <div>
+    <div className="p-2">
       <ViewTracker blogId={blog._id} />
 
       <div className="relative w-full h-[400px] mb-6 rounded-lg overflow-hidden">
