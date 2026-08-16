@@ -59,23 +59,19 @@ export function IncrementCommentLikesDislikes({ comment }: IncrementCommentLikes
   };
 
   return (
-    <div className="flex flex-row items-center gap-4 text-muted-foreground text-xs">
-      <Button 
-        variant="ghost" 
-        onClick={handleLikeClick}
-        disabled={user === null}
-        className="h-12 w-12 rounded-full text-muted-foreground hover:text-foreground"
-      >
-        <ThumbsUp
-          className={`!h-5 !w-5 transition-none ${
-            hasLiked ? "text-emerald-500" : ""
-          }`}
-          fill={hasLiked ? "currentColor" : "none"}
-        />
-        <h1 className={hasLiked ? "text-emerald-500 font-bold" : ""}>
-          {likesCount}
-        </h1>
-      </Button>
-    </div>
+    <Button
+      variant="ghost"
+      onClick={handleLikeClick}
+      className="flex flex-row items-center justify-center gap-1 h-11 w-11 p-0 rounded-full text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+    >
+      <ThumbsUp
+        className={`w-4 h-4 shrink-0 transition-none ${
+          hasLiked ? "text-emerald-500 fill-emerald-500" : ""
+        }`}
+      />
+      <span className={`text-xs font-medium leading-none ${hasLiked ? "text-emerald-500 font-bold" : ""}`}>
+        {likesCount}
+      </span>
+    </Button>
   );
 }

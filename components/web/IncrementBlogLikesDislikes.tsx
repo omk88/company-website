@@ -187,7 +187,6 @@ export function IncrementBlogLikesDislikes({ blog }: IncrementBlogLikesProps) {
 
   return (
     <div className="flex flex-col items-center gap-2 py-2 text-zinc-500">
-      {/* Upvote Button */}
       <Button
         variant="ghost"
         onClick={handleLikeClick}
@@ -203,7 +202,6 @@ export function IncrementBlogLikesDislikes({ blog }: IncrementBlogLikesProps) {
         </span>
       </Button>
 
-      {/* Emoji Reaction Button */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
@@ -243,7 +241,6 @@ export function IncrementBlogLikesDislikes({ blog }: IncrementBlogLikesProps) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Comment Button */}
       <Button
         variant="ghost"
         onClick={scrollToView}
@@ -253,7 +250,6 @@ export function IncrementBlogLikesDislikes({ blog }: IncrementBlogLikesProps) {
         <span className="text-xs font-medium leading-none">{displayComments}</span>
       </Button>
 
-      {/* Share / More Menu (Public) */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
@@ -319,7 +315,6 @@ export function IncrementBlogLikesDislikes({ blog }: IncrementBlogLikesProps) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Internal Management Tools (Protected / Company Users Only) */}
       {isCompanyUser && (
         <>
           <div className="w-8 h-[1px] bg-zinc-200 dark:bg-zinc-800 my-1" />

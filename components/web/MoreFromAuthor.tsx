@@ -35,12 +35,14 @@ export function MoreFromAuthor({ displayName, username, blogs }: MoreFromAuthorP
     <div className="w-full flex flex-col pt-2">
       <div className="flex items-center gap-1.5 px-3.5 mb-2.5 text-zinc-800 dark:text-zinc-200 font-semibold text-xs tracking-tight">
         <Library className="w-3.5 h-3.5 shrink-0" />
-        <span className="shrink-0">More from</span>
-        <ProfileHoverCard authorUsername={username} displayName={displayName}>
-          <span className="hover:underline cursor-pointer truncate max-w-[120px]">
-            {displayName || username}
-          </span>
-        </ProfileHoverCard>
+        <span className="shrink-0">
+          More from{" "}
+          <ProfileHoverCard authorUsername={username} displayName={displayName}>
+            <span className="cursor-pointer truncate max-w-[120px] inline-block align-bottom">
+              {displayName || username}
+            </span>
+          </ProfileHoverCard>
+        </span>
       </div>
 
       <ul className="list-none w-full m-0 p-0 space-y-2">
@@ -52,7 +54,7 @@ export function MoreFromAuthor({ displayName, username, blogs }: MoreFromAuthorP
             >
               <div className="w-full flex flex-row items-center justify-between gap-3">
                 <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
-                  <h3 className="text-[13px] font-medium leading-snug text-zinc-800 dark:text-zinc-200 group-hover/author:text-zinc-950 dark:group-hover/author:text-white line-clamp-2 transition-colors">
+                  <h3 className="text-[13px] font-medium leading-snug text-zinc-800 dark:text-zinc-200 group-hover/author:text-zinc-950 dark:group-hover/author:text-white line-clamp-1 transition-colors">
                     {blog.title}
                   </h3>
                   

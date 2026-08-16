@@ -6,61 +6,60 @@ import { useState } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api"; 
 import { toast } from "sonner";
-import { ArrowRight } from "lucide-react"; 
+import { ArrowRight, Loader2 } from "lucide-react"; 
 
 export default function NewsletterSubscriptionForm() {
-    const [email, setEmail] = useState("");
-    const [isSubmitting, setIsSubmitting] = useState(false);
+  const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const runSubscribe = useMutation(api.subscribers.subscribe);
+  const runSubscribe = useMutation(api.subscribers.subscribe);
 
-    const handleSubscribe = async (e: React.FormEvent) => {
-        e.preventDefault();
-        
-        if (!email.trim()) return;
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim()) return;
 
-        setIsSubmitting(true);
-        try {
-            const message = await runSubscribe({ email: email.trim() });
-            
-            if (message === "Success!") {
-                toast.success("Thank you for subscribing to our updates!");
-                setEmail("");
-            } else {
-                toast.info(message); 
-            }
-        } catch (error) {
-            toast.error("Failed to process subscription. Please try again.");
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
+    setIsSubmitting(true);
+    try {
+      const message = await runSubscribe({ email: email.trim() });
+      if (message === "Success!") {
+        toast.success("Thank you for subscribing!");
+        setEmail("");
+      } else {
+        toast.info(message); 
+      }
+    } catch {
+      toast.error("Failed to subscribe. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
-    return (
-        <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3 w-full items-stretch sm:items-center">
-            <Input 
-                type="email"
-                required
-                disabled={isSubmitting}
-                placeholder="john@doe.com" 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-white dark:bg-background h-12 rounded-md px-3 focus-visible:ring-1 focus-visible:ring-ring transition-colors duration-200"
-            />
-            
-            <Button 
-                type="submit" 
-                disabled={isSubmitting}
-                className="group px-6 py-3.5 bg-foreground hover:bg-foreground/90 text-background font-semibold text-sm rounded-full transition-all duration-200 active:scale-98 inline-flex items-center justify-center gap-2 shadow-sm w-full sm:w-auto shrink-0 cursor-pointer h-12"
-            >
-                <span>{isSubmitting ? "Joining..." : "Subscribe"}</span>
-                {!isSubmitting && (
-                    <ArrowRight 
-                        className="w-4 h-4 text-background transform transition-transform duration-200 group-hover:translate-x-0.5" 
-                        strokeWidth={2.5} 
-                    />
-                )}
-            </Button> 
-        </form>
-    );
+  return (
+    <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-2 w-full sm:w-80">
+      <Input 
+        type="email"
+        required
+        disabled={isSubmitting}
+        placeholder="Enter your email" 
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        className="bg-white dark:bg-zinc-950 h-10 rounded-lg px-3 text-sm border-zinc-200 dark:border-zinc-800 focus-visible:ring-1 focus-visible:ring-zinc-400"
+      />
+      
+      <Button 
+        type="submit" 
+        disabled={isSubmitting}
+        className="h-10 px-4 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 text-xs font-semibold rounded-lg shrink-0 gap-2"
+      >
+        {isSubmitting ? (
+          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+        ) : (
+          <>
+            <span>Subscribe</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </>
+        )}
+      </Button> 
+    </form>
+  );
 }

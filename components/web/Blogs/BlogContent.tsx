@@ -85,7 +85,6 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
         <ReactMarkdown>{blog.content}</ReactMarkdown>
       </div>
 
-      <Separator className="my-10" />
       <BlogCTA />
       <Separator className="my-10" />
 
