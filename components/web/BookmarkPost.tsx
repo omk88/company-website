@@ -39,7 +39,7 @@ export function BookmarkPost({ blogId }: BookmarkPostProps) {
     >
       <Bookmark 
         className={`... ${
-          bookmarked ? "fill-current text-primary" : "fill-none text-muted-foreground"
+          bookmarked ? "fill-blue-800 text-blue-800" : "fill-none text-muted-foreground"
         }`} 
       />
     </Button>

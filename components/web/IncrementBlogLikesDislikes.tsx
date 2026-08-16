@@ -3,9 +3,8 @@
 import { api } from "@/convex/_generated/api";
 import { Doc } from "@/convex/_generated/dataModel";
 import { useConvex, useMutation, useQuery } from "convex/react";
-import { Copy, Ellipsis, MessageSquare, SmilePlus, SquarePen, Star, ThumbsUp, Trash2 } from "lucide-react";
+import { Bookmark, Copy, Ellipsis, MessageSquare, SmilePlus, SquarePen, Star, ThumbsUp, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
-import { useTransition } from "react";
 import { toast } from "sonner";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { FaFacebook } from "react-icons/fa";
@@ -29,9 +28,7 @@ export function IncrementBlogLikesDislikes({ blog }: IncrementBlogLikesProps) {
   const reactionState = useQuery(api.blogs.getBlogReactionState, { blogId: blog._id });
   const displayComments = useQuery(api.comments.getCommentNumber, { blogId: blog._id }) ?? 0;
   const featuredState = useQuery(api.blogs.getBlogFeaturedState, { blogId: blog._id });
-
-  const [isVotePending, startVoteTransition] = useTransition();
-  const [isFeaturedPending, startFeaturedTransition] = useTransition();
+  const bookmarkState = useQuery(api.blogs.getBookmarkedState, { blogId: blog._id });
 
   const userEmail = currentUser?.email;
   const isCompanyUser = userEmail?.endsWith("@taqtiq.tech");
@@ -39,12 +36,14 @@ export function IncrementBlogLikesDislikes({ blog }: IncrementBlogLikesProps) {
   const hasLiked = voteState?.hasVoted;
   const likesCount = voteState?.likes ?? blog.likes;
   const isFeatured = featuredState?.isFeatured;
+  const isBookmarked = bookmarkState?.isBookmarked ?? false;
 
   const prefetchBlog = () => {
     convex.query(api.blogs.getBlogById, { blogId: blog._id }).catch((err) => {
       console.error("Prefetch failed:", err);
     });
   };
+
 
   const toggleReactionMutation = useMutation(api.blogs.toggleBlogReaction).withOptimisticUpdate(
     (localStore, args) => {
@@ -84,10 +83,6 @@ export function IncrementBlogLikesDislikes({ blog }: IncrementBlogLikesProps) {
     }
   );
 
-  const totalReactions = reactionState
-    ? Object.values(reactionState.counts).reduce((acc, count) => acc + count, 0)
-    : 0;
-
   const toggleBlogVoteMutation = useMutation(api.blogs.toggleBlogVote).withOptimisticUpdate(
     (localStore, args) => {
       const { blogId } = args;
@@ -110,6 +105,22 @@ export function IncrementBlogLikesDislikes({ blog }: IncrementBlogLikesProps) {
     }
   );
 
+  const toggleBookmark = useMutation(
+    api.blogs.toggleBookmark
+  ).withOptimisticUpdate((localStore, args) => {
+    const previous = localStore.getQuery(api.blogs.getBookmarkedState, {
+      blogId: args.blogId,
+    });
+
+    const currentIsBookmarked = previous?.isBookmarked ?? false;
+
+    localStore.setQuery(
+      api.blogs.getBookmarkedState,
+      { blogId: args.blogId },
+      { isBookmarked: !currentIsBookmarked }
+    );
+  });
+
   const toggleFeaturedMutation = useMutation(api.blogs.toggleFeatured).withOptimisticUpdate(
     (localStore, args) => {
       const { blogId } = args;
@@ -128,53 +139,44 @@ export function IncrementBlogLikesDislikes({ blog }: IncrementBlogLikesProps) {
     }
   );
 
-  const handleLikeClick = async () => {
-    if (isVotePending) return;
+  const totalReactions = reactionState
+    ? Object.values(reactionState.counts).reduce((acc, count) => acc + count, 0)
+    : 0;
 
+  const handleLikeClick = async () => {
     if (!currentUser) {
       toast.error("You must be logged in to like an article.");
       return;
     }
 
-    startVoteTransition(async () => {
-      try {
-        await toggleBlogVoteMutation({ blogId: blog._id });
-      } catch (error) {
-        console.error("Failed to process like:", error);
-        toast.error("Failed to update your like.");
-      }
-    });
+    try {
+      await toggleBlogVoteMutation({ blogId: blog._id });
+    } catch (error) {
+      console.error("Failed to process like:", error);
+      toast.error("Failed to update your like.");
+    }
   };
 
-  const handleFeaturedClick = async () => {
-    if (isFeaturedPending) return;
-
+  const handleBookmarkClick = async () => {
     if (!currentUser) {
-      toast.error("You must be logged in to feature an article.");
+      toast.error("You must be logged in to bookmark an article.");
       return;
     }
 
-    startFeaturedTransition(async () => {
-      try {
-        await toggleFeaturedMutation({ blogId: blog._id });
-
-        await fetch("/api/revalidate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ tag: "featured-blogs" }),
-        });
-      } catch (error) {
-        console.error("Failed to process featured:", error);
-        toast.error("Failed to update your feature.");
-      }
-    });
-  };
-
-  const scrollToView = () => {
-    document.getElementById("comments")?.scrollIntoView({ behavior: "smooth" });
+    try {
+      await toggleBookmark({ blogId: blog._id });
+    } catch (error) {
+      console.error("Failed to update bookmark:", error);
+      toast.error("Failed to update bookmark.");
+    }
   };
 
   const handleSelectReaction = async (type: ReactionType) => {
+    if (!currentUser) {
+      toast.error("You must be logged in to react.");
+      return;
+    }
+
     try {
       await toggleReactionMutation({
         blogId: blog._id,
@@ -182,7 +184,32 @@ export function IncrementBlogLikesDislikes({ blog }: IncrementBlogLikesProps) {
       });
     } catch (error) {
       console.error("Failed to toggle reaction:", error);
+      toast.error("Failed to update reaction.");
     }
+  };
+
+  const handleFeaturedClick = async () => {
+    if (!currentUser) {
+      toast.error("You must be logged in to feature an article.");
+      return;
+    }
+
+    try {
+      await toggleFeaturedMutation({ blogId: blog._id });
+
+      await fetch("/api/revalidate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tag: "featured-blogs" }),
+      });
+    } catch (error) {
+      console.error("Failed to process featured:", error);
+      toast.error("Failed to update your feature.");
+    }
+  };
+
+  const scrollToView = () => {
+    document.getElementById("comments")?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
@@ -250,6 +277,20 @@ export function IncrementBlogLikesDislikes({ blog }: IncrementBlogLikesProps) {
         <span className="text-xs font-medium leading-none">{displayComments}</span>
       </Button>
 
+      <Button
+        variant="ghost"
+        onClick={handleBookmarkClick}
+        className="flex items-center justify-center h-11 w-11 p-0 rounded-full text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+      >
+        <Bookmark
+          className={`w-4 h-4 ${
+            isBookmarked
+              ? "text-blue-800 fill-blue-800 dark:text-blue-500 dark:fill-blue-500"
+              : ""
+          }`}
+        />
+      </Button>
+
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
@@ -315,6 +356,7 @@ export function IncrementBlogLikesDislikes({ blog }: IncrementBlogLikesProps) {
         </DropdownMenuContent>
       </DropdownMenu>
 
+      {/* Company Admin Tools */}
       {isCompanyUser && (
         <>
           <div className="w-8 h-[1px] bg-zinc-200 dark:bg-zinc-800 my-1" />

@@ -60,7 +60,7 @@ export function DeleteBlogDialog({ blogIds, trigger, onSuccess }: DeleteBlogDial
               type="button"
               disabled={isDeleting}
               onClick={() => handleDelete()}
-              className={`w-full sm:w-auto gap-2 transition-colors hover:bg-red-700 hover:text-white ${
+              className={`w-full sm:w-auto gap-2 transition-colors hover:bg-red-700 hover:text-white cursor-pointer ${
                 isDeleting 
                   ? "bg-red-700 text-white" 
                   : ""
@@ -80,7 +80,7 @@ export function DeleteBlogDialog({ blogIds, trigger, onSuccess }: DeleteBlogDial
               variant="outline"
               onClick={() => setIsOpen(false)}
               disabled={isDeleting}
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto cursor-pointer"
             >
               Cancel
             </Button>

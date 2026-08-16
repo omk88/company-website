@@ -1125,6 +1125,27 @@ export const toggleBlogReaction = mutation({
   },
 });
 
+export const getBookmarkedState = query({
+  args: { blogId: v.id("blogs") },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      return { isBookmarked: false };
+    }
+
+    const userId = identity.subject;
+
+    const existing = await ctx.db
+      .query("bookmarks")
+      .withIndex("by_user_and_blog", (q) =>
+        q.eq("userId", userId).eq("blogId", args.blogId)
+      )
+      .unique();
+
+    return { isBookmarked: !!existing };
+  },
+});
+
 export const toggleBookmark = mutation({
   args: { blogId: v.id("blogs") },
   handler: async (ctx, args) => {
