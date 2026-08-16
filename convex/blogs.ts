@@ -993,11 +993,11 @@ export const getBlogWithAuthorPosts = query({
       .query("blogs")
       .withIndex("by_username", (q) => q.eq("username", blog.username))
       .order("desc")
-      .take(9);
+      .take(6);
 
     const filteredAuthorPosts = rawAuthorPosts
       .filter((post) => post._id !== blog._id)
-      .slice(0, 8);
+      .slice(0, 5);
 
     const [blogImageUrl, authorPostsWithImages] = await Promise.all([
       blog.storageId

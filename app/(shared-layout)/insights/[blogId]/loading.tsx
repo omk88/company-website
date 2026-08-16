@@ -1,21 +1,20 @@
-import { Skeleton } from "@/components/ui/skeleton";
-import { SidebarProvider, Sidebar, SidebarHeader, SidebarContent, SidebarGroup, SidebarGroupContent } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { LeftSidebarControlsSkeleton } from "@/components/web/LoadingSkeletons/LeftSidebarControlsSkeleton";
 import { BlogContentSkeleton } from "@/components/web/LoadingSkeletons/BlogContentSkeleton";
 import { RightSidebarArticlesSkeleton } from "@/components/web/LoadingSkeletons/RightSidebarArticlesSkeleton";
 
 export default function BlogLoading() {
   return (
-    <SidebarProvider className="bg-white dark:bg-zinc-950 w-full min-h-screen relative block">
-      
+    <SidebarProvider className="bg-white dark:bg-zinc-950 w-full min-h-screen relative flex">
       <LeftSidebarControlsSkeleton />
 
-      <div className="w-full pl-40 pr-75 pt-16 min-h-[calc(100vh-4rem)]">
-        <BlogContentSkeleton />
-      </div>
+      <main className="flex-1 min-w-0 pt-16">
+        <div className="max-w-3xl mx-auto">
+          <BlogContentSkeleton />
+        </div>
+      </main>
 
       <RightSidebarArticlesSkeleton />
-
     </SidebarProvider>
   );
 }

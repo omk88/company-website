@@ -1,25 +1,35 @@
-import { Sidebar, SidebarHeader, SidebarContent, SidebarGroup, SidebarFooter, SidebarProvider } from "@/components/ui/sidebar";
+"use client";
+
+import { Sidebar, SidebarHeader, SidebarContent, SidebarFooter } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Separator } from "@/components/ui/separator";
-import { IncrementBlogLikesDislikesSkeleton } from "./IncrementBlogLikesDislikesSkeleton";
 
 export function LeftSidebarControlsSkeleton() {
   return (
-    <Sidebar bgClass="bg-white" showBorder={false} className="!w-40 !top-16 !z-40">
-        <SidebarHeader>
-            <Skeleton className="h-8 w-full rounded-md" />
+    <aside 
+      className="shrink-0"
+      style={{ "--sidebar-width": "3.5rem" } as React.CSSProperties}
+    >
+      <Sidebar bgClass="bg-white dark:bg-zinc-950" showBorder={false} className="!top-16 !z-40">
+        <SidebarHeader className="flex items-center justify-center p-2">
+          <Skeleton className="h-11 w-11 rounded-full" />
         </SidebarHeader>
 
-        <div className="w-1/2 mx-auto">
-            <Separator />
-        </div>
+        <div className="w-8 h-[1px] bg-zinc-200 dark:bg-zinc-800 mx-auto my-1" />
 
-        <SidebarContent>
-            <IncrementBlogLikesDislikesSkeleton />
-            <SidebarGroup />
+        <SidebarContent className="p-0">
+          <div className="flex flex-col items-center gap-2 py-2">
+            <Skeleton className="h-11 w-11 rounded-full" />
+
+            <Skeleton className="h-11 w-11 rounded-full" />
+
+            <Skeleton className="h-11 w-11 rounded-full" />
+
+            <Skeleton className="h-11 w-11 rounded-full" />
+          </div>
         </SidebarContent>
 
         <SidebarFooter />
-    </Sidebar>
+      </Sidebar>
+    </aside>
   );
 }

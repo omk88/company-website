@@ -6,6 +6,7 @@ import { Sidebar, SidebarHeader, SidebarContent, SidebarFooter } from "../ui/sid
 import { buttonVariants } from "../ui/button";
 import { IncrementBlogLikesDislikes } from "./IncrementBlogLikesDislikes";
 import { Doc } from "@/convex/_generated/dataModel";
+import { cn } from "@/lib/utils";
 
 interface LeftSidebarControlsProps {
   blog: Doc<"blogs">;
@@ -20,10 +21,10 @@ export function LeftSidebarControls({ blog }: LeftSidebarControlsProps) {
       <Sidebar bgClass="bg-white dark:bg-zinc-950" showBorder={false} className="!top-16 !z-40">
         <SidebarHeader className="flex items-center justify-center p-2">
           <Link
-            className={
-              buttonVariants({ variant: "ghost", size: "icon" }) +
-              " h-9 w-9 rounded-full text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 dark:hover:text-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-            }
+            className={cn(
+              buttonVariants({ variant: "ghost", size: "icon" }),
+              "h-11 w-11 rounded-full text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 dark:hover:text-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+            )}
             href="/insights"
             title="Back to insights"
           >
