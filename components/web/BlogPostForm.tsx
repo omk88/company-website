@@ -67,16 +67,30 @@ function toTitleCase(str: string): string {
 }
 
 function LivePostPreview({ control, previewImage, currentUser }: { control: Control<BlogFormValues>; previewImage: string | null; currentUser: User | undefined; }) {
-    const formValues = useWatch({ control });
+    const title = useWatch({ control, name: "title" }) || "";
+    const subtitle = useWatch({ control, name: "subtitle" }) || "";
+    const content = useWatch({ control, name: "content" }) || "";
 
-    const title = formValues.title;
-    const subtitle = formValues.subtitle;
-    const content = formValues.content;
+    const formattedTitle = title ? toTitleCase(title) : "";
 
-    const formattedTitle = useMemo(() => {
-        if (!title) return "";
-        return toTitleCase(title);
-    }, [title]);
+    const readTime = useMemo(() => {
+        if (!content.trim()) return "0 sec read";
+
+        const plainText = content
+            .replace(/<[^>]*>/g, " ")
+            .replace(/[#*`_~[\]()]/g, " ");
+
+        const words = plainText.trim().split(/\s+/).filter(Boolean).length;
+        
+        const totalSeconds = Math.ceil((words / 200) * 60);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+
+        if (minutes < 1) {
+            return `${seconds} sec read`;
+        }
+        return `${minutes} min read`;
+    }, [content]);
 
     return (
         <div>
@@ -97,15 +111,31 @@ function LivePostPreview({ control, previewImage, currentUser }: { control: Cont
                     )}
                 </div>
 
-                <span>{currentUser?.profile?.username || currentUser?.profile?.displayName}</span>
-                <span>
-                    {" • "}
-                    {new Date().toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                    })}
-                </span>
+                <div className="flex items-center justify-between text-sm text-zinc-600 dark:text-zinc-400 font-normal my-4">
+                    <div className="flex items-center gap-2">
+                        <img
+                            src={currentUser?.profile?.profilePicUrl || ""}
+                            alt={currentUser?.profile?.displayName || currentUser?.profile?.username || "User"}
+                            className="w-5 h-5 rounded-full object-cover shrink-0"
+                        />
+
+                        <span>{currentUser?.profile?.displayName || currentUser?.profile?.username}</span>
+
+                        <span>&middot;</span>
+
+                        <time dateTime={new Date().toISOString()}>
+                            {new Date().toLocaleDateString("en-US", {
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                            })}
+                        </time>
+                    </div>
+
+                    <span className="text-xs sm:text-sm text-zinc-500 font-medium">
+                        {readTime}
+                    </span>
+                </div>
                 
                 <div className="flex flex-col">
                     <h1 className="text-2xl font-bold tracking-tight text-neutral-950 dark:text-neutral-50 line-clamp-3">
@@ -120,7 +150,7 @@ function LivePostPreview({ control, previewImage, currentUser }: { control: Cont
                     </div>
                 </div>
 
-                {content?.trim() && <Separator className="my-4" />}
+                {content.trim() && <Separator className="my-4" />}
 
                 <div className="prose prose-neutral dark:prose-invert max-w-none text-base leading-relaxed text-neutral-800 dark:text-neutral-200 break-words">
                     <ReactMarkdown>{content}</ReactMarkdown>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, KeyboardEvent, ChangeEvent, DragEvent, ClipboardEvent } from "react";
+import { useState, useRef, KeyboardEvent, ChangeEvent, DragEvent, ClipboardEvent, useMemo, useEffect } from "react";
 import {
   Bold,
   Italic,
@@ -86,7 +86,7 @@ export function MarkdownTextEditor({
   placeholder = "Post Content (Markdown)",
   error = false,
   errorMessage,
-  minLength = 500,
+  minLength = 1000,
 }: MarkdownTextEditorProps) {
   const [internalContent, setInternalContent] = useState("");
   const [isDragging, setIsDragging] = useState(false);
@@ -105,9 +105,8 @@ export function MarkdownTextEditor({
   const handleContentChange = (newContent: string) => {
     if (onChange) {
       onChange(newContent);
-    } else {
-      setInternalContent(newContent);
     }
+    setInternalContent(newContent);
   };
 
   const insertTextAtCursor = (textToInsert: string) => {
