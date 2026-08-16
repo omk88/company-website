@@ -314,8 +314,8 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                     control={control}
                                     rules={{
                                         validate: (value) => {
-                                        if (value || existingPost?.imageUrl) return true;
-                                        return "A cover image is required";
+                                            if (value || existingPost?.imageUrl) return true;
+                                            return "A cover image is required";
                                         },
                                     }}
                                     render={({ field, fieldState }) => {
