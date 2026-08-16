@@ -332,7 +332,7 @@ export function IncrementBlogLikesDislikes({ blog, initialInteractionState }: In
         <Bookmark
           className={`w-4 h-4 ${
             isBookmarked
-              ? "text-blue-800 fill-blue-800 dark:text-blue-500 dark:fill-blue-500"
+              ? "text-blue-500 fill-blue-500 dark:text-blue-300 dark:fill-blue-300"
               : ""
           }`}
         />

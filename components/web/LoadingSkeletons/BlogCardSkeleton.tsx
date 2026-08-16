@@ -15,7 +15,7 @@ export function BlogCardSkeleton() {
             
             <div className="flex items-center gap-1.5 py-1">
               <Skeleton className="h-3 w-24" />
-              <span className="text-muted-foreground/40">•</span>
+              <span className="text-muted-foreground">•</span>
               <Skeleton className="h-3 w-16" />
             </div>
 
@@ -23,9 +23,6 @@ export function BlogCardSkeleton() {
               <Skeleton className="h-3 w-16" />
               
               <div className="flex flex-row items-center">
-                <div className="h-8 w-8 flex items-center justify-center">
-                  <Skeleton className="h-4 w-4 rounded-full" />
-                </div>
                 <div className="h-8 w-8 flex items-center justify-center">
                   <Skeleton className="h-4 w-4 rounded-full" />
                 </div>
