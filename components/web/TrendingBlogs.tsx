@@ -60,7 +60,7 @@ export function TrendingBlogs() {
                   </div>
                 </div>
 
-                <div className="relative w-11 h-11 shrink-0 overflow-hidden rounded-lg bg-zinc-100 border border-zinc-200/60">
+                <div className="relative w-11 h-11 shrink-0 overflow-hidden rounded-lg bg-zinc-100">
                   <Image
                     src={blog.imageUrl}
                     alt={blog.title}

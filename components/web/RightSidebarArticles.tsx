@@ -11,14 +11,19 @@ interface RightSidebarArticlesProps {
 
 export function RightSidebarArticles({ username, displayName, blogs }: RightSidebarArticlesProps) {
   return (
-    <Sidebar bgClass="bg-white" side="right" className="!w-75 !top-16 !z-40 h-[calc(100vh-4rem)]">
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <MoreFromAuthor username={username} displayName={displayName} blogs={blogs} />
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-    </Sidebar>
+    <aside 
+      className="shrink-0"
+      style={{ "--sidebar-width": "18rem" } as React.CSSProperties}
+    >
+      <Sidebar bgClass="bg-white dark:bg-zinc-950" side="right" showBorder={false} className="!top-16 !z-40">
+        <SidebarContent>
+          <SidebarGroup>
+            <SidebarGroupContent>
+              <MoreFromAuthor username={username} displayName={displayName} blogs={blogs} />
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
+      </Sidebar>
+    </aside>
   );
 }

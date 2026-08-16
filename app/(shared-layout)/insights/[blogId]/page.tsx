@@ -58,12 +58,14 @@ export default async function BlogPage({ params }: BlogPageProps) {
   const { blog, authorPosts } = blogData;
 
   return (
-    <SidebarProvider className="bg-white dark:bg-zinc-950 w-full min-h-screen relative block">
+    <SidebarProvider className="bg-white dark:bg-zinc-950 w-full min-h-screen relative flex">
       <LeftSidebarControls blog={blog} />
 
-      <div className="w-full pl-40 pr-75 pt-16 min-h-[calc(100vh-4rem)]">
-        <BlogContent blog={blog} preloadedComments={preloadedComments} />
-      </div>
+      <main className="flex-1 min-w-0 px-4 sm:px-8 py-6">
+        <div className="max-w-3xl mx-auto">
+          <BlogContent blog={blog} preloadedComments={preloadedComments} />
+        </div>
+      </main>
 
       <RightSidebarArticles
         username={blog.username}

@@ -18,66 +18,61 @@ interface BlogContentProps {
 }
 
 export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
-    return (
-        <main className="w-full max-w-4xl mx-auto py-3 px-3">
-            <ViewTracker blogId={blog._id} />
+  return (
+    <div>
+      <ViewTracker blogId={blog._id} />
 
-            <div className="relative w-full h-[400px] mb-3 rounded-lg">
-                <Image
-                    src={blog.imageUrl}
-                    alt={blog.title}
-                    fill
-                    priority
-                    className="object-cover"
-                />
-            </div>
+      <div className="relative w-full h-[400px] mb-6 rounded-lg overflow-hidden">
+        <Image
+          src={blog.imageUrl}
+          alt={blog.title}
+          fill
+          priority
+          className="object-cover"
+        />
+      </div>
 
-            <div className="px-1 sm:px-6 md:px-2">
-                <div className="flex flex-col gap-4">
-                    <h1 className="text-4xl font-bold tracking-tight text-neutral-950 dark:text-neutral-50">
-                        {blog.title}
-                    </h1>
-                    
-                    <div className="text-muted-foreground font-light">
-                        <ProfileHoverCard authorUsername={blog.username} displayName={blog.displayName}>
-                            <Link
-                                href={`/${blog.username}`}
-                                className="cursor-pointer"
-                            >
-                                {blog.displayName || blog.username}
-                            </Link>
-                        </ProfileHoverCard>
-                        <span>
-                            {" • "}
-                            {new Date(blog._creationTime).toLocaleDateString("en-US", {
-                                month: "short",
-                                day: "numeric",
-                                year: "numeric",
-                            })}
-                        </span>
-                    </div>
+      <div className="flex flex-col gap-4">
+        <h1 className="text-4xl font-bold tracking-tight text-neutral-950 dark:text-neutral-50">
+          {blog.title}
+        </h1>
+        
+        <div className="text-muted-foreground font-light text-sm">
+          <ProfileHoverCard authorUsername={blog.username} displayName={blog.displayName}>
+            <Link href={`/${blog.username}`} className="cursor-pointer hover:underline">
+              {blog.displayName || blog.username}
+            </Link>
+          </ProfileHoverCard>
+          <span>
+            {" • "}
+            {new Date(blog._creationTime).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })}
+          </span>
+        </div>
 
-                    <BlogEmojiReactions initialBlog={blog} />
+        <BlogEmojiReactions initialBlog={blog} />
 
-                    <p className="text-lg text-neutral-600 dark:text-neutral-400 font-medium">
-                        {blog.subtitle}
-                    </p>
-                </div>
+        <p className="text-lg text-neutral-600 dark:text-neutral-400 font-medium">
+          {blog.subtitle}
+        </p>
+      </div>
 
-                <Separator className="my-8" />
+      <Separator className="my-8" />
 
-                <div className="prose prose-neutral dark:prose-invert max-w-none text-lg leading-relaxed">
-                    <ReactMarkdown>{blog.content}</ReactMarkdown>
-                </div>
+      <div className="prose prose-neutral dark:prose-invert max-w-none text-lg leading-relaxed">
+        <ReactMarkdown>{blog.content}</ReactMarkdown>
+      </div>
 
-                <Separator className="my-10" />
-                <BlogCTA />
-                <Separator className="my-10" />
+      <Separator className="my-10" />
+      <BlogCTA />
+      <Separator className="my-10" />
 
-                <div id="comments">
-                    <CommentSection preloadedComments={preloadedComments} />
-                </div>
-            </div>
-        </main>
-    )
+      <div id="comments">
+        <CommentSection preloadedComments={preloadedComments} />
+      </div>
+    </div>
+  );
 }

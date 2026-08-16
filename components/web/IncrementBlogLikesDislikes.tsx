@@ -11,7 +11,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { FaFacebook } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 import { RxLinkedinLogo } from "react-icons/rx";
-import { Separator } from "../ui/separator";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { DeleteBlogDialog } from "./DeleteBlogDialog";
@@ -187,34 +186,39 @@ export function IncrementBlogLikesDislikes({ blog }: IncrementBlogLikesProps) {
   };
 
   return (
-    <div className="flex flex-col items-center gap-2 p-6 text-muted-foreground text-xs">
+    <div className="flex flex-col items-center gap-2 py-2 text-zinc-500">
+      {/* Upvote Button */}
       <Button
         variant="ghost"
         onClick={handleLikeClick}
-        className="h-12 w-12 rounded-full text-muted-foreground hover:text-foreground cursor-pointer"
+        className="flex flex-row items-center justify-center gap-1 h-11 w-11 p-0 rounded-full text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
       >
         <ThumbsUp
-          className={`!h-5 !w-5 transition-none ${hasLiked ? "text-emerald-500" : ""}`}
-          fill={hasLiked ? "currentColor" : "none"}
+          className={`w-4 h-4 shrink-0 transition-none ${
+            hasLiked ? "text-emerald-500 fill-emerald-500" : ""
+          }`}
         />
-        <span className={hasLiked ? "text-emerald-500 font-bold" : ""}>{likesCount}</span>
+        <span className={`text-xs font-medium leading-none ${hasLiked ? "text-emerald-500 font-bold" : ""}`}>
+          {likesCount}
+        </span>
       </Button>
 
+      {/* Emoji Reaction Button */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
-            className="h-12 w-12 rounded-full text-muted-foreground hover:text-foreground cursor-pointer"
+            className="flex flex-row items-center justify-center gap-1 h-11 w-11 p-0 rounded-full text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
           >
-            <SmilePlus className="!h-5 !w-5 transition-transform active:scale-90" />
-            <span>{totalReactions}</span>
+            <SmilePlus className="w-4 h-4 shrink-0" />
+            <span className="text-xs font-medium leading-none">{totalReactions}</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent
           side="right"
           align="center"
           sideOffset={12}
-          className="flex flex-row items-center gap-4 p-4 w-max min-w-0 z-50 overflow-visible"
+          className="flex flex-row items-center gap-2 p-2 w-max min-w-0 z-50 rounded-full"
         >
           {EMOJI_REACTIONS.map(({ type, emoji, label }) => {
             const isSelected = reactionState?.userReactions.includes(type);
@@ -223,8 +227,10 @@ export function IncrementBlogLikesDislikes({ blog }: IncrementBlogLikesProps) {
               <DropdownMenuItem
                 key={type}
                 onClick={() => handleSelectReaction(type)}
-                className={`flex h-9 w-9 shrink-0 justify-center items-center rounded-full cursor-pointer text-3xl p-0 transition-transform hover:scale-120 focus:outline-none ${
-                  isSelected ? "bg-accent scale-110 font-bold" : "hover:bg-accent/50 hover:scale-110"
+                className={`flex h-8 w-8 shrink-0 justify-center items-center rounded-full cursor-pointer text-xl p-0 transition-transform hover:scale-110 focus:outline-none ${
+                  isSelected
+                    ? "bg-zinc-100 dark:bg-zinc-800 scale-105"
+                    : "hover:bg-zinc-100 dark:hover:bg-zinc-800"
                 }`}
                 title={label}
               >
@@ -237,41 +243,43 @@ export function IncrementBlogLikesDislikes({ blog }: IncrementBlogLikesProps) {
         </DropdownMenuContent>
       </DropdownMenu>
 
+      {/* Comment Button */}
       <Button
         variant="ghost"
-        className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground cursor-pointer"
         onClick={scrollToView}
+        className="flex flex-row items-center justify-center gap-1 h-11 w-11 p-0 rounded-full text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
       >
-        <MessageSquare className="!h-5 !w-5 transition-transform active:scale-90" />
-        <span>{displayComments}</span>
+        <MessageSquare className="w-4 h-4 shrink-0" />
+        <span className="text-xs font-medium leading-none">{displayComments}</span>
       </Button>
 
+      {/* Share / More Menu (Public) */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
-            className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground disabled:opacity-100 cursor-pointer"
+            className="flex items-center justify-center h-11 w-11 p-0 rounded-full text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
           >
-            <Ellipsis className="!h-5 !w-5 transition-transform active:scale-90" />
+            <Ellipsis className="w-4 h-4" />
           </Button>
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent className="w-48">
-          <DropdownMenuLabel>Share</DropdownMenuLabel>
+        <DropdownMenuContent side="right" className="w-44 rounded-xl">
+          <DropdownMenuLabel className="text-xs font-semibold text-zinc-500">Share</DropdownMenuLabel>
 
           <DropdownMenuItem
-            className="font-bold cursor-pointer flex items-center gap-2 whitespace-nowrap"
+            className="cursor-pointer text-xs flex items-center gap-2"
             onClick={() => {
               navigator.clipboard.writeText(window.location.href);
               toast.success("Link copied to clipboard!");
             }}
           >
-            <Copy className="h-4 w-4 shrink-0" strokeWidth={3} />
+            <Copy className="h-3.5 w-3.5 shrink-0" />
             <span>Copy link</span>
           </DropdownMenuItem>
 
           <DropdownMenuItem
-            className="cursor-pointer flex items-center gap-2 whitespace-nowrap"
+            className="cursor-pointer text-xs flex items-center gap-2"
             onClick={() => {
               const shareUrl = `https://x.com/intent/tweet?url=${encodeURIComponent(
                 window.location.href
@@ -279,12 +287,12 @@ export function IncrementBlogLikesDislikes({ blog }: IncrementBlogLikesProps) {
               window.open(shareUrl, "_blank", "noopener,noreferrer");
             }}
           >
-            <FaXTwitter className="h-4 w-4 shrink-0" />
+            <FaXTwitter className="h-3.5 w-3.5 shrink-0" />
             <span>X (Twitter)</span>
           </DropdownMenuItem>
 
           <DropdownMenuItem
-            className="cursor-pointer flex items-center gap-2 whitespace-nowrap"
+            className="cursor-pointer text-xs flex items-center gap-2"
             onClick={() => {
               const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
                 window.location.href
@@ -292,12 +300,12 @@ export function IncrementBlogLikesDislikes({ blog }: IncrementBlogLikesProps) {
               window.open(shareUrl, "_blank", "noopener,noreferrer");
             }}
           >
-            <RxLinkedinLogo className="h-4 w-4 shrink-0" />
+            <RxLinkedinLogo className="h-3.5 w-3.5 shrink-0" />
             <span>LinkedIn</span>
           </DropdownMenuItem>
 
           <DropdownMenuItem
-            className="cursor-pointer flex items-center gap-2 whitespace-nowrap"
+            className="cursor-pointer text-xs flex items-center gap-2"
             onClick={() => {
               const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
                 window.location.href
@@ -305,25 +313,24 @@ export function IncrementBlogLikesDislikes({ blog }: IncrementBlogLikesProps) {
               window.open(shareUrl, "_blank", "noopener,noreferrer");
             }}
           >
-            <FaFacebook className="h-4 w-4 shrink-0" />
+            <FaFacebook className="h-3.5 w-3.5 shrink-0" />
             <span>Facebook</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
+      {/* Internal Management Tools (Protected / Company Users Only) */}
       {isCompanyUser && (
         <>
-          <div className="w-1/2 mx-auto">
-            <Separator />
-          </div>
+          <div className="w-8 h-[1px] bg-zinc-200 dark:bg-zinc-800 my-1" />
 
           <Button
             variant="ghost"
             onClick={handleFeaturedClick}
-            className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground disabled:opacity-100 cursor-pointer"
+            className="flex items-center justify-center h-11 w-11 p-0 rounded-full text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
           >
             <Star
-              className={`!h-5 !w-5 transition-all active:scale-90 ${
+              className={`w-4 h-4 ${
                 isFeatured ? "text-amber-500 fill-amber-500" : ""
               }`}
             />
@@ -331,11 +338,11 @@ export function IncrementBlogLikesDislikes({ blog }: IncrementBlogLikesProps) {
 
           <Button
             variant="ghost"
-            className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-foreground disabled:opacity-100 cursor-pointer"
+            className="flex items-center justify-center h-11 w-11 p-0 rounded-full text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
             asChild
           >
             <Link href={`/company/blog?id=${blog._id}`} onMouseEnter={prefetchBlog}>
-              <SquarePen className="!h-5 !w-5 transition-transform active:scale-90" />
+              <SquarePen className="w-4 h-4" />
             </Link>
           </Button>
 
@@ -347,9 +354,9 @@ export function IncrementBlogLikesDislikes({ blog }: IncrementBlogLikesProps) {
             trigger={
               <Button
                 variant="ghost"
-                className="h-12 w-12 rounded-full transition-all text-muted-foreground hover:text-destructive disabled:opacity-100 cursor-pointer"
+                className="flex items-center justify-center h-11 w-11 p-0 rounded-full text-zinc-600 dark:text-zinc-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer"
               >
-                <Trash2 className="!h-5 !w-5 transition-transform active:scale-90" />
+                <Trash2 className="w-4 h-4" />
               </Button>
             }
           />

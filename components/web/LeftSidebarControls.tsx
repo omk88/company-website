@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { Sidebar, SidebarHeader, SidebarContent, SidebarGroup, SidebarFooter } from "../ui/sidebar";
-import { Separator } from "../ui/separator";
+import { Sidebar, SidebarHeader, SidebarContent, SidebarFooter } from "../ui/sidebar";
 import { buttonVariants } from "../ui/button";
 import { IncrementBlogLikesDislikes } from "./IncrementBlogLikesDislikes";
 import { Doc } from "@/convex/_generated/dataModel";
@@ -14,24 +13,32 @@ interface LeftSidebarControlsProps {
 
 export function LeftSidebarControls({ blog }: LeftSidebarControlsProps) {
   return (
-    <Sidebar bgClass="bg-white" showBorder={false} className="!w-40 !top-16 !z-40">
-      <SidebarHeader>
-        <Link className={buttonVariants({ variant: "ghost" })} href="/insights">
-          <ArrowLeft className="size-4" />
-          Back to blog
-        </Link>
-      </SidebarHeader>
+    <aside 
+      className="shrink-0"
+      style={{ "--sidebar-width": "3.5rem" } as React.CSSProperties}
+    >
+      <Sidebar bgClass="bg-white dark:bg-zinc-950" showBorder={false} className="!top-16 !z-40">
+        <SidebarHeader className="flex items-center justify-center p-2">
+          <Link
+            className={
+              buttonVariants({ variant: "ghost", size: "icon" }) +
+              " h-9 w-9 rounded-full text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 dark:hover:text-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+            }
+            href="/insights"
+            title="Back to insights"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </Link>
+        </SidebarHeader>
 
-      <div className="w-1/2 mx-auto">
-        <Separator />
-      </div>
+        <div className="w-8 h-[1px] bg-zinc-200 dark:bg-zinc-800 mx-auto my-1" />
 
-      <SidebarContent>
-        <IncrementBlogLikesDislikes blog={blog} />
-        <SidebarGroup />
-      </SidebarContent>
+        <SidebarContent className="p-0">
+          <IncrementBlogLikesDislikes blog={blog} />
+        </SidebarContent>
 
-      <SidebarFooter />
-    </Sidebar>
+        <SidebarFooter />
+      </Sidebar>
+    </aside>
   );
 }
