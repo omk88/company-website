@@ -1,7 +1,7 @@
 "use client";
 
 import { api } from "@/convex/_generated/api";
-import { Doc } from "@/convex/_generated/dataModel";
+import { Doc, Id } from "@/convex/_generated/dataModel";
 import { useConvex, useMutation, useQuery } from "convex/react";
 import { Bookmark, Copy, Ellipsis, MessageSquare, SmilePlus, SquarePen, Star, ThumbsUp, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
@@ -15,28 +15,59 @@ import Link from "next/link";
 import { DeleteBlogDialog } from "./DeleteBlogDialog";
 import { EMOJI_REACTIONS, ReactionType } from "@/app/constants/reactions";
 
-interface IncrementBlogLikesProps {
-  blog: Doc<"blogs">;
+export interface InteractionState {
+  voteState: {
+    hasVoted: boolean;
+    likes: number;
+  };
+  reactionState: {
+    userReactions: string[];
+    counts: {
+      heart: number;
+      insightful: number;
+      mindblown: number;
+      fire: number;
+      thinking: number;
+    };
+  };
+  displayComments: number;
+  featuredState: {
+    isFeatured: boolean;
+  };
+  bookmarkState: {
+    isBookmarked: boolean;
+  };
 }
 
-export function IncrementBlogLikesDislikes({ blog }: IncrementBlogLikesProps) {
+interface IncrementBlogLikesProps {
+  blog: Doc<"blogs">;
+  initialInteractionState: InteractionState;
+}
+
+export function IncrementBlogLikesDislikes({ blog, initialInteractionState }: IncrementBlogLikesProps) {
   const convex = useConvex();
   const router = useRouter();
 
   const currentUser = useQuery(api.auth.getCurrentUser);
-  const voteState = useQuery(api.blogs.getBlogVoteState, { blogId: blog._id });
-  const reactionState = useQuery(api.blogs.getBlogReactionState, { blogId: blog._id });
-  const displayComments = useQuery(api.comments.getCommentNumber, { blogId: blog._id }) ?? 0;
-  const featuredState = useQuery(api.blogs.getBlogFeaturedState, { blogId: blog._id });
-  const bookmarkState = useQuery(api.blogs.getBookmarkedState, { blogId: blog._id });
+
+  const liveVoteState = useQuery(api.blogs.getBlogVoteState, { blogId: blog._id });
+  const liveReactionState = useQuery(api.blogs.getBlogReactionState, { blogId: blog._id });
+  const liveFeaturedState = useQuery(api.blogs.getBlogFeaturedState, { blogId: blog._id });
+  const liveBookmarkState = useQuery(api.blogs.getBookmarkedState, { blogId: blog._id });
+
+  const voteState = liveVoteState ?? initialInteractionState.voteState;
+  const reactionState = liveReactionState ?? initialInteractionState.reactionState;
+  const featuredState = liveFeaturedState ?? initialInteractionState.featuredState;
+  const bookmarkState = liveBookmarkState ?? initialInteractionState.bookmarkState;
+  const displayComments = initialInteractionState.displayComments;
 
   const userEmail = currentUser?.email;
   const isCompanyUser = userEmail?.endsWith("@taqtiq.tech");
 
-  const hasLiked = voteState?.hasVoted;
-  const likesCount = voteState?.likes ?? blog.likes;
-  const isFeatured = featuredState?.isFeatured;
-  const isBookmarked = bookmarkState?.isBookmarked ?? false;
+  const hasLiked = voteState.hasVoted;
+  const likesCount = voteState.likes;
+  const isFeatured = featuredState.isFeatured;
+  const isBookmarked = bookmarkState.isBookmarked;
 
   const prefetchBlog = () => {
     convex.query(api.blogs.getBlogById, { blogId: blog._id }).catch((err) => {
@@ -48,8 +79,7 @@ export function IncrementBlogLikesDislikes({ blog }: IncrementBlogLikesProps) {
   const toggleReactionMutation = useMutation(api.blogs.toggleBlogReaction).withOptimisticUpdate(
     (localStore, args) => {
       const { blogId, reactionType } = args;
-      const previous = localStore.getQuery(api.blogs.getBlogReactionState, { blogId });
-      if (!previous) return;
+      const previous = localStore.getQuery(api.blogs.getBlogReactionState, { blogId }) ?? reactionState;
 
       const userReactions = previous.userReactions ?? [];
       const counts = previous.counts ?? {
@@ -86,10 +116,10 @@ export function IncrementBlogLikesDislikes({ blog }: IncrementBlogLikesProps) {
   const toggleBlogVoteMutation = useMutation(api.blogs.toggleBlogVote).withOptimisticUpdate(
     (localStore, args) => {
       const { blogId } = args;
-      const previous = localStore.getQuery(api.blogs.getBlogVoteState, { blogId });
+      const previous = localStore.getQuery(api.blogs.getBlogVoteState, { blogId }) ?? voteState;
 
-      const currentHasVoted = previous?.hasVoted ?? false;
-      const currentLikes = previous?.likes ?? blog.likes;
+      const currentHasVoted = previous.hasVoted;
+      const currentLikes = previous.likes;
 
       const nextHasVoted = !currentHasVoted;
       const nextLikes = nextHasVoted ? currentLikes + 1 : currentLikes - 1;
@@ -105,47 +135,49 @@ export function IncrementBlogLikesDislikes({ blog }: IncrementBlogLikesProps) {
     }
   );
 
-  const toggleBookmark = useMutation(
-    api.blogs.toggleBookmark
-  ).withOptimisticUpdate((localStore, args) => {
-    const previous = localStore.getQuery(api.blogs.getBookmarkedState, {
-      blogId: args.blogId,
-    });
+  const toggleBookmark = useMutation(api.blogs.toggleBookmark).withOptimisticUpdate(
+    (localStore, args) => {
+      const previous = localStore.getQuery(api.blogs.getBookmarkedState, {
+        blogId: args.blogId,
+      }) ?? bookmarkState;
 
-    const currentIsBookmarked = previous?.isBookmarked ?? false;
+      const currentIsBookmarked = previous.isBookmarked;
 
-    localStore.setQuery(
-      api.blogs.getBookmarkedState,
-      { blogId: args.blogId },
-      { isBookmarked: !currentIsBookmarked }
-    );
-  });
+      localStore.setQuery(
+        api.blogs.getBookmarkedState,
+        { blogId: args.blogId },
+        { isBookmarked: !currentIsBookmarked }
+      );
+    }
+  );
 
   const toggleFeaturedMutation = useMutation(api.blogs.toggleFeatured).withOptimisticUpdate(
     (localStore, args) => {
       const { blogId } = args;
-      const previous = localStore.getQuery(api.blogs.getBlogFeaturedState, { blogId });
+      const previous = localStore.getQuery(api.blogs.getBlogFeaturedState, { blogId }) ?? featuredState;
 
-      const currentIsFeatured = previous?.isFeatured ?? false;
-      const nextHasVoted = !currentIsFeatured;
+      const currentIsFeatured = previous.isFeatured;
 
       localStore.setQuery(
         api.blogs.getBlogFeaturedState,
         { blogId },
         {
-          isFeatured: nextHasVoted,
+          isFeatured: !currentIsFeatured,
         }
       );
     }
   );
 
-  const totalReactions = reactionState
-    ? Object.values(reactionState.counts).reduce((acc, count) => acc + count, 0)
-    : 0;
+  const totalReactions = Object.values(reactionState.counts).reduce((acc, count) => acc + count, 0);
 
   const handleLikeClick = async () => {
     if (!currentUser) {
-      toast.error("You must be logged in to like an article.");
+      toast.error("You must be logged in to like an article.", {
+        action: {
+          label: "Sign in",
+          onClick: () => router.push("/sign-in"),
+        },
+      });
       return;
     }
 
@@ -159,7 +191,12 @@ export function IncrementBlogLikesDislikes({ blog }: IncrementBlogLikesProps) {
 
   const handleBookmarkClick = async () => {
     if (!currentUser) {
-      toast.error("You must be logged in to bookmark an article.");
+      toast.error("You must be logged in to bookmark an article.", {
+        action: {
+          label: "Sign in",
+          onClick: () => router.push("/sign-in"),
+        },
+      });
       return;
     }
 
@@ -173,7 +210,12 @@ export function IncrementBlogLikesDislikes({ blog }: IncrementBlogLikesProps) {
 
   const handleSelectReaction = async (type: ReactionType) => {
     if (!currentUser) {
-      toast.error("You must be logged in to react.");
+      toast.error("You must be logged in to react to an article.", {
+        action: {
+          label: "Sign in",
+          onClick: () => router.push("/sign-in"),
+        },
+      });
       return;
     }
 
@@ -190,7 +232,12 @@ export function IncrementBlogLikesDislikes({ blog }: IncrementBlogLikesProps) {
 
   const handleFeaturedClick = async () => {
     if (!currentUser) {
-      toast.error("You must be logged in to feature an article.");
+      toast.error("You must be logged in to feature an article.", {
+        action: {
+          label: "Sign in",
+          onClick: () => router.push("/sign-in"),
+        },
+      });
       return;
     }
 
@@ -246,7 +293,7 @@ export function IncrementBlogLikesDislikes({ blog }: IncrementBlogLikesProps) {
           className="flex flex-row items-center gap-2 p-2 w-max min-w-0 z-50 rounded-full"
         >
           {EMOJI_REACTIONS.map(({ type, emoji, label }) => {
-            const isSelected = reactionState?.userReactions.includes(type);
+            const isSelected = reactionState.userReactions.includes(type);
 
             return (
               <DropdownMenuItem
@@ -356,7 +403,6 @@ export function IncrementBlogLikesDislikes({ blog }: IncrementBlogLikesProps) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Company Admin Tools */}
       {isCompanyUser && (
         <>
           <div className="w-8 h-[1px] bg-zinc-200 dark:bg-zinc-800 my-1" />

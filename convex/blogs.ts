@@ -989,36 +989,82 @@ export const getBlogWithAuthorPosts = query({
     const blog = await ctx.db.get(args.blogId);
     if (!blog) return null;
 
-    const rawAuthorPosts = await ctx.db
-      .query("blogs")
-      .withIndex("by_username", (q) => q.eq("username", blog.username))
-      .order("desc")
-      .take(6);
+    const identity = await ctx.auth.getUserIdentity();
+    const userId = identity ? (identity.subject as Id<"profiles">) : null;
+
+    const [
+      rawAuthorPosts,
+      blogImageUrl,
+      vote,
+      userReactionsList,
+      featured,
+      bookmark,
+    ] = await Promise.all([
+      ctx.db
+        .query("blogs")
+        .withIndex("by_username", (q) => q.eq("username", blog.username))
+        .order("desc")
+        .take(6),
+
+      blog.storageId
+        ? ctx.storage.getUrl(blog.storageId)
+        : Promise.resolve(null),
+
+      userId
+        ? ctx.db
+            .query("blogVotes")
+            .withIndex("by_user_and_blog", (q) =>
+              q.eq("userId", userId).eq("blogId", args.blogId)
+            )
+            .unique()
+        : Promise.resolve(null),
+
+      userId
+        ? ctx.db
+            .query("blogReactions")
+            .withIndex("by_user_blog_and_type", (q) =>
+              q.eq("userId", userId).eq("blogId", args.blogId)
+            )
+            .collect()
+        : Promise.resolve([]),
+
+      userId
+        ? ctx.db
+            .query("featuredBlogs")
+            .withIndex("by_user_and_blog", (q) =>
+              q.eq("userId", userId).eq("blogId", args.blogId)
+            )
+            .unique()
+        : Promise.resolve(null),
+
+      userId
+        ? ctx.db
+            .query("bookmarks")
+            .withIndex("by_user_and_blog", (q) =>
+              q.eq("userId", userId).eq("blogId", args.blogId)
+            )
+            .unique()
+        : Promise.resolve(null),
+    ]);
 
     const filteredAuthorPosts = rawAuthorPosts
       .filter((post) => post._id !== blog._id)
       .slice(0, 5);
 
-    const [blogImageUrl, authorPostsWithImages] = await Promise.all([
-      blog.storageId
-        ? ctx.storage.getUrl(blog.storageId)
-        : Promise.resolve(null),
+    const authorPostsWithImages = await Promise.all(
+      filteredAuthorPosts.map(async (post) => {
+        const resolvedUrl = post.storageId
+          ? await ctx.storage.getUrl(post.storageId)
+          : null;
 
-      Promise.all(
-        filteredAuthorPosts.map(async (post) => {
-          const resolvedUrl = post.storageId
-            ? await ctx.storage.getUrl(post.storageId)
-            : null;
+        const { content, ...previewFields } = post;
 
-          const { content, ...previewFields } = post;
-
-          return {
-            ...previewFields,
-            imageUrl: resolvedUrl ?? "/noImage.png",
-          };
-        })
-      ),
-    ]);
+        return {
+          ...previewFields,
+          imageUrl: resolvedUrl ?? "/noImage.png",
+        };
+      })
+    );
 
     return {
       blog: {
@@ -1026,6 +1072,29 @@ export const getBlogWithAuthorPosts = query({
         imageUrl: blogImageUrl ?? "/noImage.png",
       },
       authorPosts: authorPostsWithImages,
+      interactionState: {
+        voteState: {
+          hasVoted: !!vote,
+          likes: blog.likes,
+        },
+        reactionState: {
+          userReactions: userReactionsList.map((r) => r.type),
+          counts: {
+            heart: blog.heartCount ?? 0,
+            insightful: blog.insightfulCount ?? 0,
+            mindblown: blog.mindblownCount ?? 0,
+            fire: blog.fireCount ?? 0,
+            thinking: blog.thinkingCount ?? 0,
+          },
+        },
+        displayComments: blog.commentCount ?? 0,
+        featuredState: {
+          isFeatured: !!featured,
+        },
+        bookmarkState: {
+          isBookmarked: !!bookmark,
+        },
+      },
     };
   },
 });

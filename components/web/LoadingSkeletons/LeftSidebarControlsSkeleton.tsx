@@ -25,6 +25,8 @@ export function LeftSidebarControlsSkeleton() {
             <Skeleton className="h-11 w-11 rounded-full" />
 
             <Skeleton className="h-11 w-11 rounded-full" />
+
+            <Skeleton className="h-11 w-11 rounded-full" />
           </div>
         </SidebarContent>
 

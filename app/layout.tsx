@@ -4,11 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "next-themes";
 import GridBackground from "@/components/web/GridBackground"; 
-import { Suspense } from "react";
 import { ConvexClientProvider } from "./ConvexClientProvider";
-import { BookmarksProvider } from "@/providers/BookmarksProvider";
-import { authClient } from "@/lib/auth-client";
-import { headers } from "next/headers";
 import dynamic from "next/dynamic";
 
 
@@ -54,10 +50,8 @@ export default function RootLayout({
           <GridBackground>
             <main>
               <ConvexClientProvider>
-                <BookmarksProvider>
-                  <Navbar />
-                  {children}
-                </BookmarksProvider>
+                <Navbar />
+                {children}
               </ConvexClientProvider>
             </main>
           </GridBackground>

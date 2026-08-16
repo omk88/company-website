@@ -4,15 +4,19 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Sidebar, SidebarHeader, SidebarContent, SidebarFooter } from "../ui/sidebar";
 import { buttonVariants } from "../ui/button";
-import { IncrementBlogLikesDislikes } from "./IncrementBlogLikesDislikes";
+import { 
+  IncrementBlogLikesDislikes, 
+  InteractionState 
+} from "./IncrementBlogLikesDislikes";
 import { Doc } from "@/convex/_generated/dataModel";
 import { cn } from "@/lib/utils";
 
 interface LeftSidebarControlsProps {
   blog: Doc<"blogs">;
+  interactionState: InteractionState;
 }
 
-export function LeftSidebarControls({ blog }: LeftSidebarControlsProps) {
+export function LeftSidebarControls({ blog, interactionState }: LeftSidebarControlsProps) {
   return (
     <aside 
       className="shrink-0"
@@ -35,7 +39,10 @@ export function LeftSidebarControls({ blog }: LeftSidebarControlsProps) {
         <div className="w-8 h-[1px] bg-zinc-200 dark:bg-zinc-800 mx-auto my-1" />
 
         <SidebarContent className="p-0">
-          <IncrementBlogLikesDislikes blog={blog} />
+          <IncrementBlogLikesDislikes 
+            blog={blog} 
+            initialInteractionState={interactionState} 
+          />
         </SidebarContent>
 
         <SidebarFooter />

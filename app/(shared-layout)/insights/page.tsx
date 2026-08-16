@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: "Insights",
 };
 
-export default async function InsightsPage() {
+export default function InsightsPage() {
   return (
     <SidebarProvider>
       <aside 
@@ -19,7 +19,6 @@ export default async function InsightsPage() {
       </aside>
 
       <div className="w-full min-w-0 flex flex-col flex-1 min-h-[calc(100vh-4rem)] pt-16">
-
         <section 
           id="blog-grid-section" 
           className="w-full flex-1 flex flex-col h-full min-h-0 bg-white dark:bg-zinc-950"
@@ -28,7 +27,6 @@ export default async function InsightsPage() {
             <PageBlogPosts />
           </div>
         </section>
-
       </div>
 
       <aside 

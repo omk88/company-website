@@ -97,11 +97,7 @@ function StandardBlogFeed({
         </ul>
       ) : displayResults.length === 0 ? (
         <div className="flex flex-col flex-1 h-full min-h-0">
-          <BlogEmptyState
-            hasActiveFilters={hasActiveFilters}
-            onResetFilters={() => {
-            }}
-          />
+          <BlogEmptyState />
         </div>
       ) : (
         <>
@@ -121,7 +117,6 @@ function StandardBlogFeed({
                   date={blog._creationTime}
                   readTime={blog.readTime}
                   tags={blog.tags}
-                  isInitialBookmarked={blog.isBookmarked}
                 />
               </li>
             ))}
