@@ -1,9 +1,8 @@
 "use client";
 
-import { Sidebar, SidebarContent, SidebarGroup, SidebarFooter, SidebarGroupLabel } from "../ui/sidebar";
-import { Cake, ChartNoAxesColumn, GraduationCap, Library, MapPin, MessageSquareText, SquareLibrary, Terminal, ThumbsUp, User, Link } from "lucide-react";
+import { Sidebar, SidebarContent, SidebarFooter } from "../ui/sidebar";
+import { Cake, Library, MapPin, MessageSquareText, SquareLibrary, Terminal, ThumbsUp, User, Link } from "lucide-react";
 import { EditProfileButton } from "./EditProfileButton";
-import { ICON_MAP } from "@/lib/socials";
 import { Preloaded, usePreloadedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { LinksHoverCard } from "./LinksHoverCard";
@@ -80,82 +79,90 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
           </div>
         </div>
 
-        <div className="p-4 gap-4 flex flex-col font-extralight text-sm font-mono tracking-tight select-none w-full">
-              
+        <div className="p-4 gap-4 flex flex-col  text-sm font-sans tracking-tight w-full">
+          {profile.bio && (
+            <div>
+              <span>{ profile.bio }</span>
+            </div>
+          )}
+
           <div>
-            <div className="flex items-start gap-1.5 min-w-[3rem] justify-start">
+            <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
               <Cake className="w-4 h-4 stroke-[2.3] shrink-0" />
               <p>{ formattedDate }</p>
             </div>
 
             { profile.location && (
-              <div className="flex items-start gap-1.5 min-w-[3rem] justify-start">
+              <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
                 <MapPin className="w-4 h-4 stroke-[2.3] shrink-0 mt-0.5" />
                 <p>{ profile.location }</p>
               </div>
             )}
-          </div>
-
-          <div className="flex items-center justify-between w-full px-12 -m-2">
-            <FollowsDialog
-              profileId={profile._id}
-              onMouseEnter={() => setShouldPrefetchFollowers(true)}
-              trigger={
-                <div 
-                  onMouseEnter={() => setShouldPrefetchFollowers(true)}
-                  className="flex items-center gap-1.5 min-w-[3rem] justify-start p-2 rounded-2xl hover:bg-zinc-100 hover:text-blue-600 transition-colors cursor-pointer"
-                >
-                  <User className="w-4 h-4 stroke-[2.3] shrink-0 mt-0.5" />
-                  <span>{profile.followerCount}</span>
-                </div>
-              }
-            />
-            <TooltipProvider delayDuration={200}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex items-center gap-1.5 min-w-[3rem] justify-start p-2 rounded-2xl hover:bg-zinc-100 transition-colors cursor-pointer">
-                    <ThumbsUp className="w-4 h-4 stroke-[2.3] shrink-0" />
-                    <span>{ profile.totalLikes }</span>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" align="center">
-                  <p className="text-xs font-medium">{ profile.totalLikes } Total Likes</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider delayDuration={200}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex items-center gap-1.5 min-w-[3rem] justify-start p-2 rounded-2xl hover:bg-zinc-100 transition-colors cursor-pointer">
-                    <Library className="w-4 h-4 stroke-[2.3] shrink-0" />
-                    <span>{ profile.articlesPublished }</span>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" align="center">
-                  <p className="text-xs font-medium">{ profile.articlesPublished } Insights Published</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider delayDuration={200}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex items-center gap-1.5 min-w-[3rem] justify-start p-2 rounded-2xl hover:bg-zinc-100 transition-colors cursor-pointer">
-                    <MessageSquareText className="w-4 h-4 stroke-[2.3] shrink-0" />
-                    <span>{ profile.commentsPublished }</span>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" align="center">
-                  <p className="text-xs font-medium">{ profile.commentsPublished } Comments Published</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-
-          {profile.bio && (
-            <div>
-              <p>{ profile.bio }</p>
+            <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
+              <Link className="w-4 h-4 stroke-[2.3] shrink-0" />
+              <span className="underline text-blue-600">{ "https://x.com/" }</span>
             </div>
-          )}
+          </div>
+
+          <div>
+            <div className="flex items-center justify-start gap-3 w-full">
+              <FollowsDialog
+                profileId={profile._id}
+                onMouseEnter={() => setShouldPrefetchFollowers(true)}
+                trigger={
+                  <div 
+                    onMouseEnter={() => setShouldPrefetchFollowers(true)}
+                    className="flex items-center gap-1.5 p-1.5 rounded-lg hover:bg-zinc-100 hover:text-blue-600 transition-colors cursor-pointer"
+                  >
+                    <User className="w-4 h-4 stroke-[2.3] shrink-0" />
+                    <span>{profile.followerCount ?? 0}</span>
+                  </div>
+                }
+              />
+
+              <TooltipProvider delayDuration={200}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center gap-1.5 p-1.5 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer">
+                      <ThumbsUp className="w-4 h-4 stroke-[2.3] shrink-0" />
+                      <span>{profile.totalLikes ?? 0}</span>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" align="center">
+                    <p className="text-xs font-medium">{profile.totalLikes ?? 0} Total Likes</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
+              <TooltipProvider delayDuration={200}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center gap-1.5 p-1.5 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer">
+                      <Library className="w-4 h-4 stroke-[2.3] shrink-0" />
+                      <span>{profile.articlesPublished ?? 0}</span>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" align="center">
+                    <p className="text-xs font-medium">{profile.articlesPublished ?? 0} Insights Published</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
+              <TooltipProvider delayDuration={200}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center gap-1.5 p-1.5 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer">
+                      <MessageSquareText className="w-4 h-4 stroke-[2.3] shrink-0" />
+                      <span>{profile.commentsPublished ?? 0}</span>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" align="center">
+                    <p className="text-xs font-medium">{profile.commentsPublished ?? 0} Comments Published</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+          </div>
 
           <div className="flex flex-row gap-4">
             {profile.socials && profile.socials.length > 0 && (

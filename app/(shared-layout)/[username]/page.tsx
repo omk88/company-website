@@ -49,7 +49,7 @@ export default async function Profile({ params }: profileRouteProps) {
                     <LeftSidebarProfile preloadedProfile={preloadedProfile} preloadedCurrentUser={preloadedCurrentUser} />
                 </aside>
 
-                <div className="w-full bg-white">
+                {/*<div className="w-full bg-white">
                     <ProfileContentWrapper
                         username={username}
                         preloadedProfile={preloadedProfile}
@@ -57,7 +57,7 @@ export default async function Profile({ params }: profileRouteProps) {
                         preloadedInitialBlogs={preloadedInitialBlogs}
                         preloadedInitialComments={preloadedInitialComments}
                     />
-                </div>
+                </div>*/}
             </SidebarProvider>
         </div>
     );
