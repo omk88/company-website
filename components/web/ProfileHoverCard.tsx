@@ -95,7 +95,7 @@ export function ProfileHoverCard({ displayName, authorUsername, children, align 
                             </div>
                         </Link>
 
-                        <div className="p-4 gap-4 flex flex-col font-extralight text-[14px] font-mono tracking-tight select-none w-full">
+                        <div className="p-4 gap-4 flex flex-col font-extralight text-[14px] font-sans tracking-tight select-none w-full">
                             <div>
                                 <div className="flex items-start gap-1.5 min-w-[3rem] justify-start">
                                     <Cake className="w-4 h-4 stroke-[2.3] shrink-0 mt-0.5" />
@@ -115,7 +115,7 @@ export function ProfileHoverCard({ displayName, authorUsername, children, align 
                                     <p>{ profile?.bio }</p>
                                 </div>
                             )}
-                            <div className="flex items-center justify-between w-full -m-2">
+                            <div className="font-sans flex items-center justify-between w-full -m-2">
                                 <TooltipProvider delayDuration={200}>
                                     <Tooltip>
                                         <TooltipTrigger asChild>
