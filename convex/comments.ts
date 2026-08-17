@@ -43,7 +43,7 @@ export const getCommentsByBlog = query({
 
 export const getCommentsByAuthor = query({
   args: {
-    authorId: v.id("profiles")
+    authorId: v.string()
   },
   handler: async (ctx, args) => {
     return await ctx.db

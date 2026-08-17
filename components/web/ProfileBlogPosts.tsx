@@ -8,7 +8,7 @@ interface ProfileBlogPostsProps {
 
 export function ProfileBlogPosts({ author }: ProfileBlogPostsProps) {
   return (
-    <div className="flex flex-col flex-1 w-full max-w-[800px] p-2 mx-auto">
+    <div className="flex flex-col flex-1 w-full max-w-[600px] p-2 mx-auto">
       <ProfileFeed author={author} />
     </div>
   );

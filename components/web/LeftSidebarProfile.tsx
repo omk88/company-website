@@ -133,7 +133,9 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
             </div>
           </div>
 
-          <FollowButton targetProfileId={profile._id} displayName={displayName} username={profile.username}/>
+          {currentUser && !isOwnProfile && (
+            <FollowButton targetProfileId={profile._id} displayName={displayName} username={profile.username}/>
+          )}
 
           <div>
             <div className="flex items-center justify-start gap-4 w-full border-b border-border">

@@ -66,6 +66,7 @@ export function ProfileFeed({ author }: ProfileFeedProps) {
                   date={blog._creationTime}
                   readTime={blog.readTime}
                   tags={blog.tags}
+                  variant="compact"
                 />
               </li>
             ))}
