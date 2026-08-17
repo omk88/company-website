@@ -38,7 +38,7 @@ export function MoreFromAuthor({ displayName, username, blogs }: MoreFromAuthorP
         <span className="shrink-0">
           More from{" "}
           <ProfileHoverCard authorUsername={username} displayName={displayName}>
-            <span className="cursor-pointer truncate max-w-[120px] inline-block align-bottom">
+            <span className="cursor-pointer truncate max-w-[140px] inline-block align-bottom">
               {displayName || username}
             </span>
           </ProfileHoverCard>

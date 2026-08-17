@@ -1,7 +1,7 @@
 "use client";
 
 import { Sidebar, SidebarContent, SidebarFooter } from "../ui/sidebar";
-import { Cake, Library, MapPin, MessageSquareText, SquareLibrary, Terminal, ThumbsUp, User, Link } from "lucide-react";
+import { Cake, Library, MapPin, MessageSquareText, SquareLibrary, Terminal, ThumbsUp, User, Link, Zap, Bookmark } from "lucide-react";
 import { EditProfileButton } from "./EditProfileButton";
 import { Preloaded, usePreloadedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -12,6 +12,7 @@ import { EducationHoverCard } from "./EducationHoverCard";
 import { FollowButton } from "./FollowButton";
 import { FollowsDialog } from "./FollowsDialog";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface profileProps {
   preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
@@ -28,6 +29,10 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
   const profile = profileData.profile;
   const avatarSrc = profileData.profilePicture;
   const defaultAvatarSrc = profileData.defaultProfilePicture;
+
+  const anim = "relative no-underline hover:no-underline after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100";
+
+  const [selectedMetric, setSelectedMetric] = useState<'insights' | 'comments' | 'bookmarks' | 'followers'>('insights');
   
   if (!profile) {
     return <div className="p-4 text-gray-500">Profile not found</div>;
@@ -61,9 +66,28 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
             </div>
 
             <div className="relative w-full">
-              <div className="flex flex-col">
-                <h4 className="text-base font-semibold leading-none">{displayName || profile.username}</h4>
-                <p className="text-sm text-muted-foreground leading-none mt-1">{`@${profile.username}`}</p>
+              <div className="flex flex-col gap-1 w-full">
+                <h4 className="text-base font-semibold text-foreground tracking-tight">
+                  {displayName || profile.username}
+                </h4>
+
+                <div className="flex items-center gap-2 flex-wrap">
+                  <p className="text-sm text-muted-foreground">{`@${profile.username}`}</p>
+
+                  <TooltipProvider delayDuration={200}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="inline-flex items-center gap-1 text-xs font-sans font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/60 cursor-help select-none">
+                          <Zap className="w-3 h-3 fill-amber-500 stroke-amber-500 shrink-0" />
+                          <span>{profile.totalLikes ?? 0}</span>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" align="start">
+                        <p className="text-xs font-medium">{profile.totalLikes ?? 0} Total Likes</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
               </div>
 
               {isOwnProfile && (
@@ -80,6 +104,7 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
         </div>
 
         <div className="p-4 gap-4 flex flex-col  text-sm font-sans tracking-tight w-full">
+          
           {profile.bio && (
             <div>
               <span>{ profile.bio }</span>
@@ -105,42 +130,22 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
           </div>
 
           <div>
-            <div className="flex items-center justify-start gap-3 w-full">
-              <FollowsDialog
-                profileId={profile._id}
-                onMouseEnter={() => setShouldPrefetchFollowers(true)}
-                trigger={
-                  <div 
-                    onMouseEnter={() => setShouldPrefetchFollowers(true)}
-                    className="flex items-center gap-1.5 p-1.5 rounded-lg hover:bg-zinc-100 hover:text-blue-600 transition-colors cursor-pointer"
-                  >
-                    <User className="w-4 h-4 stroke-[2.3] shrink-0" />
-                    <span>{profile.followerCount ?? 0}</span>
-                  </div>
-                }
-              />
-
+            <div className="flex items-center justify-start gap-4 w-full border-b border-border">
               <TooltipProvider delayDuration={200}>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="flex items-center gap-1.5 p-1.5 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer">
-                      <ThumbsUp className="w-4 h-4 stroke-[2.3] shrink-0" />
-                      <span>{profile.totalLikes ?? 0}</span>
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom" align="center">
-                    <p className="text-xs font-medium">{profile.totalLikes ?? 0} Total Likes</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-
-              <TooltipProvider delayDuration={200}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="flex items-center gap-1.5 p-1.5 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedMetric('insights')}
+                      className={cn(
+                        "flex items-center gap-1.5 pb-2 pt-1.5 px-1 font-sans text-sm font-medium transition-colors cursor-pointer text-foreground hover:opacity-70",
+                        anim,
+                        selectedMetric === 'insights' && "after:scale-x-100 after:origin-bottom-left"
+                      )}
+                    >
                       <Library className="w-4 h-4 stroke-[2.3] shrink-0" />
                       <span>{profile.articlesPublished ?? 0}</span>
-                    </div>
+                    </button>
                   </TooltipTrigger>
                   <TooltipContent side="bottom" align="center">
                     <p className="text-xs font-medium">{profile.articlesPublished ?? 0} Insights Published</p>
@@ -151,20 +156,70 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
               <TooltipProvider delayDuration={200}>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="flex items-center gap-1.5 p-1.5 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedMetric('comments')}
+                      className={cn(
+                        "flex items-center gap-1.5 pb-2 pt-1.5 px-1 font-sans text-sm font-medium transition-colors cursor-pointer text-foreground hover:opacity-70",
+                        anim,
+                        selectedMetric === 'comments' && "after:scale-x-100 after:origin-bottom-left"
+                      )}
+                    >
                       <MessageSquareText className="w-4 h-4 stroke-[2.3] shrink-0" />
                       <span>{profile.commentsPublished ?? 0}</span>
-                    </div>
+                    </button>
                   </TooltipTrigger>
                   <TooltipContent side="bottom" align="center">
                     <p className="text-xs font-medium">{profile.commentsPublished ?? 0} Comments Published</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
+
+              <TooltipProvider delayDuration={200}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedMetric('bookmarks')}
+                      className={cn(
+                        "flex items-center gap-1.5 pb-2 pt-1.5 px-1 font-sans text-sm font-medium transition-colors cursor-pointer text-foreground hover:opacity-70",
+                        anim,
+                        selectedMetric === 'bookmarks' && "after:scale-x-100 after:origin-bottom-left"
+                      )}
+                    >
+                      <Bookmark className="w-4 h-4 stroke-[2.3] shrink-0" />
+                      <span>{34}</span>
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" align="center">
+                    <p className="text-xs font-medium">{34} Bookmarks</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
+              <FollowsDialog
+                profileId={profile._id}
+                onMouseEnter={() => setShouldPrefetchFollowers(true)}
+                trigger={
+                  <button
+                    type="button"
+                    onClick={() => setSelectedMetric('followers')}
+                    onMouseEnter={() => setShouldPrefetchFollowers(true)}
+                    className={cn(
+                      "flex items-center gap-1.5 pb-2 pt-1.5 px-1 font-sans text-sm font-medium transition-colors cursor-pointer text-foreground hover:opacity-70",
+                      anim,
+                      selectedMetric === 'followers' && "after:scale-x-100 after:origin-bottom-left"
+                    )}
+                  >
+                    <User className="w-4 h-4 stroke-[2.3] shrink-0" />
+                    <span>{profile.followerCount ?? 0}</span>
+                  </button>
+                }
+              />
             </div>
           </div>
 
-          <div className="flex flex-row gap-4">
+          <div className="flex flex-row gap-2">
             {profile.socials && profile.socials.length > 0 && (
               <LinksHoverCard socials={profile.socials} />
             )}

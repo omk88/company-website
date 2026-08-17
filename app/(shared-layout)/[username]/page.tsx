@@ -1,6 +1,5 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { LeftSidebarProfile } from "@/components/web/LeftSidebarProfile";
-import { ProfileContentWrapper } from "@/components/web/ProfileContentWrapper";
 import { api } from "@/convex/_generated/api";
 import { preloadQuery } from "convex/nextjs";
 import { preloadAuthQuery } from "@/lib/auth-server";
@@ -49,15 +48,8 @@ export default async function Profile({ params }: profileRouteProps) {
                     <LeftSidebarProfile preloadedProfile={preloadedProfile} preloadedCurrentUser={preloadedCurrentUser} />
                 </aside>
 
-                {/*<div className="w-full bg-white">
-                    <ProfileContentWrapper
-                        username={username}
-                        preloadedProfile={preloadedProfile}
-                        preloadedCurrentUser={preloadedCurrentUser}
-                        preloadedInitialBlogs={preloadedInitialBlogs}
-                        preloadedInitialComments={preloadedInitialComments}
-                    />
-                </div>*/}
+                <div className="w-full bg-white">
+                </div>
             </SidebarProvider>
         </div>
     );
