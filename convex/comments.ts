@@ -41,6 +41,22 @@ export const getCommentsByBlog = query({
   }
 });
 
+export const getPaginatedCommentsByAuthor = query({
+  args: {
+    author: v.string(),
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, args) => {
+    const paginatedComments = await ctx.db
+      .query("comments")
+      .withIndex("by_authorId", (q) => q.eq("authorId", args.author))
+      .order("desc")
+      .paginate(args.paginationOpts);
+
+    return paginatedComments;
+  },
+});
+
 export const getCommentsByAuthor = query({
   args: {
     authorId: v.string()

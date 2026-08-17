@@ -15,7 +15,7 @@ import { toast } from "sonner";
 import { useTransition } from "react";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import { IncrementCommentLikesDislikes } from "./IncrementCommentLikesDislikes"; 
-import { ProfileHoverCard, formatSmartDate } from "./ProfileHoverCard";
+import { formatSmartDate } from "./ProfileHoverCard";
 
 export function CommentSection(props: { preloadedComments: Preloaded<typeof api.comments.getCommentsByBlog> }) {
   const params = useParams<{ blogId: Id<"blogs"> }>();

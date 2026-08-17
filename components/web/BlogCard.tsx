@@ -130,7 +130,7 @@ export function BlogCard({
                 src={imageUrl}
                 alt={title}
                 fill
-                className="object-cover"
+                className="object-cover aspect-[4/3]"
                 sizes="64px"
               />
             </Link>

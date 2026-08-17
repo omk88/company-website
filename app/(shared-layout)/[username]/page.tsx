@@ -3,7 +3,7 @@ import { LeftSidebarProfile } from "@/components/web/LeftSidebarProfile";
 import { api } from "@/convex/_generated/api";
 import { fetchQuery, preloadQuery } from "convex/nextjs";
 import { preloadAuthQuery } from "@/lib/auth-server";
-import { ProfileBlogPosts } from "@/components/web/ProfileBlogPosts";
+import { ProfileContent } from "@/components/web/ProfileContent";
 
 interface ProfileRouteProps {
   params: Promise<{
@@ -35,8 +35,8 @@ export default async function Profile({ params }: ProfileRouteProps) {
           />
         </aside>
 
-        <main className="flex-1 flex justify-center bg-white pt-16">
-          <ProfileBlogPosts author={profile?.profile?.userId} />
+        <main className="flex-1 flex bg-white pt-16">
+          <ProfileContent author={profile?.profile?.userId} />
         </main>
       </div>
     </SidebarProvider>

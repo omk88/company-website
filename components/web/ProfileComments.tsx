@@ -1,200 +1,67 @@
 "use client";
 
 import { api } from "@/convex/_generated/api";
-import { Preloaded, useConvex, usePreloadedQuery } from "convex/react";
-import { useEffect, useRef, useState } from "react";
-import { ProfileCommentCard } from "./ProfileCommentCard";
-import { SelectableCardWrapper } from "./SelectableCardWrapper";
-import { Id } from "@/convex/_generated/dataModel";
-import { useSearchStore } from "@/stores/useSearchStore";
+import { usePaginatedQuery } from "convex/react";
+import { useRef } from "react";
+import { CommentCard } from "./CommentCard";
+import { Doc } from "@/convex/_generated/dataModel";
 
 interface ProfileCommentsProps {
-    username: string;
-    preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
-    preloadedInitialComments: Preloaded<typeof api.comments.getPaginatedCommentsByUsername>;
-    preloadedCurrentUser: Preloaded<typeof api.auth.getCurrentUser>;
-    selectedIds: Id<"comments">[];
-    setSelectedIds: React.Dispatch<React.SetStateAction<Id<"comments">[]>>;
-    onLoadedIdsChange: (ids: Id<"comments">[]) => void;
+  author: string | undefined;
 }
 
-export function ProfileComments({
-    username,
-    preloadedInitialComments,
-    selectedIds,
-    setSelectedIds,
-    preloadedProfile,
-    preloadedCurrentUser,
-    onLoadedIdsChange,
-}: ProfileCommentsProps) {
-    const convex = useConvex();
+export function ProfileComments({ author }: ProfileCommentsProps) {
+  const { results, status } = usePaginatedQuery(
+    api.comments.getPaginatedCommentsByAuthor,
+    author ? { author } : "skip",
+    { initialNumItems: 6 }
+  );
 
-    const initialData = usePreloadedQuery(preloadedInitialComments);
-    const currentUser = usePreloadedQuery(preloadedCurrentUser);
-    const profileData = usePreloadedQuery(preloadedProfile);
-    const profile = profileData.profile;
+  const isFirstLoad = !author || status === "LoadingFirstPage";
 
-    const searchTerm = useSearchStore((s) => s.searchTerm);
-    const sortOrder = useSearchStore((s) => s.sortOrder);
+  const lastResultsRef = useRef<Doc<"comments">[]>([]);
+  if (results.length > 0) {
+    lastResultsRef.current = results as Doc<"comments">[];
+  }
 
-    const [comments, setComments] = useState(initialData.page);
-    const [cursor, setCursor] = useState<string | null>(initialData.continueCursor);
-    const [isDone, setIsDone] = useState(initialData.isDone);
-    const [isLoading, setIsLoading] = useState(false);
+  const displayResults = results.length > 0 ? (results as Doc<"comments">[]) : lastResultsRef.current;
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
-    const isOwnProfile =
-        currentUser?.userId && profile?.userId && currentUser.userId === profile.userId;
-
-    const loadMoreRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        if (!searchTerm.trim() && sortOrder === "new") {
-            setComments(initialData.page);
-            setCursor(initialData.continueCursor);
-            setIsDone(initialData.isDone);
-            return;
-        }
-
-        let isMounted = true;
-        setIsLoading(true);
-
-        const fetchFilteredComments = async () => {
-            try {
-                const result = await convex.query(
-                    api.comments.getPaginatedCommentsByUsername,
-                    {
-                        username,
-                        searchTerm: searchTerm.trim() || undefined,
-                        sortOrder,
-                        paginationOpts: {
-                            numItems: 6,
-                            cursor: null,
-                            id: 0,
-                        },
-                    }
-                );
-
-                if (isMounted) {
-                    setComments(result.page);
-                    setCursor(result.continueCursor);
-                    setIsDone(result.isDone);
-                }
-            } catch (error) {
-                console.error("Error searching comments:", error);
-            } finally {
-                if (isMounted) setIsLoading(false);
-            }
-        };
-
-        fetchFilteredComments();
-
-        return () => {
-            isMounted = false;
-        };
-    }, [searchTerm, sortOrder, username, convex, initialData]);
-
-    const loadMore = async () => {
-        if (isDone || isLoading || !cursor) return;
-        setIsLoading(true);
-
-        try {
-            const result = await convex.query(
-                api.comments.getPaginatedCommentsByUsername,
-                {
-                    username,
-                    searchTerm: searchTerm.trim() || undefined,
-                    sortOrder,
-                    paginationOpts: {
-                        numItems: 6,
-                        cursor: cursor,
-                        id: 0,
-                    },
-                }
-            );
-
-            setComments((prev) => [...prev, ...result.page]);
-            setCursor(result.continueCursor);
-            setIsDone(result.isDone);
-        } catch (error) {
-            console.error("Error loading more comments:", error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        if (isDone || isLoading) return;
-
-        const observer = new IntersectionObserver(
-            (entries) => {
-                if (entries[0].isIntersecting) {
-                    loadMore();
-                }
-            },
-            { rootMargin: "200px" }
-        );
-
-        const currentTarget = loadMoreRef.current;
-        if (currentTarget) {
-            observer.observe(currentTarget);
-        }
-
-        return () => {
-            if (currentTarget) observer.unobserve(currentTarget);
-        };
-    }, [cursor, isDone, isLoading, searchTerm, sortOrder]);
-
-    useEffect(() => {
-        onLoadedIdsChange(comments.map((comment) => comment._id));
-    }, [comments, onLoadedIdsChange]);
-
-    const handleSelectChange = (id: Id<"comments">, checked: boolean) => {
-        setSelectedIds((prev) =>
-            checked ? [...prev, id] : prev.filter((item) => item !== id)
-        );
-    };
-
+  if (isFirstLoad && displayResults.length === 0) {
     return (
-        <div className="w-full space-y-4">
-            {comments.length === 0 ? (
-                <p className="text-muted-foreground">
-                    {username} has not posted any comments yet.
-                </p>
-            ) : (
-                <>
-                    <ul className="w-full flex flex-col gap-4">
-                        {comments.map((comment) => (
-                            <li key={comment._id}>
-                                <SelectableCardWrapper
-                                    id={comment._id}
-                                    isSelected={selectedIds.includes(comment._id)}
-                                    onSelectChange={handleSelectChange}
-                                    isOwnProfile={isOwnProfile}
-                                >
-                                    <ProfileCommentCard
-                                        id={comment._id}
-                                        displayName={comment.displayName}
-                                        username={comment.username}
-                                        blogTitle={comment.blogTitle}
-                                        body={comment.body}
-                                        likes={comment.likes}
-                                        date={comment._creationTime}
-                                    />
-                                </SelectableCardWrapper>
-                            </li>
-                        ))}
-                    </ul>
-
-                    {!isDone && (
-                        <div
-                            ref={loadMoreRef}
-                            className="py-6 text-center text-sm text-muted-foreground"
-                        >
-                            {isLoading ? "Loading more comments..." : "Loading..."}
-                        </div>
-                    )}
-                </>
-            )}
-        </div>
+      <div className="flex flex-col flex-1 h-full min-h-0 w-full">
+        <ul className="flex flex-col gap-2">
+          {[1, 2, 3].map((i) => (
+            <li key={i}>
+            </li>
+          ))}
+        </ul>
+      </div>
     );
+  }
+
+  return (
+    <div className="flex flex-col flex-1 h-full min-h-0 w-full">
+      {displayResults.length === 0 ? (
+        <div className="flex flex-col flex-1 h-full min-h-0">
+        </div>
+      ) : (
+        <>
+          <ul className="flex flex-col gap-2">
+            {displayResults.map((comment, index) => (
+              <li key={comment._id}>
+                <CommentCard
+                  comment={comment}
+                  index={index}
+                  variant="compact"
+                />
+              </li>
+            ))}
+          </ul>
+
+          <div ref={loadMoreRef} className="w-full" />
+        </>
+      )}
+    </div>
+  );
 }

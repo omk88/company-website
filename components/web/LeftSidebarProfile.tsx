@@ -13,7 +13,7 @@ import { FollowButton } from "./FollowButton";
 import { FollowsDialog } from "./FollowsDialog";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { Badge } from "../ui/badge";
+import { useMetricStore } from "@/stores/useMetricStore";
 
 interface profileProps {
   preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
@@ -33,7 +33,8 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
 
   const anim = "relative no-underline hover:no-underline after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100";
 
-  const [selectedMetric, setSelectedMetric] = useState<'insights' | 'comments' | 'bookmarks' | 'followers'>('insights');
+  const selectedMetric = useMetricStore((state) => state.selectedMetric);
+  const setSelectedMetric = useMetricStore((state) => state.setSelectedMetric);
   
   if (!profile) {
     return <div className="p-4 text-gray-500">Profile not found</div>;

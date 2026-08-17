@@ -40,7 +40,7 @@ export function TrendingBlogs() {
             >
               <div className="w-full flex flex-row items-center justify-between gap-3">
                 <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
-                  <h3 className="text-[13px] font-medium leading-snug text-zinc-800 group-hover/trending:text-blue-600 line-clamp-2 transition-colors">
+                  <h3 className="text-[13px] font-medium leading-snug text-zinc-800 group-hover/trending:text-blue-600 line-clamp-1 transition-colors">
                     {blog.title}
                   </h3>
                   

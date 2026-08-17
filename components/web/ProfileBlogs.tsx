@@ -4,14 +4,14 @@ import { api } from "@/convex/_generated/api";
 import { usePaginatedQuery } from "convex/react";
 import { useRef } from "react";
 import { BlogCard } from "./BlogCard";
-import { BlogCardSkeleton } from "./LoadingSkeletons/BlogCardSkeleton";
 import { BlogEmptyState } from "./BlogEmptyState";
+import { CompactBlogCardSkeleton } from "./LoadingSkeletons/CompactBlogCardSkeleton";
 
-interface ProfileFeedProps {
+interface ProfileBlogsProps {
   author: string | undefined;
 }
 
-export function ProfileFeed({ author }: ProfileFeedProps) {
+export function ProfileBlogs({ author }: ProfileBlogsProps) {
   const { results, status } = usePaginatedQuery(
     api.blogs.getPaginatedPostsByAuthor,
     author ? { author: author as string } : "skip",
@@ -34,7 +34,7 @@ export function ProfileFeed({ author }: ProfileFeedProps) {
         <ul className="flex flex-col gap-2">
           {[1, 2, 3].map((i) => (
             <li key={i}>
-              <BlogCardSkeleton />
+              <CompactBlogCardSkeleton />
             </li>
           ))}
         </ul>
