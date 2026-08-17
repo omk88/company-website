@@ -1,6 +1,6 @@
 "use client";
 
-import { MapPin, Cake, ThumbsUp, MessageSquareText, Library, User } from "lucide-react";
+import { MapPin, Cake, ThumbsUp, MessageSquareText, Library, User, ArrowUpRight } from "lucide-react";
 import { HoverCard, HoverCardTrigger, HoverCardContent } from "../ui/hover-card";
 import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
@@ -74,24 +74,32 @@ export function ProfileHoverCard({ displayName, authorUsername, children, align 
                 <HoverCardContent side="bottom" align="start" className="w-80 p-0 overflow-hidden">
                     <div className="flex flex-col p-2">
                         <Link 
-                            href={`/${profileUsername}`} 
+                            href={`/${profileUsername}`}
+                            className="group flex items-center justify-between p-2.5 rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors duration-100 cursor-pointer"
                         >
-                            <div className="flex flex-row items-center gap-2 w-full p-2 rounded-lg cursor-pointer transition-colors hover:bg-muted">
-                                <div className="h-12 w-12 border-2 border-muted rounded-full overflow-hidden bg-muted relative shrink-0">
+                            <div className="flex items-center gap-3 min-w-0">
+                                <div className="h-10 w-10 border border-border rounded-full overflow-hidden bg-muted shrink-0">
                                     <img
                                         src={avatarSrc || defaultAvatarSrc || ""}
                                         alt="profile"
-                                        className="h-full w-full object-cover rounded-full"
+                                        className="h-full w-full object-cover"
                                         decoding="async" 
                                     />
                                 </div>
 
-                                <div className="relative w-full">
-                                    <div className="flex flex-col">
-                                        <h4 className="text-sm font-semibold leading-none">{displayName || profile?.username}</h4>
-                                        <p className="text-xs text-muted-foreground leading-none mt-1">{`@${profile?.username}`}</p>
-                                    </div>
+                                <div className="flex flex-col min-w-0">
+                                    <span className="text-sm font-semibold truncate leading-tight">
+                                        {displayName || profile?.username}
+                                    </span>
+                                    <span className="text-xs text-zinc-600 dark:text-zinc-400 group-hover:text-accent-foreground/80 truncate mt-0.5">
+                                        @{profile?.username}
+                                    </span>
                                 </div>
+                            </div>
+
+                            <div className="flex items-center gap-1 text-xs font-medium text-zinc-600 dark:text-zinc-400 group-hover:text-accent-foreground shrink-0 pl-2">
+                                <span className="hidden sm:inline">View</span>
+                                <ArrowUpRight className="w-4 h-4 stroke-[2] transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                             </div>
                         </Link>
 
