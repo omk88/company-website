@@ -538,10 +538,10 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                                         onClick={() => field.onChange("")}
                                                         className={cn(
                                                             "absolute top-2.5 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted cursor-pointer transition-colors z-10",
-                                                            fieldState.invalid ? "right-7" : "right-2"
+                                                            fieldState.invalid ? "right-12" : "right-7"
                                                         )}
                                                         >
-                                                        <X className="h-3.5 w-3.5 stroke-[2]" />
+                                                            <X className="h-3.5 w-3.5 stroke-[2]" />
                                                         </button>
                                                     )}
 

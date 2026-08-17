@@ -627,7 +627,7 @@ export function MarkdownTextEditor({
               }}
               className={cn(
                 "absolute top-2.5 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted cursor-pointer transition-colors z-10",
-                errorMessage ? "right-7" : "right-2"
+                errorMessage ? "right-12" : "right-7"
               )}
               title="Clear content"
             >
