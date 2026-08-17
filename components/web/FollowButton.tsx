@@ -4,7 +4,7 @@ import { api } from "@/convex/_generated/api";
 import { useMutation } from "convex/react";
 import { Id } from "@/convex/_generated/dataModel";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { BellPlus, Loader2 } from "lucide-react";
 
 interface FollowButtonProps {
   targetProfileId: Id<"profiles">;
@@ -40,19 +40,30 @@ export function FollowButton({ targetProfileId, username, displayName, initialIs
   };
 
   return (
-    <Button
-      variant={isFollowing ? "outline" : "default"}
-      className="cursor-pointer min-w-[100px]"
-      disabled={isPending} 
-      onClick={handleClick}
-    >
-      {isPending ? (
-        <Loader2 className="h-4 w-4 animate-spin" />
-      ) : isFollowing ? (
-        "Unfollow"
-      ) : (
-        "Follow"
-      )}
-    </Button>
+    <div className="flex flex-row gap-2 w-full items-center">
+      <Button
+        size={"icon"}
+        variant={"ghost"}
+        className="rounded-4xl cursor-pointer shrink-0"
+      >
+        <BellPlus className="stroke-[2.3]" />
+      </Button>
+      
+      <Button
+        variant={isFollowing ? "outline" : "default"}
+        className="cursor-pointer text-xs flex-1"
+        size={"sm"}
+        disabled={isPending} 
+        onClick={handleClick}
+      >
+        {isPending ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : isFollowing ? (
+          "Unfollow"
+        ) : (
+          "Follow"
+        )}
+      </Button>
+    </div>
   );
 }
