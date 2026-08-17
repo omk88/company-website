@@ -100,7 +100,7 @@ export function FeaturedBlogs() {
       >
         <div className="flex flex-col justify-between flex-1 min-w-0">
           <div>
-            <div className="font-roboto flex items-center gap-1.5 text-[11px] font-mono tracking-tight uppercase text-zinc-500 mb-1">
+            <div className="font-roboto flex items-center gap-1.5 text-[11px] tracking-tight uppercase text-zinc-500 mb-1">
               <ProfileHoverCard authorUsername={currentPost.username} displayName={currentPost.displayName}>
                 <span className="cursor-pointer truncate max-w-[90px]">{currentPost.displayName || currentPost.username}</span>
               </ProfileHoverCard>
@@ -131,7 +131,7 @@ export function FeaturedBlogs() {
         </div>
       </Link>
 
-      <div className="flex items-center gap-3 text-[11px] text-zinc-500 font-mono pt-1">
+      <div className="flex items-center gap-3 text-[11px] text-zinc-500 font-sans pt-1">
         <div className="flex items-center gap-1">
           <Eye className="w-3 h-3 stroke-[2] shrink-0" />
           <span>{compactFormatter.format(currentPost.totalViews)}</span>

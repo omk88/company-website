@@ -88,8 +88,8 @@ export function ProfileHoverCard({ displayName, authorUsername, children, align 
 
                                 <div className="relative w-full">
                                     <div className="flex flex-col">
-                                        <h4 className="text-base font-semibold leading-none">{displayName || profile?.username}</h4>
-                                        <p className="text-sm text-muted-foreground leading-none mt-1">{`@${profile?.username}`}</p>
+                                        <h4 className="text-sm font-semibold leading-none">{displayName || profile?.username}</h4>
+                                        <p className="text-xs text-muted-foreground leading-none mt-1">{`@${profile?.username}`}</p>
                                     </div>
                                 </div>
                             </div>
@@ -116,11 +116,18 @@ export function ProfileHoverCard({ displayName, authorUsername, children, align 
                                 </div>
                             )}
                             <div className="flex items-center justify-between w-full -m-2">
-                                <div className="flex items-center gap-1.5 min-w-[3rem] justify-start p-2 rounded-2xl hover:bg-zinc-100 transition-colors cursor-pointer">
-                                    <User className="w-4 h-4 stroke-[2.3] shrink-0 mt-0.5" />
-                                    <span>{10}</span>
-                                </div>
                                 <TooltipProvider delayDuration={200}>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <div className="flex items-center gap-1.5 min-w-[3rem] justify-start p-2 rounded-2xl hover:bg-zinc-100 transition-colors cursor-pointer">
+                                                <User className="w-4 h-4 stroke-[2.3] shrink-0 mt-0.5" />
+                                                <span>{profile?.followerCount}</span>
+                                            </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="bottom" align="center">
+                                            <p className="text-xs">{ profile?.followerCount } Followers </p>
+                                        </TooltipContent>
+                                    </Tooltip>
                                     <Tooltip>
                                         <TooltipTrigger asChild>
                                             <div className="flex items-center gap-1.5 min-w-[3rem] justify-start p-2 rounded-2xl hover:bg-zinc-100 transition-colors cursor-pointer">
@@ -129,7 +136,7 @@ export function ProfileHoverCard({ displayName, authorUsername, children, align 
                                             </div>
                                         </TooltipTrigger>
                                         <TooltipContent side="bottom" align="center">
-                                            <p className="text-xs font-medium">{ profile?.totalLikes } Total Likes</p>
+                                            <p className="text-xs">{ profile?.totalLikes } Total Likes</p>
                                         </TooltipContent>
                                     </Tooltip>
                                     </TooltipProvider>
@@ -142,7 +149,7 @@ export function ProfileHoverCard({ displayName, authorUsername, children, align 
                                             </div>
                                             </TooltipTrigger>
                                             <TooltipContent side="bottom" align="center">
-                                            <p className="text-xs font-medium">{ profile?.articlesPublished } Insights Published</p>
+                                            <p className="text-xs">{ profile?.articlesPublished } Insights Published</p>
                                             </TooltipContent>
                                         </Tooltip>
                                     </TooltipProvider>
@@ -155,7 +162,7 @@ export function ProfileHoverCard({ displayName, authorUsername, children, align 
                                                 </div>
                                             </TooltipTrigger>
                                             <TooltipContent side="bottom" align="center">
-                                                <p className="text-xs font-medium">{ profile?.commentsPublished } Comments Published</p>
+                                                <p className="text-xs">{ profile?.commentsPublished } Comments Published</p>
                                             </TooltipContent>
                                         </Tooltip>
                                     </TooltipProvider>

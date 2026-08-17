@@ -139,7 +139,7 @@ export function BlogCard({
           </p>
         </Link>
 
-        <div className="flex font-extralight items-center justify-between text-sm font-mono tracking-tight select-none w-full mt-auto">
+        <div className="flex font-sans items-center justify-between text-sm font-extralight tracking-tight select-none w-full mt-auto">
           <div className="flex items-center">
             <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
               <Eye className="w-4 h-4 stroke-[2.3] shrink-0" />
@@ -163,7 +163,7 @@ export function BlogCard({
                     <Badge 
                       key={tag} 
                       variant="outline" 
-                      className="font-mono text-[10px] px-1.5 py-0.5 whitespace-nowrap border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                      className="font-sans text-[10px] px-1.5 py-0.5 whitespace-nowrap border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                     >
                       <span className="capitalize">{tag}</span>
                     </Badge>
