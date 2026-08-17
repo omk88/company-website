@@ -137,7 +137,7 @@ function LivePostPreview({ control, previewImage, currentUser }: { control: Cont
                     </span>
                 </div>
                 
-                <div className="flex flex-col">
+                <div className="flex flex-col gap-4">
                     <h1 className="text-2xl font-bold tracking-tight text-neutral-950 dark:text-neutral-50 line-clamp-3">
                         {formattedTitle}
                     </h1>
