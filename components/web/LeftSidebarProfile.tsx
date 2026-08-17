@@ -1,7 +1,7 @@
 "use client";
 
 import { Sidebar, SidebarContent, SidebarFooter } from "../ui/sidebar";
-import { Cake, Library, MapPin, MessageSquareText, SquareLibrary, Terminal, ThumbsUp, User, Link, Zap, Bookmark } from "lucide-react";
+import { Cake, Library, MapPin, MessageSquareText, User, Link, Zap, Bookmark, GraduationCap } from "lucide-react";
 import { EditProfileButton } from "./EditProfileButton";
 import { Preloaded, usePreloadedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -13,6 +13,7 @@ import { FollowButton } from "./FollowButton";
 import { FollowsDialog } from "./FollowsDialog";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { Badge } from "../ui/badge";
 
 interface profileProps {
   preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
@@ -46,6 +47,8 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
     day: "numeric",
     year: "numeric",
   }).format(profile._creationTime);
+
+  const tags = ["JavaScript", "TypeScript", "Next.js", "Convex"];
 
   return (
     <Sidebar 
@@ -123,6 +126,7 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
                 <p>{ profile.location }</p>
               </div>
             )}
+
             <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
               <Link className="w-4 h-4 stroke-[2.3] shrink-0" />
               <span className="underline text-blue-600">{ "https://x.com/" }</span>

@@ -680,6 +680,22 @@ export const getPaginatedPostsByUsername = query({
   },
 });
 
+export const getPaginatedPostsByAuthor = query({
+  args: {
+    author: v.string(),
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, args) => {
+    const paginatedBlogs = await ctx.db
+      .query("blogs")
+      .withIndex("by_author", (q) => q.eq("author", args.author))
+      .order("desc")
+      .paginate(args.paginationOpts);
+
+    return paginatedBlogs;
+  },
+});
+
 export const getPaginatedPostsByType = query({
   args: {
     postType: v.optional(v.union(v.literal("team"), v.literal("community"))),

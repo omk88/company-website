@@ -1,56 +1,44 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { LeftSidebarProfile } from "@/components/web/LeftSidebarProfile";
 import { api } from "@/convex/_generated/api";
-import { preloadQuery } from "convex/nextjs";
+import { fetchQuery, preloadQuery } from "convex/nextjs";
 import { preloadAuthQuery } from "@/lib/auth-server";
+import { ProfileBlogPosts } from "@/components/web/ProfileBlogPosts";
 
-interface profileRouteProps {
-    params: Promise<{
-        username: string;
-    }>;
+interface ProfileRouteProps {
+  params: Promise<{
+    username: string;
+  }>;
 }
 
-export default async function Profile({ params }: profileRouteProps) {
-    const { username } = await params;
+export default async function Profile({ params }: ProfileRouteProps) {
+  const { username } = await params;
 
-    const preloadedProfilePromise = preloadQuery(api.profiles.getProfileByUsername, { username });
-    const preloadedCurrentUserPromise = preloadAuthQuery(api.auth.getCurrentUser);
-    
-    const preloadedInitialBlogsPromise = preloadQuery(api.blogs.getPaginatedPostsByUsername, {
-        username: username,
-        paginationOpts: {
-            numItems: 6,    
-            cursor: null,   
-            id: 0,
-        }
-    });
+  const profile = await fetchQuery(api.profiles.getProfileByUsername, { username });
 
-    const preloadedInitialCommentsPromise = preloadQuery(api.comments.getPaginatedCommentsByUsername, {
-        username: username,
-        paginationOpts: {
-            numItems: 6,    
-            cursor: null,   
-            id: 0,
-        }
-    });
+  const [preloadedProfile, preloadedCurrentUser] = await Promise.all([
+    preloadQuery(api.profiles.getProfileByUsername, { username }),
+    preloadAuthQuery(api.auth.getCurrentUser),
+  ]);
 
-    const [preloadedProfile, preloadedCurrentUser, preloadedInitialBlogs, preloadedInitialComments] = await Promise.all([
-        preloadedProfilePromise,
-        preloadedCurrentUserPromise,
-        preloadedInitialBlogsPromise,
-        preloadedInitialCommentsPromise
-    ]);
+  if (!profile) {
+    return <div>User not found</div>;
+  }
 
-    return (
-        <div>
-            <SidebarProvider style={{ "--sidebar-width": "24rem" } as React.CSSProperties}>
-                <aside>
-                    <LeftSidebarProfile preloadedProfile={preloadedProfile} preloadedCurrentUser={preloadedCurrentUser} />
-                </aside>
+  return (
+    <SidebarProvider style={{ "--sidebar-width": "24rem" } as React.CSSProperties}>
+      <div className="flex w-full min-h-screen">
+        <aside>
+          <LeftSidebarProfile 
+            preloadedProfile={preloadedProfile} 
+            preloadedCurrentUser={preloadedCurrentUser} 
+          />
+        </aside>
 
-                <div className="w-full bg-white">
-                </div>
-            </SidebarProvider>
-        </div>
-    );
+        <main className="flex-1 flex justify-center bg-white pt-16">
+          <ProfileBlogPosts author={profile?.profile?.userId} />
+        </main>
+      </div>
+    </SidebarProvider>
+  );
 }
