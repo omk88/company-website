@@ -696,6 +696,36 @@ export const getPaginatedPostsByAuthor = query({
   },
 });
 
+export const getPaginatedBookmarkedPostsByUser = query({
+  args: {
+    userId: v.string(),
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, args) => {
+    const paginatedBookmarks = await ctx.db
+      .query("bookmarks")
+      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .order("desc")
+      .paginate(args.paginationOpts);
+
+    const pageWithBlogs = await Promise.all(
+      paginatedBookmarks.page.map(async (bookmark) => {
+        const blog = await ctx.db.get(bookmark.blogId);
+        return blog;
+      })
+    );
+
+    const validBlogs = pageWithBlogs.filter(
+      (blog): blog is NonNullable<typeof blog> => blog !== null
+    );
+
+    return {
+      ...paginatedBookmarks,
+      page: validBlogs,
+    };
+  },
+});
+
 export const getPaginatedPostsByType = query({
   args: {
     postType: v.optional(v.union(v.literal("team"), v.literal("community"))),

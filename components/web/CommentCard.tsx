@@ -82,7 +82,7 @@ export function CommentCard({ comment, index, variant }: CommentProps) {
         return (
             <div className="group flex flex-col p-3 bg-zinc-50/80 hover:bg-zinc-100/90 rounded-xl transition-colors duration-100 dark:bg-muted/30">
                 <div className="flex items-center justify-between text-[11px] font-sans uppercase tracking-wider text-zinc-600 dark:text-zinc-400 leading-none">
-                    <span><time>{formatSmartDate(comment._creationTime, false)}</time>  •  {comment.blogTitle}</span>
+                    <span className="line-clamp-1"><time>{formatSmartDate(comment._creationTime, false)}</time>  •  {comment.blogTitle}</span>
                     <ShareMenu />
                 </div>
                 <div className="text-sm line-clamp-3">

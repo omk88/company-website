@@ -3,6 +3,7 @@
 import { useMetricStore } from "@/stores/useMetricStore";
 import { ProfileBlogs } from "./ProfileBlogs";
 import { ProfileComments } from "./ProfileComments";
+import { ProfileBookmarks } from "./ProfileBookmarks";
 
 interface ProfileContentProps {
   author: string | undefined;
@@ -14,6 +15,7 @@ export function ProfileContent({ author }: ProfileContentProps) {
   const components = {
     insights: <ProfileBlogs author={author} />,
     comments: <ProfileComments author={author} />,
+    bookmarks: <ProfileBookmarks author={author} />,
   };
 
   return (
