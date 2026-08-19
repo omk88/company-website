@@ -87,7 +87,7 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: L
                         </div>
                       </TooltipTrigger>
                       <TooltipContent side="bottom" align="start">
-                        <p className="text-xs font-medium">{profile.totalLikes ?? 0} Total Likes</p>
+                        <p className="text-xs font-medium">{profile.totalLikes} Total Likes</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>

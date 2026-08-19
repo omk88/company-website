@@ -35,7 +35,7 @@ export function ProfileFollows({ profile }: ProfileFollowsProps) {
           )}
         >
           <UsersRound className="w-4 h-4 stroke-[2.3] shrink-0" />
-          <span>{0} Followers</span>
+          <span>{profile.profile?.followerCount} Followers</span>
         </button>
 
         <button
@@ -48,7 +48,7 @@ export function ProfileFollows({ profile }: ProfileFollowsProps) {
           )}
         >
           <UserRoundCheck className="w-4 h-4 stroke-[2.3] shrink-0" />
-          <span>{0} Following</span>
+          <span>{profile.profile?.followingCount} Following</span>
         </button>
       </div>
 

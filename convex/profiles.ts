@@ -370,6 +370,7 @@ export const toggleFollow = mutation({
       await ctx.db.insert("follows", {
         followerId: currentProfileId,
         followingId: args.targetProfileId,
+        isBell: false,
       });
 
       await ctx.db.patch(currentProfileId, {
@@ -383,6 +384,46 @@ export const toggleFollow = mutation({
       return { isFollowing: true };
     }
   }, 
+});
+
+export const toggleBell = mutation({
+  args: { targetProfileId: v.id("profiles") },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated.");
+
+    const currentProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
+      .unique();
+
+    if (!currentProfile) {
+      throw new Error("Profile not found.");
+    }
+
+    const currentProfileId = currentProfile._id;
+
+    const existingFollow = await ctx.db
+      .query("follows")
+      .withIndex("by_follower_and_following", (q) =>
+        q
+          .eq("followerId", currentProfileId)
+          .eq("followingId", args.targetProfileId)
+      )
+      .unique();
+
+    if (!existingFollow) {
+      throw new Error("You must follow this user before enabling notifications.");
+    }
+
+    const newBellState = !existingFollow.isBell;
+
+    await ctx.db.patch(existingFollow._id, {
+      isBell: newBellState,
+    });
+
+    return { isBell: newBellState };
+  },
 });
 
 export const getPaginatedFollowingByProfile = query({
