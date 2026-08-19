@@ -36,7 +36,7 @@ export default async function Profile({ params }: ProfileRouteProps) {
         </aside>
 
         <main className="flex-1 flex bg-white pt-16">
-          <ProfileContent author={profile?.profile?.userId} />
+          <ProfileContent author={profile?.profile?.userId} profileId={profile?.profile?._id} />
         </main>
       </div>
     </SidebarProvider>

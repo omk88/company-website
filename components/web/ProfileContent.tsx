@@ -4,18 +4,22 @@ import { useMetricStore } from "@/stores/useMetricStore";
 import { ProfileBlogs } from "./ProfileBlogs";
 import { ProfileComments } from "./ProfileComments";
 import { ProfileBookmarks } from "./ProfileBookmarks";
+import { ProfileFollowers } from "./ProfileFollowers";
+import { Id } from "@/convex/_generated/dataModel";
 
 interface ProfileContentProps {
   author: string | undefined;
+  profileId: Id<"profiles"> | undefined;
 }
 
-export function ProfileContent({ author }: ProfileContentProps) {
+export function ProfileContent({ author, profileId }: ProfileContentProps) {
   const selectedMetric = useMetricStore((state) => state.selectedMetric);
 
   const components = {
     insights: <ProfileBlogs author={author} />,
     comments: <ProfileComments author={author} />,
     bookmarks: <ProfileBookmarks author={author} />,
+    followers: <ProfileFollowers profileId={profileId} />
   };
 
   return (

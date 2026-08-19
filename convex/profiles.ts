@@ -1,6 +1,5 @@
 import { paginationOptsValidator } from "convex/server";
-import { Id } from "./_generated/dataModel";
-import { mutation, MutationCtx, query } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
 export const initialiseProfile = mutation({
@@ -369,4 +368,32 @@ export const toggleFollow = mutation({
       return { isFollowing: true };
     }
   }, 
+});
+
+export const getPaginatedFollowersByProfile = query({
+  args: {
+    profileId: v.id("profiles"),
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, args) => {
+    const paginatedFollows = await ctx.db
+      .query("follows")
+      .withIndex("by_following", (q) => q.eq("followingId", args.profileId))
+      .paginate(args.paginationOpts);
+
+    const profiles = await Promise.all(
+      paginatedFollows.page.map(async (follow) => {
+        return await ctx.db.get(follow.followerId);
+      })
+    );
+
+    const validProfiles = profiles.filter(
+      (profile): profile is NonNullable<typeof profile> => profile !== null
+    );
+
+    return {
+      ...paginatedFollows,
+      page: validProfiles,
+    };
+  },
 });

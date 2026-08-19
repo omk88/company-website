@@ -21,8 +21,9 @@ import { MarkdownTextEditor } from "./MarkdownTextEditor";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { Button } from "../ui/button";
 import { useCurrentUser } from "@/app/ConvexClientProvider";
+import { TAGS } from "@/app/constants/tags";
+import z from "zod";
 
-const AVAILABLE_TAGS = ["product", "research", "design", "technology", "opinion", "tutorials"];
 
 interface BlogFormValues {
     title: string;
@@ -219,51 +220,50 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
     };
 
     const onSubmit = async (data: BlogFormValues) => {
-        if (!userData) {
-            console.error("No user data.");
+        if (!userData?.userId) {
+            toast.error("User session not found. Please log in.");
             return;
         }
 
-        if (data.tags.length === 0) {
-            toast.error("Please select at least one tag.");
+        const hasExistingImage = Boolean(existingPost?.imageUrl);
+        if (!selectedImage && !hasExistingImage) {
+            toast.error("Please upload a cover image from your computer.");
             return;
         }
 
         setIsLoading(true);
 
         const postType = userData.email?.endsWith("@taqtiq.tech") ? "team" : "community";
-        
+
         try {
-            if (!selectedImage && !existingPost?.imageUrl) {
-                toast.error("Please upload a cover image from your computer.");
-                return;
-            }
-
             let storageId = existingPost?.storageId || "";
-
             const formattedTitle = toTitleCase(data.title);
 
+            if (selectedImage) {
             const options = {
-                maxSizeMB: 1.0,                  
-                maxWidthOrHeight: 1920,      
+                maxSizeMB: 1.0,
+                maxWidthOrHeight: 1920,
                 useWebWorker: true,
-                fileType: 'image/webp' as const,
-                initialQuality: 0.85,      
+                fileType: "image/webp" as const,
+                initialQuality: 0.85,
             };
 
-            if (selectedImage) {
-                const compressedFile = (await imageCompression(selectedImage, options)) as File;
+            const compressedFile = (await imageCompression(selectedImage, options)) as File;
+            const uploadUrl = await generateUploadUrl();
 
-                const uploadUrl = await generateUploadUrl();
-                const result = await fetch(uploadUrl, {
-                    method: "POST",
-                    headers: { "Content-Type": compressedFile.type },
-                    body: compressedFile,
-                });
+            const result = await fetch(uploadUrl, {
+                method: "POST",
+                headers: { "Content-Type": compressedFile.type },
+                body: compressedFile,
+            });
 
-                if (!result.ok) throw new Error("Failed to upload image bundle.");
-                const resJson = await result.json();
-                storageId = resJson.storageId;
+            if (!result.ok) throw new Error("Failed to upload image bundle.");
+
+            const resJson = await result.json();
+            const responseSchema = z.object({ storageId: z.string() });
+            const parsedResponse = responseSchema.parse(resJson);
+
+            storageId = parsedResponse.storageId;
             }
 
             if (editingBlogId) {
@@ -274,7 +274,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                     content: data.content,
                     author: userData.userId,
                     displayName: userData.profile?.displayName,
-                    username: String(userData?.username || ""),
+                    username: String(userData?.profile?.username || ""),
                     tags: data.tags,
                     storageId: storageId,
                 });
@@ -284,13 +284,13 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                     title: formattedTitle,
                     subtitle: data.subtitle,
                     content: data.content,
-                    author: userData?.userId || "",
+                    author: userData.userId,
                     displayName: userData.profile?.displayName,
                     username: userData?.profile?.username || "",
                     authorAvatarUrl: userData.profile?.profilePicUrl || undefined,
                     tags: data.tags,
                     storageId: storageId,
-                    postType: postType
+                    postType: postType,
                 });
                 toast.success("Blog article published successfully!");
             }
@@ -299,20 +299,21 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                 await fetch("/api/revalidate", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ tags: ["featured-blogs", "main-blogs", "morefrom-blogs", "trending-blogs"] }),
+                    body: JSON.stringify({
+                    tags: ["featured-blogs", "main-blogs", "morefrom-blogs", "trending-blogs"],
+                    }),
                 });
             } catch (err) {
                 console.error("Background revalidation failure:", err);
             }
-            
-            clearImage();
-            reset(); 
 
+            clearImage();
+            reset();
             router.push("/insights");
             router.refresh();
         } catch (error) {
             console.error(error);
-            toast.error("Process interrupted.");
+            toast.error(error instanceof Error ? error.message : "Process interrupted.");
         } finally {
             setIsLoading(false);
         }
@@ -661,7 +662,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                                     </PopoverTrigger>
                                                     <PopoverContent className="w-fit p-2" align="start">
                                                         <div className="space-y-1">
-                                                            {AVAILABLE_TAGS.map((tag) => (
+                                                            {TAGS.map((tag) => (
                                                                 <div
                                                                 key={tag}
                                                                 className="flex items-center space-x-2 p-1.5 hover:bg-muted rounded-md cursor-pointer"

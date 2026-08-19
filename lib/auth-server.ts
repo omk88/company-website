@@ -1,4 +1,5 @@
 import { api } from "@/convex/_generated/api";
+import { QueryCtx, MutationCtx } from "@/convex/_generated/server";
 import { convexBetterAuthNextJs } from "@convex-dev/better-auth/nextjs";
 
 export const {
@@ -25,3 +26,18 @@ export async function getServerAuth() {
     return { isAuth: false, initialImage: null };
   }
 }
+
+export async function getCurrentUserProfile(ctx: QueryCtx | MutationCtx) {
+  const identity = await ctx.auth.getUserIdentity();
+  if (!identity) {
+    return null;
+  }
+  
+  const profile = await ctx.db
+    .query("profiles")
+    .withIndex("by_userId", (q) => q.eq("userId", identity.subject as any))
+    .unique();
+
+  return {
+    ...profile,
+  }}

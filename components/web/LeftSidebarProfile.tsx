@@ -1,7 +1,7 @@
 "use client";
 
 import { Sidebar, SidebarContent, SidebarFooter } from "../ui/sidebar";
-import { Cake, Library, MapPin, MessageSquareText, User, Link, Zap, Bookmark, GraduationCap } from "lucide-react";
+import { Cake, Library, MapPin, MessageSquareText, User, Link, Zap, Bookmark, GraduationCap, UserRound } from "lucide-react";
 import { EditProfileButton } from "./EditProfileButton";
 import { Preloaded, usePreloadedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -10,7 +10,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/
 import { SkillsHoverCard } from "./SkillsHoverCard";
 import { EducationHoverCard } from "./EducationHoverCard";
 import { FollowButton } from "./FollowButton";
-import { FollowsDialog } from "./FollowsDialog";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useMetricStore } from "@/stores/useMetricStore";
@@ -206,25 +205,27 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
                 </Tooltip>
               </TooltipProvider>
 
-              <FollowsDialog
-                profileId={profile._id}
-                onMouseEnter={() => setShouldPrefetchFollowers(true)}
-                trigger={
-                  <button
-                    type="button"
-                    onClick={() => setSelectedMetric('followers')}
-                    onMouseEnter={() => setShouldPrefetchFollowers(true)}
-                    className={cn(
-                      "flex items-center gap-1.5 pb-2 pt-1.5 px-1 font-sans text-sm font-medium transition-colors cursor-pointer text-foreground hover:opacity-70",
-                      anim,
-                      selectedMetric === 'followers' && "after:scale-x-100 after:origin-bottom-left"
-                    )}
-                  >
-                    <User className="w-4 h-4 stroke-[2.3] shrink-0" />
-                    <span>{profile.followerCount ?? 0}</span>
-                  </button>
-                }
-              />
+              <TooltipProvider delayDuration={200}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedMetric('followers')}
+                      className={cn(
+                        "flex items-center gap-1.5 pb-2 pt-1.5 px-1 font-sans text-sm font-medium transition-colors cursor-pointer text-foreground hover:opacity-70",
+                        anim,
+                        selectedMetric === 'followers' && "after:scale-x-100 after:origin-bottom-left"
+                      )}
+                    >
+                      <UserRound className="w-4 h-4 stroke-[2.3] shrink-0" />
+                      <span>{profile.followerCount}</span>
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" align="center">
+                    <p className="text-xs font-medium">{profile.followerCount} Followers</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           </div>
 
