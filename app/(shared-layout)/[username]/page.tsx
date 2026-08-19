@@ -36,7 +36,7 @@ export default async function Profile({ params }: ProfileRouteProps) {
         </aside>
 
         <main className="flex-1 flex bg-white pt-16">
-          <ProfileContent author={profile?.profile?.userId} profileId={profile?.profile?._id} />
+          <ProfileContent author={profile?.profile?.userId} profileId={profile?.profile?._id} profilePicture={profile.profilePicture} defaultProfilePicture={profile.defaultProfilePicture} />
         </main>
       </div>
     </SidebarProvider>

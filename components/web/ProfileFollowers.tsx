@@ -8,9 +8,11 @@ import { Id } from "@/convex/_generated/dataModel";
 
 interface ProfileFollowersProps {
   profileId: string | undefined;
+  profilePicture: string | null;
+  defaultProfilePicture: string | null;
 }
 
-export function ProfileFollowers({ profileId }: ProfileFollowersProps) {
+export function ProfileFollowers({ profileId, profilePicture, defaultProfilePicture }: ProfileFollowersProps) {
   const { results, status } = usePaginatedQuery(
     api.profiles.getPaginatedFollowersByProfile,
     profileId ? { profileId: profileId as Id<"profiles">  } : "skip",
@@ -50,13 +52,14 @@ export function ProfileFollowers({ profileId }: ProfileFollowersProps) {
       ) : (
         <>
           <ul className="flex flex-col gap-2">
-            {displayResults.map((profile: any) => (
+            {displayResults.map(({ profile, profilePicture, defaultProfilePicture }: any) => (
               <li key={profile._id}>
                 <ProfileCard
-                    userId={profile.userId}
-                    displayName={profile.displayName}
-                    username={profile.username}
-                    avatarUrl={profile.avatarUrl}                  
+                  userId={profile.userId}
+                  displayName={profile.displayName}
+                  username={profile.username}
+                  profilePicture={profilePicture}
+                  defaultProfilePicture={defaultProfilePicture}  
                 />
               </li>
             ))}

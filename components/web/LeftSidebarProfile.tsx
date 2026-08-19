@@ -69,7 +69,7 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
             </div>
 
             <div className="relative w-full">
-              <div className="flex flex-col gap-1 w-full">
+              <div className="flex flex-col w-full">
                 <h4 className="text-base font-semibold text-foreground tracking-tight">
                   {displayName || profile.username}
                 </h4>

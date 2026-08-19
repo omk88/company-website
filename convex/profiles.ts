@@ -391,9 +391,26 @@ export const getPaginatedFollowersByProfile = query({
       (profile): profile is NonNullable<typeof profile> => profile !== null
     );
 
+    const pageWithPictures = await Promise.all(
+      validProfiles.map(async (profile) => {
+        const picStorageUrl = profile.profilePic
+          ? await ctx.storage.getUrl(profile.profilePic)
+          : null;
+        const defaultPicStorageUrl = profile.defaultProfilePic
+          ? await ctx.storage.getUrl(profile.defaultProfilePic)
+          : null;
+
+        return {
+          profile,
+          profilePicture: picStorageUrl,
+          defaultProfilePicture: defaultPicStorageUrl,
+        };
+      })
+    );
+
     return {
       ...paginatedFollows,
-      page: validProfiles,
+      page: pageWithPictures,
     };
   },
 });
