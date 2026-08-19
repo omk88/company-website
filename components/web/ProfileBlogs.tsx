@@ -6,6 +6,8 @@ import { useRef } from "react";
 import { BlogCard } from "./BlogCard";
 import { BlogEmptyState } from "./BlogEmptyState";
 import { CompactBlogCardSkeleton } from "./LoadingSkeletons/CompactBlogCardSkeleton";
+import { cn } from "@/lib/utils";
+import { Library } from "lucide-react";
 
 interface ProfileBlogsProps {
   author: string | undefined;
@@ -44,6 +46,17 @@ export function ProfileBlogs({ author }: ProfileBlogsProps) {
 
   return (
     <div className="flex flex-col flex-1 h-full min-h-0 w-full">
+      <div className="flex items-center justify-start gap-4 w-full border-b border-border mb-4">
+        <div
+          className={cn(
+            "relative flex items-center gap-1.5 pb-2 pt-1.5 px-1 font-sans text-sm font-medium text-foreground",
+            "after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-current"
+          )}
+        >
+          <Library className="w-4 h-4 stroke-[2.3] shrink-0" />
+          <span>{0} Insights Published</span>
+        </div>
+      </div>
       {displayResults.length === 0 ? (
         <div className="flex flex-col flex-1 h-full min-h-0">
           <BlogEmptyState />
