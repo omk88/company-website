@@ -90,12 +90,6 @@ export const createPost = mutation({
       profilePromise,
     ]);
 
-    if (profile) {
-      await ctx.db.patch(profile._id, {
-        articlesPublished: (profile.articlesPublished || 0) + 1,
-      });
-    }
-
     return blogId;
   },
 });
@@ -355,7 +349,6 @@ export const deleteBlogs = mutation({
         databaseWrites.push(
           ctx.db.patch(blogAuthorProfile._id, {
             totalLikes: Math.max(0, (blogAuthorProfile.totalLikes || 0) - blogVotes.length),
-            articlesPublished: Math.max(0, (blogAuthorProfile.articlesPublished || 1) - 1),
           })
         );
       }
@@ -378,7 +371,6 @@ export const deleteBlogs = mutation({
           databaseWrites.push(
             ctx.db.patch(commenterProfile._id, {
               totalLikes: Math.max(0, (commenterProfile.totalLikes || 0) - likesToRemove),
-              commentsPublished: Math.max(0, (commenterProfile.commentsPublished || 0) - commentsByThisUser),
             })
           );
         }

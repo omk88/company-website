@@ -48,8 +48,6 @@ export const initialiseProfile = mutation({
       profilePic: args.profilePic,
       defaultProfilePic: args.defaultProfilePic,
       totalLikes: 0,
-      articlesPublished: 0,
-      commentsPublished: 0,
       followerCount: 0,
       followingCount: 0,
     });
@@ -93,9 +91,27 @@ export const getProfileByUsername = query({
       return {
         profilePicture: null,
         defaultProfilePicture: null,  
-        profile: null 
+        profile: null,
+        bookmarkCount: 0,
+        articleCount: 0,
+        commentCount: 0,
       };
     }
+
+    const [bookmarks, articles, comments] = await Promise.all([
+      ctx.db
+        .query("bookmarks")
+        .withIndex("by_user", (q) => q.eq("userId", profile.userId))
+        .collect(),
+      ctx.db
+        .query("blogs")
+        .withIndex("by_author", (q) => q.eq("author", profile.userId))
+        .collect(),
+      ctx.db
+        .query("comments")
+        .withIndex("by_authorId", (q) => q.eq("authorId", profile.userId))
+        .collect(),
+    ]);
 
     const picStorageId = profile.profilePic;
     const defaultPicStorageId = profile.defaultProfilePic;
@@ -103,22 +119,23 @@ export const getProfileByUsername = query({
     const picStorageUrl = picStorageId ? await ctx.storage.getUrl(picStorageId) : null;
     const defaultPicStorageUrl = defaultPicStorageId ? await ctx.storage.getUrl(defaultPicStorageId) : null;
 
-    const profilePicture = picStorageUrl;
-    const defaultProfilePicture = defaultPicStorageUrl;
-
-    const sanitizedProfile = {
-      ...profile,
-      displayName: profile.displayName,
-      location: profile.location,
-      locationCountryCode: profile.locationCountryCode,
-      bio: profile.bio,
-      
-      education: profile.education,
-      skills: profile.skills,
-      socials: profile.socials,
+    return { 
+      profilePicture: picStorageUrl, 
+      defaultProfilePicture: defaultPicStorageUrl, 
+      profile: {
+        ...profile,
+        displayName: profile.displayName,
+        location: profile.location,
+        locationCountryCode: profile.locationCountryCode,
+        bio: profile.bio,
+        education: profile.education,
+        skills: profile.skills,
+        socials: profile.socials,
+      },
+      bookmarkCount: bookmarks.length,
+      articleCount: articles.length,
+      commentCount: comments.length,
     };
-
-    return { profilePicture, defaultProfilePicture, profile: sanitizedProfile };
   },
 });
 
@@ -212,8 +229,6 @@ export const createProfile = mutation({
       })
     ),
     totalLikes: v.number(),
-    articlesPublished: v.number(),
-    commentsPublished: v.number(),
     followerCount: v.number(),
     followingCount: v.number(),
   },

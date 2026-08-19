@@ -8,19 +8,25 @@ import { BlogEmptyState } from "./BlogEmptyState";
 import { CompactBlogCardSkeleton } from "./LoadingSkeletons/CompactBlogCardSkeleton";
 import { cn } from "@/lib/utils";
 import { Library } from "lucide-react";
+import { FunctionReturnType } from "convex/server";
+
+type ProfileData = FunctionReturnType<typeof api.profiles.getProfileByUsername>;
 
 interface ProfileBlogsProps {
-  author: string | undefined;
+  profile: ProfileData;
 }
 
-export function ProfileBlogs({ author }: ProfileBlogsProps) {
+export function ProfileBlogs({ profile }: ProfileBlogsProps) {
+
+  const userId = profile?.profile?.userId;
+
   const { results, status } = usePaginatedQuery(
     api.blogs.getPaginatedPostsByAuthor,
-    author ? { author: author as string } : "skip",
+    userId ? { author: userId } : "skip",
     { initialNumItems: 6 }
   );
 
-  const isFirstLoad = !author || status === "LoadingFirstPage";
+  const isFirstLoad = !userId || status === "LoadingFirstPage";
 
   const lastResultsRef = useRef<any[]>([]);
   if (results.length > 0) {
@@ -54,7 +60,7 @@ export function ProfileBlogs({ author }: ProfileBlogsProps) {
           )}
         >
           <Library className="w-4 h-4 stroke-[2.3] shrink-0" />
-          <span>{0} Insights Published</span>
+          <span>{profile.articleCount} Insights Published</span>
         </div>
       </div>
       {displayResults.length === 0 ? (

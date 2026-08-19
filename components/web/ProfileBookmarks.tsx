@@ -8,19 +8,25 @@ import { BlogEmptyState } from "./BlogEmptyState";
 import { CompactBlogCardSkeleton } from "./LoadingSkeletons/CompactBlogCardSkeleton";
 import { cn } from "@/lib/utils";
 import { Bookmark } from "lucide-react";
+import { FunctionReturnType } from "convex/server";
+
+type ProfileData = FunctionReturnType<typeof api.profiles.getProfileByUsername>;
 
 interface ProfileBookmarksProps {
-  author: string | undefined;
+  profile: ProfileData;
 }
 
-export function ProfileBookmarks({ author }: ProfileBookmarksProps) {
+export function ProfileBookmarks({ profile }: ProfileBookmarksProps) {
+
+  const userId = profile?.profile?.userId;
+  
   const { results, status } = usePaginatedQuery(
     api.blogs.getPaginatedBookmarkedPostsByUser,
-    author ? { userId: author } : "skip",
+    userId ? { userId: userId } : "skip",
     { initialNumItems: 6 }
   );
 
-  const isFirstLoad = !author || status === "LoadingFirstPage";
+  const isFirstLoad = !userId || status === "LoadingFirstPage";
 
   const lastResultsRef = useRef<any[]>([]);
   if (results.length > 0) {
@@ -54,7 +60,7 @@ export function ProfileBookmarks({ author }: ProfileBookmarksProps) {
           )}
         >
           <Bookmark className="w-4 h-4 stroke-[2.3] shrink-0" />
-          <span>{0} Bookmarks Added</span>
+          <span>{profile.bookmarkCount} Bookmarks Added</span>
         </div>
       </div>
       {displayResults.length === 0 ? (

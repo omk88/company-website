@@ -155,9 +155,9 @@ const schema = defineSchema({
         url: v.string()
       })
     )),
+
+    // Denormalised for performance
     totalLikes: v.number(),
-    articlesPublished: v.number(),
-    commentsPublished: v.number(),
     followerCount: v.number(),
     followingCount: v.number(),
   })

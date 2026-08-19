@@ -10,18 +10,15 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/
 import { SkillsHoverCard } from "./SkillsHoverCard";
 import { EducationHoverCard } from "./EducationHoverCard";
 import { FollowButton } from "./FollowButton";
-import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useMetricStore } from "@/stores/useMetricStore";
 
-interface profileProps {
+interface LeftSidebarProfileProps {
   preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
   preloadedCurrentUser: Preloaded<typeof api.auth.getCurrentUser>;
 }
 
-export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: profileProps) {
-
-  const [shouldPrefetchFollowers, setShouldPrefetchFollowers] = useState(false);
+export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: LeftSidebarProfileProps) {
   
   const profileData = usePreloadedQuery(preloadedProfile);
   const currentUser = usePreloadedQuery(preloadedCurrentUser);
@@ -29,6 +26,10 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
   const profile = profileData.profile;
   const avatarSrc = profileData.profilePicture;
   const defaultAvatarSrc = profileData.defaultProfilePicture;
+
+  const bookmarkCount = profileData.bookmarkCount;
+  const articleCount = profileData.articleCount;
+  const commentCount = profileData.commentCount;
 
   const anim = "relative no-underline hover:no-underline after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100";
 
@@ -152,11 +153,11 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
                       )}
                     >
                       <Library className="w-4 h-4 stroke-[2.3] shrink-0" />
-                      <span>{profile.articlesPublished ?? 0}</span>
+                      <span>{articleCount}</span>
                     </button>
                   </TooltipTrigger>
                   <TooltipContent side="bottom" align="center">
-                    <p className="text-xs font-medium">{profile.articlesPublished ?? 0} Insights Published</p>
+                    <p className="text-xs font-medium">{articleCount} Insights Published</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -174,11 +175,11 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
                       )}
                     >
                       <MessageSquareText className="w-4 h-4 stroke-[2.3] shrink-0" />
-                      <span>{profile.commentsPublished ?? 0}</span>
+                      <span>{commentCount}</span>
                     </button>
                   </TooltipTrigger>
                   <TooltipContent side="bottom" align="center">
-                    <p className="text-xs font-medium">{profile.commentsPublished ?? 0} Comments Published</p>
+                    <p className="text-xs font-medium">{commentCount} Comments Published</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -196,11 +197,11 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: p
                       )}
                     >
                       <Bookmark className="w-4 h-4 stroke-[2.3] shrink-0" />
-                      <span>{34}</span>
+                      <span>{bookmarkCount}</span>
                     </button>
                   </TooltipTrigger>
                   <TooltipContent side="bottom" align="center">
-                    <p className="text-xs font-medium">{34} Bookmarks</p>
+                    <p className="text-xs font-medium">{bookmarkCount} Bookmarks</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>

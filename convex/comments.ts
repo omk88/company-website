@@ -127,9 +127,6 @@ export const createComment = mutation({
         hotScore,
         controversialScore,
       }),
-      ctx.db.patch(profile._id, {
-        commentsPublished: (profile.commentsPublished || 0) + 1,
-      })
     ]);
 
     return commentId;

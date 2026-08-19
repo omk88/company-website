@@ -8,17 +8,19 @@ import { Id } from "@/convex/_generated/dataModel";
 import { useFollowsStore } from "@/stores/useFollowsStore";
 import { cn } from "@/lib/utils";
 import { UserRoundCheck, UsersRound } from "lucide-react";
+import { FunctionReturnType } from "convex/server";
+
+type ProfileData = FunctionReturnType<typeof api.profiles.getProfileByUsername>;
 
 interface ProfileFollowsProps {
-  profileId: string | undefined;
+  profile: ProfileData;
 }
 
-export function ProfileFollows({ profileId }: ProfileFollowsProps) {
+export function ProfileFollows({ profile }: ProfileFollowsProps) {
   const selectedFollows = useFollowsStore((state) => state.selectedFollows);
   const setSelectedFollows = useFollowsStore((state) => state.setSelectedFollows);
 
-  const anim =
-    "relative no-underline hover:no-underline after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100";
+  const anim = "relative no-underline hover:no-underline after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100";
 
   return (
     <div className="flex flex-col flex-1 h-full min-h-0 w-full">
@@ -51,9 +53,9 @@ export function ProfileFollows({ profileId }: ProfileFollowsProps) {
       </div>
 
       {selectedFollows === "followers" ? (
-        <FollowersList profileId={profileId} />
+        <FollowersList profileId={profile?.profile?._id} />
       ) : (
-        <FollowingList profileId={profileId} />
+        <FollowingList profileId={profile?.profile?._id} />
       )}
     </div>
   );

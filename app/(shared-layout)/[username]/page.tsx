@@ -14,16 +14,10 @@ interface ProfileRouteProps {
 export default async function Profile({ params }: ProfileRouteProps) {
   const { username } = await params;
 
-  const profile = await fetchQuery(api.profiles.getProfileByUsername, { username });
-
   const [preloadedProfile, preloadedCurrentUser] = await Promise.all([
     preloadQuery(api.profiles.getProfileByUsername, { username }),
     preloadAuthQuery(api.auth.getCurrentUser),
   ]);
-
-  if (!profile) {
-    return <div>User not found</div>;
-  }
 
   return (
     <SidebarProvider style={{ "--sidebar-width": "24rem" } as React.CSSProperties}>
@@ -36,7 +30,10 @@ export default async function Profile({ params }: ProfileRouteProps) {
         </aside>
 
         <main className="flex-1 flex bg-white pt-16">
-          <ProfileContent author={profile?.profile?.userId} profileId={profile?.profile?._id} profilePicture={profile.profilePicture} defaultProfilePicture={profile.defaultProfilePicture} />
+          <ProfileContent
+            preloadedProfile={preloadedProfile} 
+            preloadedCurrentUser={preloadedCurrentUser} 
+          />
         </main>
       </div>
     </SidebarProvider>

@@ -7,19 +7,25 @@ import { CommentCard } from "./CommentCard";
 import { Doc } from "@/convex/_generated/dataModel";
 import { MessageSquareText } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { FunctionReturnType } from "convex/server";
+
+type ProfileData = FunctionReturnType<typeof api.profiles.getProfileByUsername>;
 
 interface ProfileCommentsProps {
-  author: string | undefined;
+  profile: ProfileData;
 }
 
-export function ProfileComments({ author }: ProfileCommentsProps) {
+export function ProfileComments({ profile }: ProfileCommentsProps) {
+
+  const userId = profile?.profile?.userId;
+
   const { results, status } = usePaginatedQuery(
     api.comments.getPaginatedCommentsByAuthor,
-    author ? { author } : "skip",
+    userId ? { author: userId } : "skip",
     { initialNumItems: 6 }
   );
 
-  const isFirstLoad = !author || status === "LoadingFirstPage";
+  const isFirstLoad = !userId || status === "LoadingFirstPage";
 
   const lastResultsRef = useRef<Doc<"comments">[]>([]);
   if (results.length > 0) {
@@ -52,7 +58,7 @@ export function ProfileComments({ author }: ProfileCommentsProps) {
           )}
         >
           <MessageSquareText className="w-4 h-4 stroke-[2.3] shrink-0" />
-          <span>{0} Comments Published</span>
+          <span>{profile.commentCount} Comments Published</span>
         </div>
       </div>
       {displayResults.length === 0 ? (
