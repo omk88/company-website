@@ -4,7 +4,7 @@ import { useMetricStore } from "@/stores/useMetricStore";
 import { ProfileBlogs } from "./ProfileBlogs";
 import { ProfileComments } from "./ProfileComments";
 import { ProfileBookmarks } from "./ProfileBookmarks";
-import { ProfileFollowers } from "./ProfileFollowers";
+import { ProfileFollows } from "./ProfileFollows";
 import { Id } from "@/convex/_generated/dataModel";
 
 interface ProfileContentProps {
@@ -21,7 +21,7 @@ export function ProfileContent({ author, profileId, profilePicture, defaultProfi
     insights: <ProfileBlogs author={author} />,
     comments: <ProfileComments author={author} />,
     bookmarks: <ProfileBookmarks author={author} />,
-    followers: <ProfileFollowers profileId={profileId} profilePicture={profilePicture} defaultProfilePicture={defaultProfilePicture} />
+    followers: <ProfileFollows profileId={profileId} />
   };
 
   return (

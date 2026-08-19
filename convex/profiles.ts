@@ -370,6 +370,51 @@ export const toggleFollow = mutation({
   }, 
 });
 
+export const getPaginatedFollowingByProfile = query({
+  args: {
+    profileId: v.id("profiles"),
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, args) => {
+    const paginatedFollows = await ctx.db
+      .query("follows")
+      .withIndex("by_follower", (q) => q.eq("followerId", args.profileId))
+      .paginate(args.paginationOpts);
+
+    const profiles = await Promise.all(
+      paginatedFollows.page.map(async (follow) => {
+        return await ctx.db.get(follow.followingId);
+      })
+    );
+
+    const validProfiles = profiles.filter(
+      (profile): profile is NonNullable<typeof profile> => profile !== null
+    );
+
+    const pageWithPictures = await Promise.all(
+      validProfiles.map(async (profile) => {
+        const picStorageUrl = profile.profilePic
+          ? await ctx.storage.getUrl(profile.profilePic)
+          : null;
+        const defaultPicStorageUrl = profile.defaultProfilePic
+          ? await ctx.storage.getUrl(profile.defaultProfilePic)
+          : null;
+
+        return {
+          profile,
+          profilePicture: picStorageUrl,
+          defaultProfilePicture: defaultPicStorageUrl,
+        };
+      })
+    );
+
+    return {
+      ...paginatedFollows,
+      page: pageWithPictures,
+    };
+  },
+});
+
 export const getPaginatedFollowersByProfile = query({
   args: {
     profileId: v.id("profiles"),
