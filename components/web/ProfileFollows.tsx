@@ -2,7 +2,6 @@
 
 import { api } from "@/convex/_generated/api";
 import { usePaginatedQuery } from "convex/react";
-import { useRef } from "react";
 import { ProfileCard } from "./ProfileCard";
 import { Id } from "@/convex/_generated/dataModel";
 import { useFollowsStore } from "@/stores/useFollowsStore";
@@ -13,6 +12,9 @@ import { FunctionReturnType } from "convex/server";
 type ProfileData = FunctionReturnType<typeof api.profiles.getProfileByUsername>;
 type CurrentUserData = FunctionReturnType<typeof api.auth.getCurrentUser>;
 
+type FollowerItem = FunctionReturnType<typeof api.profiles.getPaginatedFollowersByProfile>["page"][number];
+type FollowingItem = FunctionReturnType<typeof api.profiles.getPaginatedFollowingByProfile>["page"][number];
+
 interface ProfileFollowsProps {
   profile: ProfileData;
   currentUser?: CurrentUserData;
@@ -22,7 +24,8 @@ export function ProfileFollows({ profile, currentUser }: ProfileFollowsProps) {
   const selectedFollows = useFollowsStore((state) => state.selectedFollows);
   const setSelectedFollows = useFollowsStore((state) => state.setSelectedFollows);
 
-  const anim = "relative no-underline hover:no-underline after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100";
+  const anim =
+    "relative no-underline hover:no-underline after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100";
 
   const currentProfileId = currentUser?.profile?._id;
 
@@ -65,11 +68,11 @@ export function ProfileFollows({ profile, currentUser }: ProfileFollowsProps) {
   );
 }
 
-function FollowersList({ 
-  profileId, 
-  currentProfileId 
-}: { 
-  profileId: string | undefined; 
+function FollowersList({
+  profileId,
+  currentProfileId,
+}: {
+  profileId: string | undefined;
   currentProfileId?: string;
 }) {
   const { results, status } = usePaginatedQuery(
@@ -79,31 +82,29 @@ function FollowersList({
   );
 
   const isFirstLoad = !profileId || status === "LoadingFirstPage";
-  const lastResultsRef = useRef<any[]>([]);
 
-  if (results.length > 0) {
-    lastResultsRef.current = results;
-  }
-  const displayResults = results.length > 0 ? results : lastResultsRef.current;
-
-  if (isFirstLoad && displayResults.length === 0) {
+  if (isFirstLoad) {
     return <LoadingSkeleton />;
   }
 
-  if (displayResults.length === 0) {
+  if (results.length === 0) {
     return <p className="text-muted-foreground text-sm py-4">No followers found.</p>;
   }
 
   return (
     <ul className="flex flex-col gap-2">
-      {displayResults.map(({ profile, profilePicture, defaultProfilePicture, isFollowing, isBell }) => {
-        const isSelf = currentProfileId ? profile._id === currentProfileId : false;
+      {results.map((rawItem) => {
+        const item = rawItem as unknown as FollowerItem;
+        if (!item?.profile) return null;
+
+        const { profile, profilePicture, defaultProfilePicture, isFollowing, isBell } = item;
+        const isSelf = Boolean(currentProfileId && profile._id === currentProfileId);
 
         return (
           <li key={profile._id}>
             <ProfileCard
               userId={profile._id}
-              displayName={profile.displayName}
+              displayName={profile.displayName ?? profile.username}
               username={profile.username}
               profilePicture={profilePicture}
               defaultProfilePicture={defaultProfilePicture}
@@ -118,11 +119,11 @@ function FollowersList({
   );
 }
 
-function FollowingList({ 
-  profileId, 
-  currentProfileId 
-}: { 
-  profileId: string | undefined; 
+function FollowingList({
+  profileId,
+  currentProfileId,
+}: {
+  profileId: string | undefined;
   currentProfileId?: string;
 }) {
   const { results, status } = usePaginatedQuery(
@@ -132,31 +133,29 @@ function FollowingList({
   );
 
   const isFirstLoad = !profileId || status === "LoadingFirstPage";
-  const lastResultsRef = useRef<any[]>([]);
 
-  if (results.length > 0) {
-    lastResultsRef.current = results;
-  }
-  const displayResults = results.length > 0 ? results : lastResultsRef.current;
-
-  if (isFirstLoad && displayResults.length === 0) {
+  if (isFirstLoad) {
     return <LoadingSkeleton />;
   }
 
-  if (displayResults.length === 0) {
+  if (results.length === 0) {
     return <p className="text-muted-foreground text-sm py-4">Not following anyone yet.</p>;
   }
 
   return (
     <ul className="flex flex-col gap-2">
-      {displayResults.map(({ profile, profilePicture, defaultProfilePicture, isFollowing, isBell }) => {
-        const isSelf = currentProfileId ? profile._id === currentProfileId : false;
+      {results.map((rawItem) => {
+        const item = rawItem as unknown as FollowingItem;
+        if (!item?.profile) return null;
+
+        const { profile, profilePicture, defaultProfilePicture, isFollowing, isBell } = item;
+        const isSelf = Boolean(currentProfileId && profile._id === currentProfileId);
 
         return (
           <li key={profile._id}>
             <ProfileCard
               userId={profile._id}
-              displayName={profile.displayName}
+              displayName={profile.displayName ?? profile.username}
               username={profile.username}
               profilePicture={profilePicture}
               defaultProfilePicture={defaultProfilePicture}

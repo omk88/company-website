@@ -461,92 +461,138 @@ export const toggleBell = mutation({
   },
 });
 
-export const getPaginatedFollowingByProfile = query({
-  args: {
-    profileId: v.id("profiles"),
-    paginationOpts: paginationOptsValidator,
-  },
-  handler: async (ctx, args) => {
-    const paginatedFollows = await ctx.db
-      .query("follows")
-      .withIndex("by_follower", (q) => q.eq("followerId", args.profileId))
-      .paginate(args.paginationOpts);
-
-    const profiles = await Promise.all(
-      paginatedFollows.page.map(async (follow) => {
-        return await ctx.db.get(follow.followingId);
-      })
-    );
-
-    const validProfiles = profiles.filter(
-      (profile): profile is NonNullable<typeof profile> => profile !== null
-    );
-
-    const pageWithPictures = await Promise.all(
-      validProfiles.map(async (profile) => {
-        const picStorageUrl = profile.profilePic
-          ? await ctx.storage.getUrl(profile.profilePic)
-          : null;
-        const defaultPicStorageUrl = profile.defaultProfilePic
-          ? await ctx.storage.getUrl(profile.defaultProfilePic)
-          : null;
-
-        return {
-          profile,
-          profilePicture: picStorageUrl,
-          defaultProfilePicture: defaultPicStorageUrl,
-        };
-      })
-    );
-
-    return {
-      ...paginatedFollows,
-      page: pageWithPictures,
-    };
-  },
-});
-
 export const getPaginatedFollowersByProfile = query({
   args: {
     profileId: v.id("profiles"),
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
-    const paginatedFollows = await ctx.db
+    const identity = await ctx.auth.getUserIdentity();
+    let viewerProfile = null;
+    if (identity) {
+      viewerProfile = await ctx.db
+        .query("profiles")
+        .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
+        .unique();
+    }
+
+    const paginated = await ctx.db
       .query("follows")
       .withIndex("by_following", (q) => q.eq("followingId", args.profileId))
       .paginate(args.paginationOpts);
 
-    const profiles = await Promise.all(
-      paginatedFollows.page.map(async (follow) => {
-        return await ctx.db.get(follow.followerId);
-      })
-    );
+    const page = await Promise.all(
+      paginated.page.map(async (followDoc) => {
+        const profile = await ctx.db.get(followDoc.followerId);
+        if (!profile) return null;
 
-    const validProfiles = profiles.filter(
-      (profile): profile is NonNullable<typeof profile> => profile !== null
-    );
+        let isFollowing = false;
+        let isBell = false;
 
-    const pageWithPictures = await Promise.all(
-      validProfiles.map(async (profile) => {
-        const picStorageUrl = profile.profilePic
+        if (viewerProfile) {
+          const viewerFollowDoc = await ctx.db
+            .query("follows")
+            .withIndex("by_follower_and_following", (q) =>
+              q
+                .eq("followerId", viewerProfile._id)
+                .eq("followingId", profile._id)
+            )
+            .unique();
+
+          if (viewerFollowDoc) {
+            isFollowing = true;
+            isBell = viewerFollowDoc.isBell ?? false;
+          }
+        }
+
+        const profilePicture = profile.profilePic
           ? await ctx.storage.getUrl(profile.profilePic)
           : null;
-        const defaultPicStorageUrl = profile.defaultProfilePic
-          ? await ctx.storage.getUrl(profile.defaultProfilePic)
-          : null;
+        const defaultProfilePicture = await ctx.storage.getUrl(
+          profile.defaultProfilePic
+        );
 
         return {
           profile,
-          profilePicture: picStorageUrl,
-          defaultProfilePicture: defaultPicStorageUrl,
+          profilePicture,
+          defaultProfilePicture,
+          isFollowing,
+          isBell,
         };
       })
     );
 
     return {
-      ...paginatedFollows,
-      page: pageWithPictures,
+      ...paginated,
+      page: page.filter(Boolean),
+    };
+  },
+});
+
+export const getPaginatedFollowingByProfile = query({
+  args: {
+    profileId: v.id("profiles"),
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    let viewerProfile = null;
+    if (identity) {
+      viewerProfile = await ctx.db
+        .query("profiles")
+        .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
+        .unique();
+    }
+
+    const paginated = await ctx.db
+      .query("follows")
+      .withIndex("by_follower", (q) => q.eq("followerId", args.profileId))
+      .paginate(args.paginationOpts);
+
+    const page = await Promise.all(
+      paginated.page.map(async (followDoc) => {
+        const profile = await ctx.db.get(followDoc.followingId);
+        if (!profile) return null;
+
+        let isFollowing = false;
+        let isBell = false;
+
+        if (viewerProfile) {
+          const viewerFollowDoc = await ctx.db
+            .query("follows")
+            .withIndex("by_follower_and_following", (q) =>
+              q
+                .eq("followerId", viewerProfile._id)
+                .eq("followingId", profile._id)
+            )
+            .unique();
+
+          if (viewerFollowDoc) {
+            isFollowing = true;
+            isBell = viewerFollowDoc.isBell ?? false;
+          }
+        }
+
+        const profilePicture = profile.profilePic
+          ? await ctx.storage.getUrl(profile.profilePic)
+          : null;
+        const defaultProfilePicture = await ctx.storage.getUrl(
+          profile.defaultProfilePic
+        );
+
+        return {
+          profile,
+          profilePicture,
+          defaultProfilePicture,
+          isFollowing,
+          isBell,
+        };
+      })
+    );
+
+    return {
+      ...paginated,
+      page: page.filter(Boolean),
     };
   },
 });
