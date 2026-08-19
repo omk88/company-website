@@ -4,7 +4,7 @@ import { api } from "@/convex/_generated/api";
 import { usePaginatedQuery } from "convex/react";
 import { useRef } from "react";
 import { BlogCard } from "./BlogCard";
-import { BlogEmptyState } from "./BlogEmptyState";
+import { EmptyState } from "./EmptyState";
 import { CompactBlogCardSkeleton } from "./LoadingSkeletons/CompactBlogCardSkeleton";
 import { cn } from "@/lib/utils";
 import { Bookmark } from "lucide-react";
@@ -17,9 +17,8 @@ interface ProfileBookmarksProps {
 }
 
 export function ProfileBookmarks({ profile }: ProfileBookmarksProps) {
-
   const userId = profile?.profile?.userId;
-  
+
   const { results, status } = usePaginatedQuery(
     api.blogs.getPaginatedBookmarkedPostsByUser,
     userId ? { userId: userId } : "skip",
@@ -36,20 +35,6 @@ export function ProfileBookmarks({ profile }: ProfileBookmarksProps) {
   const displayResults = results.length > 0 ? results : lastResultsRef.current;
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
-  if (isFirstLoad && displayResults.length === 0) {
-    return (
-      <div className="flex flex-col flex-1 h-full min-h-0 w-full">
-        <ul className="flex flex-col gap-2">
-          {[1, 2, 3].map((i) => (
-            <li key={i}>
-              <CompactBlogCardSkeleton />
-            </li>
-          ))}
-        </ul>
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col flex-1 h-full min-h-0 w-full">
       <div className="flex items-center justify-start gap-4 w-full border-b border-border mb-4">
@@ -60,12 +45,21 @@ export function ProfileBookmarks({ profile }: ProfileBookmarksProps) {
           )}
         >
           <Bookmark className="w-4 h-4 stroke-[2.3] shrink-0" />
-          <span>{profile.bookmarkCount} Bookmarks Added</span>
+          <span>{profile?.bookmarkCount ?? 0} Bookmarks Added</span>
         </div>
       </div>
-      {displayResults.length === 0 ? (
+
+      {isFirstLoad && displayResults.length === 0 ? (
+        <ul className="flex flex-col gap-2">
+          {[1, 2, 3].map((i) => (
+            <li key={i}>
+              <CompactBlogCardSkeleton />
+            </li>
+          ))}
+        </ul>
+      ) : displayResults.length === 0 ? (
         <div className="flex flex-col flex-1 h-full min-h-0">
-          <BlogEmptyState />
+          <EmptyState size="sm" description="This user hasn't added any bookmarks yet." />
         </div>
       ) : (
         <>

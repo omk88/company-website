@@ -31,8 +31,9 @@ export function ProfileCard({
       href={`/${username}`}
       className="block text-inherit no-underline"
     >
-      <div className="flex flex-row items-center gap-2 px-4 py-2 bg-zinc-50/80 hover:bg-zinc-100/90 dark:bg-zinc-900/80 dark:hover:bg-zinc-800/90 rounded-xl cursor-pointer transition-colors">
-        
+      <div 
+        className="flex flex-row items-center gap-2 px-4 py-2 bg-zinc-50/80 dark:bg-zinc-900/80 rounded-xl cursor-pointer transition-colors hover:bg-zinc-100/90 dark:hover:bg-zinc-800/90 [&:has(.no-card-hover:hover)]:bg-zinc-50/80 dark:[&:has(.no-card-hover:hover)]:bg-zinc-900/80"
+      >
         <div className="h-12 w-12 border-2 border-muted rounded-full overflow-hidden bg-muted relative shrink-0">
           <img
             src={profilePicture || defaultProfilePicture || ""}
@@ -44,7 +45,7 @@ export function ProfileCard({
 
         <div className="flex flex-col min-w-0">
           <ProfileHoverCard authorUsername={username} displayName={displayName || username}>
-            <span className="text-sm font-semibold truncate hover:underline">
+            <span className="text-sm font-semibold truncate">
               {displayName || username}
             </span>
           </ProfileHoverCard>
@@ -55,7 +56,7 @@ export function ProfileCard({
 
         {!isSelf && (
           <div 
-            className="ml-auto shrink-0"
+            className="no-card-hover ml-auto shrink-0"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();

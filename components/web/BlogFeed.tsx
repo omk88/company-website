@@ -5,7 +5,7 @@ import { usePaginatedQuery } from "convex/react";
 import { useEffect, useRef } from "react";
 import { BlogCard } from "./BlogCard";
 import { BlogCardSkeleton } from "./LoadingSkeletons/BlogCardSkeleton";
-import { BlogEmptyState } from "./BlogEmptyState";
+import { EmptyState } from "./EmptyState";
 
 interface BlogFeedProps {
   postType?: "community" | "team";
@@ -97,7 +97,7 @@ function StandardBlogFeed({
         </ul>
       ) : displayResults.length === 0 ? (
         <div className="flex flex-col flex-1 h-full min-h-0">
-          <BlogEmptyState />
+          <EmptyState size="lg" />
         </div>
       ) : (
         <>

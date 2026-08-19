@@ -24,14 +24,12 @@ export function ProfileFollows({ profile, currentUser }: ProfileFollowsProps) {
   const selectedFollows = useFollowsStore((state) => state.selectedFollows);
   const setSelectedFollows = useFollowsStore((state) => state.setSelectedFollows);
 
-  const anim =
-    "relative no-underline hover:no-underline after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100";
-
+  const anim = "relative no-underline hover:no-underline after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100";
   const currentProfileId = currentUser?.profile?._id;
 
   return (
     <div className="flex flex-col flex-1 h-full min-h-0 w-full">
-      <div className="flex items-center justify-start gap-4 w-full border-b border-border mb-4">
+      <div className="flex items-center justify-start gap-4 w-full border-b border-border mb-4 shrink-0">
         <button
           type="button"
           onClick={() => setSelectedFollows("followers")}
@@ -170,14 +168,29 @@ function FollowingList({
   );
 }
 
+export function ProfileCardSkeleton() {
+  return (
+    <div className="flex flex-row items-center gap-2 px-4 py-2 bg-zinc-50/80 dark:bg-zinc-900/80 rounded-xl animate-pulse">
+      <div className="h-12 w-12 rounded-full bg-muted shrink-0" />
+
+      <div className="flex flex-col gap-1.5 min-w-0 flex-1">
+        <div className="h-3.5 w-28 bg-muted rounded" />
+        <div className="h-2.5 w-16 bg-muted/60 rounded" />
+      </div>
+
+      <div className="h-7 w-16 bg-muted rounded-md shrink-0 ml-auto" />
+    </div>
+  );
+}
+
 function LoadingSkeleton() {
   return (
-    <div className="flex flex-col flex-1 h-full min-h-0 w-full">
-      <ul className="flex flex-col gap-2">
-        {[1, 2, 3].map((i) => (
-          <li key={i} className="h-12 w-full bg-muted/40 animate-pulse rounded-md" />
-        ))}
-      </ul>
-    </div>
+    <ul className="flex flex-col gap-2 w-full">
+      {[1, 2, 3, 4, 5].map((i) => (
+        <li key={i}>
+          <ProfileCardSkeleton />
+        </li>
+      ))}
+    </ul>
   );
 }

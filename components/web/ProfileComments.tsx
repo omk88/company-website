@@ -8,6 +8,7 @@ import { Doc } from "@/convex/_generated/dataModel";
 import { MessageSquareText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { FunctionReturnType } from "convex/server";
+import { CompactCommentCardSkeleton } from "./LoadingSkeletons/CompactCommentCardSkeleton";
 
 type ProfileData = FunctionReturnType<typeof api.profiles.getProfileByUsername>;
 
@@ -16,7 +17,6 @@ interface ProfileCommentsProps {
 }
 
 export function ProfileComments({ profile }: ProfileCommentsProps) {
-
   const userId = profile?.profile?.userId;
 
   const { results, status } = usePaginatedQuery(
@@ -35,19 +35,6 @@ export function ProfileComments({ profile }: ProfileCommentsProps) {
   const displayResults = results.length > 0 ? (results as Doc<"comments">[]) : lastResultsRef.current;
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
-  if (isFirstLoad && displayResults.length === 0) {
-    return (
-      <div className="flex flex-col flex-1 h-full min-h-0 w-full">
-        <ul className="flex flex-col gap-2">
-          {[1, 2, 3].map((i) => (
-            <li key={i}>
-            </li>
-          ))}
-        </ul>
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col flex-1 h-full min-h-0 w-full">
       <div className="flex items-center justify-start gap-4 w-full border-b border-border mb-4">
@@ -58,11 +45,21 @@ export function ProfileComments({ profile }: ProfileCommentsProps) {
           )}
         >
           <MessageSquareText className="w-4 h-4 stroke-[2.3] shrink-0" />
-          <span>{profile.commentCount} Comments Published</span>
+          <span>{profile?.commentCount ?? 0} Comments Published</span>
         </div>
       </div>
-      {displayResults.length === 0 ? (
+
+      {isFirstLoad && displayResults.length === 0 ? (
+        <ul className="flex flex-col gap-2">
+          {[1, 2, 3].map((i) => (
+            <li key={i}>
+              <CompactCommentCardSkeleton />
+            </li>
+          ))}
+        </ul>
+      ) : displayResults.length === 0 ? (
         <div className="flex flex-col flex-1 h-full min-h-0">
+
         </div>
       ) : (
         <>

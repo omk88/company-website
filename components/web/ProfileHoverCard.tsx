@@ -153,11 +153,11 @@ export function ProfileHoverCard({ displayName, authorUsername, children, align 
                                             <TooltipTrigger asChild>
                                             <div className="flex items-center gap-1.5 min-w-[3rem] justify-start p-2 rounded-2xl hover:bg-zinc-100 transition-colors cursor-pointer">
                                                 <Library className="w-4 h-4 stroke-[2.3] shrink-0" />
-                                                <span>{ profile?.articlesPublished }</span>
+                                                <span>{ 0 }</span>
                                             </div>
                                             </TooltipTrigger>
                                             <TooltipContent side="bottom" align="center">
-                                            <p className="text-xs">{ profile?.articlesPublished } Insights Published</p>
+                                            <p className="text-xs">{ 0 } Insights Published</p>
                                             </TooltipContent>
                                         </Tooltip>
                                     </TooltipProvider>
@@ -166,11 +166,11 @@ export function ProfileHoverCard({ displayName, authorUsername, children, align 
                                             <TooltipTrigger asChild>
                                                 <div className="flex items-center gap-1.5 min-w-[3rem] justify-start p-2 rounded-2xl hover:bg-zinc-100 transition-colors cursor-pointer">
                                                     <MessageSquareText className="w-4 h-4 stroke-[2.3] shrink-0" />
-                                                    <span>{ profile?.commentsPublished }</span>
+                                                    <span>{ 0 }</span>
                                                 </div>
                                             </TooltipTrigger>
                                             <TooltipContent side="bottom" align="center">
-                                                <p className="text-xs">{ profile?.commentsPublished } Comments Published</p>
+                                                <p className="text-xs">{ 0 } Comments Published</p>
                                             </TooltipContent>
                                         </Tooltip>
                                     </TooltipProvider>
