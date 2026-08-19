@@ -14,7 +14,6 @@ interface ProfileContentProps {
 }
 
 export function ProfileContent({ preloadedProfile, preloadedCurrentUser }: ProfileContentProps) {
-
   const profileData = usePreloadedQuery(preloadedProfile);
   const currentUser = usePreloadedQuery(preloadedCurrentUser);
 
@@ -24,7 +23,7 @@ export function ProfileContent({ preloadedProfile, preloadedCurrentUser }: Profi
     insights: <ProfileBlogs profile={profileData} />,
     comments: <ProfileComments profile={profileData} />,
     bookmarks: <ProfileBookmarks profile={profileData} />,
-    followers: <ProfileFollows profile={profileData} />
+    followers: <ProfileFollows profile={profileData} currentUser={currentUser} />
   };
 
   return (

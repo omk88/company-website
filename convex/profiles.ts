@@ -95,29 +95,59 @@ export const getProfileByUsername = query({
         bookmarkCount: 0,
         articleCount: 0,
         commentCount: 0,
+        viewerStatus: { isFollowing: false, isBell: false, isSelf: false },
       };
     }
 
-    const [bookmarks, articles, comments] = await Promise.all([
+    const identity = await ctx.auth.getUserIdentity();
+
+    const [currentProfile, bookmarkCount, articleCount, commentCount] = await Promise.all([
+      identity
+        ? ctx.db
+            .query("profiles")
+            .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
+            .unique()
+        : null,
       ctx.db
         .query("bookmarks")
         .withIndex("by_user", (q) => q.eq("userId", profile.userId))
-        .collect(),
+        .collect()
+        .then((items) => items.length), 
       ctx.db
         .query("blogs")
         .withIndex("by_author", (q) => q.eq("author", profile.userId))
-        .collect(),
+        .collect()
+        .then((items) => items.length),
       ctx.db
         .query("comments")
         .withIndex("by_authorId", (q) => q.eq("authorId", profile.userId))
-        .collect(),
+        .collect()
+        .then((items) => items.length),
     ]);
 
-    const picStorageId = profile.profilePic;
-    const defaultPicStorageId = profile.defaultProfilePic;
+    let isFollowing = false;
+    let isBell = false;
+    const isSelf = currentProfile?._id === profile._id;
 
-    const picStorageUrl = picStorageId ? await ctx.storage.getUrl(picStorageId) : null;
-    const defaultPicStorageUrl = defaultPicStorageId ? await ctx.storage.getUrl(defaultPicStorageId) : null;
+    const followPromise = currentProfile && !isSelf
+      ? ctx.db
+          .query("follows")
+          .withIndex("by_follower_and_following", (q) =>
+            q.eq("followerId", currentProfile._id).eq("followingId", profile._id)
+          )
+          .unique()
+      : null;
+
+    const [followRecord, picStorageUrl, defaultPicStorageUrl] = await Promise.all([
+      followPromise,
+      profile.profilePic ? ctx.storage.getUrl(profile.profilePic) : null,
+      profile.defaultProfilePic ? ctx.storage.getUrl(profile.defaultProfilePic) : null,
+    ]);
+
+    if (followRecord) {
+      isFollowing = true;
+      isBell = followRecord.isBell;
+    }
 
     return { 
       profilePicture: picStorageUrl, 
@@ -132,9 +162,14 @@ export const getProfileByUsername = query({
         skills: profile.skills,
         socials: profile.socials,
       },
-      bookmarkCount: bookmarks.length,
-      articleCount: articles.length,
-      commentCount: comments.length,
+      bookmarkCount,
+      articleCount,
+      commentCount,
+      viewerStatus: {
+        isFollowing,
+        isBell,
+        isSelf,
+      },
     };
   },
 });

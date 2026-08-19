@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { api } from "@/convex/_generated/api";
 import { useMutation } from "convex/react";
@@ -12,6 +12,7 @@ interface FollowButtonProps {
   displayName: string | undefined;
   initialIsFollowing?: boolean;
   initialIsBell?: boolean;
+  isSelf?: boolean;
   variant?: "default" | "compact";
 }
 
@@ -21,12 +22,22 @@ export function FollowButton({
   displayName,
   initialIsFollowing = false,
   initialIsBell = false,
+  isSelf = false,
   variant,
 }: FollowButtonProps) {
   const [isPending, setIsPending] = useState(false);
   const [isBellPending, setIsBellPending] = useState(false);
+
   const [isFollowing, setIsFollowing] = useState(initialIsFollowing);
   const [isBell, setIsBell] = useState(initialIsBell);
+
+  useEffect(() => {
+    setIsFollowing(initialIsFollowing);
+  }, [initialIsFollowing]);
+
+  useEffect(() => {
+    setIsBell(initialIsBell);
+  }, [initialIsBell]);
 
   const isCompact = variant === "compact";
 

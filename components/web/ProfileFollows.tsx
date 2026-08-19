@@ -11,16 +11,20 @@ import { UserRoundCheck, UsersRound } from "lucide-react";
 import { FunctionReturnType } from "convex/server";
 
 type ProfileData = FunctionReturnType<typeof api.profiles.getProfileByUsername>;
+type CurrentUserData = FunctionReturnType<typeof api.auth.getCurrentUser>;
 
 interface ProfileFollowsProps {
   profile: ProfileData;
+  currentUser?: CurrentUserData;
 }
 
-export function ProfileFollows({ profile }: ProfileFollowsProps) {
+export function ProfileFollows({ profile, currentUser }: ProfileFollowsProps) {
   const selectedFollows = useFollowsStore((state) => state.selectedFollows);
   const setSelectedFollows = useFollowsStore((state) => state.setSelectedFollows);
 
   const anim = "relative no-underline hover:no-underline after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100";
+
+  const currentProfileId = currentUser?.profile?._id;
 
   return (
     <div className="flex flex-col flex-1 h-full min-h-0 w-full">
@@ -35,7 +39,7 @@ export function ProfileFollows({ profile }: ProfileFollowsProps) {
           )}
         >
           <UsersRound className="w-4 h-4 stroke-[2.3] shrink-0" />
-          <span>{profile.profile?.followerCount} Followers</span>
+          <span>{profile?.profile?.followerCount ?? 0} Followers</span>
         </button>
 
         <button
@@ -48,21 +52,27 @@ export function ProfileFollows({ profile }: ProfileFollowsProps) {
           )}
         >
           <UserRoundCheck className="w-4 h-4 stroke-[2.3] shrink-0" />
-          <span>{profile.profile?.followingCount} Following</span>
+          <span>{profile?.profile?.followingCount ?? 0} Following</span>
         </button>
       </div>
 
       {selectedFollows === "followers" ? (
-        <FollowersList profileId={profile?.profile?._id} />
+        <FollowersList profileId={profile?.profile?._id} currentProfileId={currentProfileId} />
       ) : (
-        <FollowingList profileId={profile?.profile?._id} />
+        <FollowingList profileId={profile?.profile?._id} currentProfileId={currentProfileId} />
       )}
     </div>
   );
 }
 
-function FollowersList({ profileId }: { profileId: string | undefined }) {
-  const { results, status, loadMore } = usePaginatedQuery(
+function FollowersList({ 
+  profileId, 
+  currentProfileId 
+}: { 
+  profileId: string | undefined; 
+  currentProfileId?: string;
+}) {
+  const { results, status } = usePaginatedQuery(
     api.profiles.getPaginatedFollowersByProfile,
     profileId ? { profileId: profileId as Id<"profiles"> } : "skip",
     { initialNumItems: 10 }
@@ -86,23 +96,36 @@ function FollowersList({ profileId }: { profileId: string | undefined }) {
 
   return (
     <ul className="flex flex-col gap-2">
-      {displayResults.map(({ profile, profilePicture, defaultProfilePicture }) => (
-        <li key={profile._id}>
-          <ProfileCard
-            userId={profile.userId}
-            displayName={profile.displayName}
-            username={profile.username}
-            profilePicture={profilePicture}
-            defaultProfilePicture={defaultProfilePicture}
-          />
-        </li>
-      ))}
+      {displayResults.map(({ profile, profilePicture, defaultProfilePicture, isFollowing, isBell }) => {
+        const isSelf = currentProfileId ? profile._id === currentProfileId : false;
+
+        return (
+          <li key={profile._id}>
+            <ProfileCard
+              userId={profile._id}
+              displayName={profile.displayName}
+              username={profile.username}
+              profilePicture={profilePicture}
+              defaultProfilePicture={defaultProfilePicture}
+              isFollowing={isFollowing}
+              isBell={isBell}
+              isSelf={isSelf}
+            />
+          </li>
+        );
+      })}
     </ul>
   );
 }
 
-function FollowingList({ profileId }: { profileId: string | undefined }) {
-  const { results, status, loadMore } = usePaginatedQuery(
+function FollowingList({ 
+  profileId, 
+  currentProfileId 
+}: { 
+  profileId: string | undefined; 
+  currentProfileId?: string;
+}) {
+  const { results, status } = usePaginatedQuery(
     api.profiles.getPaginatedFollowingByProfile,
     profileId ? { profileId: profileId as Id<"profiles"> } : "skip",
     { initialNumItems: 10 }
@@ -126,17 +149,24 @@ function FollowingList({ profileId }: { profileId: string | undefined }) {
 
   return (
     <ul className="flex flex-col gap-2">
-      {displayResults.map(({ profile, profilePicture, defaultProfilePicture }) => (
-        <li key={profile._id}>
-          <ProfileCard
-            userId={profile.userId}
-            displayName={profile.displayName}
-            username={profile.username}
-            profilePicture={profilePicture}
-            defaultProfilePicture={defaultProfilePicture}
-          />
-        </li>
-      ))}
+      {displayResults.map(({ profile, profilePicture, defaultProfilePicture, isFollowing, isBell }) => {
+        const isSelf = currentProfileId ? profile._id === currentProfileId : false;
+
+        return (
+          <li key={profile._id}>
+            <ProfileCard
+              userId={profile._id}
+              displayName={profile.displayName}
+              username={profile.username}
+              profilePicture={profilePicture}
+              defaultProfilePicture={defaultProfilePicture}
+              isFollowing={isFollowing}
+              isBell={isBell}
+              isSelf={isSelf}
+            />
+          </li>
+        );
+      })}
     </ul>
   );
 }

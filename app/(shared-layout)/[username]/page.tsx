@@ -15,7 +15,7 @@ export default async function Profile({ params }: ProfileRouteProps) {
   const { username } = await params;
 
   const [preloadedProfile, preloadedCurrentUser] = await Promise.all([
-    preloadQuery(api.profiles.getProfileByUsername, { username }),
+    preloadAuthQuery(api.profiles.getProfileByUsername, { username }),
     preloadAuthQuery(api.auth.getCurrentUser),
   ]);
 

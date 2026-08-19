@@ -31,6 +31,10 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: L
   const articleCount = profileData.articleCount;
   const commentCount = profileData.commentCount;
 
+  const isFollowing = profileData.viewerStatus.isFollowing;
+  const isBell = profileData.viewerStatus.isBell;
+  const isSelf = profileData.viewerStatus.isSelf;
+
   const anim = "relative no-underline hover:no-underline after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100";
 
   const selectedMetric = useMetricStore((state) => state.selectedMetric);
@@ -134,8 +138,14 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: L
             </div>
           </div>
 
-          {currentUser && !isOwnProfile && (
-            <FollowButton targetProfileId={profile._id} displayName={displayName} username={profile.username}/>
+          {!isSelf && (
+            <FollowButton
+              targetProfileId={profile._id}
+              displayName={displayName}
+              username={profile.username}
+              initialIsFollowing={isFollowing}
+              initialIsBell={isBell}
+            />
           )}
 
           <div>
