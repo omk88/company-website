@@ -11,11 +11,14 @@ interface FollowButtonProps {
   username: string;
   displayName: string | undefined;
   initialIsFollowing?: boolean;
+  variant?: "default" | "compact";
 }
 
-export function FollowButton({ targetProfileId, username, displayName, initialIsFollowing = false }: FollowButtonProps) {
+export function FollowButton({ targetProfileId, username, displayName, initialIsFollowing = false, variant }: FollowButtonProps) {
   const [isPending, setIsPending] = useState(false);
   const [isFollowing, setIsFollowing] = useState(initialIsFollowing);
+
+  const isCompact = variant === "compact";
 
   const followMutation = useMutation(api.profiles.toggleFollow);
 
@@ -38,6 +41,36 @@ export function FollowButton({ targetProfileId, username, displayName, initialIs
       setIsPending(false);
     }
   };
+
+  if (isCompact) {
+    return (
+      <div className="flex flex-row gap-1.5 w-full items-center">
+        <Button
+          size="icon"
+          variant="ghost"
+          className="h-6 w-6 rounded-full cursor-pointer shrink-0"
+        >
+          <BellPlus className="h-2 w-2 stroke-[2.3]" />
+        </Button>
+        
+        <Button
+          variant={isFollowing ? "outline" : "default"}
+          className="cursor-pointer text-xs px-2 flex-1"
+          size="xs"
+          disabled={isPending} 
+          onClick={handleClick}
+        >
+          {isPending ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : isFollowing ? (
+            "Unfollow"
+          ) : (
+            "Follow"
+          )}
+        </Button>
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-row gap-2 w-full items-center">
