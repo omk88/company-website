@@ -1,17 +1,18 @@
 "use client";
 
 import { Sidebar, SidebarContent, SidebarFooter } from "../ui/sidebar";
-import { Cake, Library, MapPin, MessageSquareText, User, Link, Zap, Bookmark, GraduationCap, UserRound } from "lucide-react";
+import { Cake, Library, MapPin, MessageSquareText, Link as LinkIcon, Zap, Bookmark, GraduationCap, UserRound } from "lucide-react";
 import { EditProfileButton } from "./EditProfileButton";
 import { Preloaded, usePreloadedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { LinksHoverCard } from "./LinksHoverCard";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { SkillsHoverCard } from "./SkillsHoverCard";
 import { EducationHoverCard } from "./EducationHoverCard";
 import { FollowButton } from "./FollowButton";
 import { cn } from "@/lib/utils";
 import { useMetricStore } from "@/stores/useMetricStore";
+import { ProfileSettingsButton } from "./ProfileSettingsButton";
+import Link from "next/link";
 
 interface LeftSidebarProfileProps {
   preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
@@ -52,8 +53,6 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: L
     day: "numeric",
     year: "numeric",
   }).format(profile._creationTime);
-
-  const tags = ["JavaScript", "TypeScript", "Next.js", "Convex"];
 
   return (
     <Sidebar 
@@ -99,7 +98,9 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: L
               </div>
 
               {isOwnProfile && (
-                <div className="absolute right-0 top-0 flex items-center h-[1em]">
+                <div className="flex flex-row absolute right-0 top-0 flex items-center h-[1em]">
+                  <ProfileSettingsButton />
+                  
                   <EditProfileButton
                     profile={profile}
                     avatarSrc={avatarSrc || ""}
@@ -132,10 +133,15 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: L
               </div>
             )}
 
-            <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
-              <Link className="w-4 h-4 stroke-[2.3] shrink-0" />
-              <span className="underline text-blue-600">{ "https://x.com/" }</span>
-            </div>
+            {profile.socials && profile.socials.length > 0 && (
+              <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
+
+                <LinkIcon className="w-4 h-4 stroke-[2.3] shrink-0" />
+                <Link href={profile.socials[0].url} className="underline text-blue-600">
+                  {profile.socials?.[0]?.url}
+                </Link>
+              </div>
+            )}
           </div>
 
           {!isSelf && (
@@ -241,9 +247,6 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: L
           </div>
 
           <div className="flex flex-row gap-2">
-            {profile.socials && profile.socials.length > 0 && (
-              <LinksHoverCard socials={profile.socials} />
-            )}
 
             {profile.education && profile.education.length > 0 && (
               <EducationHoverCard education={profile.education} />
