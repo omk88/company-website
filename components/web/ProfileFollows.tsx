@@ -8,6 +8,7 @@ import { useFollowsStore } from "@/stores/useFollowsStore";
 import { cn } from "@/lib/utils";
 import { UserRoundCheck, UsersRound } from "lucide-react";
 import { FunctionReturnType } from "convex/server";
+import { EmptyState } from "./EmptyState";
 
 type ProfileData = FunctionReturnType<typeof api.profiles.getProfileByUsername>;
 type CurrentUserData = FunctionReturnType<typeof api.auth.getCurrentUser>;
@@ -86,7 +87,7 @@ function FollowersList({
   }
 
   if (results.length === 0) {
-    return <p className="text-muted-foreground text-sm py-4">No followers found.</p>;
+    return <EmptyState size="sm" title="No users found" description="This user doesn't have any followers yet." />;
   }
 
   return (
@@ -137,7 +138,7 @@ function FollowingList({
   }
 
   if (results.length === 0) {
-    return <p className="text-muted-foreground text-sm py-4">Not following anyone yet.</p>;
+    return <EmptyState size="sm" title="No users found" description="This user isn't following anyone yet." />;
   }
 
   return (

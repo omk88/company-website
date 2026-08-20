@@ -37,7 +37,7 @@ export function EmptyState({
         <Inbox className="h-4 w-4 text-muted-foreground stroke-[1.8]" />
       </div>
 
-      <div className="mt-4 max-w-sm space-y-1.5">
+      <div className="mt-4 max-w-sm space-y-1">
         <h3 className="text-sm font-bold tracking-tight text-foreground">
           {title}
         </h3>

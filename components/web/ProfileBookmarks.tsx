@@ -59,7 +59,7 @@ export function ProfileBookmarks({ profile }: ProfileBookmarksProps) {
         </ul>
       ) : displayResults.length === 0 ? (
         <div className="flex flex-col flex-1 h-full min-h-0">
-          <EmptyState size="sm" description="This user hasn't added any bookmarks yet." />
+          <EmptyState size="sm" title="No bookmarked posts found" description="This user hasn't added any bookmarks yet." />
         </div>
       ) : (
         <>

@@ -9,6 +9,7 @@ import { MessageSquareText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { FunctionReturnType } from "convex/server";
 import { CompactCommentCardSkeleton } from "./LoadingSkeletons/CompactCommentCardSkeleton";
+import { EmptyState } from "./EmptyState";
 
 type ProfileData = FunctionReturnType<typeof api.profiles.getProfileByUsername>;
 
@@ -59,7 +60,7 @@ export function ProfileComments({ profile }: ProfileCommentsProps) {
         </ul>
       ) : displayResults.length === 0 ? (
         <div className="flex flex-col flex-1 h-full min-h-0">
-
+          <EmptyState size="sm" title="No comments found" description="This user hasn't posted any comments yet." />
         </div>
       ) : (
         <>
@@ -74,7 +75,6 @@ export function ProfileComments({ profile }: ProfileCommentsProps) {
               </li>
             ))}
           </ul>
-
           <div ref={loadMoreRef} className="w-full" />
         </>
       )}
