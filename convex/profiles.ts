@@ -461,6 +461,27 @@ export const toggleBell = mutation({
   },
 });
 
+export const isUsernameTaken = query({
+  args: {
+    username: v.string(),
+    currentUserId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const cleanUsername = args.username.trim().toLowerCase();
+    
+    if (cleanUsername.length < 2) return false;
+
+    const existingProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_username", (q) => q.eq("username", cleanUsername))
+      .first();
+
+    if (!existingProfile) return false;
+
+    return existingProfile.userId !== args.currentUserId;
+  },
+});
+
 export const getPaginatedFollowersByProfile = query({
   args: {
     profileId: v.id("profiles"),
