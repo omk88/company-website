@@ -1,13 +1,31 @@
 "use client";
 
+import { useState } from "react";
 import { Sidebar, SidebarContent, SidebarFooter } from "../ui/sidebar";
-import { Cake, Library, MapPin, MessageSquareText, Link as LinkIcon, Zap, Bookmark, GraduationCap, UserRound } from "lucide-react";
+import { 
+  Cake, 
+  Library, 
+  MapPin, 
+  MessageSquareText, 
+  Zap, 
+  Bookmark, 
+  GraduationCap, 
+  UserRound, 
+  Wrench,
+  Globe,
+  Link as LinkIcon
+} from "lucide-react";
+import { 
+  FaInstagram, 
+  FaXTwitter, 
+  FaLinkedin, 
+  FaGithub, 
+  FaYoutube 
+} from "react-icons/fa6";
 import { EditProfileButton } from "./EditProfileButton";
 import { Preloaded, usePreloadedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
-import { SkillsHoverCard } from "./SkillsHoverCard";
-import { EducationHoverCard } from "./EducationHoverCard";
 import { FollowButton } from "./FollowButton";
 import { cn } from "@/lib/utils";
 import { useMetricStore } from "@/stores/useMetricStore";
@@ -19,8 +37,30 @@ interface LeftSidebarProfileProps {
   preloadedCurrentUser: Preloaded<typeof api.auth.getCurrentUser>;
 }
 
+// Helper to map platform names to brand icons from react-icons/fa6
+function SocialPlatformIcon({ platform, className }: { platform?: string; className?: string }) {
+  const normalized = platform?.toLowerCase().trim();
+
+  switch (normalized) {
+    case "instagram":
+      return <FaInstagram className={className} />;
+    case "twitter":
+    case "x":
+      return <FaXTwitter className={className} />;
+    case "linkedin":
+      return <FaLinkedin className={className} />;
+    case "github":
+      return <FaGithub className={className} />;
+    case "youtube":
+      return <FaYoutube className={className} />;
+    default:
+      return <Globe className={className} />;
+  }
+}
+
 export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: LeftSidebarProfileProps) {
-  
+  const [isExpanded, setIsExpanded] = useState(false);
+
   const profileData = usePreloadedQuery(preloadedProfile);
   const currentUser = usePreloadedQuery(preloadedCurrentUser);
 
@@ -47,6 +87,13 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: L
 
   const { username, displayName } = profile;
   const isOwnProfile = currentUser?.userId && profile?.userId && currentUser.userId === profile.userId;
+
+  const additionalSocials = profile.socials?.slice(1) ?? [];
+  const hasEducation = Boolean(profile.education && profile.education.length > 0);
+  const hasSkills = Boolean(profile.skills && profile.skills.length > 0);
+  const hasExtraSocials = additionalSocials.length > 0;
+
+  const hasExpandableContent = hasEducation || hasSkills || hasExtraSocials;
 
   const formattedDate = new Intl.DateTimeFormat("en-US", {
     month: "short",
@@ -98,9 +145,8 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: L
               </div>
 
               {isOwnProfile && (
-                <div className="flex flex-row absolute right-0 top-0 flex items-center h-[1em]">
+                <div className="flex flex-row absolute right-0 top-0 items-center h-[1em]">
                   <ProfileSettingsButton />
-                  
                   <EditProfileButton
                     profile={profile}
                     avatarSrc={avatarSrc || ""}
@@ -112,33 +158,37 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: L
           </div>
         </div>
 
-        <div className="p-4 gap-4 flex flex-col  text-sm font-sans tracking-tight w-full">
-          
+        <div className="p-4 gap-4 flex flex-col text-sm font-sans tracking-tight w-full">
           {profile.bio && (
             <div>
-              <span>{ profile.bio }</span>
+              <span>{profile.bio}</span>
             </div>
           )}
 
-          <div>
+          <div className="space-y-1">
             <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
               <Cake className="w-4 h-4 stroke-[2.3] shrink-0" />
-              <p>{ formattedDate }</p>
+              <p>{formattedDate}</p>
             </div>
 
-            { profile.location && (
+            {profile.location && (
               <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
-                <MapPin className="w-4 h-4 stroke-[2.3] shrink-0 mt-0.5" />
-                <p>{ profile.location }</p>
+                <MapPin className="w-4 h-4 stroke-[2.3] shrink-0" />
+                <p>{profile.location}</p>
               </div>
             )}
 
+            {/* Main Link uses standard Lucide LinkIcon */}
             {profile.socials && profile.socials.length > 0 && (
               <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
-
-                <LinkIcon className="w-4 h-4 stroke-[2.3] shrink-0" />
-                <Link href={profile.socials[0].url} className="underline text-blue-600">
-                  {profile.socials?.[0]?.url}
+                <LinkIcon className="w-4 h-4 stroke-[2.3] shrink-0 text-foreground" />
+                <Link 
+                  href={profile.socials[0].url} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="underline text-blue-600 break-all"
+                >
+                  {profile.socials[0].url}
                 </Link>
               </div>
             )}
@@ -152,6 +202,84 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: L
               initialIsFollowing={isFollowing}
               initialIsBell={isBell}
             />
+          )}
+
+          {hasExpandableContent && (
+            <div className="flex flex-col gap-2">
+              <button
+                type="button"
+                onClick={() => setIsExpanded((prev) => !prev)}
+                className="text-sm font-medium text-left cursor-pointer hover:text-blue-600 transition-colors w-fit"
+              >
+                {isExpanded ? "Show less" : "Read more"}
+              </button>
+
+              <div
+                className={cn(
+                  "grid transition-all duration-300 ease-in-out",
+                  isExpanded ? "grid-rows-[1fr] opacity-100 mt-1" : "grid-rows-[0fr] opacity-0"
+                )}
+              >
+                <div className="overflow-hidden flex flex-col gap-3">
+                  
+                  {/* Read More Area: Uses brand icons in full black/foreground color */}
+                  {hasExtraSocials && (
+                    <div className="flex flex-col gap-1.5">
+                      {additionalSocials.map((social, index) => (
+                        <div className="flex items-center gap-1.5 text-xs" key={index}>
+                          <SocialPlatformIcon 
+                            platform={social.platform} 
+                            className="w-4 h-4 shrink-0 text-foreground" 
+                          />
+                          <Link 
+                            href={social.url} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="underline text-blue-600 break-all"
+                          >
+                            {social.url}
+                          </Link>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {hasEducation && (
+                    <div className="flex flex-col gap-2">
+                      {profile.education?.map((item, index) => (
+                        <div className="flex items-start gap-1.5 text-xs text-muted-foreground" key={index}>
+                          <GraduationCap className="w-4 h-4 stroke-[2.3] shrink-0 text-foreground mt-0.5" />
+                          <div>
+                            <p className="font-medium text-foreground">{item.degree} in {item.subject}</p>
+                            <p>{item.institution}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {hasSkills && (
+                    <div className="flex flex-col gap-1.5">
+                      <div className="flex items-center gap-1.5 text-xs font-medium text-foreground">
+                        <Wrench className="w-4 h-4 stroke-[2.3] shrink-0" />
+                        <span>Skills</span>
+                      </div>
+                      <div className="flex flex-wrap gap-1">
+                        {profile.skills?.map((skill, index) => (
+                          <span 
+                            key={index} 
+                            className="text-xs bg-secondary text-secondary-foreground px-2 py-0.5 rounded-md font-medium"
+                          >
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                </div>
+              </div>
+            </div>
           )}
 
           <div>
@@ -244,17 +372,6 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: L
                 </Tooltip>
               </TooltipProvider>
             </div>
-          </div>
-
-          <div className="flex flex-row gap-2">
-
-            {profile.education && profile.education.length > 0 && (
-              <EducationHoverCard education={profile.education} />
-            )}
-            
-            {profile.skills && profile.skills.length > 0 && (
-              <SkillsHoverCard skills={profile.skills} />
-            )}
           </div>
         </div>
 
