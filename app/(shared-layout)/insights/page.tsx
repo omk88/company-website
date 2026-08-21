@@ -1,8 +1,8 @@
 import { Metadata } from "next";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { LeftSidebar } from "@/components/web/LeftSidebar";
 import { RightSidebar } from "@/components/web/RightSidebar";
 import { PageBlogPosts } from "@/components/web/PageBlogPosts";
+import { LeftSidebar } from "@/components/web/LeftSidebar";
 
 export const metadata: Metadata = {
   title: "Insights",

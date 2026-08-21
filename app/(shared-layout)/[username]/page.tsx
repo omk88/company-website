@@ -1,9 +1,9 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { LeftSidebarProfile } from "@/components/web/LeftSidebarProfile";
+import { RightSidebarProfile } from "@/components/web/RightSidebarProfile";
 import { api } from "@/convex/_generated/api";
 import { preloadAuthQuery } from "@/lib/auth-server";
 import { ProfileContent } from "@/components/web/ProfileContent";
-import { LeftSidebar } from "@/components/web/LeftSidebar";
+import { LeftSidebarProfile } from "@/components/web/LeftSidebarProfile";
 
 interface ProfileRouteProps {
   params: Promise<{
@@ -21,11 +21,19 @@ export default async function Profile({ params }: ProfileRouteProps) {
 
   return (
     <SidebarProvider>
-      <LeftSidebar />
+      <aside 
+        className="shrink-0"
+        style={{ "--sidebar-width": "12.8rem" } as React.CSSProperties}
+      >
+        <LeftSidebarProfile
+            preloadedProfile={preloadedProfile} 
+            preloadedCurrentUser={preloadedCurrentUser} 
+        />
+      </aside>
       
       <div className="flex w-full min-h-screen">
         <main className="flex-1 bg-white pt-16 flex justify-center">
-          <div className="w-full max-w-2xl px-4">
+          <div className="w-full max-w-2xl px-6 mx-auto">
             <ProfileContent
               preloadedProfile={preloadedProfile} 
               preloadedCurrentUser={preloadedCurrentUser} 
@@ -34,7 +42,7 @@ export default async function Profile({ params }: ProfileRouteProps) {
         </main>
 
         <aside style={{ "--sidebar-width": "24rem" } as React.CSSProperties} className="w-96 shrink-0">
-          <LeftSidebarProfile 
+          <RightSidebarProfile 
             preloadedProfile={preloadedProfile} 
             preloadedCurrentUser={preloadedCurrentUser} 
           />
