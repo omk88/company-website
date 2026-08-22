@@ -96,8 +96,19 @@ export function RightSidebarProfile({ preloadedProfile, preloadedCurrentUser }: 
         style={{ height: "calc(100vh - 4rem)" }}
       >
         <SidebarContent className="!p-0 bg-white">
-          <div className="m-3 p-3 rounded-xl bg-zinc-50/80">
+          <div className="relative m-3 p-3 rounded-xl bg-zinc-50/80">
             
+            {isOwnProfile && (
+              <div className="absolute top-3 right-3 flex items-center z-10">
+                <ProfileSettingsButton />
+                <EditProfileButton
+                  profile={profile}
+                  avatarSrc={avatarSrc || ""}
+                  defaultAvatarSrc={defaultAvatarSrc || ""}
+                />
+              </div>
+            )}
+
             <div className="p-2 pb-0">
               <div className="flex flex-row items-center gap-4 w-full">
                 <div className="h-16 w-16 border-2 border-muted rounded-full overflow-hidden bg-muted relative shrink-0">
@@ -109,7 +120,8 @@ export function RightSidebarProfile({ preloadedProfile, preloadedCurrentUser }: 
                   />
                 </div>
 
-                <div className="relative w-full">
+                {/* Added `pr-14` to prevent text from overlapping the top-right buttons */}
+                <div className="w-full pr-14">
                   <div className="flex flex-col w-full">
                     <h4 className="text-base font-semibold text-foreground tracking-tight">
                       {displayName || profile.username}
@@ -133,17 +145,6 @@ export function RightSidebarProfile({ preloadedProfile, preloadedCurrentUser }: 
                       </TooltipProvider>
                     </div>
                   </div>
-
-                  {isOwnProfile && (
-                    <div className="flex flex-row absolute right-0 top-0 items-center h-[1em]">
-                      <ProfileSettingsButton />
-                      <EditProfileButton
-                        profile={profile}
-                        avatarSrc={avatarSrc || ""}
-                        defaultAvatarSrc={defaultAvatarSrc || ""}
-                      />
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
@@ -253,7 +254,7 @@ export function RightSidebarProfile({ preloadedProfile, preloadedCurrentUser }: 
                             <span>Skills</span>
                           </div>
 
-                          <div className="flex flex-wrap gap-1 items-center">
+                          <div className="flex flex-wrap gap-2 items-center">
                             {profile.skills?.map((skill, index) => (
                               <Badge 
                                 key={index} 
