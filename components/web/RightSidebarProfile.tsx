@@ -9,7 +9,7 @@ import {
   GraduationCap, 
   Wrench,
   Globe,
-  Link as LinkIcon
+  Link as LinkIcon,
 } from "lucide-react";
 import { 
   FaInstagram, 
@@ -24,9 +24,9 @@ import { api } from "@/convex/_generated/api";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { FollowButton } from "./FollowButton";
 import { cn } from "@/lib/utils";
-import { useMetricStore } from "@/stores/useMetricStore";
 import { ProfileSettingsButton } from "./ProfileSettingsButton";
 import Link from "next/link";
+import { Badge } from "../ui/badge";
 
 interface RightSidebarProfileProps {
   preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
@@ -214,7 +214,7 @@ export function RightSidebarProfile({ preloadedProfile, preloadedCurrentUser }: 
                       {hasExtraSocials && (
                         <div className="flex flex-col gap-1.5">
                           {additionalSocials.map((social, index) => (
-                            <div className="flex items-center gap-1.5 text-xs" key={index}>
+                            <div className="flex items-center gap-1.5 text-sm" key={index}>
                               <SocialPlatformIcon 
                                 platform={social.platform} 
                                 className="w-4 h-4 shrink-0 text-foreground" 
@@ -235,10 +235,10 @@ export function RightSidebarProfile({ preloadedProfile, preloadedCurrentUser }: 
                       {hasEducation && (
                         <div className="flex flex-col gap-2">
                           {profile.education?.map((item, index) => (
-                            <div className="flex items-start gap-1.5 text-xs text-muted-foreground" key={index}>
+                            <div className="flex items-start gap-1.5 text-sm text-muted-foreground" key={index}>
                               <GraduationCap className="w-4 h-4 stroke-[2.3] shrink-0 text-foreground mt-0.5" />
                               <div>
-                                <p className="font-medium text-foreground">{item.degree} in {item.subject}</p>
+                                <p className="text-foreground">{item.degree} in {item.subject}</p>
                                 <p>{item.institution}</p>
                               </div>
                             </div>
@@ -248,29 +248,29 @@ export function RightSidebarProfile({ preloadedProfile, preloadedCurrentUser }: 
 
                       {hasSkills && (
                         <div className="flex flex-col gap-1.5">
-                          <div className="flex items-center gap-1.5 text-xs font-medium text-foreground">
+                          <div className="flex items-center gap-1.5 text-sm font-medium text-foreground">
                             <Wrench className="w-4 h-4 stroke-[2.3] shrink-0" />
                             <span>Skills</span>
                           </div>
-                          <div className="flex flex-wrap gap-1">
+
+                          <div className="flex flex-wrap gap-1 items-center">
                             {profile.skills?.map((skill, index) => (
-                              <span 
+                              <Badge 
                                 key={index} 
-                                className="text-xs bg-secondary text-secondary-foreground px-2 py-0.5 rounded-md font-medium"
+                                variant="outline" 
+                                className="font-sans px-1.5 py-0.5 whitespace-nowrap border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                               >
-                                {skill}
-                              </span>
+                                <span className="capitalize">{skill}</span>
+                              </Badge>
                             ))}
                           </div>
                         </div>
                       )}
-
                     </div>
                   </div>
                 </div>
               )}
             </div>
-
           </div>
         </SidebarContent>
         <SidebarFooter className="hidden" />
