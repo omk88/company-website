@@ -101,7 +101,7 @@ export const getProfileByUsername = query({
 
     const identity = await ctx.auth.getUserIdentity();
 
-    const [currentProfile, bookmarkCount, articleCount, commentCount] = await Promise.all([
+    const [currentProfile, bookmarks, blogs, comments] = await Promise.all([
       identity
         ? ctx.db
             .query("profiles")
@@ -111,26 +111,21 @@ export const getProfileByUsername = query({
       ctx.db
         .query("bookmarks")
         .withIndex("by_user", (q) => q.eq("userId", profile.userId))
-        .collect()
-        .then((items) => items.length), 
+        .collect(),
       ctx.db
         .query("blogs")
         .withIndex("by_author", (q) => q.eq("author", profile.userId))
-        .collect()
-        .then((items) => items.length),
+        .collect(),
       ctx.db
         .query("comments")
         .withIndex("by_authorId", (q) => q.eq("authorId", profile.userId))
-        .collect()
-        .then((items) => items.length),
+        .collect(),
     ]);
 
-    let isFollowing = false;
-    let isBell = false;
     const isSelf = currentProfile?._id === profile._id;
 
-    const followPromise = currentProfile && !isSelf
-      ? ctx.db
+    const followRecord = currentProfile && !isSelf
+      ? await ctx.db
           .query("follows")
           .withIndex("by_follower_and_following", (q) =>
             q.eq("followerId", currentProfile._id).eq("followingId", profile._id)
@@ -138,16 +133,10 @@ export const getProfileByUsername = query({
           .unique()
       : null;
 
-    const [followRecord, picStorageUrl, defaultPicStorageUrl] = await Promise.all([
-      followPromise,
+    const [picStorageUrl, defaultPicStorageUrl] = await Promise.all([
       profile.profilePic ? ctx.storage.getUrl(profile.profilePic) : null,
       profile.defaultProfilePic ? ctx.storage.getUrl(profile.defaultProfilePic) : null,
     ]);
-
-    if (followRecord) {
-      isFollowing = true;
-      isBell = followRecord.isBell;
-    }
 
     return { 
       profilePicture: picStorageUrl, 
@@ -162,12 +151,12 @@ export const getProfileByUsername = query({
         skills: profile.skills,
         socials: profile.socials,
       },
-      bookmarkCount,
-      articleCount,
-      commentCount,
+      bookmarkCount: bookmarks.length,
+      articleCount: blogs.length,
+      commentCount: comments.length,
       viewerStatus: {
-        isFollowing,
-        isBell,
+        isFollowing: Boolean(followRecord),
+        isBell: followRecord?.isBell ?? false,
         isSelf,
       },
     };
@@ -458,6 +447,17 @@ export const toggleBell = mutation({
     });
 
     return { isBell: newBellState };
+  },
+});
+
+export const getAllUsernames = query({
+  args: {},
+  handler: async (ctx) => {
+    const profiles = await ctx.db.query("profiles").collect();
+
+    return profiles
+      .map((profile) => profile.username)
+      .filter((username): username is string => Boolean(username));
   },
 });
 

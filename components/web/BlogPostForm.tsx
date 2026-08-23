@@ -124,13 +124,6 @@ function LivePostPreview({ control, previewImage, currentUser }: { control: Cont
 
                         <span>&middot;</span>
 
-                        <time dateTime={new Date().toISOString()}>
-                            {new Date().toLocaleDateString("en-US", {
-                                month: "short",
-                                day: "numeric",
-                                year: "numeric",
-                            })}
-                        </time>
                     </div>
 
                     <span className="text-xs sm:text-sm text-zinc-500 font-medium">

@@ -4,12 +4,8 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "next-themes";
 import GridBackground from "@/components/web/GridBackground"; 
-import { ConvexClientProvider } from "./ConvexClientProvider";
 import dynamic from "next/dynamic";
-import { Suspense } from "react";
-import { api } from "@/convex/_generated/api";
-import { getToken, preloadAuthQuery } from "@/lib/auth-server";
-import { AuthProvider } from "@/components/web/AuthProvider";
+import { ConvexClientProvider } from "./ConvexClientProvider";
 
 const Navbar = dynamic(() => import("@/components/web/Navbar").then((mod) => mod.Navbar), {
   ssr: true,
@@ -63,10 +59,10 @@ export default function RootLayout({
         >
           <GridBackground>
             <main>
-              <AuthProvider>
+              <ConvexClientProvider>
                 <Navbar />
                 {children}
-              </AuthProvider>
+              </ConvexClientProvider>
             </main>
           </GridBackground>
           <Toaster />
