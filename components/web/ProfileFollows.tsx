@@ -30,7 +30,7 @@ export function ProfileFollows({ profile, currentUser }: ProfileFollowsProps) {
 
   return (
     <div className="flex flex-col flex-1 h-full min-h-0 w-full">
-      <div className="flex items-center justify-start gap-4 w-full border-b border-border mb-4 shrink-0">
+      <div className="flex items-center justify-start gap-4 w-full border-b border-border mb-4 px-6 shrink-0">
         <button
           type="button"
           onClick={() => setSelectedFollows("followers")}
@@ -58,11 +58,13 @@ export function ProfileFollows({ profile, currentUser }: ProfileFollowsProps) {
         </button>
       </div>
 
-      {selectedFollows === "followers" ? (
-        <FollowersList profileId={profile?.profile?._id} currentProfileId={currentProfileId} />
-      ) : (
-        <FollowingList profileId={profile?.profile?._id} currentProfileId={currentProfileId} />
-      )}
+      <div className="w-full max-w-2xl mx-auto px-6 flex-1">
+        {selectedFollows === "followers" ? (
+          <FollowersList profileId={profile?.profile?._id} currentProfileId={currentProfileId} />
+        ) : (
+          <FollowingList profileId={profile?.profile?._id} currentProfileId={currentProfileId} />
+        )}
+      </div>
     </div>
   );
 }

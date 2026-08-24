@@ -33,7 +33,7 @@ export function ProfileContent({ preloadedProfile, preloadedCurrentUser }: Profi
   };
 
   return (
-    <div className="flex flex-col flex-1 w-full max-w-[600px] p-2">
+    <div className="flex flex-col flex-1">
       {renderActiveTab()}
     </div>
   );

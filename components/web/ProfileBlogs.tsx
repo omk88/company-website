@@ -37,7 +37,8 @@ export function ProfileBlogs({ profile }: ProfileBlogsProps) {
 
   return (
     <div className="flex flex-col flex-1 h-full min-h-0 w-full">
-      <div className="flex items-center justify-start gap-4 w-full border-b border-border mb-4">
+      {/* 1. Full-width border header with horizontal padding */}
+      <div className="flex items-center justify-start gap-4 w-full border-b border-border mb-4 px-6">
         <div
           className={cn(
             "relative flex items-center gap-1.5 pb-2 pt-1.5 px-1 font-sans text-sm font-medium text-foreground",
@@ -49,45 +50,48 @@ export function ProfileBlogs({ profile }: ProfileBlogsProps) {
         </div>
       </div>
 
-      {isFirstLoad && displayResults.length === 0 ? (
-        <ul className="flex flex-col gap-2">
-          {[1, 2, 3].map((i) => (
-            <li key={i}>
-              <CompactBlogCardSkeleton />
-            </li>
-          ))}
-        </ul>
-      ) : displayResults.length === 0 ? (
-        <div className="flex flex-col flex-1 h-full min-h-0">
-          <EmptyState size="sm" description="This user hasn't posted any insights yet." />
-        </div>
-      ) : (
-        <>
+      {/* 2. Constrained max-w-2xl container strictly for cards */}
+      <div className="w-full max-w-2xl mx-auto px-6 flex-1">
+        {isFirstLoad && displayResults.length === 0 ? (
           <ul className="flex flex-col gap-2">
-            {displayResults.map((blog: any) => (
-              <li key={blog._id}>
-                <BlogCard
-                  id={blog._id}
-                  imageUrl={blog.imageUrl}
-                  displayName={blog.displayName}
-                  username={blog.username}
-                  title={blog.title}
-                  subtitle={blog.subtitle}
-                  totalViews={blog.totalViews}
-                  likes={blog.likes}
-                  commentCount={blog.commentCount}
-                  date={blog._creationTime}
-                  readTime={blog.readTime}
-                  tags={blog.tags}
-                  variant="compact"
-                />
+            {[1, 2, 3].map((i) => (
+              <li key={i}>
+                <CompactBlogCardSkeleton />
               </li>
             ))}
           </ul>
+        ) : displayResults.length === 0 ? (
+          <div className="flex flex-col flex-1 h-full min-h-0">
+            <EmptyState size="sm" description="This user hasn't posted any insights yet." />
+          </div>
+        ) : (
+          <>
+            <ul className="flex flex-col gap-2">
+              {displayResults.map((blog: any) => (
+                <li key={blog._id}>
+                  <BlogCard
+                    id={blog._id}
+                    imageUrl={blog.imageUrl}
+                    displayName={blog.displayName}
+                    username={blog.username}
+                    title={blog.title}
+                    subtitle={blog.subtitle}
+                    totalViews={blog.totalViews}
+                    likes={blog.likes}
+                    commentCount={blog.commentCount}
+                    date={blog._creationTime}
+                    readTime={blog.readTime}
+                    tags={blog.tags}
+                    variant="compact"
+                  />
+                </li>
+              ))}
+            </ul>
 
-          <div ref={loadMoreRef} className="w-full" />
-        </>
-      )}
+            <div ref={loadMoreRef} className="w-full" />
+          </>
+        )}
+      </div>
     </div>
   );
 }

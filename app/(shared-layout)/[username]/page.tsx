@@ -33,7 +33,7 @@ export default async function Profile({ params }: ProfileRouteProps) {
       
       <div className="flex w-full min-h-screen">
         <main className="flex-1 bg-white pt-16 flex justify-center">
-          <div className="w-full max-w-2xl px-6 mx-auto">
+          <div className="w-full mx-auto">
             <ProfileContent 
               preloadedProfile={preloadedProfile} 
               preloadedCurrentUser={preloadedCurrentUser} 
