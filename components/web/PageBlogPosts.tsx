@@ -1,42 +1,26 @@
-"use client";
+import { preloadQuery } from "convex/nextjs";
+import { api } from "@/convex/_generated/api";
+import { BlogFeedWrapper } from "./BlogFeedWrapper";
+import { connection } from "next/server";
 
-import { BlogFeed } from "./BlogFeed";
-import { useSearchStore, FeedType } from "@/stores/useSearchStore";
+export async function PageBlogPosts() {
 
-const FEEDS: { id: FeedType; dbPostType?: "community" | "team"; isPopularOnly?: boolean }[] = [
-  { id: "all" },
-  { id: "popular", isPopularOnly: true },
-  { id: "team", dbPostType: "team" },
-  { id: "community", dbPostType: "community" },
-];
-
-export function PageBlogPosts() {
-  const feedType = useSearchStore((state) => state.feedType);
-  const searchTerm = useSearchStore((state) => state.searchTerm);
-  const activeTags = useSearchStore((state) => state.activeTags);
-  const sortOrder = useSearchStore((state) => state.sortOrder);
+  await connection();
+  
+  const preloadedData = await preloadQuery(
+    api.blogs.getPaginatedPostsByType,
+    {
+      sortOrder: "new",
+      paginationOpts: {
+        numItems: 6,
+        cursor: null,
+      },
+    }
+  );
 
   return (
     <div className="flex flex-col flex-1 h-full min-h-0 p-2">
-      {FEEDS.map((feed) => {
-        const isActive = feedType === feed.id;
-
-        return (
-          <div 
-            key={feed.id} 
-            className={isActive ? "flex flex-col flex-1 h-full min-h-0" : "hidden"}
-          >
-            <BlogFeed
-              postType={feed.dbPostType}
-              isPopularOnly={feed.isPopularOnly}
-              searchTerm={searchTerm}
-              activeTags={activeTags}
-              sortOrder={sortOrder}
-              isActive={isActive}
-            />
-          </div>
-        );
-      })}
+      <BlogFeedWrapper preloadedData={preloadedData} />
     </div>
-  );
+  )
 }

@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { RightSidebarProfile } from "@/components/web/RightSidebarProfile";
 import { api } from "@/convex/_generated/api";
@@ -11,7 +12,7 @@ interface ProfileRouteProps {
   }>;
 }
 
-export default async function Profile({ params }: ProfileRouteProps) {
+async function ProfileView({ params }: ProfileRouteProps) {
   const { username } = await params;
 
   const [preloadedProfile, preloadedCurrentUser] = await Promise.all([
@@ -26,8 +27,8 @@ export default async function Profile({ params }: ProfileRouteProps) {
         style={{ "--sidebar-width": "12.8rem" } as React.CSSProperties}
       >
         <LeftSidebarProfile
-            preloadedProfile={preloadedProfile} 
-            preloadedCurrentUser={preloadedCurrentUser} 
+          preloadedProfile={preloadedProfile} 
+          preloadedCurrentUser={preloadedCurrentUser} 
         />
       </aside>
       
@@ -49,5 +50,13 @@ export default async function Profile({ params }: ProfileRouteProps) {
         </aside>
       </div>
     </SidebarProvider>
+  );
+}
+
+export default function Profile({ params }: ProfileRouteProps) {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-white" />}>
+      <ProfileView params={params} />
+    </Suspense>
   );
 }

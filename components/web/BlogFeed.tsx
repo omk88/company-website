@@ -15,6 +15,7 @@ interface BlogFeedProps {
   sortOrder: string;
   isActive: boolean;
   isInitialFeed?: boolean;
+  preloadedData?: any; 
 }
 
 export function BlogFeed(props: BlogFeedProps) {
@@ -30,7 +31,7 @@ function StandardBlogFeed({
   isActive,
   preloadedData,
   isInitialFeed,
-}: BlogFeedProps & { preloadedData?: any }) {
+}: BlogFeedProps) {
   const trimmedSearch = searchTerm.trim();
 
   const { results, status, loadMore } = usePaginatedQuery(
@@ -38,7 +39,7 @@ function StandardBlogFeed({
     {
       postType,
       isPopularOnly,
-      searchTerm: searchTerm.trim() || undefined,
+      searchTerm: trimmedSearch || undefined,
       activeTags: activeTags.length > 0 ? activeTags : undefined,
       sortOrder,
     },
@@ -50,6 +51,7 @@ function StandardBlogFeed({
     trimmedSearch.length > 0 ||
     activeTags.length > 0 ||
     sortOrder !== "new";
+
   const canUsePreloadedData =
     Boolean(isInitialFeed) && Boolean(preloadedData) && !hasActiveFilters;
 
@@ -58,11 +60,15 @@ function StandardBlogFeed({
     lastResultsRef.current = results;
   }
 
+  const preloadedItems = Array.isArray(preloadedData)
+    ? preloadedData
+    : preloadedData?.page ?? [];
+
   const displayResults =
     results.length > 0
       ? results
       : isFirstLoad && canUsePreloadedData
-      ? preloadedData.page
+      ? preloadedItems
       : lastResultsRef.current;
 
   const loadMoreRef = useRef<HTMLDivElement>(null);
