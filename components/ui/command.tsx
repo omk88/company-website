@@ -15,7 +15,7 @@ import {
   InputGroup,
   InputGroupAddon,
 } from "@/components/ui/input-group"
-import { SearchIcon, CheckIcon } from "lucide-react"
+import { SearchIcon, CheckIcon, XIcon } from "lucide-react"
 
 function Command({
   className,
@@ -65,24 +65,43 @@ function CommandDialog({
   )
 }
 
+interface CommandInputProps
+  extends React.ComponentProps<typeof CommandPrimitive.Input> {
+  onClear?: () => void;
+  showClear?: boolean;
+}
+
 function CommandInput({
   className,
+  onClear,
+  showClear = false,
   ...props
-}: React.ComponentProps<typeof CommandPrimitive.Input>) {
+}: CommandInputProps) {
   return (
     <div data-slot="command-input-wrapper" className="p-1 pb-0">
-      <InputGroup className="h-8! rounded-lg! border-input/30 bg-input/30 shadow-none! *:data-[slot=input-group-addon]:pl-2!">
+      <InputGroup className="h-8! rounded-lg! border-input/30 bg-input/30 shadow-none! *:data-[slot=input-group-addon]:pl-2! relative flex items-center">
+        <InputGroupAddon>
+          <SearchIcon className="size-4 shrink-0 opacity-50" />
+        </InputGroupAddon>
+        
         <CommandPrimitive.Input
           data-slot="command-input"
           className={cn(
-            "w-full text-sm outline-hidden disabled:cursor-not-allowed disabled:opacity-50",
+            "w-full text-sm outline-hidden disabled:cursor-not-allowed disabled:opacity-50 pr-6",
             className
           )}
           {...props}
         />
-        <InputGroupAddon>
-          <SearchIcon className="size-4 shrink-0 opacity-50" />
-        </InputGroupAddon>
+
+        {showClear && (
+          <button
+            type="button"
+            onClick={onClear}
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer rounded-sm p-0.5 hover:bg-muted transition-colors z-10"
+          >
+            <XIcon className="size-3.5 shrink-0 stroke-[2]" />
+          </button>
+        )}
       </InputGroup>
     </div>
   )

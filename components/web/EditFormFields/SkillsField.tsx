@@ -64,7 +64,7 @@ export const SkillsFields: React.FC<SkillsFieldsProps> = ({
             variant="outline"
             role="combobox"
             aria-expanded={comboboxOpen}
-            className="w-full justify-between font-normal text-muted-foreground h-9 bg-white"
+            className="cursor-pointer w-full justify-between font-normal text-zinc-600 dark:text-zinc-400 h-9 text-sm"
             disabled={watchedSkills.length >= 6}
           >
             {watchedSkills.length >= 6 
@@ -80,10 +80,13 @@ export const SkillsFields: React.FC<SkillsFieldsProps> = ({
               className="text-xs" 
               value={searchQuery}
               onValueChange={setSearchQuery}
+              showClear={Boolean(searchQuery)}
+              onClear={() => setSearchQuery("")}
             />
+            
             <CommandList>
               {filteredSkills.length === 0 && (
-                <CommandEmpty>No tech skill found.</CommandEmpty>
+                <CommandEmpty>No skills found.</CommandEmpty>
               )}
               
               <CommandGroup className="max-h-[200px] overflow-y-auto">
@@ -112,7 +115,7 @@ export const SkillsFields: React.FC<SkillsFieldsProps> = ({
       </Popover>
 
       <div className="relative w-full mt-2">
-        <div className="min-h-[135px] max-h-[165px] overflow-y-auto border border-dashed rounded-md p-2 pr-9 bg-muted/10 flex flex-wrap gap-1.5 content-start transition-all">
+        <div className="min-h-[135px] max-h-[165px] overflow-y-auto border rounded-md p-2 pr-9 flex flex-wrap gap-1.5 content-start transition-all">
           {watchedSkills.map((skill) => (
             <Badge 
               key={skill} 
@@ -123,7 +126,7 @@ export const SkillsFields: React.FC<SkillsFieldsProps> = ({
               <button
                 type="button"
                 onClick={() => handleToggleSkill(skill)}
-                className="hover:bg-muted rounded-full p-0.5 transition-colors"
+                className="cursor-pointer hover:bg-muted rounded-full p-0.5 transition-colors"
               >
                 <Plus className="h-3 w-3 rotate-45 text-muted-foreground hover:text-foreground" />
               </button>
@@ -131,8 +134,8 @@ export const SkillsFields: React.FC<SkillsFieldsProps> = ({
           ))}
           
           {watchedSkills.length === 0 && (
-            <p className="text-xs text-muted-foreground italic self-center pl-1">
-              No skills selected yet.
+            <p className="text-xs text-muted-foreground self-center pl-1">
+              No skills added yet.
             </p>
           )}
         </div>
@@ -141,7 +144,7 @@ export const SkillsFields: React.FC<SkillsFieldsProps> = ({
           <button 
             onClick={handleClearAllSkills} 
             type="button" 
-            className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted"
+            className="cursor-pointer absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted"
           >
             <X className="h-3.5 w-3.5 stroke-[2]" />
           </button>

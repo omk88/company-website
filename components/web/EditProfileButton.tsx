@@ -64,7 +64,7 @@ const profileFormSchema = z.object({
         }
       });
     }),
-  skills: z.array(z.string()).max(10, "You can add up to 10 skills"),
+  skills: z.array(z.string()).max(6, "You can add up to 6 skills"),
   socials: z
     .array(
       z.object({
@@ -216,8 +216,6 @@ export function EditProfileDialog({ profile, avatarSrc, defaultAvatarSrc, childr
       form.clearErrors("username");
     }
   }, [isUsernameTaken, shouldCheckUsername, form]);
-
-  /* --------------------------- Form Field Arrays --------------------------- */
 
   const { fields: socialFields, append: appendSocial, remove: removeSocial, update: updateSocial } = useFieldArray({
     control: form.control,
