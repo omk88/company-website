@@ -70,6 +70,10 @@ export function RightSidebarProfile({ preloadedProfile, preloadedCurrentUser }: 
   const avatarSrc = profileData.profilePicture;
   const defaultAvatarSrc = profileData.defaultProfilePicture;
 
+  console.log("Resolved Storage URLs:", { avatarSrc, defaultAvatarSrc });
+
+  const displayAvatar = avatarSrc || defaultAvatarSrc;
+
   const isFollowing = profileData.viewerStatus.isFollowing;
   const isBell = profileData.viewerStatus.isBell;
   const isSelf = profileData.viewerStatus.isSelf;
@@ -88,7 +92,6 @@ export function RightSidebarProfile({ preloadedProfile, preloadedCurrentUser }: 
 
   const hasExpandableContent = hasEducation || hasSkills || hasExtraSocials;
   const formattedDate = dateFormatter.format(profile._creationTime);
-  const finalAvatar = avatarSrc || defaultAvatarSrc || "";
 
   return (
     <Sidebar
@@ -113,16 +116,19 @@ export function RightSidebarProfile({ preloadedProfile, preloadedCurrentUser }: 
 
           <div className="p-2 pb-0">
             <div className="flex flex-row items-center gap-4 w-full">
-              <div className="h-16 w-16 border-2 border-muted rounded-full overflow-hidden bg-muted relative shrink-0">
-                {finalAvatar && (
+              <div className="relative h-16 w-16 shrink-0 rounded-full overflow-hidden border-2 border-muted bg-muted">
+                {displayAvatar ? (
                   <Image
-                    src={finalAvatar}
+                    src={displayAvatar}
                     alt={`${displayName || profile.username}'s avatar`}
                     fill
                     sizes="64px"
                     priority
                     className="object-cover rounded-full"
+                    unoptimized
                   />
+                ) : (
+                  <div className="h-full w-full bg-zinc-200" />
                 )}
               </div>
 

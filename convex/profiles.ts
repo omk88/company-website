@@ -90,7 +90,7 @@ export const getProfileByUsername = query({
     if (!profile) {
       return {
         profilePicture: null,
-        defaultProfilePicture: null,  
+        defaultProfilePicture: null,
         profile: null,
         bookmarkCount: 0,
         articleCount: 0,
@@ -101,46 +101,47 @@ export const getProfileByUsername = query({
 
     const identity = await ctx.auth.getUserIdentity();
 
-    const [currentProfile, bookmarks, blogs, comments] = await Promise.all([
-      identity
-        ? ctx.db
-            .query("profiles")
-            .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
-            .unique()
-        : null,
-      ctx.db
-        .query("bookmarks")
-        .withIndex("by_user", (q) => q.eq("userId", profile.userId))
-        .collect(),
-      ctx.db
-        .query("blogs")
-        .withIndex("by_author", (q) => q.eq("author", profile.userId))
-        .collect(),
-      ctx.db
-        .query("comments")
-        .withIndex("by_authorId", (q) => q.eq("authorId", profile.userId))
-        .collect(),
-    ]);
+    const [currentProfile, bookmarks, blogs, comments, picStorageUrl, defaultPicStorageUrl] =
+      await Promise.all([
+        identity
+          ? ctx.db
+              .query("profiles")
+              .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
+              .unique()
+          : null,
+        ctx.db
+          .query("bookmarks")
+          .withIndex("by_user", (q) => q.eq("userId", profile.userId))
+          .collect(),
+        ctx.db
+          .query("blogs")
+          .withIndex("by_author", (q) => q.eq("author", profile.userId))
+          .collect(),
+        ctx.db
+          .query("comments")
+          .withIndex("by_authorId", (q) => q.eq("authorId", profile.userId))
+          .collect(),
+        // Get profilePic URL if storage ID exists, otherwise return null
+        profile.profilePic ? ctx.storage.getUrl(profile.profilePic) : null,
+        // defaultProfilePic is guaranteed to exist as a storage ID
+        ctx.storage.getUrl(profile.defaultProfilePic),
+      ]);
 
     const isSelf = currentProfile?._id === profile._id;
 
-    const followRecord = currentProfile && !isSelf
-      ? await ctx.db
-          .query("follows")
-          .withIndex("by_follower_and_following", (q) =>
-            q.eq("followerId", currentProfile._id).eq("followingId", profile._id)
-          )
-          .unique()
-      : null;
+    const followRecord =
+      currentProfile && !isSelf
+        ? await ctx.db
+            .query("follows")
+            .withIndex("by_follower_and_following", (q) =>
+              q.eq("followerId", currentProfile._id).eq("followingId", profile._id)
+            )
+            .unique()
+        : null;
 
-    const [picStorageUrl, defaultPicStorageUrl] = await Promise.all([
-      profile.profilePic ? ctx.storage.getUrl(profile.profilePic) : null,
-      profile.defaultProfilePic ? ctx.storage.getUrl(profile.defaultProfilePic) : null,
-    ]);
-
-    return { 
-      profilePicture: picStorageUrl, 
-      defaultProfilePicture: defaultPicStorageUrl, 
+    return {
+      profilePicture: picStorageUrl,
+      defaultProfilePicture: defaultPicStorageUrl,
       profile: {
         ...profile,
         displayName: profile.displayName,

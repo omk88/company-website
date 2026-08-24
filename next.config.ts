@@ -5,17 +5,21 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: '*.eu-west-1.convex.site',
-        port: '',
-        pathname: '/**',
+        protocol: "https",
+        hostname: "groovy-peacock-979.eu-west-1.convex.cloud",
       },
       {
-        protocol: 'https',
-        hostname: '*.eu-west-1.convex.cloud',
-        port: '',
-        pathname: '/**',
-      }
+        protocol: "https",
+        hostname: "groovy-peacock-979.eu-west-1.convex.site",
+      },
+      {
+        protocol: "https",
+        hostname: "**.convex.cloud",
+      },
+      {
+        protocol: "https",
+        hostname: "**.convex.site",
+      },
     ],
   },
   compiler: {
