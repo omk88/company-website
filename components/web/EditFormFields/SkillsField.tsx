@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useDeferredValue } from "react";
 import { useFormContext } from "react-hook-form";
 import { ChevronsUpDown, Check, Plus, X } from "lucide-react"; 
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,7 @@ export const SkillsFields: React.FC<SkillsFieldsProps> = ({
 
   const watchedSkills: string[] = watch("skills") || [];
   const [searchQuery, setSearchQuery] = useState("");
+  const deferredQuery = useDeferredValue(searchQuery);
 
   useEffect(() => {
     if (!comboboxOpen) {
@@ -30,8 +31,26 @@ export const SkillsFields: React.FC<SkillsFieldsProps> = ({
     }
   }, [comboboxOpen]);
 
+  const watchedSkillsSet = useMemo(() => new Set(watchedSkills), [watchedSkills]);
+
+  const filteredSkills = useMemo(() => {
+    if (!deferredQuery.trim()) return ALLOWED_SKILLS.slice(0, 20);
+
+    const query = deferredQuery.toLowerCase();
+    const result: string[] = [];
+
+    for (let i = 0; i < ALLOWED_SKILLS.length; i++) {
+      if (ALLOWED_SKILLS[i].toLowerCase().includes(query)) {
+        result.push(ALLOWED_SKILLS[i]);
+        if (result.length === 20) break;
+      }
+    }
+
+    return result;
+  }, [ALLOWED_SKILLS, deferredQuery]);
+
   const handleToggleSkill = (skill: string) => {
-    const isSelected = watchedSkills.includes(skill);
+    const isSelected = watchedSkillsSet.has(skill);
     let updatedSkills: string[];
 
     if (isSelected) {
@@ -47,10 +66,6 @@ export const SkillsFields: React.FC<SkillsFieldsProps> = ({
   const handleClearAllSkills = () => {
     setValue("skills", [], { shouldValidate: true });
   };
-
-  const filteredSkills = ALLOWED_SKILLS.filter((skill) =>
-    skill.toLowerCase().includes(searchQuery.toLowerCase())
-  ).slice(0, 20);
 
   return (
     <Field>
@@ -91,13 +106,13 @@ export const SkillsFields: React.FC<SkillsFieldsProps> = ({
               
               <CommandGroup className="max-h-[200px] overflow-y-auto">
                 {filteredSkills.map((skill) => {
-                  const isSelected = watchedSkills.includes(skill);
+                  const isSelected = watchedSkillsSet.has(skill);
                   return (
                     <CommandItem
                       key={skill}
                       value={skill}
                       onSelect={() => handleToggleSkill(skill)}
-                      className="text-xs"
+                      className="cursor-pointer text-xs"
                     >
                       <Check
                         className={`mr-2 h-3.5 w-3.5 ${
@@ -119,8 +134,8 @@ export const SkillsFields: React.FC<SkillsFieldsProps> = ({
           {watchedSkills.map((skill) => (
             <Badge 
               key={skill} 
-              variant="secondary" 
-              className="text-[11px] px-2 py-0.5 flex items-center gap-1 bg-secondary/50 h-6 select-none shrink-0"
+              variant="outline" 
+              className="font-mono text-[10px] px-1.5 py-0.5 whitespace-nowrap border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300"
             >
               {skill}
               <button

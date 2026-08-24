@@ -267,9 +267,9 @@ export function RightSidebarProfile({ preloadedProfile, preloadedCurrentUser }: 
                         <div className="flex flex-wrap gap-2 items-center">
                           {profile.skills?.map((skill, index) => (
                             <Badge 
-                              key={index} 
+                              key={skill} 
                               variant="outline" 
-                              className="font-sans px-1.5 py-0.5 whitespace-nowrap border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                              className="font-mono text-[10px] px-1.5 py-0.5 whitespace-nowrap border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300"
                             >
                               <span className="capitalize">{skill}</span>
                             </Badge>
