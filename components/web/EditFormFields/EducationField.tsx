@@ -117,11 +117,17 @@ export const EducationFields: React.FC<EducationFieldsProps> = ({
             return (
               <div key={field.id} className="flex items-center justify-between p-2.5 border rounded-md bg-secondary/20">
                 <div className="flex items-start gap-2.5 overflow-hidden pr-2">
-                  <GraduationCap className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+                  <GraduationCap className="h-4 w-4 text-foreground shrink-0 mt-0.5" />
                   
-                  <p className="text-xs text-foreground break-words whitespace-normal">
-                    {displayDegree} in {selectedSubject} from {selectedInstitution}
-                  </p>
+                  <div className="flex flex-col">
+                    <span className="text-xs text-foreground break-words whitespace-normal">
+                      {displayDegree} {selectedSubject}
+                    </span>
+
+                    <span className="text-xs text-zinc-600 dark:text-zinc-400">
+                      {selectedInstitution}
+                    </span>
+                  </div>
                 </div>
                 <Button
                   type="button"
