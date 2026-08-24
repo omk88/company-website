@@ -1,19 +1,18 @@
-import { Suspense } from "react";
+import { connection } from "next/server";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { RightSidebarProfile } from "@/components/web/RightSidebarProfile";
 import { api } from "@/convex/_generated/api";
 import { preloadAuthQuery } from "@/lib/auth-server";
-import { ProfileContent } from "@/components/web/ProfileContent";
 import { LeftSidebarProfile } from "@/components/web/LeftSidebarProfile";
+import { ProfileContent } from "@/components/web/ProfileContent";
+import { RightSidebarProfile } from "@/components/web/RightSidebarProfile";
 
 interface ProfileRouteProps {
-  params: Promise<{
-    username: string;
-  }>;
+  params: Promise<{ username: string }>;
 }
 
-async function ProfileView({ params }: ProfileRouteProps) {
+export default async function Profile({ params }: ProfileRouteProps) {
   const { username } = await params;
+  await connection();
 
   const [preloadedProfile, preloadedCurrentUser] = await Promise.all([
     preloadAuthQuery(api.profiles.getProfileByUsername, { username }),
@@ -26,7 +25,7 @@ async function ProfileView({ params }: ProfileRouteProps) {
         className="shrink-0"
         style={{ "--sidebar-width": "12.8rem" } as React.CSSProperties}
       >
-        <LeftSidebarProfile
+        <LeftSidebarProfile 
           preloadedProfile={preloadedProfile} 
           preloadedCurrentUser={preloadedCurrentUser} 
         />
@@ -35,7 +34,7 @@ async function ProfileView({ params }: ProfileRouteProps) {
       <div className="flex w-full min-h-screen">
         <main className="flex-1 bg-white pt-16 flex justify-center">
           <div className="w-full max-w-2xl px-6 mx-auto">
-            <ProfileContent
+            <ProfileContent 
               preloadedProfile={preloadedProfile} 
               preloadedCurrentUser={preloadedCurrentUser} 
             />
@@ -50,13 +49,5 @@ async function ProfileView({ params }: ProfileRouteProps) {
         </aside>
       </div>
     </SidebarProvider>
-  );
-}
-
-export default function Profile({ params }: ProfileRouteProps) {
-  return (
-    <Suspense fallback={<div className="min-h-screen bg-white" />}>
-      <ProfileView params={params} />
-    </Suspense>
   );
 }

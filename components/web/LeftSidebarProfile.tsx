@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Preloaded, usePreloadedQuery, useQuery } from "convex/react";
+import { Preloaded, usePreloadedQuery } from "convex/react";
 import { toast } from "sonner";
 import { api } from "@/convex/_generated/api";
 import { useProfileStore, ProfileMetricType } from "@/stores/useProfileStore";
@@ -17,9 +17,6 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { SidebarSearch } from "@/components/web/SidebarSearch";
-import { SidebarSort } from "@/components/web/SidebarSort";
-import { SidebarTags } from "@/components/web/SidebarTags";
 
 import { Library, MessageSquareText, Bookmark, UsersRound, Plus } from "lucide-react";
 
@@ -53,18 +50,11 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: L
 
   const selectedMetric = useProfileStore((state) => state.selectedMetric);
   const setSelectedMetric = useProfileStore((state) => state.setSelectedMetric);
-
   const router = useRouter();
-  const userData = useQuery(api.auth.getCurrentUser);
 
   const handleCreatePostClick = () => {
-    if (!userData) {
-      toast.error("You must be logged in to create a post.", {
-        action: {
-          label: "Sign in",
-          onClick: () => router.push("/sign-in"),
-        },
-      });
+    if (!currentUser) {
+      toast.error("You must be logged in to create a post.");
       return;
     }
 
@@ -122,11 +112,8 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: L
             <div className="w-full px-1 py-1">
               <Separator />
             </div>
-            <SidebarSearch placeholder="insights" fullWidth={true} showDropdown={true} />
-            <SidebarSort fullWidth={true} />
-            <SidebarTags fullWidth={true} />
 
-            <div className="w-full pt-2">
+            <div className="w-full">
               <Button 
                 className="w-full h-9 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-[13px] font-medium cursor-pointer flex items-center justify-center gap-1.5 transition-all active:scale-[0.98]"
                 onClick={handleCreatePostClick}

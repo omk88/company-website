@@ -16,19 +16,25 @@ interface ProfileContentProps {
 export function ProfileContent({ preloadedProfile, preloadedCurrentUser }: ProfileContentProps) {
   const profileData = usePreloadedQuery(preloadedProfile);
   const currentUser = usePreloadedQuery(preloadedCurrentUser);
-
   const selectedMetric = useProfileStore((state) => state.selectedMetric);
 
-  const components = {
-    insights: <ProfileBlogs profile={profileData} />,
-    comments: <ProfileComments profile={profileData} />,
-    bookmarks: <ProfileBookmarks profile={profileData} />,
-    followers: <ProfileFollows profile={profileData} currentUser={currentUser} />
+  const renderActiveTab = () => {
+    switch (selectedMetric) {
+      case "comments":
+        return <ProfileComments profile={profileData} />;
+      case "bookmarks":
+        return <ProfileBookmarks profile={profileData} />;
+      case "followers":
+        return <ProfileFollows profile={profileData} currentUser={currentUser} />;
+      case "insights":
+      default:
+        return <ProfileBlogs profile={profileData} />;
+    }
   };
 
   return (
     <div className="flex flex-col flex-1 w-full max-w-[600px] p-2">
-      {components[selectedMetric as keyof typeof components] || <ProfileBlogs profile={profileData} />}
+      {renderActiveTab()}
     </div>
   );
 }

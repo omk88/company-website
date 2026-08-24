@@ -1,9 +1,7 @@
 import Link from "next/link";
-import { buttonVariants } from "../ui/button";
 import { ThemeToggle } from "./ThemeToggle";
 import { RxLinkedinLogo } from "react-icons/rx";
 import { AiOutlineInstagram } from "react-icons/ai";
-import { cn } from "@/lib/utils";
 import { FaXTwitter } from "react-icons/fa6";
 import { MobileMenu } from "./MobileMenu";
 import { NavbarAuthClient } from "./NavbarAuthClient";
