@@ -3,7 +3,7 @@
 import Link from "next/link"; 
 import Image from "next/image";
 import { api } from "@/convex/_generated/api";
-import { useQuery } from "convex/react";
+import { Preloaded, usePreloadedQuery, useQuery } from "convex/react";
 import { Eye, MessageSquare, ThumbsUp, TrendingUp } from "lucide-react";
 import { TrendingBlogsSkeleton } from "./LoadingSkeletons/TrendingBlogsSkeleton";
 
@@ -13,12 +13,8 @@ const compactFormatter = new Intl.NumberFormat("en", {
   maximumFractionDigits: 1,
 });
 
-export function TrendingBlogs() {
-  const trendingBlogs = useQuery(api.blogs.getTrendingPosts);
-
-  if (trendingBlogs === undefined) {
-    return <TrendingBlogsSkeleton count={3} />;
-  }
+export function TrendingBlogs({ preloadedData }: { preloadedData: Preloaded<typeof api.blogs.getTrendingPosts> }) {
+  const trendingBlogs = usePreloadedQuery(preloadedData) ?? [];
 
   if (trendingBlogs.length === 0) {
     return null;

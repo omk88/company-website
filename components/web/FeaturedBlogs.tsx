@@ -6,7 +6,7 @@ import { ArrowLeft, ArrowRight, Eye, MessageSquare, Sparkles, ThumbsUp } from "l
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { api } from "@/convex/_generated/api";
-import { useQuery } from "convex/react";
+import { Preloaded, usePreloadedQuery, useQuery } from "convex/react";
 import { ProfileHoverCard } from "./ProfileHoverCard";
 import { FeaturedBlogsSkeleton } from "./LoadingSkeletons/FeaturedBlogsSkeleton";
 
@@ -33,11 +33,9 @@ function formatRelativeDate(dateString: string | number | Date): string {
   }).toUpperCase();
 }
 
-export function FeaturedBlogs() {
+export function FeaturedBlogs({ preloadedData }: { preloadedData: Preloaded<typeof api.blogs.getFeaturedPosts> }) {
+  const blogs = usePreloadedQuery(preloadedData) ?? [];
   const [currentIndex, setCurrentIndex] = useState(0);
-
-  const featuredBlogs = useQuery(api.blogs.getFeaturedPosts);
-  const blogs = featuredBlogs ?? [];
 
   const handlePrev = () => {
     setCurrentIndex((prevIndex) => 
@@ -56,11 +54,7 @@ export function FeaturedBlogs() {
     const interval = setInterval(handleNext, 10000);
     return () => clearInterval(interval);
   }, [blogs.length]);
-
-  if (featuredBlogs === undefined) {
-    return <FeaturedBlogsSkeleton />;
-  }
-
+  
   if (blogs.length === 0) {
     return null;
   }
