@@ -81,12 +81,12 @@ export const EducationFields: React.FC<EducationFieldsProps> = ({
     <Field>
       <div className="flex items-center justify-between mb-1">
         <FieldLabel>Education</FieldLabel>
-        {educationFields.length < 3 && editingEduIndex === -1 && (
+        {educationFields.length < 2 && editingEduIndex === -1 && (
           <Button
             type="button"
             variant="outline"
             size="sm"
-            className="h-7 px-2 text-xs"
+            className="h-7 px-2 text-xs cursor-pointer"
             onClick={() => {
               const nextIndex = educationFields.length;
               appendEducation({ degree: "", subject: "", institution: "" });
@@ -127,7 +127,7 @@ export const EducationFields: React.FC<EducationFieldsProps> = ({
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 shrink-0 hover:bg-destructive/10 self-start" /* Added self-start to keep delete button aligned near top */
+                  className="h-9 w-9 hover:bg-destructive/10 text-destructive cursor-pointer"
                   onClick={() => {
                     removeEducation(index);
                     if (editingEduIndex === index) setEditingEduIndex(-1);
@@ -147,7 +147,7 @@ export const EducationFields: React.FC<EducationFieldsProps> = ({
                     value={selectedDegree}
                     onValueChange={(val) => setValue(`education.${index}.degree`, val, { shouldValidate: true })}
                   >
-                    <SelectTrigger className="h-9 text-xs bg-white">
+                    <SelectTrigger className="h-9 text-xs bg-white text-zinc-600 dark:text-zinc-400 [&>svg]:text-zinc-600 dark:[&>svg]:text-zinc-400 [&[data-placeholder]]:text-zinc-600 dark:[&[data-placeholder]]:text-zinc-400">
                       <SelectValue placeholder="Degree" />
                     </SelectTrigger>
                     <SelectContent>
@@ -308,7 +308,7 @@ export const EducationFields: React.FC<EducationFieldsProps> = ({
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="h-9 w-9 text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700"
+                  className="h-9 w-9 text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 cursor-pointer"
                   onClick={() => {
                     const currentValues = watch(`education.${index}`);
                     updateEducation(index, { ...currentValues });
@@ -321,7 +321,7 @@ export const EducationFields: React.FC<EducationFieldsProps> = ({
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="h-9 w-9 hover:bg-destructive/10 text-destructive"
+                  className="h-9 w-9 hover:bg-destructive/10 text-destructive cursor-pointer"
                   onClick={() => {
                     removeEducation(index);
                     if (editingEduIndex === index) setEditingEduIndex(-1);
@@ -335,7 +335,7 @@ export const EducationFields: React.FC<EducationFieldsProps> = ({
         })}
 
         {educationFields.length === 0 && (
-          <p className="text-xs text-muted-foreground italic">No education history added yet.</p>
+          <p className="text-xs text-zinc-600 dark:text-zinc-400">No education history added yet.</p>
         )}
       </div>
       {errors.education?.root && (

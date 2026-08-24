@@ -149,7 +149,7 @@ export const SkillsFields: React.FC<SkillsFieldsProps> = ({
           ))}
           
           {watchedSkills.length === 0 && (
-            <p className="text-xs text-muted-foreground self-center pl-1">
+            <p className="text-xs text-zinc-600 dark:text-zinc-400 self-center pl-1">
               No skills added yet.
             </p>
           )}
