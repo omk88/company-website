@@ -21,9 +21,13 @@ export async function getServerAuth() {
     return {
       isAuth: !!user,
       initialImage: user?.profile?.profilePicUrl || null,
+      initialProfile: user?.profile ? {
+        username: user.profile.username,
+        displayName: user.profile.displayName,
+      } : null,
     };
   } catch (error) {
-    return { isAuth: false, initialImage: null };
+    return { isAuth: false, initialImage: null, initialProfile: null };
   }
 }
 

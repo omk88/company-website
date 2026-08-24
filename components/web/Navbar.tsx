@@ -11,9 +11,15 @@ import { Skeleton } from "../ui/skeleton";
 import { NavLink } from "./NavLink";
 
 async function NavbarAuthServer() {
-  const { isAuth, initialImage } = await getServerAuth();
+  const { isAuth, initialImage, initialProfile } = await getServerAuth();
 
-  return <NavbarAuthClient initialIsAuth={isAuth} initialImage={initialImage} />;
+  return (
+      <NavbarAuthClient
+        initialIsAuth={isAuth}
+        initialImage={initialImage}
+        initialProfile={initialProfile}
+      />
+    );
 }
 
 function AuthSkeleton() {

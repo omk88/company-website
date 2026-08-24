@@ -9,15 +9,24 @@ import { LogOut, LogIn, ArrowUpRight, Plus } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Separator } from "../ui/separator";
+import { Skeleton } from "../ui/skeleton";
 import { useEffect, useState } from "react";
 import { useCurrentUser } from "@/app/ConvexClientProvider";
 
 interface NavbarAuthClientProps {
   initialIsAuth: boolean;
   initialImage?: string | null;
+  initialProfile?: {
+    username?: string;
+    displayName?: string;
+  } | null;
 }
 
-export function NavbarAuthClient({ initialIsAuth, initialImage }: NavbarAuthClientProps) {
+export function NavbarAuthClient({ 
+  initialIsAuth, 
+  initialImage, 
+  initialProfile 
+}: NavbarAuthClientProps) {
   const router = useRouter();
   const { data: session } = authClient.useSession();
   const [open, setOpen] = useState(false);
@@ -46,8 +55,11 @@ export function NavbarAuthClient({ initialIsAuth, initialImage }: NavbarAuthClie
   const isLoggedIn = isMounted ? !!session : initialIsAuth;
   const userData = useCurrentUser();
 
+  const activeProfile = userData?.profile ?? initialProfile;
+  const profileUsername = activeProfile?.username;
+  const profileDisplayName = activeProfile?.displayName || profileUsername;
+
   const defaultAvatarUrl = "/default.svg";
-  const profileUsername = userData?.profile?.username;
 
   const clientSessionImage =
     session?.user?.image && !session.user.image.includes("googleusercontent.com")
@@ -88,7 +100,7 @@ export function NavbarAuthClient({ initialIsAuth, initialImage }: NavbarAuthClie
                   className="w-80 p-1.5 rounded-xl border border-border bg-popover"
                 >
                   <Link
-                    href={`/${userData?.profile?.username || ""}`}
+                    href={`/${profileUsername || ""}`}
                     onClick={() => setOpen(false)}
                     className="group flex items-center justify-between p-2.5 rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors duration-100 cursor-pointer"
                   >
@@ -102,12 +114,21 @@ export function NavbarAuthClient({ initialIsAuth, initialImage }: NavbarAuthClie
                         />
                       </div>
                       <div className="flex flex-col min-w-0">
-                        <span className="text-sm font-semibold truncate leading-tight">
-                          {`${userData?.profile?.displayName || userData?.profile?.username || ""}`}
-                        </span>
-                        <span className="text-xs text-zinc-600 dark:text-zinc-400 group-hover:text-accent-foreground/80 truncate mt-0.5">
-                          @{userData?.profile?.username}
-                        </span>
+                        {activeProfile ? (
+                          <>
+                            <span className="text-sm font-semibold truncate leading-tight">
+                              {profileDisplayName}
+                            </span>
+                            <span className="text-xs text-zinc-600 dark:text-zinc-400 group-hover:text-accent-foreground/80 truncate mt-0.5">
+                              @{profileUsername}
+                            </span>
+                          </>
+                        ) : (
+                          <div className="space-y-1 py-0.5">
+                            <Skeleton className="h-3.5 w-24" />
+                            <Skeleton className="h-3 w-16" />
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -123,7 +144,7 @@ export function NavbarAuthClient({ initialIsAuth, initialImage }: NavbarAuthClie
 
                   <div className="flex flex-col gap-0.5">
                     <Link
-                      href={`/company/blog`}
+                      href="/company/blog"
                       onClick={() => setOpen(false)}
                       className="flex items-center text-zinc-600 dark:text-zinc-400 gap-2.5 px-2.5 py-2 text-xs rounded-md hover:bg-accent hover:text-accent-foreground transition-colors duration-100 cursor-pointer"
                     >
