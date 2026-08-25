@@ -139,21 +139,21 @@ export const EducationFields: React.FC<EducationFieldsProps> = ({
                     if (editingEduIndex === index) setEditingEduIndex(-1);
                   }}
                 >
-                  <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                  <Trash2 className="h-4 w-4 text-destructive" />
                 </Button>
               </div>
             );
           }
 
           return (
-            <div key={field.id} className="p-3 border rounded-md bg-muted/30 space-y-3 relative flex gap-3 items-start">
+            <div key={field.id} className="p-3 border rounded-md space-y-3 relative flex gap-3 items-start">
               <div className="flex-1 space-y-3">
                 <div>
                   <Select
                     value={selectedDegree}
                     onValueChange={(val) => setValue(`education.${index}.degree`, val, { shouldValidate: true })}
                   >
-                    <SelectTrigger className="h-9 text-xs bg-white text-zinc-600 dark:text-zinc-400 [&>svg]:text-zinc-600 dark:[&>svg]:text-zinc-400 [&[data-placeholder]]:text-zinc-600 dark:[&[data-placeholder]]:text-zinc-400">
+                    <SelectTrigger className="h-9 text-xs bg-white text-foreground hover:bg-accent hover:text-accent-foreground transition-colors [&>svg]:text-foreground [&[data-placeholder]]:text-foreground cursor-pointer">
                       <SelectValue placeholder="Degree" />
                     </SelectTrigger>
                     <SelectContent>
@@ -187,10 +187,10 @@ export const EducationFields: React.FC<EducationFieldsProps> = ({
                       <Button
                         variant="outline"
                         role="combobox"
-                        className="w-full justify-between font-normal text-xs h-9 bg-white text-left"
+                        className="w-full justify-between font-normal text-xs h-9 bg-white text-left cursor-pointer"
                       >
                         <span className="truncate">{selectedSubject || "Search and select subject..."}</span>
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0" />
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-[340px] p-0" align="start">
@@ -255,10 +255,10 @@ export const EducationFields: React.FC<EducationFieldsProps> = ({
                       <Button
                         variant="outline"
                         role="combobox"
-                        className="w-full justify-between font-normal text-xs h-9 bg-white text-left"
+                        className="w-full justify-between font-normal text-xs h-9 bg-white text-left cursor-pointer"
                       >
                         <span className="truncate">{selectedInstitution || "Search and select institution..."}</span>
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0" />
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-[340px] p-0" align="start">
