@@ -106,12 +106,12 @@ export const EducationFields: React.FC<EducationFieldsProps> = ({
           const selectedInstitution = watch(`education.${index}.institution`);
 
           if (isCommitted) {
-            const matchingDegree = DEGREE_TYPES.find((d) => d.value === selectedDegree);
+            const matchingDegree = DEGREE_TYPES.find((d) => d === selectedDegree);
             let displayDegree = selectedDegree || "";
 
             if (matchingDegree) {
-              const shorthandMatch = matchingDegree.label.match(/\(([^)]+)\)/);
-              displayDegree = shorthandMatch ? shorthandMatch[1] : matchingDegree.label;
+              const shorthandMatch = matchingDegree.match(/\(([^)]+)\)/);
+              displayDegree = shorthandMatch ? shorthandMatch[1] : matchingDegree;
             }
 
             return (
@@ -159,11 +159,11 @@ export const EducationFields: React.FC<EducationFieldsProps> = ({
                     <SelectContent>
                       {DEGREE_TYPES.map((degree) => (
                         <SelectItem 
-                          key={degree.value} 
-                          value={degree.value} 
+                          key={degree} 
+                          value={degree} 
                           className="text-xs"
                         >
-                          {degree.label}
+                          {degree}
                         </SelectItem>
                       ))}
                     </SelectContent>
