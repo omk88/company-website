@@ -8,7 +8,6 @@ import Link from "next/link";
 import { api } from "@/convex/_generated/api";
 import { Preloaded, usePreloadedQuery, useQuery } from "convex/react";
 import { ProfileHoverCard } from "./ProfileHoverCard";
-import { FeaturedBlogsSkeleton } from "./LoadingSkeletons/FeaturedBlogsSkeleton";
 
 function formatRelativeDate(dateString: string | number | Date): string {
   const now = new Date();
@@ -31,6 +30,11 @@ function formatRelativeDate(dateString: string | number | Date): string {
     day: "numeric",
     year: "numeric",
   }).toUpperCase();
+}
+
+function truncateName(name: string, maxLength: number = 12): string {
+  if (!name) return "";
+  return name.length > maxLength ? `${name.slice(0, maxLength)}…` : name;
 }
 
 export function FeaturedBlogs({ preloadedData }: { preloadedData: Preloaded<typeof api.blogs.getFeaturedPosts> }) {
@@ -68,6 +72,9 @@ export function FeaturedBlogs({ preloadedData }: { preloadedData: Preloaded<type
     maximumFractionDigits: 1,
   });
 
+  const rawName = currentPost.displayName || currentPost.username;
+  const displayName = truncateName(rawName, 12);
+
   return (
     <div className="flex flex-col justify-between w-full bg-zinc-50/80 dark:bg-zinc-900/50 rounded-xl p-3.5 transition-all">
       <div className="flex items-center justify-between mb-2">
@@ -96,9 +103,11 @@ export function FeaturedBlogs({ preloadedData }: { preloadedData: Preloaded<type
           <div>
             <div className="font-roboto flex items-center gap-1.5 text-[11px] tracking-tight uppercase text-zinc-500 mb-1">
               <ProfileHoverCard authorUsername={currentPost.username} displayName={currentPost.displayName}>
-                <span className="cursor-pointer truncate max-w-[90px]">{currentPost.displayName || currentPost.username}</span>
+                <span className="cursor-pointer shrink-0" title={rawName}>
+                  {displayName}
+                </span>
               </ProfileHoverCard>
-              <span>•</span>
+              <span className="shrink-0">•</span>
               <span className="shrink-0">{formattedDate}</span>
             </div>
 
