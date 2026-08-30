@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 
 import { Separator } from "@/components/ui/separator";
@@ -7,11 +6,23 @@ import { BlogCTA } from "@/components/web/BlogCTA";
 import { CommentSection } from "@/components/web/CommentSection";
 import { ViewTracker } from "@/components/web/ViewTracker";
 import { BlogEmojiReactions } from "@/components/web/BlogEmojiReactions";
-import { ProfileHoverCard } from "@/components/web/ProfileHoverCard";
 import { Doc } from "@/convex/_generated/dataModel";
 import { Preloaded } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { BlogName } from "./BlogName";
+
+import { CodeBlock } from "../CodeBlock";
+import rehypeHighlight from "rehype-highlight";
+import { createLowlight } from "lowlight";
+import js from "highlight.js/lib/languages/javascript";
+import ts from "highlight.js/lib/languages/typescript";
+import "highlight.js/styles/github-dark.css";
+
+const lowlight = createLowlight();
+lowlight.register("javascript", js);
+lowlight.register("js", js);
+lowlight.register("typescript", ts);
+lowlight.register("ts", ts);
 
 interface BlogContentProps {
     blog: Doc<"blogs">;
@@ -76,7 +87,12 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
       <Separator className="my-8" />
 
       <div className="prose prose-neutral dark:prose-invert max-w-none text-lg leading-relaxed">
-        <ReactMarkdown>{blog.content}</ReactMarkdown>
+        <ReactMarkdown
+          rehypePlugins={[[rehypeHighlight, { lowlight }]]}
+          components={{ pre: CodeBlock }}
+        >
+          {blog.content}
+        </ReactMarkdown>
       </div>
 
       <BlogCTA />

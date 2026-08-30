@@ -41,7 +41,7 @@ export function Navbar() {
 
           <div className="hidden md:flex items-center gap-6">
             <NavLink href="/" anim={anim}>Home</NavLink>
-            <NavLink href="/vision" anim={anim}>Vision</NavLink>
+            <NavLink href="/vision" anim={anim}>About</NavLink>
             <NavLink href="/insights" anim={anim}>Insights</NavLink>
             <NavLink href="/contact" anim={anim}>Contact</NavLink>
             <NavLink href="/products" anim={anim}>Products</NavLink>

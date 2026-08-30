@@ -6,8 +6,6 @@ import { useRef } from "react";
 import { BlogCard } from "./BlogCard";
 import { EmptyState } from "./EmptyState";
 import { CompactBlogCardSkeleton } from "./LoadingSkeletons/CompactBlogCardSkeleton";
-import { cn } from "@/lib/utils";
-import { Library } from "lucide-react";
 import { FunctionReturnType } from "convex/server";
 
 type ProfileData = FunctionReturnType<typeof api.profiles.getProfileByUsername>;
@@ -47,7 +45,7 @@ export function ProfileBlogs({ profile }: ProfileBlogsProps) {
             ))}
           </ul>
         ) : displayResults.length === 0 ? (
-          <div className="flex flex-col flex-1 h-full min-h-0">
+          <div className="flex flex-col flex-1 h-full min-h-0 items-center justify-center">
             <EmptyState size="sm" description="This user hasn't posted any insights yet." />
           </div>
         ) : (
