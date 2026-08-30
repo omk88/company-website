@@ -36,7 +36,7 @@ export function ProfileBlogs({ profile }: ProfileBlogsProps) {
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className="flex flex-col flex-1 h-full min-h-0 w-full mt-6">
+    <div className="flex flex-col flex-1 h-full min-h-0 w-full mt-2">
       <div className="w-full max-w-2xl mx-auto px-6 flex-1">
         {isFirstLoad && displayResults.length === 0 ? (
           <ul className="flex flex-col gap-2">

@@ -5,6 +5,7 @@ import { useMutation } from "convex/react";
 import { Id } from "@/convex/_generated/dataModel";
 import { toast } from "sonner";
 import { Bell, BellPlus, Loader2 } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface FollowButtonProps {
   targetProfileId: Id<"profiles">;
@@ -85,31 +86,100 @@ export function FollowButton({
     }
   };
 
+  if (isSelf) return null;
+
+  const transitionConfig = { duration: 0.2, ease: "easeInOut" };
+
   if (isCompact) {
     return (
-      <div className="flex flex-row gap-1.5 w-full items-center">
-        {isFollowing && (
+      <motion.div layout className="flex flex-row gap-1.5 w-full items-center h-6">
+        <AnimatePresence mode="popLayout" initial={false}>
+          {isFollowing && (
+            <motion.div
+              key="bell-compact"
+              initial={{ scale: 0, opacity: 0, width: 0 }}
+              animate={{ scale: 1, opacity: 1, width: "auto" }}
+              exit={{ scale: 0, opacity: 0, width: 0 }}
+              transition={transitionConfig}
+              className="shrink-0 flex items-center h-full overflow-hidden"
+            >
+              <Button
+                size="icon"
+                variant="ghost"
+                className="h-6 w-6 rounded-full cursor-pointer shrink-0"
+                disabled={isBellPending}
+                onClick={handleBellClick}
+              >
+                {isBellPending ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                ) : isBell ? (
+                  <Bell className="h-3 w-3 fill-current stroke-[2.3]" />
+                ) : (
+                  <BellPlus className="h-3 w-3 stroke-[2.3]" />
+                )}
+              </Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <motion.div layout transition={transitionConfig} className="flex-1 h-full">
           <Button
-            size="icon"
-            variant="ghost"
-            className="h-6 w-6 rounded-full cursor-pointer shrink-0"
-            disabled={isBellPending}
-            onClick={handleBellClick}
+            variant={isFollowing ? "outline" : "default"}
+            className="cursor-pointer text-xs px-3 w-full h-full box-border leading-none rounded-full font-medium"
+            size="xs"
+            disabled={isPending}
+            onClick={handleFollowClick}
           >
-            {isBellPending ? (
+            {isPending ? (
               <Loader2 className="h-3 w-3 animate-spin" />
-            ) : isBell ? (
-              <Bell className="h-3 w-3 fill-current stroke-[2.3]" />
+            ) : isFollowing ? (
+              "Unfollow"
             ) : (
-              <BellPlus className="h-3 w-3 stroke-[2.3]" />
+              "Follow"
             )}
           </Button>
-        )}
+        </motion.div>
+      </motion.div>
+    );
+  }
 
+  return (
+    // Thin 28px height (h-7) with a full pill outline
+    <motion.div layout className="flex flex-row gap-1.5 w-full items-center h-7">
+      <AnimatePresence mode="popLayout" initial={false}>
+        {isFollowing && (
+          <motion.div
+            key="bell-default"
+            initial={{ scale: 0, opacity: 0, width: 0 }}
+            animate={{ scale: 1, opacity: 1, width: "auto" }}
+            exit={{ scale: 0, opacity: 0, width: 0 }}
+            transition={transitionConfig}
+            className="shrink-0 flex items-center h-full overflow-hidden"
+          >
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-7 w-7 rounded-full cursor-pointer shrink-0 p-0"
+              disabled={isBellPending}
+              onClick={handleBellClick}
+            >
+              {isBellPending ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : isBell ? (
+                <Bell className="h-3.5 w-3.5 fill-current stroke-[2.3]" />
+              ) : (
+                <BellPlus className="h-3.5 w-3.5 stroke-[2.3]" />
+              )}
+            </Button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <motion.div layout transition={transitionConfig} className="flex-1 h-full">
         <Button
           variant={isFollowing ? "outline" : "default"}
-          className="cursor-pointer text-xs px-2 flex-1"
-          size="xs"
+          className="cursor-pointer text-xs px-4 w-full h-full box-border py-0 leading-none rounded-full font-medium"
+          size="sm"
           disabled={isPending}
           onClick={handleFollowClick}
         >
@@ -121,45 +191,7 @@ export function FollowButton({
             "Follow"
           )}
         </Button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex flex-row gap-2 w-full items-center">
-      {isFollowing && (
-        <Button
-          size={"icon"}
-          variant={"ghost"}
-          className="rounded-4xl cursor-pointer shrink-0"
-          disabled={isBellPending}
-          onClick={handleBellClick}
-        >
-          {isBellPending ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : isBell ? (
-            <Bell className="h-4 w-4 fill-current stroke-[2.3]" />
-          ) : (
-            <BellPlus className="h-4 w-4 stroke-[2.3]" />
-          )}
-        </Button>
-      )}
-
-      <Button
-        variant={isFollowing ? "outline" : "default"}
-        className="cursor-pointer text-xs flex-1"
-        size={"sm"}
-        disabled={isPending}
-        onClick={handleFollowClick}
-      >
-        {isPending ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : isFollowing ? (
-          "Unfollow"
-        ) : (
-          "Follow"
-        )}
-      </Button>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

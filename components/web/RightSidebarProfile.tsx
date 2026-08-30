@@ -102,17 +102,6 @@ export function RightSidebarProfile({ preloadedProfile, preloadedCurrentUser }: 
     >
       <SidebarContent className="!p-0 bg-white">
         <div className="relative m-3 p-3 rounded-xl bg-zinc-50/80">
-          
-          {isOwnProfile && (
-            <div className="absolute top-3 right-3 flex items-center z-10">
-              <ProfileSettingsButton />
-              <EditProfileButton
-                profile={profile}
-                avatarSrc={avatarSrc || ""}
-                defaultAvatarSrc={defaultAvatarSrc || ""}
-              />
-            </div>
-          )}
 
           <div className="p-2 pb-0">
             <div className="flex flex-row items-center gap-4 w-full">
@@ -132,7 +121,7 @@ export function RightSidebarProfile({ preloadedProfile, preloadedCurrentUser }: 
                 )}
               </div>
 
-              <div className="w-full pr-14">
+              <div className="flex flex-row justify-between w-full">
                 <div className="flex flex-col w-full">
                   <h4 className="text-base font-semibold text-foreground tracking-tight">
                     {displayName || profile.username}
@@ -140,27 +129,49 @@ export function RightSidebarProfile({ preloadedProfile, preloadedCurrentUser }: 
 
                   <div className="flex items-center gap-2 flex-wrap">
                     <p className="text-sm text-muted-foreground">{`@${profile.username}`}</p>
-
-                    <TooltipProvider delayDuration={200}>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <div className="inline-flex items-center gap-1 text-xs font-sans font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/60 cursor-help select-none">
-                            <Zap className="w-3 h-3 fill-amber-500 stroke-amber-500 shrink-0" />
-                            <span>{profile.totalLikes ?? 0}</span>
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent side="bottom" align="start">
-                          <p className="text-xs font-medium">{profile.totalLikes} Total Likes</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
                   </div>
                 </div>
+
+                {isOwnProfile && (
+                  <div className="flex items-center z-10">
+                    <ProfileSettingsButton />
+                    <EditProfileButton
+                      profile={profile}
+                      avatarSrc={avatarSrc || ""}
+                      defaultAvatarSrc={defaultAvatarSrc || ""}
+                    />
+                  </div>
+                )}
+
+                {!isSelf && (
+                  <FollowButton
+                    targetProfileId={profile._id}
+                    displayName={displayName}
+                    username={profile.username}
+                    initialIsFollowing={isFollowing}
+                    initialIsBell={isBell}
+                  />
+                )}
               </div>
             </div>
           </div>
 
           <div className="p-2 pt-4 gap-4 flex flex-col text-sm font-sans tracking-tight w-full">
+            
+            <TooltipProvider delayDuration={200}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="inline-flex w-fit items-center gap-1 text-xs font-sans font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/60 cursor-help select-none">
+                    <Zap className="w-3 h-3 fill-amber-500 stroke-amber-500 shrink-0" />
+                    <span>{profile.totalLikes ?? 0}</span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" align="start">
+                  <p className="text-xs font-medium">{profile.totalLikes} Total Likes</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            
             {profile.bio && (
               <div>
                 <span>{profile.bio}</span>
@@ -194,16 +205,6 @@ export function RightSidebarProfile({ preloadedProfile, preloadedCurrentUser }: 
                 </div>
               )}
             </div>
-
-            {!isSelf && (
-              <FollowButton
-                targetProfileId={profile._id}
-                displayName={displayName}
-                username={profile.username}
-                initialIsFollowing={isFollowing}
-                initialIsBell={isBell}
-              />
-            )}
 
             {hasExpandableContent && (
               <div className="flex flex-col gap-2">
