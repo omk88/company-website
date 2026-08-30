@@ -88,8 +88,6 @@ export function FollowButton({
 
   if (isSelf) return null;
 
-  const transitionConfig = { duration: 0.2, ease: "easeInOut" };
-
   if (isCompact) {
     return (
       <motion.div layout className="flex flex-row gap-1.5 w-full items-center h-6">
@@ -100,7 +98,6 @@ export function FollowButton({
               initial={{ scale: 0, opacity: 0, width: 0 }}
               animate={{ scale: 1, opacity: 1, width: "auto" }}
               exit={{ scale: 0, opacity: 0, width: 0 }}
-              transition={transitionConfig}
               className="shrink-0 flex items-center h-full overflow-hidden"
             >
               <Button
@@ -122,7 +119,7 @@ export function FollowButton({
           )}
         </AnimatePresence>
 
-        <motion.div layout transition={transitionConfig} className="flex-1 h-full">
+        <motion.div layout className="flex-1 h-full">
           <Button
             variant={isFollowing ? "outline" : "default"}
             className="cursor-pointer text-xs px-3 w-full h-full box-border leading-none rounded-full font-medium"
@@ -144,7 +141,6 @@ export function FollowButton({
   }
 
   return (
-    // Thin 28px height (h-7) with a full pill outline
     <motion.div layout className="flex flex-row gap-1.5 w-full items-center h-7">
       <AnimatePresence mode="popLayout" initial={false}>
         {isFollowing && (
@@ -153,7 +149,6 @@ export function FollowButton({
             initial={{ scale: 0, opacity: 0, width: 0 }}
             animate={{ scale: 1, opacity: 1, width: "auto" }}
             exit={{ scale: 0, opacity: 0, width: 0 }}
-            transition={transitionConfig}
             className="shrink-0 flex items-center h-full overflow-hidden"
           >
             <Button
@@ -175,7 +170,7 @@ export function FollowButton({
         )}
       </AnimatePresence>
 
-      <motion.div layout transition={transitionConfig} className="flex-1 h-full">
+      <motion.div layout className="flex-1 h-full">
         <Button
           variant={isFollowing ? "outline" : "default"}
           className="cursor-pointer text-xs px-4 w-full h-full box-border py-0 leading-none rounded-full font-medium"
