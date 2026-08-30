@@ -1,6 +1,6 @@
 "use client";
 
-import { TrendingUp, Users2, Globe, Plus, Library } from "lucide-react";
+import { TrendingUp, Users2, Globe, Library } from "lucide-react";
 import { Separator } from "../ui/separator";
 import { 
   Sidebar, 

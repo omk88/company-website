@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Check, Copy } from "lucide-react";
 import { Button } from "../ui/button";
+import { toast } from "sonner";
 
 export function CodeBlock({ children, ...props }: React.HTMLAttributes<HTMLPreElement>) {
   const [copied, setCopied] = useState(false);
@@ -20,6 +21,9 @@ export function CodeBlock({ children, ...props }: React.HTMLAttributes<HTMLPreEl
     const text = extractText(children);
     navigator.clipboard.writeText(text);
     setCopied(true);
+    
+    toast.success("Copied to clipboard!");
+
     setTimeout(() => setCopied(false), 2000);
   };
 
