@@ -153,7 +153,7 @@ export default function SignUpForm() {
                             )}
                         />
                         
-                        <Button type="submit" className="w-full" disabled={isLoading}>
+                        <Button type="submit" className="w-full cursor-pointer" disabled={isLoading}>
                             {isLoading ? (
                                 <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -180,7 +180,7 @@ export default function SignUpForm() {
                 <Button 
                     type="button" 
                     variant="outline" 
-                    className="w-full" 
+                    className="w-full cursor-pointer" 
                     onClick={handleGoogleSignIn}
                     disabled={isLoading} 
                 >
