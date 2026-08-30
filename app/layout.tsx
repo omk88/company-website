@@ -4,12 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "next-themes";
 import GridBackground from "@/components/web/GridBackground"; 
-import dynamic from "next/dynamic";
 import { ConvexClientProvider } from "./ConvexClientProvider";
-
-const Navbar = dynamic(() => import("@/components/web/Navbar").then((mod) => mod.Navbar), {
-  ssr: true,
-});
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -57,14 +52,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <GridBackground>
-            <main>
-              <ConvexClientProvider>
-                <Navbar />
-                {children}
-              </ConvexClientProvider>
-            </main>
-          </GridBackground>
+          <main>
+            <ConvexClientProvider>
+              {children}
+            </ConvexClientProvider>
+          </main>
           <Toaster />
         </ThemeProvider>
       </body>
