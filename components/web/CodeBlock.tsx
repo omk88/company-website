@@ -1,27 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Check, Copy } from "lucide-react";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
 
 export function CodeBlock({ children, ...props }: React.HTMLAttributes<HTMLPreElement>) {
   const [copied, setCopied] = useState(false);
-
-  const extractText = (node: React.ReactNode): string => {
-    if (typeof node === "string") return node;
-    if (Array.isArray(node)) return node.map(extractText).join("");
-    if (node && typeof node === "object" && "props" in node) {
-      return extractText((node.props as { children?: React.ReactNode }).children);
-    }
-    return "";
-  };
+  const preRef = useRef<HTMLPreElement>(null);
 
   const handleCopy = () => {
-    const text = extractText(children);
-    navigator.clipboard.writeText(text);
+    const codeText = preRef.current?.innerText || "";
+
+    if (!codeText) return;
+
+    navigator.clipboard.writeText(codeText);
     setCopied(true);
-    
     toast.success("Copied to clipboard!");
 
     setTimeout(() => setCopied(false), 2000);
@@ -37,6 +31,7 @@ export function CodeBlock({ children, ...props }: React.HTMLAttributes<HTMLPreEl
       </Button>
 
       <pre
+        ref={preRef}
         {...props}
         className="!bg-transparent !m-0 !rounded-none p-4 overflow-x-auto text-sm leading-relaxed [&_code]:!bg-transparent [&_code]:!p-0"
       >
