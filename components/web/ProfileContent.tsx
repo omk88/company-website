@@ -3,7 +3,8 @@
 import { ProfileBlogs } from "./ProfileBlogs";
 import { ProfileComments } from "./ProfileComments";
 import { ProfileBookmarks } from "./ProfileBookmarks";
-import { ProfileFollows } from "./ProfileFollows";
+import { ProfileFollowers } from "./ProfileFollowers";
+import { ProfileFollowing } from "./ProfileFollowing";
 import { Preloaded, usePreloadedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useProfileStore } from "@/stores/useProfileStore";
@@ -25,7 +26,9 @@ export function ProfileContent({ preloadedProfile, preloadedCurrentUser }: Profi
       case "bookmarks":
         return <ProfileBookmarks profile={profileData} />;
       case "followers":
-        return <ProfileFollows profile={profileData} currentUser={currentUser} />;
+        return <ProfileFollowers profile={profileData} currentUser={currentUser} />;
+      case "following":
+        return <ProfileFollowing profile={profileData} currentUser={currentUser} />;
       case "insights":
       default:
         return <ProfileBlogs profile={profileData} />;
