@@ -2,7 +2,7 @@
 
 import { createContext, useContext } from "react";
 import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
-import { ConvexReactClient, Preloaded, usePreloadedQuery } from "convex/react";
+import { ConvexReactClient, Preloaded, usePreloadedQuery, useQuery } from "convex/react";
 import { authClient } from "@/lib/auth-client";
 import { api } from "@/convex/_generated/api";
 
@@ -32,10 +32,16 @@ export function ConvexClientProvider({
   );
 }
 
+function usePreloadedUser(preloaded: Preloaded<typeof api.auth.getCurrentUser>) {
+  return usePreloadedQuery(preloaded);
+}
+
 export function useCurrentUser() {
   const preloaded = useContext(PreloadedUserContext);
-  if (!preloaded) {
-    return null;
+  
+  if (preloaded) {
+    return usePreloadedUser(preloaded);
   }
-  return usePreloadedQuery(preloaded);
+
+  return useQuery(api.auth.getCurrentUser);
 }

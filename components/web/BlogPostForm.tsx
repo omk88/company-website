@@ -3,7 +3,7 @@
 import { Controller, useForm, useWatch, Control } from "react-hook-form";
 import { FieldGroup, Field } from "../ui/field";
 import { toast } from "sonner";
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, useMemo, memo, useDeferredValue } from "react";
 import { cn } from "@/lib/utils";
 import { api } from "@/convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
@@ -67,92 +67,110 @@ function toTitleCase(str: string): string {
     .join(' ');
 }
 
-function LivePostPreview({ control, previewImage, currentUser }: { control: Control<BlogFormValues>; previewImage: string | null; currentUser: User | undefined; }) {
-    const title = useWatch({ control, name: "title" }) || "";
-    const subtitle = useWatch({ control, name: "subtitle" }) || "";
-    const content = useWatch({ control, name: "content" }) || "";
+const MemoizedMarkdown = memo(function MemoizedMarkdown({ content }: { content: string }) {
+  return (
+    <div className="prose prose-neutral dark:prose-invert max-w-none text-base leading-relaxed text-neutral-800 dark:text-neutral-200 break-words">
+      <ReactMarkdown>{content}</ReactMarkdown>
+    </div>
+  );
+});
 
-    const formattedTitle = title ? toTitleCase(title) : "";
+export const LivePostPreview = memo(function LivePostPreview({
+  control,
+  previewImage,
+}: {
+  control: Control<BlogFormValues>;
+  previewImage: string | null;
+}) {
+  const title = useWatch({ control, name: "title" }) || "";
+  const subtitle = useWatch({ control, name: "subtitle" }) || "";
+  const content = useWatch({ control, name: "content" }) || "";
 
-    const readTime = useMemo(() => {
-        if (!content.trim()) return "0 sec read";
+  const deferredContent = useDeferredValue(content);
 
-        const plainText = content
-            .replace(/<[^>]*>/g, " ")
-            .replace(/[#*`_~[\]()]/g, " ");
+  const formattedTitle = title ? toTitleCase(title) : "";
+  const currentUser = useCurrentUser();
 
-        const words = plainText.trim().split(/\s+/).filter(Boolean).length;
-        
-        const totalSeconds = Math.ceil((words / 200) * 60);
-        const minutes = Math.floor(totalSeconds / 60);
-        const seconds = totalSeconds % 60;
+  const authorName =
+    currentUser?.profile?.displayName ||
+    currentUser?.profile?.username ||
+    "User";
 
-        if (minutes < 1) {
-            return `${seconds} sec read`;
-        }
-        return `${minutes} min read`;
-    }, [content]);
+  const profilePic = currentUser?.profile?.profilePicUrl || currentUser?.profile?.defaultProfilePic;
 
-    return (
-        <div>
-            <div className="w-full">
-                <div className="relative w-full h-[240px] mb-2 overflow-hidden rounded-lg flex items-center justify-center border">
-                    {previewImage ? (
-                        <img 
-                            src={previewImage} 
-                            alt="Cover preview" 
-                            className="w-full h-full object-cover"
-                        />
-                    ) : (
-                        <div className="text-muted-foreground">
-                            <span>
-                                <Image className="h-6 w-6 stroke-[1.5]" />
-                            </span>
-                        </div>
-                    )}
-                </div>
+  const readTime = useMemo(() => {
+    if (!content.trim()) return "0 sec read";
 
-                <div className="flex items-center justify-between text-sm text-zinc-600 dark:text-zinc-400 font-normal my-4">
-                    <div className="flex items-center gap-2">
-                        <img
-                            src={currentUser?.profile?.profilePicUrl || ""}
-                            alt={currentUser?.profile?.displayName || currentUser?.profile?.username || "User"}
-                            className="w-5 h-5 rounded-full object-cover shrink-0"
-                        />
+    const plainText = content
+      .replace(/<[^>]*>/g, " ")
+      .replace(/[#*`_~[\]()]/g, " ");
 
-                        <span>{currentUser?.profile?.displayName || currentUser?.profile?.username}</span>
+    const words = plainText.trim().split(/\s+/).filter(Boolean).length;
+    const totalSeconds = Math.ceil((words / 200) * 60);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
 
-                        <span>&middot;</span>
+    return minutes < 1 ? `${seconds} sec read` : `${minutes} min read`;
+  }, [content]);
 
-                    </div>
-
-                    <span className="text-xs sm:text-sm text-zinc-500 font-medium">
-                        {readTime}
-                    </span>
-                </div>
-                
-                <div className="flex flex-col gap-4">
-                    <h1 className="text-2xl font-bold tracking-tight text-neutral-950 dark:text-neutral-50 line-clamp-3">
-                        {formattedTitle}
-                    </h1>
-                    <div className="flex flex-col gap-2">
-                        {subtitle && (
-                            <p className="text-lg text-neutral-600 dark:text-neutral-400 font-medium">
-                                {subtitle}
-                            </p>
-                        )}
-                    </div>
-                </div>
-
-                {content.trim() && <Separator className="my-4" />}
-
-                <div className="prose prose-neutral dark:prose-invert max-w-none text-base leading-relaxed text-neutral-800 dark:text-neutral-200 break-words">
-                    <ReactMarkdown>{content}</ReactMarkdown>
-                </div>
+  return (
+    <div>
+      <div className="w-full">
+        <div className="relative w-full h-[240px] mb-2 overflow-hidden rounded-lg flex items-center justify-center border bg-zinc-50 dark:bg-zinc-900">
+          {previewImage ? (
+            <img
+              src={previewImage}
+              alt="Cover preview"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="text-muted-foreground">
+              <Image className="h-6 w-6 stroke-[1.5]" />
             </div>
+          )}
         </div>
-    );
-}
+
+        <div className="flex items-center justify-between text-sm text-zinc-600 dark:text-zinc-400 font-normal my-4">
+          <div className="flex items-center gap-2">
+            {profilePic ? (
+              <img
+                src={profilePic}
+                alt={authorName}
+                className="w-5 h-5 rounded-full object-cover shrink-0"
+              />
+            ) : (
+              <div className="w-5 h-5 rounded-full bg-zinc-200 dark:bg-zinc-700 shrink-0 flex items-center justify-center text-[10px] font-bold">
+                {authorName.charAt(0).toUpperCase()}
+              </div>
+            )}
+
+            <span>{authorName}</span>
+            <span>&middot;</span>
+          </div>
+
+          <span className="text-xs sm:text-sm text-zinc-500 font-medium">
+            {readTime}
+          </span>
+        </div>
+
+        <div className="flex flex-col gap-4">
+          <h1 className="text-2xl font-bold tracking-tight text-neutral-950 dark:text-neutral-50 line-clamp-3">
+            {formattedTitle}
+          </h1>
+          {subtitle && (
+            <p className="text-lg text-neutral-600 dark:text-neutral-400 font-medium">
+              {subtitle}
+            </p>
+          )}
+        </div>
+
+        {deferredContent.trim() && <Separator className="my-4" />}
+
+        <MemoizedMarkdown content={deferredContent} />
+      </div>
+    </div>
+  );
+});
 
 export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
     const router = useRouter();
@@ -767,7 +785,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
 
                 <div className="w-full py-4 px-4 sm:px-6 overflow-y-auto [scrollbar-gutter:stable] h-full min-h-0">
                     <div className="w-full">
-                        <LivePostPreview control={control} previewImage={imagePreviewUrl} currentUser={userData} />
+                        <LivePostPreview control={control} previewImage={imagePreviewUrl} />
                     </div>
                 </div>
             </div>
