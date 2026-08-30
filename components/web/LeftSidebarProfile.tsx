@@ -79,14 +79,10 @@ export function LeftSidebarProfile({ preloadedProfile }: LeftSidebarProfileProps
                       }
                     `}
                   >
-                    <Icon 
-                      className={`h-4 w-4 shrink-0 transition-colors ${
-                        isActive ? "text-foreground" : "text-zinc-500 group-hover:text-foreground"
-                      }`} 
-                    />
+                    <Icon className="h-4 w-4 shrink-0 stroke-[2.5] transition-colors currentColor" />
                     
                     <span className="flex items-center gap-1">
-                      <span className={isActive ? "text-foreground font-semibold" : "text-zinc-500 group-hover:text-foreground"}>
+                      <span>
                         {count}
                       </span>
                       <span>{item.label}</span>
