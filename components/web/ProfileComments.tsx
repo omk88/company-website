@@ -38,20 +38,6 @@ export function ProfileComments({ profile }: ProfileCommentsProps) {
 
 return (
     <div className="flex flex-col flex-1 h-full min-h-0 w-full">
-      {/* Full-width border header */}
-      <div className="flex items-center justify-start gap-4 w-full border-b border-border mb-4 px-6">
-        <div
-          className={cn(
-            "relative flex items-center gap-1.5 pb-2 pt-1.5 px-1 font-sans text-sm font-medium text-foreground",
-            "after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-current"
-          )}
-        >
-          <MessageSquareText className="w-4 h-4 stroke-[2.3] shrink-0" />
-          <span>{profile?.commentCount ?? 0} Comments Published</span>
-        </div>
-      </div>
-
-      {/* Constrained card container */}
       <div className="w-full max-w-2xl mx-auto px-6">
         {isFirstLoad && displayResults.length === 0 ? (
           <ul className="flex flex-col gap-2">

@@ -36,21 +36,7 @@ export function ProfileBlogs({ profile }: ProfileBlogsProps) {
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className="flex flex-col flex-1 h-full min-h-0 w-full">
-      {/* 1. Full-width border header with horizontal padding */}
-      <div className="flex items-center justify-start gap-4 w-full border-b border-border mb-4 px-6">
-        <div
-          className={cn(
-            "relative flex items-center gap-1.5 pb-2 pt-1.5 px-1 font-sans text-sm font-medium text-foreground",
-            "after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-current"
-          )}
-        >
-          <Library className="w-4 h-4 stroke-[2.3] shrink-0" />
-          <span>{profile?.articleCount ?? 0} Insights Published</span>
-        </div>
-      </div>
-
-      {/* 2. Constrained max-w-2xl container strictly for cards */}
+    <div className="flex flex-col flex-1 h-full min-h-0 w-full mt-6">
       <div className="w-full max-w-2xl mx-auto px-6 flex-1">
         {isFirstLoad && displayResults.length === 0 ? (
           <ul className="flex flex-col gap-2">

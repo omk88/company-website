@@ -9,6 +9,7 @@ import { Suspense } from "react";
 import { getServerAuth } from "@/lib/auth-server";
 import { Skeleton } from "../ui/skeleton";
 import { NavLink } from "./NavLink";
+import CreatePostButton from "./CreatePostButton";
 
 async function NavbarAuthServer() {
   const { isAuth, initialImage, initialProfile } = await getServerAuth();
@@ -45,9 +46,16 @@ export function Navbar() {
             <NavLink href="/contact" anim={anim}>Contact</NavLink>
             <NavLink href="/products" anim={anim}>Products</NavLink>
           </div>
+
+          <div className="ml-4">
+            <Suspense fallback={<div className="w-24 h-8" />}>
+              <CreatePostButton />
+            </Suspense>
+          </div>
         </div>
 
         <div className="hidden md:flex items-center gap-5 text-foreground">
+
           <div className="flex items-center gap-4 border-r border-border pr-4">
             <Link href="https://x.com/TaQtiQ_tech" target="_blank" rel="noopener noreferrer">
               <FaXTwitter className="h-4 w-4 transition-transform hover:scale-105 cursor-pointer opacity-80 hover:opacity-100" />

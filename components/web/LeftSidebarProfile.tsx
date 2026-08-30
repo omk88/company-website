@@ -1,8 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { Preloaded, usePreloadedQuery } from "convex/react";
-import { toast } from "sonner";
 import { api } from "@/convex/_generated/api";
 import { useProfileStore, ProfileMetricType } from "@/stores/useProfileStore";
 
@@ -15,10 +13,9 @@ import {
   SidebarMenuButton, 
   SidebarFooter 
 } from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
-import { Library, MessageSquareText, Bookmark, UsersRound, Plus } from "lucide-react";
+import { Library, MessageSquareText, Bookmark, UsersRound, Plus, UserRoundCheck } from "lucide-react";
 
 interface LeftSidebarProfileProps {
   preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
@@ -30,36 +27,28 @@ const NAV_ITEMS = [
   { id: "comments", label: "Comments", icon: MessageSquareText },
   { id: "bookmarks", label: "Bookmarks", icon: Bookmark },
   { id: "followers", label: "Followers", icon: UsersRound },
+  { id: "following", label: "Following", icon: UserRoundCheck },
 ] as const;
 
-export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: LeftSidebarProfileProps) {
+export function LeftSidebarProfile({ preloadedProfile }: LeftSidebarProfileProps) {
   const profileData = usePreloadedQuery(preloadedProfile);
-  const currentUser = usePreloadedQuery(preloadedCurrentUser);
 
   const bookmarkCount = profileData.bookmarkCount ?? 0;
   const articleCount = profileData.articleCount ?? 0;
   const commentCount = profileData.commentCount ?? 0;
   const followerCount = profileData.profile?.followerCount ?? 0;
+  const followingCount = profileData.profile?.followingCount ?? 0;
 
   const counts: Record<ProfileMetricType, number> = {
     insights: articleCount,
     comments: commentCount,
     bookmarks: bookmarkCount,
     followers: followerCount,
+    following: followingCount,
   };
 
   const selectedMetric = useProfileStore((state) => state.selectedMetric);
   const setSelectedMetric = useProfileStore((state) => state.setSelectedMetric);
-  const router = useRouter();
-
-  const handleCreatePostClick = () => {
-    if (!currentUser) {
-      toast.error("You must be logged in to create a post.");
-      return;
-    }
-
-    router.push("/create-blog");
-  };
 
   return (
     <Sidebar 
@@ -111,16 +100,6 @@ export function LeftSidebarProfile({ preloadedProfile, preloadedCurrentUser }: L
           <div className="flex flex-col py-2 gap-2.5 items-start w-full">
             <div className="w-full px-1 py-1">
               <Separator />
-            </div>
-
-            <div className="w-full">
-              <Button 
-                className="w-full h-9 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-[13px] font-medium cursor-pointer flex items-center justify-center gap-1.5 transition-all active:scale-[0.98]"
-                onClick={handleCreatePostClick}
-              >
-                <Plus className="w-4 h-4 shrink-0 stroke-[2.2]" />
-                <span>Create a Post</span>
-              </Button>
             </div>
           </div>
 

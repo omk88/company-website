@@ -14,12 +14,7 @@ import {
 import { SidebarSearch } from "./SidebarSearch";
 import { SidebarSort } from "./SidebarSort";
 import { SidebarTags } from "./SidebarTags";
-import { useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
 import { useSearchStore, FeedType } from "@/stores/useSearchStore";
-import { Button } from "../ui/button";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 
 const NAV_ITEMS = [
   { id: "all", label: "All Insights", icon: Library },
@@ -31,24 +26,6 @@ const NAV_ITEMS = [
 export function LeftSidebar() {
   const feedType = useSearchStore((state) => state.feedType);
   const setFeedType = useSearchStore((state) => state.setFeedType);
-
-  const router = useRouter();
-
-  const userData = useQuery(api.auth.getCurrentUser);
-
-  const handleCreatePostClick = () => {
-    if (!userData) {
-      toast.error("You must be logged in to create a post.", {
-        action: {
-          label: "Sign in",
-          onClick: () => router.push("/sign-in"),
-        },
-      });
-      return;
-    }
-
-    router.push("/create-blog");
-  };
 
   return (
     <Sidebar 
@@ -97,16 +74,6 @@ export function LeftSidebar() {
             <SidebarSearch placeholder="insights" fullWidth={true} showDropdown={true} />
             <SidebarSort fullWidth={true} />
             <SidebarTags fullWidth={true} />
-
-            <div className="w-full pt-2">
-              <Button 
-                className="w-full h-9 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-[13px] font-medium cursor-pointer flex items-center justify-center gap-1.5 transition-all active:scale-[0.98]"
-                onClick={handleCreatePostClick}
-              >
-                <Plus className="w-4 h-4 shrink-0 stroke-[2.2]" />
-                <span>Create a Post</span>
-              </Button>
-            </div>
           </div>
 
         </SidebarGroup>

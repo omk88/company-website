@@ -23,7 +23,7 @@ export default async function Profile({ params }: ProfileRouteProps) {
     <SidebarProvider>
       <aside 
         className="shrink-0"
-        style={{ "--sidebar-width": "18rem" } as React.CSSProperties}
+        style={{ "--sidebar-width": "12.8rem" } as React.CSSProperties}
       >
         <LeftSidebarProfile 
           preloadedProfile={preloadedProfile} 
