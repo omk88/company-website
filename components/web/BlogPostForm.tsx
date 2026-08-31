@@ -3,7 +3,7 @@
 import { Controller, useForm, useWatch, Control } from "react-hook-form";
 import { FieldGroup, Field } from "../ui/field";
 import { toast } from "sonner";
-import { useState, useRef, useEffect, useMemo, memo, useDeferredValue } from "react";
+import { useState, useRef, useEffect, useMemo, memo, useDeferredValue, Suspense } from "react";
 import { cn } from "@/lib/utils";
 import { api } from "@/convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
@@ -175,7 +175,9 @@ export const LivePostPreview = memo(function LivePostPreview({
 
             <span>{authorName}</span>
             <span>&middot;</span>
-            <span>{currentDate}</span>
+            <Suspense>
+                <span>{currentDate}</span>
+            </Suspense>
           </div>
 
           <span className="text-xs sm:text-sm text-zinc-500 font-medium">
