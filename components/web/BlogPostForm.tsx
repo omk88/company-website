@@ -114,7 +114,18 @@ export const LivePostPreview = memo(function LivePostPreview({
     currentUser?.profile?.username ||
     "User";
 
-  const profilePic = currentUser?.profile?.profilePicUrl || currentUser?.profile?.defaultProfilePic;
+  const profilePic =
+    currentUser?.profile?.profilePicUrl || currentUser?.profile?.defaultProfilePic;
+
+  const currentDate = useMemo(() => {
+    const formatted = new Date().toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+    });
+
+    return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+  }, []);
 
   const readTime = useMemo(() => {
     if (!content.trim()) return "0 sec read";
@@ -164,6 +175,7 @@ export const LivePostPreview = memo(function LivePostPreview({
 
             <span>{authorName}</span>
             <span>&middot;</span>
+            <span>{currentDate}</span>
           </div>
 
           <span className="text-xs sm:text-sm text-zinc-500 font-medium">
