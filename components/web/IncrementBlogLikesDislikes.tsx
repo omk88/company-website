@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { DeleteBlogDialog } from "./DeleteBlogDialog";
 import { EMOJI_REACTIONS, ReactionType } from "@/app/constants/reactions";
+import { useCurrentUser } from "@/app/ConvexClientProvider";
 
 export interface InteractionState {
   voteState: {
@@ -48,27 +49,24 @@ export function IncrementBlogLikesDislikes({ blog, initialInteractionState }: In
   const convex = useConvex();
   const router = useRouter();
 
-  const currentUser = useQuery(api.auth.getCurrentUser);
+  const currentUser = useCurrentUser();
 
-  const liveVoteState = useQuery(api.blogs.getBlogVoteState, { blogId: blog._id });
-  const liveReactionState = useQuery(api.blogs.getBlogReactionState, { blogId: blog._id });
-  const liveFeaturedState = useQuery(api.blogs.getBlogFeaturedState, { blogId: blog._id });
-  const liveBookmarkState = useQuery(api.blogs.getBookmarkedState, { blogId: blog._id });
-  const liveCommentCount = useQuery(api.blogs.getBlogCommentCount, { blogId: blog._id });
+  const liveState = useQuery(api.blogs.getBlogInteractionState, { blogId: blog._id });
 
-  const voteState = liveVoteState ?? initialInteractionState.voteState;
-  const reactionState = liveReactionState ?? initialInteractionState.reactionState;
-  const featuredState = liveFeaturedState ?? initialInteractionState.featuredState;
-  const bookmarkState = liveBookmarkState ?? initialInteractionState.bookmarkState;
-  const displayComments = liveCommentCount ?? initialInteractionState.displayComments;
+  const voteState = liveState?.voteState ?? initialInteractionState.voteState;
+  const reactionState = liveState?.reactionState ?? initialInteractionState.reactionState;
+  const featuredState = liveState?.featuredState ?? initialInteractionState.featuredState;
+  const isBookmarked = liveState?.isBookmarked ?? initialInteractionState.bookmarkState.isBookmarked;
+  const displayComments = liveState?.commentCount ?? initialInteractionState.displayComments;
 
+  const isOwnBlog = liveState?.isOwnBlog ?? false;
   const userEmail = currentUser?.email;
-  const isCompanyUser = userEmail?.endsWith("@taqtiq.tech");
+  const isCompanyUser = Boolean(userEmail?.endsWith("@taqtiq.tech"));
+  const canEditOrDelete = isCompanyUser || isOwnBlog;
 
   const hasLiked = voteState.hasVoted;
   const likesCount = voteState.likes;
   const isFeatured = featuredState.isFeatured;
-  const isBookmarked = bookmarkState.isBookmarked;
 
   const prefetchBlog = () => {
     convex.query(api.blogs.getBlogById, { blogId: blog._id }).catch((err) => {
@@ -80,10 +78,11 @@ export function IncrementBlogLikesDislikes({ blog, initialInteractionState }: In
   const toggleReactionMutation = useMutation(api.blogs.toggleBlogReaction).withOptimisticUpdate(
     (localStore, args) => {
       const { blogId, reactionType } = args;
-      const previous = localStore.getQuery(api.blogs.getBlogReactionState, { blogId }) ?? reactionState;
+      const previous = localStore.getQuery(api.blogs.getBlogInteractionState, { blogId });
+      if (!previous) return;
 
-      const userReactions = previous.userReactions ?? [];
-      const counts = previous.counts ?? {
+      const userReactions = previous.reactionState?.userReactions ?? [];
+      const counts = previous.reactionState?.counts ?? {
         heart: 0,
         insightful: 0,
         mindblown: 0,
@@ -101,13 +100,16 @@ export function IncrementBlogLikesDislikes({ blog, initialInteractionState }: In
       const nextCount = hasReacted ? Math.max(0, currentCount - 1) : currentCount + 1;
 
       localStore.setQuery(
-        api.blogs.getBlogReactionState,
+        api.blogs.getBlogInteractionState,
         { blogId },
         {
-          userReactions: nextUserReactions,
-          counts: {
-            ...counts,
-            [reactionType]: nextCount,
+          ...previous,
+          reactionState: {
+            userReactions: nextUserReactions,
+            counts: {
+              ...counts,
+              [reactionType]: nextCount,
+            },
           },
         }
       );
@@ -117,20 +119,24 @@ export function IncrementBlogLikesDislikes({ blog, initialInteractionState }: In
   const toggleBlogVoteMutation = useMutation(api.blogs.toggleBlogVote).withOptimisticUpdate(
     (localStore, args) => {
       const { blogId } = args;
-      const previous = localStore.getQuery(api.blogs.getBlogVoteState, { blogId }) ?? voteState;
+      const previous = localStore.getQuery(api.blogs.getBlogInteractionState, { blogId });
+      if (!previous) return;
 
-      const currentHasVoted = previous.hasVoted;
-      const currentLikes = previous.likes;
+      const currentHasVoted = previous.voteState.hasVoted;
+      const currentLikes = previous.voteState.likes;
 
       const nextHasVoted = !currentHasVoted;
       const nextLikes = nextHasVoted ? currentLikes + 1 : currentLikes - 1;
 
       localStore.setQuery(
-        api.blogs.getBlogVoteState,
+        api.blogs.getBlogInteractionState,
         { blogId },
         {
-          hasVoted: nextHasVoted,
-          likes: nextLikes,
+          ...previous,
+          voteState: {
+            hasVoted: nextHasVoted,
+            likes: nextLikes,
+          },
         }
       );
     }
@@ -138,16 +144,17 @@ export function IncrementBlogLikesDislikes({ blog, initialInteractionState }: In
 
   const toggleBookmark = useMutation(api.blogs.toggleBookmark).withOptimisticUpdate(
     (localStore, args) => {
-      const previous = localStore.getQuery(api.blogs.getBookmarkedState, {
-        blogId: args.blogId,
-      }) ?? bookmarkState;
-
-      const currentIsBookmarked = previous.isBookmarked;
+      const { blogId } = args;
+      const previous = localStore.getQuery(api.blogs.getBlogInteractionState, { blogId });
+      if (!previous) return;
 
       localStore.setQuery(
-        api.blogs.getBookmarkedState,
-        { blogId: args.blogId },
-        { isBookmarked: !currentIsBookmarked }
+        api.blogs.getBlogInteractionState,
+        { blogId },
+        {
+          ...previous,
+          isBookmarked: !previous.isBookmarked,
+        }
       );
     }
   );
@@ -155,15 +162,17 @@ export function IncrementBlogLikesDislikes({ blog, initialInteractionState }: In
   const toggleFeaturedMutation = useMutation(api.blogs.toggleFeatured).withOptimisticUpdate(
     (localStore, args) => {
       const { blogId } = args;
-      const previous = localStore.getQuery(api.blogs.getBlogFeaturedState, { blogId }) ?? featuredState;
-
-      const currentIsFeatured = previous.isFeatured;
+      const previous = localStore.getQuery(api.blogs.getBlogInteractionState, { blogId });
+      if (!previous) return;
 
       localStore.setQuery(
-        api.blogs.getBlogFeaturedState,
+        api.blogs.getBlogInteractionState,
         { blogId },
         {
-          isFeatured: !currentIsFeatured,
+          ...previous,
+          featuredState: {
+            isFeatured: !previous.featuredState.isFeatured,
+          },
         }
       );
     }
@@ -404,46 +413,52 @@ export function IncrementBlogLikesDislikes({ blog, initialInteractionState }: In
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {isCompanyUser && (
+      {(isCompanyUser || canEditOrDelete) && (
         <>
           <div className="w-8 h-[1px] bg-zinc-200 dark:bg-zinc-800 my-1" />
 
-          <Button
-            variant="ghost"
-            onClick={handleFeaturedClick}
-            className="flex items-center justify-center h-11 w-11 p-0 rounded-full text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-          >
-            <Star
-              className={`w-4 h-4 ${
-                isFeatured ? "text-amber-500 fill-amber-500" : ""
-              }`}
-            />
-          </Button>
+          {isCompanyUser && (
+            <Button
+              variant="ghost"
+              onClick={handleFeaturedClick}
+              className="flex items-center justify-center h-11 w-11 p-0 rounded-full text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+            >
+              <Star
+                className={`w-4 h-4 ${
+                  isFeatured ? "text-amber-500 fill-amber-500" : ""
+                }`}
+              />
+            </Button>
+          )}
 
-          <Button
-            variant="ghost"
-            className="flex items-center justify-center h-11 w-11 p-0 rounded-full text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-            asChild
-          >
-            <Link href={`/company/blog?id=${blog._id}`} onMouseEnter={prefetchBlog}>
-              <SquarePen className="w-4 h-4" />
-            </Link>
-          </Button>
-
-          <DeleteBlogDialog
-            blogIds={[blog._id]}
-            onSuccess={() => {
-              router.push("/insights");
-            }}
-            trigger={
+          {canEditOrDelete && (
+            <>
               <Button
                 variant="ghost"
-                className="flex items-center justify-center h-11 w-11 p-0 rounded-full text-zinc-600 dark:text-zinc-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer"
+                className="flex items-center justify-center h-11 w-11 p-0 rounded-full text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                asChild
               >
-                <Trash2 className="w-4 h-4" />
+                <Link href={`/company/blog?id=${blog._id}`} onMouseEnter={prefetchBlog}>
+                  <SquarePen className="w-4 h-4" />
+                </Link>
               </Button>
-            }
-          />
+
+              <DeleteBlogDialog
+                blogIds={[blog._id]}
+                onSuccess={() => {
+                  router.push("/insights");
+                }}
+                trigger={
+                  <Button
+                    variant="ghost"
+                    className="flex items-center justify-center h-11 w-11 p-0 rounded-full text-zinc-600 dark:text-zinc-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                }
+              />
+            </>
+          )}
         </>
       )}
     </div>

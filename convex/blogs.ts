@@ -111,107 +111,83 @@ export const recordView = mutation({
   },
 });
 
-export const getBlogReactionState = query({
+export const getBlogInteractionState = query({
   args: { blogId: v.id("blogs") },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-
     const blog = await ctx.db.get(args.blogId);
     if (!blog) {
       return null;
     }
 
+    const identity = await ctx.auth.getUserIdentity();
+
+    let hasVoted = false;
     let userReactions: string[] = [];
+    let isFeatured = false;
+    let isBookmarked = false;
+    let isOwnBlog = false;
 
     if (identity) {
       const userId = identity.subject as Id<"profiles">;
 
-      const reactions = await ctx.db
-        .query("blogReactions")
-        .withIndex("by_user_blog_and_type", (q) => 
-          q.eq("userId", userId).eq("blogId", args.blogId)
-        )
-        .collect();
+      const [vote, reactions, featured, bookmark] = await Promise.all([
+        ctx.db
+          .query("blogVotes")
+          .withIndex("by_user_and_blog", (q) =>
+            q.eq("userId", userId).eq("blogId", args.blogId)
+          )
+          .unique(),
 
-      userReactions = reactions.map((r) => r.type);
-    }
+        ctx.db
+          .query("blogReactions")
+          .withIndex("by_user_blog_and_type", (q) =>
+            q.eq("userId", userId).eq("blogId", args.blogId)
+          )
+          .collect(),
 
-    return {
-      userReactions,
-      counts: {
-        heart: blog.heartCount ?? 0,
-        insightful: blog.insightfulCount ?? 0,
-        mindblown: blog.mindblownCount ?? 0,
-        fire: blog.fireCount ?? 0,
-        thinking: blog.thinkingCount ?? 0,
-      }
-    }
-  }
-})
+        ctx.db
+          .query("featuredBlogs")
+          .withIndex("by_user_and_blog", (q) =>
+            q.eq("userId", userId).eq("blogId", args.blogId)
+          )
+          .unique(),
 
-export const getBlogCommentCount = query({
-  args: { blogId: v.id("blogs") },
-  handler: async (ctx, args) => {
-    const blog = await ctx.db.get(args.blogId);
-    if (!blog) {
-      return null;
-    }
+        ctx.db
+          .query("bookmarks")
+          .withIndex("by_user_and_blog", (q) =>
+            q.eq("userId", identity.subject).eq("blogId", args.blogId)
+          )
+          .unique(),
+      ]);
 
-    return blog.commentCount;
-  },
-});
-
-export const getBlogVoteState = query({
-  args: { blogId: v.id("blogs") },
-  handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    
-    const blog = await ctx.db.get(args.blogId);
-    if (!blog) {
-      return null;
-    }
-
-    let hasVoted = false;
-    if (identity) {
-      const vote = await ctx.db
-        .query("blogVotes")
-        .withIndex("by_user_and_blog", (q) =>
-          q.eq("userId", identity.subject as Id<"profiles">).eq("blogId", args.blogId)
-        )
-        .unique();
       hasVoted = !!vote;
+      userReactions = reactions.map((r) => r.type);
+      isFeatured = !!featured;
+      isBookmarked = !!bookmark;
+      isOwnBlog = blog.author === identity.subject;
     }
 
     return {
-      hasVoted,
-      likes: blog.likes,
-    };
-  },
-});
-
-export const getBlogFeaturedState = query({
-  args: { blogId: v.id("blogs") },
-  handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    
-    const blog = await ctx.db.get(args.blogId);
-    if (!blog) {
-      return null;
-    }
-
-    let isFeatured = false;
-    if (identity) {
-      const vote = await ctx.db
-        .query("featuredBlogs")
-        .withIndex("by_user_and_blog", (q) =>
-          q.eq("userId", identity.subject as Id<"profiles">).eq("blogId", args.blogId)
-        )
-        .unique();
-      isFeatured = !!vote;
-    }
-
-    return {
-      isFeatured
+      voteState: {
+        hasVoted,
+        likes: blog.likes,
+      },
+      reactionState: {
+        userReactions,
+        counts: {
+          heart: blog.heartCount ?? 0,
+          insightful: blog.insightfulCount ?? 0,
+          mindblown: blog.mindblownCount ?? 0,
+          fire: blog.fireCount ?? 0,
+          thinking: blog.thinkingCount ?? 0,
+        },
+      },
+      featuredState: {
+        isFeatured,
+      },
+      isBookmarked,
+      commentCount: blog.commentCount ?? 0,
+      isOwnBlog,
     };
   },
 });
