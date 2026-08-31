@@ -24,6 +24,19 @@ import { useCurrentUser } from "@/app/ConvexClientProvider";
 import { TAGS } from "@/app/constants/tags";
 import z from "zod";
 
+import { CodeBlock } from "./CodeBlock";
+import rehypeHighlight from "rehype-highlight";
+import { createLowlight } from "lowlight";
+import js from "highlight.js/lib/languages/javascript";
+import ts from "highlight.js/lib/languages/typescript";
+import "highlight.js/styles/github-dark.css";
+
+const lowlight = createLowlight();
+lowlight.register("javascript", js);
+lowlight.register("js", js);
+lowlight.register("typescript", ts);
+lowlight.register("ts", ts);
+
 
 interface BlogFormValues {
     title: string;
@@ -70,7 +83,12 @@ function toTitleCase(str: string): string {
 const MemoizedMarkdown = memo(function MemoizedMarkdown({ content }: { content: string }) {
   return (
     <div className="prose prose-neutral dark:prose-invert max-w-none text-base leading-relaxed text-neutral-800 dark:text-neutral-200 break-words">
-      <ReactMarkdown>{content}</ReactMarkdown>
+        <ReactMarkdown
+            rehypePlugins={[[rehypeHighlight, { lowlight }]]}
+            components={{ pre: CodeBlock }}
+        >
+            {content}
+        </ReactMarkdown>
     </div>
   );
 });
