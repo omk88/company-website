@@ -117,20 +117,21 @@ export const LivePostPreview = memo(function LivePostPreview({
   const profilePic =
     currentUser?.profile?.profilePicUrl || currentUser?.profile?.defaultProfilePic;
 
-  const currentDate = useMemo(() => {
-    const formatted = new Date().toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-    });
+  const [currentDate, setCurrentDate] = useState<string>("");
 
-    return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+  useEffect(() => {
+    const formatted = new Date().toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+    setCurrentDate(formatted.charAt(0).toUpperCase() + formatted.slice(1));
   }, []);
 
   const readTime = useMemo(() => {
-    if (!content.trim()) return "0 sec read";
+    if (!deferredContent.trim()) return "0 sec read";
 
-    const plainText = content
+    const plainText = deferredContent
       .replace(/<[^>]*>/g, " ")
       .replace(/[#*`_~[\]()]/g, " ");
 
@@ -140,7 +141,7 @@ export const LivePostPreview = memo(function LivePostPreview({
     const seconds = totalSeconds % 60;
 
     return minutes < 1 ? `${seconds} sec read` : `${minutes} min read`;
-  }, [content]);
+  }, [deferredContent]);
 
   return (
     <div>
@@ -174,10 +175,12 @@ export const LivePostPreview = memo(function LivePostPreview({
             )}
 
             <span>{authorName}</span>
-            <span>&middot;</span>
-            <Suspense>
+            {currentDate && (
+              <>
+                <span>&middot;</span>
                 <span>{currentDate}</span>
-            </Suspense>
+              </>
+            )}
           </div>
 
           <span className="text-xs sm:text-sm text-zinc-500 font-medium">
