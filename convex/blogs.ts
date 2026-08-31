@@ -149,6 +149,18 @@ export const getBlogReactionState = query({
   }
 })
 
+export const getBlogCommentCount = query({
+  args: { blogId: v.id("blogs") },
+  handler: async (ctx, args) => {
+    const blog = await ctx.db.get(args.blogId);
+    if (!blog) {
+      return null;
+    }
+
+    return blog.commentCount;
+  },
+});
+
 export const getBlogVoteState = query({
   args: { blogId: v.id("blogs") },
   handler: async (ctx, args) => {

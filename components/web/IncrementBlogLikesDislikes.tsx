@@ -1,7 +1,7 @@
 "use client";
 
 import { api } from "@/convex/_generated/api";
-import { Doc, Id } from "@/convex/_generated/dataModel";
+import { Doc } from "@/convex/_generated/dataModel";
 import { useConvex, useMutation, useQuery } from "convex/react";
 import { Bookmark, Copy, Ellipsis, MessageSquare, SmilePlus, SquarePen, Star, ThumbsUp, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
@@ -54,12 +54,13 @@ export function IncrementBlogLikesDislikes({ blog, initialInteractionState }: In
   const liveReactionState = useQuery(api.blogs.getBlogReactionState, { blogId: blog._id });
   const liveFeaturedState = useQuery(api.blogs.getBlogFeaturedState, { blogId: blog._id });
   const liveBookmarkState = useQuery(api.blogs.getBookmarkedState, { blogId: blog._id });
+  const liveCommentCount = useQuery(api.blogs.getBlogCommentCount, { blogId: blog._id });
 
   const voteState = liveVoteState ?? initialInteractionState.voteState;
   const reactionState = liveReactionState ?? initialInteractionState.reactionState;
   const featuredState = liveFeaturedState ?? initialInteractionState.featuredState;
   const bookmarkState = liveBookmarkState ?? initialInteractionState.bookmarkState;
-  const displayComments = initialInteractionState.displayComments;
+  const displayComments = liveCommentCount ?? initialInteractionState.displayComments;
 
   const userEmail = currentUser?.email;
   const isCompanyUser = userEmail?.endsWith("@taqtiq.tech");
