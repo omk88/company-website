@@ -217,6 +217,7 @@ export default function BlogPostForm() {
 
     const userData = useCurrentUser();
     const selectedBlog = useBlogStore((state) => state.selectedBlog);
+    const setSelectedBlog = useBlogStore((state) => state.setSelectedBlog);
 
     useEffect(() => {
         if (selectedBlog?.imageUrl) {
@@ -355,9 +356,19 @@ export default function BlogPostForm() {
             }
 
             clearImage();
+
+            const targetBlogId = selectedBlog?._id;
+
             reset();
-            router.push("/insights");
+            setSelectedBlog(null);
+
+            if (targetBlogId) {
+                router.push(`/insights/${targetBlogId}`);
+            } else {
+                router.push("/insights");
+            }
             router.refresh();
+
         } catch (error) {
             console.error(error);
             toast.error(error instanceof Error ? error.message : "Process interrupted.");
