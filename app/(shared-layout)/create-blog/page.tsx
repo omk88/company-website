@@ -2,7 +2,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import BlogPostForm from "@/components/web/BlogPostForm";
 import { LeftSidebarCreateBlog } from "@/components/web/LeftSidebarCreateBlog";
 
-export default async function Blog() {
+export default function Blog() {
 
   return (
     <div>

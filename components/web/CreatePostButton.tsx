@@ -5,12 +5,13 @@ import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { Plus } from "lucide-react";
 import { useCurrentUser } from "@/app/ConvexClientProvider";
+import { useBlogStore } from "@/stores/useBlogStore";
 
 export default function CreatePostButton() {
-
     const router = useRouter();
     const currentUser = useCurrentUser();
     const pathname = usePathname();
+    const setSelectedBlog = useBlogStore((state) => state.setSelectedBlog);
 
     const allowedStatic = ["/insights"];
     const excludedStatic = ["/vision", "/insights", "/contact", "/products", "/sign-in"];
@@ -22,8 +23,7 @@ export default function CreatePostButton() {
     const handleCreatePostClick = () => {
         if (!currentUser) {
             toast.error("You must be logged in to create a post.", {
-            action:
-                {
+                action: {
                     label: "Sign in",
                     onClick: () => router.push("/sign-in"),
                 },
@@ -31,6 +31,7 @@ export default function CreatePostButton() {
             return;
         }
 
+        setSelectedBlog(null);
         router.push("/create-blog");
     };
 
@@ -45,5 +46,5 @@ export default function CreatePostButton() {
                 <span>Create a Post</span>
             </Button>
         </div>
-    )
+    );
 }

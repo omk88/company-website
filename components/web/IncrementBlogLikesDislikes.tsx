@@ -15,6 +15,7 @@ import Link from "next/link";
 import { DeleteBlogDialog } from "./DeleteBlogDialog";
 import { EMOJI_REACTIONS, ReactionType } from "@/app/constants/reactions";
 import { useCurrentUser } from "@/app/ConvexClientProvider";
+import { useBlogStore } from "@/stores/useBlogStore";
 
 export interface InteractionState {
   voteState: {
@@ -269,6 +270,8 @@ export function IncrementBlogLikesDislikes({ blog, initialInteractionState }: In
     document.getElementById("comments")?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const setSelectedBlog = useBlogStore((state) => state.setSelectedBlog);
+
   return (
     <div className="flex flex-col items-center gap-2 py-2 text-zinc-500">
       <Button
@@ -434,11 +437,12 @@ export function IncrementBlogLikesDislikes({ blog, initialInteractionState }: In
           {canEditOrDelete && (
             <>
               <Button
+                onClick={() => setSelectedBlog(blog)}
                 variant="ghost"
                 className="flex items-center justify-center h-11 w-11 p-0 rounded-full text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
                 asChild
               >
-                <Link href={`/company/blog?id=${blog._id}`} onMouseEnter={prefetchBlog}>
+                <Link href={`/create-blog?id=${blog._id}`}>
                   <SquarePen className="w-4 h-4" />
                 </Link>
               </Button>

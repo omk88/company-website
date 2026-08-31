@@ -30,6 +30,7 @@ import { createLowlight } from "lowlight";
 import js from "highlight.js/lib/languages/javascript";
 import ts from "highlight.js/lib/languages/typescript";
 import "highlight.js/styles/github-dark.css";
+import { useBlogStore } from "@/stores/useBlogStore";
 
 const lowlight = createLowlight();
 lowlight.register("javascript", js);
@@ -207,7 +208,7 @@ export const LivePostPreview = memo(function LivePostPreview({
   );
 });
 
-export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
+export default function BlogPostForm() {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -215,41 +216,41 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const userData = useCurrentUser();
-
-    const existingPost = useQuery(
-        api.blogs.getBlogById,
-        editingBlogId ? { blogId: editingBlogId as Id<"blogs"> } : "skip"
-    );
+    const selectedBlog = useBlogStore((state) => state.selectedBlog);
 
     useEffect(() => {
-        if (existingPost?.imageUrl) {
-            setImagePreviewUrl(existingPost.imageUrl);
+        if (selectedBlog?.imageUrl) {
+            setImagePreviewUrl(selectedBlog.imageUrl);
+        } else {
+            setImagePreviewUrl(null);
         }
-    }, [existingPost]);
+    }, [selectedBlog]);
 
     const createBlog = useMutation(api.blogs.createPost);
     const updateBlog = useMutation(api.blogs.updatePost);
     const generateUploadUrl = useMutation(api.blogs.generateUploadUrl);
     
     const { control, handleSubmit, clearErrors, formState: { errors }, reset } = useForm<BlogFormValues>({
-        defaultValues: { title: "", subtitle: "", content: "", author: "", tags: [], coverImage: null, }
+        defaultValues: { title: "", subtitle: "", content: "", author: "", tags: [], coverImage: null }
     });
 
     const errorCount = Object.keys(errors).length;
     const hasErrors = errorCount > 0;
 
     useEffect(() => {
-        if (existingPost) {
+        if (selectedBlog) {
             reset({
-                title: existingPost.title,
-                subtitle: existingPost.subtitle,
-                content: existingPost.content,
-                author: existingPost.author,
-                tags: existingPost.tags || [],
-                coverImage: existingPost.imageUrl || null,
+                title: selectedBlog.title,
+                subtitle: selectedBlog.subtitle || "",
+                content: selectedBlog.content,
+                author: selectedBlog.author,
+                tags: selectedBlog.tags || [],
+                coverImage: selectedBlog.imageUrl || null,
             });
+        } else {
+            reset({ title: "", subtitle: "", content: "", author: "", tags: [], coverImage: null });
         }
-    }, [existingPost, reset]);
+    }, [selectedBlog, reset]);
 
     const clearImage = () => {
         setSelectedImage(null);
@@ -271,7 +272,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
             return;
         }
 
-        const hasExistingImage = Boolean(existingPost?.imageUrl);
+        const hasExistingImage = Boolean(selectedBlog?.imageUrl);
         if (!selectedImage && !hasExistingImage) {
             toast.error("Please upload a cover image from your computer.");
             return;
@@ -282,39 +283,39 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
         const postType = userData.email?.endsWith("@taqtiq.tech") ? "team" : "community";
 
         try {
-            let storageId = existingPost?.storageId || "";
+            let storageId = selectedBlog?.storageId || "";
             const formattedTitle = toTitleCase(data.title);
 
             if (selectedImage) {
-            const options = {
-                maxSizeMB: 1.0,
-                maxWidthOrHeight: 1920,
-                useWebWorker: true,
-                fileType: "image/webp" as const,
-                initialQuality: 0.85,
-            };
+                const options = {
+                    maxSizeMB: 1.0,
+                    maxWidthOrHeight: 1920,
+                    useWebWorker: true,
+                    fileType: "image/webp" as const,
+                    initialQuality: 0.85,
+                };
 
-            const compressedFile = (await imageCompression(selectedImage, options)) as File;
-            const uploadUrl = await generateUploadUrl();
+                const compressedFile = (await imageCompression(selectedImage, options)) as File;
+                const uploadUrl = await generateUploadUrl();
 
-            const result = await fetch(uploadUrl, {
-                method: "POST",
-                headers: { "Content-Type": compressedFile.type },
-                body: compressedFile,
-            });
+                const result = await fetch(uploadUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": compressedFile.type },
+                    body: compressedFile,
+                });
 
-            if (!result.ok) throw new Error("Failed to upload image bundle.");
+                if (!result.ok) throw new Error("Failed to upload image bundle.");
 
-            const resJson = await result.json();
-            const responseSchema = z.object({ storageId: z.string() });
-            const parsedResponse = responseSchema.parse(resJson);
+                const resJson = await result.json();
+                const responseSchema = z.object({ storageId: z.string() });
+                const parsedResponse = responseSchema.parse(resJson);
 
-            storageId = parsedResponse.storageId;
+                storageId = parsedResponse.storageId;
             }
 
-            if (editingBlogId) {
+            if (selectedBlog?._id) {
                 await updateBlog({
-                    blogId: editingBlogId as Id<"blogs">,
+                    blogId: selectedBlog._id as Id<"blogs">,
                     title: formattedTitle,
                     subtitle: data.subtitle,
                     content: data.content,
@@ -346,7 +347,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                    tags: ["featured-blogs", "main-blogs", "morefrom-blogs", "trending-blogs"],
+                        tags: ["featured-blogs", "main-blogs", "morefrom-blogs", "trending-blogs"],
                     }),
                 });
             } catch (err) {
@@ -391,7 +392,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                     control={control}
                                     rules={{
                                         validate: (value) => {
-                                            if (value || existingPost?.imageUrl) return true;
+                                            if (value || selectedBlog?.imageUrl) return true;
                                             return "A cover image is required";
                                         },
                                     }}
@@ -410,10 +411,10 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                                     className="hidden"
                                                     onChange={(e) => {
                                                         if (e.target.files && e.target.files[0]) {
-                                                        const file = e.target.files[0];
-                                                        setSelectedImage(file);
-                                                        setImagePreviewUrl(URL.createObjectURL(file));
-                                                        field.onChange(file);
+                                                            const file = e.target.files[0];
+                                                            setSelectedImage(file);
+                                                            setImagePreviewUrl(URL.createObjectURL(file));
+                                                            field.onChange(file);
                                                         }
                                                     }}
                                                 />
@@ -422,23 +423,23 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                                     <label
                                                         htmlFor="cover-image-upload"
                                                         className={cn(
-                                                        "group flex items-center justify-between w-full h-8 pl-2.5 pr-8 rounded-md border border-input bg-background text-xs cursor-pointer hover:bg-accent/50 transition-all select-none relative",
-                                                        "has-[button:hover]:bg-background",
-                                                        !isInvalid &&
-                                                            "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-transparent",
-                                                        isInvalid &&
-                                                            "border-destructive focus-within:ring-2 focus-within:ring-destructive focus-within:ring-offset-2 focus-within:border-transparent",
-                                                        isLoading && "opacity-50 cursor-not-allowed pointer-events-none"
+                                                            "group flex items-center justify-between w-full h-8 pl-2.5 pr-8 rounded-md border border-input bg-background text-xs cursor-pointer hover:bg-accent/50 transition-all select-none relative",
+                                                            "has-[button:hover]:bg-background",
+                                                            !isInvalid &&
+                                                                "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-transparent",
+                                                            isInvalid &&
+                                                                "border-destructive focus-within:ring-2 focus-within:ring-destructive focus-within:ring-offset-2 focus-within:border-transparent",
+                                                            isLoading && "opacity-50 cursor-not-allowed pointer-events-none"
                                                         )}
                                                     >
                                                         <span className="flex flex-row items-center gap-1.5 text-muted-foreground group-hover:text-foreground group-has-[button:hover]:text-muted-foreground transition-colors truncate max-w-[75%]">
                                                             <Paperclip className="h-3.5 w-3.5 shrink-0 stroke-[1.5]" />
                                                             <span className="truncate">
                                                                 {selectedImage
-                                                                ? selectedImage.name
-                                                                : existingPost?.imageUrl
-                                                                ? "Change cover image..."
-                                                                : "Cover image..."}
+                                                                    ? selectedImage.name
+                                                                    : selectedBlog?.imageUrl
+                                                                    ? "Change cover image..."
+                                                                    : "Cover image..."}
                                                             </span>
                                                         </span>
 
@@ -446,15 +447,15 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                                             <button
                                                                 type="button"
                                                                 onClick={(e) => {
-                                                                e.preventDefault();
-                                                                e.stopPropagation();
-                                                                clearImage();
-                                                                field.onChange(null);
+                                                                    e.preventDefault();
+                                                                    e.stopPropagation();
+                                                                    clearImage();
+                                                                    field.onChange(null);
                                                                 }}
                                                                 disabled={isLoading}
                                                                 className={cn(
-                                                                "text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted shrink-0 transition-colors relative z-10 cursor-pointer absolute",
-                                                                errorMessage ? "right-7" : "right-2"
+                                                                    "text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted shrink-0 transition-colors relative z-10 cursor-pointer absolute",
+                                                                    errorMessage ? "right-7" : "right-2"
                                                                 )}
                                                                 title="Remove image"
                                                             >
@@ -803,14 +804,14 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                             isLoading && "cursor-not-allowed opacity-70"
                                         )}
                                     >
-                                    {isLoading ? (
-                                        <>
-                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                            {editingBlogId ? "Updating" : "Publishing"}
-                                        </>
-                                    ) : (
-                                        editingBlogId ? "Update Post" : "Publish Post"
-                                    )}
+                                        {isLoading ? (
+                                            <>
+                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                {selectedBlog ? "Updating" : "Publishing"}
+                                            </>
+                                        ) : (
+                                            selectedBlog ? "Update Post" : "Publish Post"
+                                        )}
                                     </Button>
                                 </div>
                             </FieldGroup>
