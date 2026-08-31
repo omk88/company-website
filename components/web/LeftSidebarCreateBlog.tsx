@@ -1,11 +1,19 @@
+"use client";
 
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { Sidebar, SidebarHeader, SidebarContent, SidebarFooter } from "../ui/sidebar";
+import { Sidebar, SidebarHeader, SidebarFooter } from "../ui/sidebar";
 import { buttonVariants } from "../ui/button";
 import { cn } from "@/lib/utils";
+import { useBlogStore } from "@/stores/useBlogStore";
 
 export function LeftSidebarCreateBlog() {
+  const selectedBlog = useBlogStore((state) => state.selectedBlog);
+
+  const backHref = selectedBlog?._id
+    ? `/insights/${selectedBlog._id}`
+    : "/insights";
+
   return (
     <aside 
       className="shrink-0"
@@ -18,8 +26,8 @@ export function LeftSidebarCreateBlog() {
               buttonVariants({ variant: "ghost", size: "icon" }),
               "h-11 w-11 rounded-full text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 dark:hover:text-zinc-100 dark:hover:bg-zinc-800 transition-colors"
             )}
-            href="/insights"
-            title="Back to insights"
+            href={backHref}
+            title={selectedBlog?._id ? "Back to blog post" : "Back to insights"}
           >
             <ArrowLeft className="w-4 h-4" />
           </Link>
