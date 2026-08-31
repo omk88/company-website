@@ -14,7 +14,7 @@ import { Separator } from "../ui/separator";
 import { Id } from "@/convex/_generated/dataModel";
 import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
-import { AlertCircle, Check, ChevronDown, Image, Paperclip, X } from "lucide-react";
+import { AlertCircle, Check, ChevronDown, Image, Loader2, Paperclip, X } from "lucide-react";
 import imageCompression from "browser-image-compression";
 import { FunctionReturnType } from "convex/server";
 import { MarkdownTextEditor } from "./MarkdownTextEditor";
@@ -790,7 +790,7 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                         </div>
                                     )}
                                     
-                                    <button
+                                    <Button
                                         type="submit"
                                         disabled={isLoading}
                                         className={cn(
@@ -798,11 +798,15 @@ export default function BlogPostForm({ editingBlogId }: BlogPostFormProps) {
                                             isLoading && "cursor-not-allowed opacity-70"
                                         )}
                                     >
-                                        {isLoading 
-                                            ? (editingBlogId ? "Updating..." : "Publishing...") 
-                                            : (editingBlogId ? "Update Post" : "Publish Post")
-                                        }
-                                    </button>
+                                    {isLoading ? (
+                                        <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            {editingBlogId ? "Updating" : "Publishing"}
+                                        </>
+                                    ) : (
+                                        editingBlogId ? "Update Post" : "Publish Post"
+                                    )}
+                                    </Button>
                                 </div>
                             </FieldGroup>
                         </form>
