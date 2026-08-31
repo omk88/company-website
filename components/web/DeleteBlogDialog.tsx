@@ -44,14 +44,14 @@ export function DeleteBlogDialog({ blogIds, trigger, onSuccess }: DeleteBlogDial
             <DialogTitle>
               {isMultiple ? `Delete ${blogIds.length} blog posts?` : "Delete blog post?"}
             </DialogTitle>
-            <DialogDescription className="flex flex-cols gap-4 p-4">
-                <TriangleAlert className="w-20 h-20 text-yellow-500" />
-                <span>
-                  {isMultiple
-                    ? `Are you sure you want to delete these ${blogIds.length} blogs? This action cannot be undone and will permanently remove these posts and all of their comments.`
-                    : "Are you sure you want to delete this blog? This action cannot be undone and will permanently remove this post and all of its comments."
-                  }
-                </span>
+            <DialogDescription className="flex items-center gap-4 py-4">
+              <TriangleAlert className="h-10 w-10 shrink-0 text-yellow-500" />
+              <span>
+                {isMultiple
+                  ? `Are you sure you want to delete these ${blogIds.length} blogs? This action cannot be undone and will permanently remove these posts and all of their comments.`
+                  : "Are you sure you want to delete this blog? This action cannot be undone and will permanently remove this post and all of its comments."
+                }
+              </span>
             </DialogDescription>
           </DialogHeader>
 
