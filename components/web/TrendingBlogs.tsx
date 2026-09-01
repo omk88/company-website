@@ -5,7 +5,6 @@ import Image from "next/image";
 import { api } from "@/convex/_generated/api";
 import { Preloaded, usePreloadedQuery, useQuery } from "convex/react";
 import { Eye, MessageSquare, ThumbsUp, TrendingUp } from "lucide-react";
-import { TrendingBlogsSkeleton } from "./LoadingSkeletons/TrendingBlogsSkeleton";
 
 const compactFormatter = new Intl.NumberFormat("en", {
   notation: "compact",

@@ -12,6 +12,7 @@ import { Separator } from "../ui/separator";
 import { Skeleton } from "../ui/skeleton";
 import { useEffect, useState } from "react";
 import { useCurrentUser } from "@/app/ConvexClientProvider";
+import BlogNotificationCard from "./BlogNotificationCard";
 
 interface NavbarAuthClientProps {
   initialIsAuth: boolean;
@@ -29,7 +30,8 @@ export function NavbarAuthClient({
 }: NavbarAuthClientProps) {
   const router = useRouter();
   const { data: session } = authClient.useSession();
-  const [open, setOpen] = useState(false);
+  const [openProfile, setOpenProfile] = useState(false);
+  const [openNotifications, setOpenNotifications] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -37,7 +39,7 @@ export function NavbarAuthClient({
   }, []);
 
   const handleSignOut = async () => {
-    setOpen(false);
+    setOpenProfile(false);
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
@@ -75,17 +77,52 @@ export function NavbarAuthClient({
       <div className="flex items-center gap-2 shrink-0">
         {isLoggedIn ? (
           <>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="w-9 h-9 relative flex items-center justify-center cursor-pointer"
-            >
-              <Bell className="h-4 w-4 text-foreground transition-all block dark:hidden" />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Popover open={openNotifications} onOpenChange={setOpenNotifications}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="w-9 h-9 relative flex items-center justify-center cursor-pointer"
+                    >
+                      <Bell className="h-4 w-4 text-foreground transition-all block dark:hidden" />
+                    </Button>
+                  </PopoverTrigger>
+
+                  <PopoverContent
+                    align="end"
+                    className="w-80 p-1.5 rounded-xl border border-border bg-popover"
+                  >
+                    <div className="flex flex-row gap-2 items-center text-sm px-2 pt-2 pb-1.5">
+                      <Bell className="h-4 w-4 text-foreground transition-all block dark:hidden" />
+                      <span className="font-medium">Notifications</span>
+                      
+                      <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[11px] font-semibold text-white leading-none">
+                        4
+                      </span>
+                    </div>
+
+                    <Separator />
+
+                    <div className="flex flex-col gap-2">
+                      {[1, 2, 3].map((_, index) => (
+                        <div 
+                          key={index} 
+                          className="p-2 rounded-lg bg-zinc-50/80 hover:bg-accent transition-colors cursor-pointer"
+                        >
+                          <BlogNotificationCard />
+                        </div>
+                      ))}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </TooltipTrigger>
+            </Tooltip>
 
             <Tooltip>
               <TooltipTrigger asChild>
-                <Popover open={open} onOpenChange={setOpen}>
+                <Popover open={openProfile} onOpenChange={setOpenProfile}>
                   <PopoverTrigger asChild>
                     <button
                       type="button"
@@ -110,7 +147,7 @@ export function NavbarAuthClient({
                   >
                     <Link
                       href={`/${profileUsername || ""}`}
-                      onClick={() => setOpen(false)}
+                      onClick={() => setOpenProfile(false)}
                       className="group flex items-center justify-between p-2.5 rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors duration-100 cursor-pointer"
                     >
                       <div className="flex items-center gap-3 min-w-0">
@@ -154,7 +191,7 @@ export function NavbarAuthClient({
                     <div className="flex flex-col gap-0.5">
                       <Link
                         href="/company/blog"
-                        onClick={() => setOpen(false)}
+                        onClick={() => setOpenProfile(false)}
                         className="flex items-center text-zinc-600 dark:text-zinc-400 gap-2.5 px-2.5 py-2 text-xs rounded-md hover:bg-accent hover:text-accent-foreground transition-colors duration-100 cursor-pointer"
                       >
                         <Plus className="w-4 h-4 stroke-[2] shrink-0 group-hover:text-current" />
