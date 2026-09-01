@@ -3,7 +3,7 @@
 export default function CommentNotificationCard() {
   return (
     <div className="relative w-full flex flex-row items-center gap-3 p-2 rounded-lg bg-zinc-50/80 hover:bg-accent transition-colors cursor-pointer group">
-      <span className="absolute top-2 right-2 h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-background" />
+      <span className="absolute top-2 right-2 h-2.5 w-2.5 rounded-full bg-red-500" />
 
       <div className="flex-1 min-w-0 flex flex-row items-center justify-between gap-3 pr-4">
         <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">

@@ -88,6 +88,8 @@ export function NavbarAuthClient({
                       className="w-9 h-9 relative flex items-center justify-center cursor-pointer"
                     >
                       <Bell className="h-4 w-4 text-foreground transition-all block dark:hidden" />
+                      
+                      <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500" />
                     </Button>
                   </PopoverTrigger>
 
