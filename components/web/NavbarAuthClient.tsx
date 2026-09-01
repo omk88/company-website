@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button, buttonVariants } from "../ui/button";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
-import { LogOut, LogIn, ArrowUpRight, Plus, Bell } from "lucide-react";
+import { LogOut, LogIn, ArrowUpRight, Plus, Bell, Library, MessageSquare, MessageSquareText } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Separator } from "../ui/separator";
@@ -13,6 +13,7 @@ import { Skeleton } from "../ui/skeleton";
 import { useEffect, useState } from "react";
 import { useCurrentUser } from "@/app/ConvexClientProvider";
 import BlogNotificationCard from "./BlogNotificationCard";
+import CommentNotificationCard from "./CommentNotificationCard";
 
 interface NavbarAuthClientProps {
   initialIsAuth: boolean;
@@ -107,19 +108,21 @@ export function NavbarAuthClient({
 
                     <span className="text-xs font-semibold px-2">Today</span>
 
-                    <div className="flex flex-row gap-2 items-center">
+                    <div className="flex flex-row gap-2 items-center text-xs font-roboto text-zinc-600 dark:text-zinc-400 capitalize px-2">
                         <div className="h-5 w-5 rounded-full overflow-hidden border border-border bg-muted shrink-0 flex items-center justify-center">
                             <img
-                            src={"/comp1.png"}
-                            alt={"User Profile"}
-                            loading="eager"
-                            decoding="sync"
-                            suppressHydrationWarning
-                            className="h-full w-full object-cover"
+                              src={"/comp1.png"}
+                              alt={"User Profile"}
+                              loading="eager"
+                              decoding="sync"
+                              suppressHydrationWarning
+                              className="h-full w-full object-cover"
                             />
                         </div>
 
-                        <span className="text-xs font-roboto text-zinc-600 dark:text-zinc-400 capitalize">info posted 4 insights</span>
+                        <span>info added 3 insights</span>
+
+                        <Library className="h-4 w-4 ml-auto" />
                     </div>
 
                     <div className="flex flex-col gap-2">
@@ -127,6 +130,24 @@ export function NavbarAuthClient({
                         <BlogNotificationCard key={index} />
                       ))}
                     </div>
+
+                    <div className="flex flex-row gap-2 items-center text-xs font-roboto text-zinc-600 dark:text-zinc-400 capitalize px-2">
+                      <div className="h-5 w-5 rounded-full overflow-hidden border border-border bg-muted shrink-0 flex items-center justify-center">
+                          <img
+                            src={"/comp1.png"}
+                            alt={"User Profile"}
+                            loading="eager"
+                            decoding="sync"
+                            suppressHydrationWarning
+                            className="h-full w-full object-cover"
+                          />
+                      </div>
+
+                      <span>omk98 added 1 comment to your post</span>
+
+                      <MessageSquareText className="h-4 w-4 ml-auto" />
+                    </div>
+                    <CommentNotificationCard />
                   </PopoverContent>
                 </Popover>
               </TooltipTrigger>
