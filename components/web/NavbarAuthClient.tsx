@@ -105,14 +105,26 @@ export function NavbarAuthClient({
 
                     <Separator />
 
+                    <span className="text-xs font-semibold px-2">Today</span>
+
+                    <div className="flex flex-row gap-2 items-center">
+                        <div className="h-5 w-5 rounded-full overflow-hidden border border-border bg-muted shrink-0 flex items-center justify-center">
+                            <img
+                            src={"/comp1.png"}
+                            alt={"User Profile"}
+                            loading="eager"
+                            decoding="sync"
+                            suppressHydrationWarning
+                            className="h-full w-full object-cover"
+                            />
+                        </div>
+
+                        <span className="text-xs font-roboto text-zinc-600 dark:text-zinc-400 capitalize">info posted 4 insights</span>
+                    </div>
+
                     <div className="flex flex-col gap-2">
                       {[1, 2, 3].map((_, index) => (
-                        <div 
-                          key={index} 
-                          className="p-2 rounded-lg bg-zinc-50/80 hover:bg-accent transition-colors cursor-pointer"
-                        >
-                          <BlogNotificationCard />
-                        </div>
+                        <BlogNotificationCard key={index} />
                       ))}
                     </div>
                   </PopoverContent>
