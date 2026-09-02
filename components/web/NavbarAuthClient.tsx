@@ -76,12 +76,16 @@ export function NavbarAuthClient({
     ? userData?.profile?.profilePicUrl || clientSessionImage || initialImage || defaultAvatarUrl
     : initialImage || defaultAvatarUrl;
 
-  const unreadCount = useQuery(
-    api.notifications.getUnreadPostsCount,
-    profileId ? { profileId } : "skip"
-  ) ?? 0;
 
   const markAsRead = useMutation(api.notifications.markNotificationsAsRead);
+
+  const notificationData = useQuery(
+    api.notifications.getUnreadPosts,
+    profileId ? { profileId } : "skip"
+  );
+
+  const unreadCount = notificationData?.count ?? 0;
+  const unreadNotifications = notificationData?.notifications ?? [];
 
   const [hasUnread, setHasUnread] = useState(unreadCount > 0);
   const [showBadge, setShowBadge] = useState(unreadCount > 0);
@@ -167,10 +171,23 @@ export function NavbarAuthClient({
                         <Library className="h-4 w-4 ml-auto" />
                     </div>
 
-                    <div className="flex flex-col gap-2">
-                      {[1, 2, 3].map((_, index) => (
-                        <BlogNotificationCard key={index} />
-                      ))}
+                    <div className="flex flex-col gap-2 max-h-80 overflow-y-auto p-1">
+                      {unreadNotifications.length > 0 ? (
+                        unreadNotifications.map((blog) => (
+                          <BlogNotificationCard
+                            key={blog._id}
+                            _id={blog._id}
+                            title={blog.title}
+                            imageUrl={blog.imageUrl}
+                            createdAt={blog.createdAt}
+                            author={blog.author}
+                          />
+                        ))
+                      ) : (
+                        <div className="p-4 text-center text-xs text-zinc-500">
+                          No unread posts
+                        </div>
+                      )}
                     </div>
 
                     <div className="flex flex-row gap-2 items-center text-xs font-roboto text-zinc-600 dark:text-zinc-400 capitalize px-2">

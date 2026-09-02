@@ -1,42 +1,31 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 
-export const getUnreadPostsCount = query({
+export const getUnreadPosts = query({
   args: { profileId: v.id("profiles") },
   handler: async (ctx, args) => {
     const profile = await ctx.db.get(args.profileId);
-    if (!profile) return 0;
+    if (!profile) return { count: 0, notifications: [] };
 
-    const lastRead = profile.lastCheckedNotificationsAt ?? 0;
+    const lastChecked = profile.lastCheckedNotificationsAt ?? 0;
 
-    const follows = await ctx.db
-      .query("follows")
-      .withIndex("by_follower", (q) => q.eq("followerId", args.profileId))
-      .filter((q) => q.eq(q.field("isBell"), true))
-      .collect();
+    const unreadBlogs = await ctx.db
+      .query("blogs")
+      .withIndex("by_createdAt", (q) => q.gt("createdAt", lastChecked))
+      .order("desc")
+      .take(10);
 
-    if (follows.length === 0) return 0;
-
-    let unreadCount = 0;
-
-    for (const follow of follows) {
-      const followedProfile = await ctx.db.get(follow.followingId);
-      
-      if (!followedProfile || !followedProfile.userId) continue;
-
-      const newPosts = await ctx.db
-        .query("blogs")
-        .withIndex("by_author_createdAt", (q) =>
-          q
-            .eq("author", followedProfile.userId)
-            .gt("createdAt", lastRead)
-        )
-        .collect();
-
-      unreadCount += newPosts.length;
-    }
-
-    return unreadCount;
+    return {
+      count: unreadBlogs.length,
+      notifications: unreadBlogs.map((blog) => ({
+        _id: blog._id,
+        title: blog.title,
+        imageUrl: blog.imageUrl,
+        createdAt: blog.createdAt,
+        author: blog.displayName || blog.username,
+        authorAvatarUrl: blog.authorAvatarUrl,
+      })),
+    };
   },
 });
 
