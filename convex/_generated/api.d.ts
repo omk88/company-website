@@ -20,6 +20,7 @@ import type * as contact from "../contact.js";
 import type * as crons from "../crons.js";
 import type * as files from "../files.js";
 import type * as http from "../http.js";
+import type * as notifications from "../notifications.js";
 import type * as postImageCleanup from "../postImageCleanup.js";
 import type * as profiles from "../profiles.js";
 import type * as scoreAlgorithm from "../scoreAlgorithm.js";
@@ -44,6 +45,7 @@ declare const fullApi: ApiFromModules<{
   crons: typeof crons;
   files: typeof files;
   http: typeof http;
+  notifications: typeof notifications;
   postImageCleanup: typeof postImageCleanup;
   profiles: typeof profiles;
   scoreAlgorithm: typeof scoreAlgorithm;
