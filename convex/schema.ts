@@ -58,6 +58,8 @@ const schema = defineSchema({
     .index("by_type_controversial", ["postType", "controversialScore"])
     .index("by_type_likes", ["postType", "likes"])
 
+    .index("by_author_createdAt", ["author", "createdAt"])
+
     .searchIndex("search_title", { searchField: "title", filterFields: ["username"] })
     .searchIndex("search_title_by_type", { searchField: "title", filterFields: ["postType"] }),
 
@@ -215,6 +217,7 @@ const schema = defineSchema({
     followingId: v.id("profiles"),
     isBell: v.boolean(),
   })
+    .index("by_follower_and_isBell", ["followerId", "isBell"])
     .index("by_follower_and_following", ["followerId", "followingId"])
     .index("by_following", ["followingId"])
     .index("by_follower", ["followerId"]),

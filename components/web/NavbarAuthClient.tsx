@@ -83,9 +83,25 @@ export function NavbarAuthClient({
 
   const markAsRead = useMutation(api.notifications.markNotificationsAsRead);
 
+  const [hasUnread, setHasUnread] = useState(unreadCount > 0);
+  const [showBadge, setShowBadge] = useState(unreadCount > 0);
+
+  useEffect(() => {
+    if (!openNotifications) {
+      if (unreadCount > 0) {
+        setHasUnread(true);
+        setShowBadge(true);
+      } else {
+        setHasUnread(false);
+        const timer = setTimeout(() => setShowBadge(false), 200);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [unreadCount, openNotifications]);
+
   const handleOpenNotifications = (open: boolean) => {
     setOpenNotifications(open);
-    if (open && profileId && unreadCount > 0) {
+    if (!open && profileId && unreadCount > 0) {
       markAsRead({ profileId });
     }
   };
@@ -106,8 +122,11 @@ export function NavbarAuthClient({
                     >
                       <Bell className="h-4 w-4 text-foreground transition-all block dark:hidden" />
                       
-                      {unreadCount > 0 && (
-                        <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500 animate-in fade-in zoom-in" />
+                      {showBadge && (
+                        <span
+                          data-state={unreadCount > 0 ? "open" : "closed"}
+                          className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500 transition-all duration-200 ease-in-out data-[state=open]:animate-in data-[state=open]:fade-in data-[state=open]:zoom-in-50 data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=closed]:zoom-out-0"
+                        />
                       )}
                     </Button>
                   </PopoverTrigger>
