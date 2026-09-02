@@ -18,14 +18,20 @@ export const getUnreadPostsCount = query({
     if (follows.length === 0) return 0;
 
     let unreadCount = 0;
+
     for (const follow of follows) {
-      const posts = await ctx.db
+      const followedProfile = await ctx.db.get(follow.followingId);
+      if (!followedProfile) continue;
+
+      const newPosts = await ctx.db
         .query("blogs")
-        .withIndex("by_author", (q) => q.eq("author", follow.followingId))
-        .filter((q) => q.gt(q.field("_creationTime"), lastRead))
+        .withIndex("by_author", (q) =>
+          q.eq("author", followedProfile.userId)
+        )
+        .filter((q) => q.gt(q.field("createdAt"), lastRead))
         .collect();
 
-      unreadCount += posts.length;
+      unreadCount += newPosts.length;
     }
 
     return unreadCount;

@@ -5,6 +5,7 @@ const schema = defineSchema({
   blogs: defineTable({
     storageId: v.string(),
     author: v.string(),
+    authorProfileId: v.optional(v.id("profiles")),
     title: v.string(),
     subtitle: v.string(),
     imageUrl: v.string(),

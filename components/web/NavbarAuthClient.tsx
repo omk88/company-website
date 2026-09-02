@@ -14,6 +14,8 @@ import { useEffect, useState } from "react";
 import { useCurrentUser } from "@/app/ConvexClientProvider";
 import BlogNotificationCard from "./BlogNotificationCard";
 import CommentNotificationCard from "./CommentNotificationCard";
+import { useMutation, useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 interface NavbarAuthClientProps {
   initialIsAuth: boolean;
@@ -57,6 +59,7 @@ export function NavbarAuthClient({
 
   const isLoggedIn = isMounted ? !!session : initialIsAuth;
   const userData = useCurrentUser();
+  const profileId = userData?.profile?._id;
 
   const activeProfile = userData?.profile ?? initialProfile;
   const profileUsername = activeProfile?.username;
@@ -73,6 +76,20 @@ export function NavbarAuthClient({
     ? userData?.profile?.profilePicUrl || clientSessionImage || initialImage || defaultAvatarUrl
     : initialImage || defaultAvatarUrl;
 
+  const unreadCount = useQuery(
+    api.notifications.getUnreadPostsCount,
+    profileId ? { profileId } : "skip"
+  ) ?? 0;
+
+  const markAsRead = useMutation(api.notifications.markNotificationsAsRead);
+
+  const handleOpenNotifications = (open: boolean) => {
+    setOpenNotifications(open);
+    if (open && profileId && unreadCount > 0) {
+      markAsRead({ profileId });
+    }
+  };
+
   return (
     <TooltipProvider delayDuration={200}>
       <div className="flex items-center gap-2 shrink-0">
@@ -80,7 +97,7 @@ export function NavbarAuthClient({
           <>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Popover open={openNotifications} onOpenChange={setOpenNotifications}>
+                <Popover open={openNotifications} onOpenChange={handleOpenNotifications}>
                   <PopoverTrigger asChild>
                     <Button
                       variant="ghost"
@@ -89,7 +106,9 @@ export function NavbarAuthClient({
                     >
                       <Bell className="h-4 w-4 text-foreground transition-all block dark:hidden" />
                       
-                      <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500" />
+                      {unreadCount > 0 && (
+                        <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500 animate-in fade-in zoom-in" />
+                      )}
                     </Button>
                   </PopoverTrigger>
 
@@ -101,9 +120,11 @@ export function NavbarAuthClient({
                       <Bell className="h-4 w-4 text-foreground transition-all block dark:hidden" />
                       <span className="font-medium">Notifications</span>
                       
-                      <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[11px] font-semibold text-white leading-none">
-                        4
-                      </span>
+                      {unreadCount > 0 && (
+                        <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[11px] font-semibold text-white leading-none">
+                          {unreadCount > 99 ? "99+" : unreadCount}
+                        </span>
+                      )}
                     </div>
 
                     <Separator />
@@ -225,7 +246,7 @@ export function NavbarAuthClient({
 
                     <div className="flex flex-col gap-0.5">
                       <Link
-                        href="/company/blog"
+                        href="/create-blog"
                         onClick={() => setOpenProfile(false)}
                         className="flex items-center text-zinc-600 dark:text-zinc-400 gap-2.5 px-2.5 py-2 text-xs rounded-md hover:bg-accent hover:text-accent-foreground transition-colors duration-100 cursor-pointer"
                       >
