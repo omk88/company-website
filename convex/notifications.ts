@@ -38,18 +38,29 @@ export const getNotifications = query({
     const allPosts = nestedPosts.flat().sort((a, b) => b.createdAt - a.createdAt);
 
     const pageSize = args.paginationOpts.numItems;
-    const page = allPosts.slice(0, pageSize).map((blog) => ({
-      _id: blog._id,
-      title: blog.title,
-      imageUrl: blog.imageUrl,
-      createdAt: blog.createdAt,
-      author: blog.author,
-      authorUsername: blog.username,
-      authorDisplayName: blog.displayName,
-      isUnread: blog.createdAt > lastRead, 
-    }));
+    const selectedPosts = allPosts.slice(0, pageSize);
 
-    return { page, isDone: allPosts.length <= pageSize, continueCursor: "" };
+    const postsWithAuthors = await Promise.all(
+      selectedPosts.map(async (blog) => {
+        const authorProfile = await ctx.db
+          .query("profiles")
+          .withIndex("by_userId", (q) => q.eq("userId", blog.author))
+          .unique();
+
+        return {
+          _id: blog._id,
+          title: blog.title,
+          imageUrl: blog.imageUrl,
+          createdAt: blog.createdAt,
+          author: blog.author,
+          authorUsername: authorProfile?.username ?? "",
+          authorDisplayName: authorProfile?.displayName ?? "",
+          isUnread: blog.createdAt > lastRead,
+        };
+      })
+    );
+
+    return { page: postsWithAuthors, isDone: allPosts.length <= pageSize, continueCursor: "" };
   },
 });
 

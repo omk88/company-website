@@ -30,18 +30,9 @@ type NotificationItem = {
   title: string;
   imageUrl?: string;
   createdAt: number | string;
-  readAt?: number | string;
-  author:
-    | {
-        _id?: string;
-        id?: string;
-        name?: string;
-        displayName?: string;
-        username?: string;
-        profilePicUrl?: string;
-        avatarUrl?: string;
-      }
-    | string;
+  author: string; // author ID
+  authorUsername: string;
+  authorDisplayName?: string;
   isUnread?: boolean;
 };
 
@@ -172,18 +163,16 @@ export function NavbarAuthClient({
     notificationsList.forEach((blog: any) => {
       const timeCategory = getCategory(blog.createdAt) as "Today" | "Yesterday" | "Older";
 
-      const authorObj = typeof blog.author === "object" ? blog.author : null;
-      const authorId =
-        authorObj?._id || authorObj?.id || (typeof blog.author === "string" ? blog.author : "unknown");
-      const authorName =
-        authorObj?.displayName || authorObj?.username || authorObj?.name || "Author";
-      const authorAvatar = authorObj?.profilePicUrl || authorObj?.avatarUrl || "/comp1.png";
+      const authorId = blog.author || "unknown";
+      
+      const displayName = blog.authorDisplayName?.trim();
+      const username = blog.authorUsername?.trim();
+
+      const authorName = displayName || username || "Author";
+      const authorAvatar = blog.authorAvatar || "/comp1.png";
 
       const isUnread = Boolean(blog.isUnread);
-
-      const readBatchId = blog.readAt
-        ? parseDate(blog.readAt).toISOString()
-        : parseDate(blog.createdAt).toISOString().split("T")[0];
+      const readBatchId = parseDate(blog.createdAt).toISOString().split("T")[0];
 
       const groupKey = isUnread
         ? `${authorId}-unread`
