@@ -288,7 +288,7 @@ export function NavbarAuthClient({
 
                                 {authorGroups.map((group) => (
                                   <div key={group.groupKey} className="flex flex-col gap-1.5 pl-1">
-                                    <div className="flex flex-row gap-2 items-center text-xs font-roboto text-zinc-600 dark:text-zinc-400 px-2 py-0.5 rounded-md bg-muted/40">
+                                    <div className="flex flex-row gap-2 items-center text-xs font-roboto text-zinc-600 dark:text-zinc-400 px-2 py-0.5">
                                       <div className="h-5 w-5 rounded-full overflow-hidden border border-border bg-muted shrink-0 flex items-center justify-center">
                                         <img
                                           src={group.authorAvatar}
@@ -301,9 +301,9 @@ export function NavbarAuthClient({
                                       </div>
 
                                       <span className="truncate">
-                                        <strong className="font-semibold text-foreground">
+                                        <span>
                                           {group.authorName}
-                                        </strong>{" "}
+                                        </span>{" "}
                                         added {group.items.length}{" "}
                                         {group.items.length === 1 ? "insight" : "insights"}
                                       </span>
