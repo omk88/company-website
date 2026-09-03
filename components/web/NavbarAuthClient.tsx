@@ -15,6 +15,7 @@ import { useCurrentUser } from "@/app/ConvexClientProvider";
 import BlogNotificationCard from "./BlogNotificationCard";
 import { useMutation, usePaginatedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { ScrollArea } from "../ui/scroll-area";
 
 interface NavbarAuthClientProps {
   initialIsAuth: boolean;
@@ -30,7 +31,7 @@ type NotificationItem = {
   title: string;
   imageUrl?: string;
   createdAt: number | string;
-  author: string; // author ID
+  author: string;
   authorUsername: string;
   authorDisplayName?: string;
   isUnread?: boolean;
@@ -272,7 +273,7 @@ export function NavbarAuthClient({
 
                     <Separator className="mb-1" />
 
-                    <div className="flex flex-col gap-3 max-h-80 overflow-y-auto p-1">
+                    <ScrollArea className="h-80 pr-3">
                       {notificationsList && notificationsList.length > 0 ? (
                         <>
                           {(["Today", "Yesterday", "Older"] as const).map((timeCategory) => {
@@ -352,7 +353,7 @@ export function NavbarAuthClient({
                           No notifications yet
                         </div>
                       )}
-                    </div>
+                    </ScrollArea>
                   </PopoverContent>
                 </Popover>
               </TooltipTrigger>
