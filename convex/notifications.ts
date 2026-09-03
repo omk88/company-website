@@ -1,3 +1,4 @@
+import { Id } from "./_generated/dataModel";
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 
@@ -9,15 +10,26 @@ export const getUnreadPosts = query({
 
     const lastChecked = profile.lastCheckedNotificationsAt ?? 0;
 
-    const unreadBlogs = await ctx.db
+    const follows = await ctx.db
+      .query("follows")
+      .withIndex("by_follower", (q) => q.eq("followerId", args.profileId as Id<"profiles">))
+      .collect();
+
+    if (follows.length === 0) {
+      return { count: 0, notifications: [] };
+    }
+
+    const followedIds = new Set(follows.map((f) => f.followingId.toString()));
+
+    const recentBlogs = await ctx.db
       .query("blogs")
       .withIndex("by_createdAt", (q) => q.gt("createdAt", lastChecked))
       .order("desc")
-      .take(10);
+      .collect();
 
     return {
-      count: unreadBlogs.length,
-      notifications: unreadBlogs.map((blog) => ({
+      count: recentBlogs.length,
+      notifications: recentBlogs.map((blog) => ({
         _id: blog._id,
         title: blog.title,
         imageUrl: blog.imageUrl,
