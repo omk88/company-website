@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button, buttonVariants } from "../ui/button";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
-import { LogOut, LogIn, ArrowUpRight, Plus, Bell, Library, MessageSquare, MessageSquareText } from "lucide-react";
+import { LogOut, LogIn, ArrowUpRight, Plus, Bell, Loader2 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Separator } from "../ui/separator";
@@ -13,10 +13,8 @@ import { Skeleton } from "../ui/skeleton";
 import { useEffect, useState } from "react";
 import { useCurrentUser } from "@/app/ConvexClientProvider";
 import BlogNotificationCard from "./BlogNotificationCard";
-import CommentNotificationCard from "./CommentNotificationCard";
-import { useMutation, useQuery } from "convex/react";
+import { useMutation, usePaginatedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
 
 interface NavbarAuthClientProps {
   initialIsAuth: boolean;
@@ -77,27 +75,22 @@ export function NavbarAuthClient({
     ? userData?.profile?.profilePicUrl || clientSessionImage || initialImage || defaultAvatarUrl
     : initialImage || defaultAvatarUrl;
 
-
   const markAsRead = useMutation(api.notifications.markNotificationsAsRead);
 
-  const notificationData = useQuery(
+  const { results: notificationsList, status, loadMore, isLoading } = usePaginatedQuery(
     api.notifications.getUnreadPosts,
-    profileId ? { profileId } : "skip"
+    profileId ? { profileId } : "skip",
+    { initialNumItems: 5 }
   );
 
-  const unreadCount = notificationData?.count ?? 0;
-  const unreadNotifications = notificationData?.notifications ?? [];
-
-  const [hasUnread, setHasUnread] = useState(unreadCount > 0);
+  const unreadCount = notificationsList.length;
   const [showBadge, setShowBadge] = useState(unreadCount > 0);
 
   useEffect(() => {
     if (!openNotifications) {
       if (unreadCount > 0) {
-        setHasUnread(true);
         setShowBadge(true);
       } else {
-        setHasUnread(false);
         const timer = setTimeout(() => setShowBadge(false), 200);
         return () => clearTimeout(timer);
       }
@@ -125,7 +118,7 @@ export function NavbarAuthClient({
                       size="icon"
                       className="w-9 h-9 relative flex items-center justify-center cursor-pointer"
                     >
-                      <Bell className="h-4 w-4 text-foreground transition-all block dark:hidden" />
+                      <Bell className="h-4 w-4 text-foreground transition-all" />
                       
                       {showBadge && (
                         <span
@@ -141,7 +134,7 @@ export function NavbarAuthClient({
                     className="w-80 p-1.5 rounded-xl border border-border bg-popover"
                   >
                     <div className="flex flex-row gap-2 items-center text-sm px-2 pt-2 pb-1.5">
-                      <Bell className="h-4 w-4 text-foreground transition-all block dark:hidden" />
+                      <Bell className="h-4 w-4 text-foreground transition-all" />
                       <span className="font-medium">Notifications</span>
                       
                       {unreadCount > 0 && (
@@ -153,61 +146,47 @@ export function NavbarAuthClient({
 
                     <Separator />
 
-                    <span className="text-xs font-semibold px-2">Today</span>
-
-                    <div className="flex flex-row gap-2 items-center text-xs font-roboto text-zinc-600 dark:text-zinc-400 capitalize px-2">
-                        <div className="h-5 w-5 rounded-full overflow-hidden border border-border bg-muted shrink-0 flex items-center justify-center">
-                            <img
-                              src={"/comp1.png"}
-                              alt={"User Profile"}
-                              loading="eager"
-                              decoding="sync"
-                              suppressHydrationWarning
-                              className="h-full w-full object-cover"
-                            />
-                        </div>
-
-                        <span>info added 3 insights</span>
-
-                        <Library className="h-4 w-4 ml-auto" />
-                    </div>
-
                     <div className="flex flex-col gap-2 max-h-80 overflow-y-auto p-1">
-                      {unreadNotifications.length > 0 ? (
-                        unreadNotifications.map((blog) => (
-                          <BlogNotificationCard
-                            key={blog._id}
-                            _id={blog._id}
-                            title={blog.title}
-                            imageUrl={blog.imageUrl}
-                            createdAt={blog.createdAt}
-                            author={blog.author}
-                          />
-                        ))
+                      {notificationsList.length > 0 ? (
+                        <>
+                          {notificationsList.map((blog) => (
+                            <BlogNotificationCard
+                              key={blog._id}
+                              _id={blog._id}
+                              title={blog.title}
+                              imageUrl={blog.imageUrl}
+                              createdAt={blog.createdAt}
+                              author={blog.author}
+                            />
+                          ))}
+
+                          {status === "CanLoadMore" && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="w-full text-xs text-muted-foreground mt-1"
+                              onClick={() => loadMore(5)}
+                            >
+                              Load earlier posts
+                            </Button>
+                          )}
+
+                          {status === "LoadingMore" && (
+                            <div className="flex justify-center p-2">
+                              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                            </div>
+                          )}
+                        </>
+                      ) : isLoading ? (
+                        <div className="p-4 text-center text-xs text-zinc-500">
+                          Loading...
+                        </div>
                       ) : (
                         <div className="p-4 text-center text-xs text-zinc-500">
                           No unread posts
                         </div>
                       )}
                     </div>
-
-                    <div className="flex flex-row gap-2 items-center text-xs font-roboto text-zinc-600 dark:text-zinc-400 capitalize px-2">
-                      <div className="h-5 w-5 rounded-full overflow-hidden border border-border bg-muted shrink-0 flex items-center justify-center">
-                          <img
-                            src={"/comp1.png"}
-                            alt={"User Profile"}
-                            loading="eager"
-                            decoding="sync"
-                            suppressHydrationWarning
-                            className="h-full w-full object-cover"
-                          />
-                      </div>
-
-                      <span>omk98 added 1 comment to your post</span>
-
-                      <MessageSquareText className="h-4 w-4 ml-auto" />
-                    </div>
-                    <CommentNotificationCard />
                   </PopoverContent>
                 </Popover>
               </TooltipTrigger>

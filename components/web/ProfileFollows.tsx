@@ -3,7 +3,6 @@
 import { api } from "@/convex/_generated/api";
 import { usePaginatedQuery } from "convex/react";
 import { ProfileCard } from "./ProfileCard";
-import { Id } from "@/convex/_generated/dataModel";
 import { useFollowsStore } from "@/stores/useFollowsStore";
 import { cn } from "@/lib/utils";
 import { UserRoundCheck, UsersRound } from "lucide-react";
@@ -26,7 +25,10 @@ export function ProfileFollows({ profile, currentUser }: ProfileFollowsProps) {
   const setSelectedFollows = useFollowsStore((state) => state.setSelectedFollows);
 
   const anim = "relative no-underline hover:no-underline after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100";
-  const currentProfileId = currentUser?.profile?._id;
+  
+  // 1. Extract Better Auth string userIds
+  const currentUserId = currentUser?.profile?.userId;
+  const targetUserId = profile?.profile?.userId;
 
   return (
     <div className="flex flex-col flex-1 h-full min-h-0 w-full">
@@ -60,9 +62,9 @@ export function ProfileFollows({ profile, currentUser }: ProfileFollowsProps) {
 
       <div className="w-full max-w-2xl mx-auto px-6 flex-1">
         {selectedFollows === "followers" ? (
-          <FollowersList profileId={profile?.profile?._id} currentProfileId={currentProfileId} />
+          <FollowersList targetUserId={targetUserId} currentUserId={currentUserId} />
         ) : (
-          <FollowingList profileId={profile?.profile?._id} currentProfileId={currentProfileId} />
+          <FollowingList targetUserId={targetUserId} currentUserId={currentUserId} />
         )}
       </div>
     </div>
@@ -70,19 +72,20 @@ export function ProfileFollows({ profile, currentUser }: ProfileFollowsProps) {
 }
 
 function FollowersList({
-  profileId,
-  currentProfileId,
+  targetUserId,
+  currentUserId,
 }: {
-  profileId: string | undefined;
-  currentProfileId?: string;
+  targetUserId: string | undefined;
+  currentUserId?: string;
 }) {
+  // 2. Query using targetUserId string
   const { results, status } = usePaginatedQuery(
     api.profiles.getPaginatedFollowersByProfile,
-    profileId ? { profileId: profileId as Id<"profiles"> } : "skip",
+    targetUserId ? { userId: targetUserId } : "skip",
     { initialNumItems: 10 }
   );
 
-  const isFirstLoad = !profileId || status === "LoadingFirstPage";
+  const isFirstLoad = !targetUserId || status === "LoadingFirstPage";
 
   if (isFirstLoad) {
     return <LoadingSkeleton />;
@@ -99,12 +102,14 @@ function FollowersList({
         if (!item?.profile) return null;
 
         const { profile, profilePicture, defaultProfilePicture, isFollowing, isBell } = item;
-        const isSelf = Boolean(currentProfileId && profile._id === currentProfileId);
+        
+        // 3. Compare using string userIds
+        const isSelf = Boolean(currentUserId && profile.userId === currentUserId);
 
         return (
           <li key={profile._id}>
             <ProfileCard
-              userId={profile._id}
+              userId={profile.userId}
               displayName={profile.displayName ?? profile.username}
               username={profile.username}
               profilePicture={profilePicture}
@@ -121,19 +126,20 @@ function FollowersList({
 }
 
 function FollowingList({
-  profileId,
-  currentProfileId,
+  targetUserId,
+  currentUserId,
 }: {
-  profileId: string | undefined;
-  currentProfileId?: string;
+  targetUserId: string | undefined;
+  currentUserId?: string;
 }) {
+  // 2. Query using targetUserId string
   const { results, status } = usePaginatedQuery(
     api.profiles.getPaginatedFollowingByProfile,
-    profileId ? { profileId: profileId as Id<"profiles"> } : "skip",
+    targetUserId ? { userId: targetUserId } : "skip",
     { initialNumItems: 10 }
   );
 
-  const isFirstLoad = !profileId || status === "LoadingFirstPage";
+  const isFirstLoad = !targetUserId || status === "LoadingFirstPage";
 
   if (isFirstLoad) {
     return <LoadingSkeleton />;
@@ -150,12 +156,14 @@ function FollowingList({
         if (!item?.profile) return null;
 
         const { profile, profilePicture, defaultProfilePicture, isFollowing, isBell } = item;
-        const isSelf = Boolean(currentProfileId && profile._id === currentProfileId);
+        
+        // 3. Compare using string userIds
+        const isSelf = Boolean(currentUserId && profile.userId === currentUserId);
 
         return (
           <li key={profile._id}>
             <ProfileCard
-              userId={profile._id}
+              userId={profile.userId}
               displayName={profile.displayName ?? profile.username}
               username={profile.username}
               profilePicture={profilePicture}

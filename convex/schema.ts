@@ -213,8 +213,8 @@ const schema = defineSchema({
     .index("by_storageId", ["storageId"]),
 
   follows: defineTable({
-    followerId: v.id("profiles"),
-    followingId: v.id("profiles"),
+    followerId: v.string(),
+    followingId: v.string(),
     isBell: v.boolean(),
   })
     .index("by_follower_and_isBell", ["followerId", "isBell"])

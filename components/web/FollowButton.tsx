@@ -2,13 +2,12 @@ import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { api } from "@/convex/_generated/api";
 import { useMutation } from "convex/react";
-import { Id } from "@/convex/_generated/dataModel";
 import { toast } from "sonner";
 import { Bell, BellPlus, Loader2 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
 interface FollowButtonProps {
-  targetProfileId: Id<"profiles">;
+  userId: string;
   username: string;
   displayName: string | undefined;
   initialIsFollowing?: boolean;
@@ -18,7 +17,7 @@ interface FollowButtonProps {
 }
 
 export function FollowButton({
-  targetProfileId,
+  userId,
   username,
   displayName,
   initialIsFollowing = false,
@@ -49,7 +48,7 @@ export function FollowButton({
     setIsPending(true);
 
     try {
-      const result = await followMutation({ targetProfileId });
+      const result = await followMutation({ targetUserId: userId });
 
       if (result?.isFollowing) {
         setIsFollowing(true);
@@ -70,7 +69,7 @@ export function FollowButton({
     setIsBellPending(true);
 
     try {
-      const result = await bellMutation({ targetProfileId });
+      const result = await bellMutation({ targetUserId: userId });
 
       if (result?.isBell) {
         setIsBell(true);

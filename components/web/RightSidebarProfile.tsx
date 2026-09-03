@@ -145,7 +145,7 @@ export function RightSidebarProfile({ preloadedProfile, preloadedCurrentUser }: 
 
                 {!isSelf && (
                   <FollowButton
-                    targetProfileId={profile._id}
+                    userId={profile.userId}
                     displayName={displayName}
                     username={profile.username}
                     initialIsFollowing={isFollowing}

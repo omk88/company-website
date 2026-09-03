@@ -166,25 +166,34 @@ export const getProfileByUsername = query({
 
 export const getProfileFollowers = query({
   args: {
-    profileId: v.id("profiles"),
+    userId: v.string(), 
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
     const page = await ctx.db
       .query("follows")
-      .withIndex("by_following", (q) => q.eq("followingId", args.profileId))
+      .withIndex("by_following", (q) => q.eq("followingId", args.userId))
       .paginate(args.paginationOpts);
 
     const followers = await Promise.all(
       page.page.map(async (follow) => {
-        const followerProfile = await ctx.db.get(follow.followerId);
+        const followerProfile = await ctx.db
+          .query("profiles")
+          .withIndex("by_userId", (q) => q.eq("userId", follow.followerId))
+          .unique();
+
         if (!followerProfile) return null;
 
-        const picUrl = followerProfile.profilePic ? await ctx.storage.getUrl(followerProfile.profilePic) : null;
-        const defaultPicUrl = followerProfile.defaultProfilePic ? await ctx.storage.getUrl(followerProfile.defaultProfilePic) : null;
+        const picUrl = followerProfile.profilePic
+          ? await ctx.storage.getUrl(followerProfile.profilePic)
+          : null;
+        const defaultPicUrl = followerProfile.defaultProfilePic
+          ? await ctx.storage.getUrl(followerProfile.defaultProfilePic)
+          : null;
 
         return {
           _id: followerProfile._id,
+          userId: followerProfile.userId,
           username: followerProfile.username,
           displayName: followerProfile.displayName,
           profilePicUrl: picUrl,
@@ -344,37 +353,43 @@ export const updateProfile = mutation({
 });
 
 export const toggleFollow = mutation({
-  args: { targetProfileId: v.id("profiles") },
+  args: { targetUserId: v.string() },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated.");
 
+    const currentUserId = identity.subject;
+
+    if (currentUserId === args.targetUserId) {
+      throw new Error("You cannot follow yourself.");
+    }
+
     const currentProfile = await ctx.db
       .query("profiles")
-      .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
+      .withIndex("by_userId", (q) => q.eq("userId", currentUserId))
       .unique();
 
     if (!currentProfile) {
-      throw new Error("Profile not found.")
+      throw new Error("Profile not found.");
     }
 
-    const currentProfileId = currentProfile._id;
+    const targetProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_userId", (q) => q.eq("userId", args.targetUserId))
+      .unique();
 
-    if (currentProfileId === args.targetProfileId) {
-      throw new Error("You cannot follow yourself.")
+    if (!targetProfile) {
+      throw new Error("Target profile not found.");
     }
 
     const existingFollow = await ctx.db
       .query("follows")
       .withIndex("by_follower_and_following", (q) =>
         q
-          .eq("followerId", currentProfileId)
-          .eq("followingId", args.targetProfileId)
+          .eq("followerId", currentUserId)
+          .eq("followingId", args.targetUserId)
       )
       .unique();
-
-    const targetProfile = await ctx.db.get(args.targetProfileId);
-    if (!targetProfile) throw new Error("Target profile not found.");
 
     const currentFollowing = currentProfile.followingCount || 0;
     const targetFollowers = targetProfile.followerCount || 0;
@@ -382,58 +397,49 @@ export const toggleFollow = mutation({
     if (existingFollow) {
       await ctx.db.delete(existingFollow._id);
 
-      await ctx.db.patch(currentProfileId, {
+      await ctx.db.patch(currentProfile._id, {
         followingCount: Math.max(0, currentFollowing - 1),
       });
 
-      await ctx.db.patch(args.targetProfileId, {
+      await ctx.db.patch(targetProfile._id, {
         followerCount: Math.max(0, targetFollowers - 1),
       });
 
       return { isFollowing: false };
     } else {
       await ctx.db.insert("follows", {
-        followerId: currentProfileId,
-        followingId: args.targetProfileId,
+        followerId: currentUserId,
+        followingId: args.targetUserId,
         isBell: false,
       });
 
-      await ctx.db.patch(currentProfileId, {
+      await ctx.db.patch(currentProfile._id, {
         followingCount: currentFollowing + 1,
       });
 
-      await ctx.db.patch(args.targetProfileId, {
+      await ctx.db.patch(targetProfile._id, {
         followerCount: targetFollowers + 1,
       });
 
       return { isFollowing: true };
     }
-  }, 
+  },
 });
 
 export const toggleBell = mutation({
-  args: { targetProfileId: v.id("profiles") },
+  args: { targetUserId: v.string() },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated.");
 
-    const currentProfile = await ctx.db
-      .query("profiles")
-      .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
-      .unique();
-
-    if (!currentProfile) {
-      throw new Error("Profile not found.");
-    }
-
-    const currentProfileId = currentProfile._id;
+    const currentUserId = identity.subject;
 
     const existingFollow = await ctx.db
       .query("follows")
       .withIndex("by_follower_and_following", (q) =>
         q
-          .eq("followerId", currentProfileId)
-          .eq("followingId", args.targetProfileId)
+          .eq("followerId", currentUserId)
+          .eq("followingId", args.targetUserId)
       )
       .unique();
 
@@ -485,39 +491,37 @@ export const isUsernameTaken = query({
 
 export const getPaginatedFollowersByProfile = query({
   args: {
-    profileId: v.id("profiles"),
+    userId: v.string(),
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
-    let viewerProfile = null;
-    if (identity) {
-      viewerProfile = await ctx.db
-        .query("profiles")
-        .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
-        .unique();
-    }
+    const viewerUserId = identity?.subject ?? null;
 
     const paginated = await ctx.db
       .query("follows")
-      .withIndex("by_following", (q) => q.eq("followingId", args.profileId))
+      .withIndex("by_following", (q) => q.eq("followingId", args.userId))
       .paginate(args.paginationOpts);
 
     const page = await Promise.all(
       paginated.page.map(async (followDoc) => {
-        const profile = await ctx.db.get(followDoc.followerId);
+        const profile = await ctx.db
+          .query("profiles")
+          .withIndex("by_userId", (q) => q.eq("userId", followDoc.followerId))
+          .unique();
+
         if (!profile) return null;
 
         let isFollowing = false;
         let isBell = false;
 
-        if (viewerProfile) {
+        if (viewerUserId) {
           const viewerFollowDoc = await ctx.db
             .query("follows")
             .withIndex("by_follower_and_following", (q) =>
               q
-                .eq("followerId", viewerProfile._id)
-                .eq("followingId", profile._id)
+                .eq("followerId", viewerUserId)
+                .eq("followingId", profile.userId)
             )
             .unique();
 
@@ -530,9 +534,9 @@ export const getPaginatedFollowersByProfile = query({
         const profilePicture = profile.profilePic
           ? await ctx.storage.getUrl(profile.profilePic)
           : null;
-        const defaultProfilePicture = await ctx.storage.getUrl(
-          profile.defaultProfilePic
-        );
+        const defaultProfilePicture = profile.defaultProfilePic
+          ? await ctx.storage.getUrl(profile.defaultProfilePic)
+          : null;
 
         return {
           profile,
@@ -553,39 +557,37 @@ export const getPaginatedFollowersByProfile = query({
 
 export const getPaginatedFollowingByProfile = query({
   args: {
-    profileId: v.id("profiles"),
+    userId: v.string(),
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
-    let viewerProfile = null;
-    if (identity) {
-      viewerProfile = await ctx.db
-        .query("profiles")
-        .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
-        .unique();
-    }
+    const viewerUserId = identity?.subject ?? null;
 
     const paginated = await ctx.db
       .query("follows")
-      .withIndex("by_follower", (q) => q.eq("followerId", args.profileId))
+      .withIndex("by_follower", (q) => q.eq("followerId", args.userId))
       .paginate(args.paginationOpts);
 
     const page = await Promise.all(
       paginated.page.map(async (followDoc) => {
-        const profile = await ctx.db.get(followDoc.followingId);
+        const profile = await ctx.db
+          .query("profiles")
+          .withIndex("by_userId", (q) => q.eq("userId", followDoc.followingId))
+          .unique();
+
         if (!profile) return null;
 
         let isFollowing = false;
         let isBell = false;
 
-        if (viewerProfile) {
+        if (viewerUserId) {
           const viewerFollowDoc = await ctx.db
             .query("follows")
             .withIndex("by_follower_and_following", (q) =>
               q
-                .eq("followerId", viewerProfile._id)
-                .eq("followingId", profile._id)
+                .eq("followerId", viewerUserId)
+                .eq("followingId", profile.userId)
             )
             .unique();
 
@@ -598,9 +600,9 @@ export const getPaginatedFollowingByProfile = query({
         const profilePicture = profile.profilePic
           ? await ctx.storage.getUrl(profile.profilePic)
           : null;
-        const defaultProfilePicture = await ctx.storage.getUrl(
-          profile.defaultProfilePic
-        );
+        const defaultProfilePicture = profile.defaultProfilePic
+          ? await ctx.storage.getUrl(profile.defaultProfilePic)
+          : null;
 
         return {
           profile,

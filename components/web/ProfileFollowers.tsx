@@ -3,7 +3,6 @@
 import { api } from "@/convex/_generated/api";
 import { usePaginatedQuery } from "convex/react";
 import { ProfileCard } from "./ProfileCard";
-import { Id } from "@/convex/_generated/dataModel";
 import { FunctionReturnType } from "convex/server";
 import { EmptyState } from "./EmptyState";
 import { ProfileCardSkeleton } from "./ProfileFollows";
@@ -19,16 +18,16 @@ interface ProfileFollowersProps {
 }
 
 export function ProfileFollowers({ profile, currentUser }: ProfileFollowersProps) {
-  const currentProfileId = currentUser?.profile?._id;
-  const profileId = profile?.profile?._id;
+  const currentUserId = currentUser?.profile?.userId;
+  const targetUserId = profile?.profile?.userId;
 
   const { results, status } = usePaginatedQuery(
     api.profiles.getPaginatedFollowersByProfile,
-    profileId ? { profileId: profileId as Id<"profiles"> } : "skip",
+    targetUserId ? { userId: targetUserId } : "skip",
     { initialNumItems: 10 }
   );
 
-  const isFirstLoad = !profileId || status === "LoadingFirstPage";
+  const isFirstLoad = !targetUserId || status === "LoadingFirstPage";
 
   if (isFirstLoad) {
     return <LoadingSkeleton />;
@@ -50,12 +49,13 @@ export function ProfileFollowers({ profile, currentUser }: ProfileFollowersProps
           if (!item?.profile) return null;
 
           const { profile: targetProfile, profilePicture, defaultProfilePicture, isFollowing, isBell } = item;
-          const isSelf = Boolean(currentProfileId && targetProfile._id === currentProfileId);
+          
+          const isSelf = Boolean(currentUserId && targetProfile.userId === currentUserId);
 
           return (
             <li key={targetProfile._id}>
               <ProfileCard
-                userId={targetProfile._id}
+                userId={targetProfile.userId}
                 displayName={targetProfile.displayName ?? targetProfile.username}
                 username={targetProfile.username}
                 profilePicture={profilePicture}
