@@ -44,6 +44,8 @@ export const getNotifications = query({
       imageUrl: blog.imageUrl,
       createdAt: blog.createdAt,
       author: blog.author,
+      authorUsername: blog.username,
+      authorDisplayName: blog.displayName,
       isUnread: blog.createdAt > lastRead, 
     }));
 

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button, buttonVariants } from "../ui/button";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
-import { LogOut, LogIn, ArrowUpRight, Plus, Bell, Loader2 } from "lucide-react";
+import { LogOut, LogIn, ArrowUpRight, Plus, Bell, Loader2, Library } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Separator } from "../ui/separator";
@@ -25,8 +25,60 @@ interface NavbarAuthClientProps {
   } | null;
 }
 
-const getCategory = (dateString: string | number) => {
-  const date = new Date(dateString);
+type NotificationItem = {
+  _id: string;
+  title: string;
+  imageUrl?: string;
+  createdAt: number | string;
+  readAt?: number | string;
+  author:
+    | {
+        _id?: string;
+        id?: string;
+        name?: string;
+        displayName?: string;
+        username?: string;
+        profilePicUrl?: string;
+        avatarUrl?: string;
+      }
+    | string;
+  isUnread?: boolean;
+};
+
+interface AuthorGroup {
+  groupKey: string;
+  authorId: string;
+  authorName: string;
+  authorAvatar: string;
+  isUnreadGroup: boolean;
+  items: NotificationItem[];
+}
+
+export const parseDate = (dateVal: string | number | Date): Date => {
+  if (typeof dateVal === "number") {
+    return new Date(dateVal);
+  }
+
+  if (typeof dateVal === "string") {
+    const numeric = Number(dateVal);
+    if (!isNaN(numeric) && dateVal.trim() !== "") {
+      return new Date(numeric);
+    }
+    const parsed = new Date(dateVal);
+    if (!isNaN(parsed.getTime())) {
+      return parsed;
+    }
+  }
+
+  if (dateVal instanceof Date && !isNaN(dateVal.getTime())) {
+    return dateVal;
+  }
+
+  return new Date();
+};
+
+const getCategory = (dateInput: string | number) => {
+  const date = parseDate(dateInput);
   const now = new Date();
 
   const isToday = date.toDateString() === now.toDateString();
@@ -40,10 +92,10 @@ const getCategory = (dateString: string | number) => {
   return "Older";
 };
 
-export function NavbarAuthClient({ 
-  initialIsAuth, 
-  initialImage, 
-  initialProfile 
+export function NavbarAuthClient({
+  initialIsAuth,
+  initialImage,
+  initialProfile,
 }: NavbarAuthClientProps) {
   const router = useRouter();
   const { data: session } = authClient.useSession();
@@ -101,20 +153,63 @@ export function NavbarAuthClient({
   );
 
   const groupedNotifications = useMemo(() => {
-    const groups: { Today: typeof notificationsList; Yesterday: typeof notificationsList; Older: typeof notificationsList } = {
+    const categories: Record<"Today" | "Yesterday" | "Older", AuthorGroup[]> = {
       Today: [],
       Yesterday: [],
       Older: [],
     };
 
-    if (notificationsList) {
-      notificationsList.forEach((blog) => {
-        const category = getCategory(blog.createdAt);
-        groups[category].push(blog);
-      });
+    if (!notificationsList || notificationsList.length === 0) {
+      return categories;
     }
 
-    return groups;
+    const tempMap: Record<"Today" | "Yesterday" | "Older", Map<string, AuthorGroup>> = {
+      Today: new Map(),
+      Yesterday: new Map(),
+      Older: new Map(),
+    };
+
+    notificationsList.forEach((blog: any) => {
+      const timeCategory = getCategory(blog.createdAt) as "Today" | "Yesterday" | "Older";
+
+      const authorObj = typeof blog.author === "object" ? blog.author : null;
+      const authorId =
+        authorObj?._id || authorObj?.id || (typeof blog.author === "string" ? blog.author : "unknown");
+      const authorName =
+        authorObj?.displayName || authorObj?.username || authorObj?.name || "Author";
+      const authorAvatar = authorObj?.profilePicUrl || authorObj?.avatarUrl || "/comp1.png";
+
+      const isUnread = Boolean(blog.isUnread);
+
+      const readBatchId = blog.readAt
+        ? parseDate(blog.readAt).toISOString()
+        : parseDate(blog.createdAt).toISOString().split("T")[0];
+
+      const groupKey = isUnread
+        ? `${authorId}-unread`
+        : `${authorId}-read-batch-${readBatchId}`;
+
+      const categoryMap = tempMap[timeCategory];
+
+      if (!categoryMap.has(groupKey)) {
+        categoryMap.set(groupKey, {
+          groupKey,
+          authorId,
+          authorName,
+          authorAvatar,
+          isUnreadGroup: isUnread,
+          items: [],
+        });
+      }
+
+      categoryMap.get(groupKey)!.items.push(blog);
+    });
+
+    (Object.keys(tempMap) as Array<"Today" | "Yesterday" | "Older">).forEach((cat) => {
+      categories[cat] = Array.from(tempMap[cat].values());
+    });
+
+    return categories;
   }, [notificationsList]);
 
   const unreadCount = notificationsList ? notificationsList.filter((item) => item.isUnread).length : 0;
@@ -161,7 +256,7 @@ export function NavbarAuthClient({
                       className="w-9 h-9 relative flex items-center justify-center cursor-pointer"
                     >
                       <Bell className="h-4 w-4 text-foreground transition-all" />
-                      
+
                       {showBadge && (
                         <span
                           data-state={unreadCount > 0 ? "open" : "closed"}
@@ -178,7 +273,7 @@ export function NavbarAuthClient({
                     <div className="flex flex-row gap-2 items-center text-sm px-2 pt-2 pb-1.5">
                       <Bell className="h-4 w-4 text-foreground transition-all" />
                       <span className="font-medium">Notifications</span>
-                      
+
                       {unreadCount > 0 && (
                         <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[11px] font-semibold text-white leading-none">
                           {unreadCount > 99 ? "99+" : unreadCount}
@@ -188,28 +283,57 @@ export function NavbarAuthClient({
 
                     <Separator className="mb-1" />
 
-                    <div className="flex flex-col gap-2 max-h-80 overflow-y-auto p-1">
+                    <div className="flex flex-col gap-3 max-h-80 overflow-y-auto p-1">
                       {notificationsList && notificationsList.length > 0 ? (
                         <>
-                          {(["Today", "Yesterday", "Older"] as const).map((category) => {
-                            const items = groupedNotifications[category];
-                            if (!items || items.length === 0) return null;
+                          {(["Today", "Yesterday", "Older"] as const).map((timeCategory) => {
+                            const authorGroups = groupedNotifications[timeCategory];
+                            if (!authorGroups || authorGroups.length === 0) return null;
 
                             return (
-                              <div key={category} className="flex flex-col gap-1.5">
+                              <div key={timeCategory} className="flex flex-col gap-2">
                                 <span className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 px-2 pt-1 tracking-wider">
-                                  {category}
+                                  {timeCategory}
                                 </span>
-                                {items.map((blog) => (
-                                  <BlogNotificationCard
-                                    key={blog._id}
-                                    _id={blog._id}
-                                    title={blog.title}
-                                    imageUrl={blog.imageUrl}
-                                    createdAt={blog.createdAt}
-                                    author={blog.author}
-                                    isUnread={blog.isUnread}
-                                  />
+
+                                {authorGroups.map((group) => (
+                                  <div key={group.groupKey} className="flex flex-col gap-1.5 pl-1">
+                                    <div className="flex flex-row gap-2 items-center text-xs font-roboto text-zinc-600 dark:text-zinc-400 px-2 py-0.5 rounded-md bg-muted/40">
+                                      <div className="h-5 w-5 rounded-full overflow-hidden border border-border bg-muted shrink-0 flex items-center justify-center">
+                                        <img
+                                          src={group.authorAvatar}
+                                          alt={group.authorName}
+                                          loading="eager"
+                                          decoding="sync"
+                                          suppressHydrationWarning
+                                          className="h-full w-full object-cover"
+                                        />
+                                      </div>
+
+                                      <span className="truncate">
+                                        <strong className="font-semibold text-foreground">
+                                          {group.authorName}
+                                        </strong>{" "}
+                                        added {group.items.length}{" "}
+                                        {group.items.length === 1 ? "insight" : "insights"}
+                                      </span>
+
+                                      <Library className="h-3.5 w-3.5 ml-auto shrink-0 text-muted-foreground" />
+                                    </div>
+
+                                    <div className="flex flex-col gap-1.5">
+                                      {group.items.map((blog) => (
+                                        <BlogNotificationCard
+                                          key={blog._id}
+                                          _id={blog._id}
+                                          title={blog.title}
+                                          imageUrl={blog.imageUrl}
+                                          createdAt={blog.createdAt as number}
+                                          isUnread={blog.isUnread}
+                                        />
+                                      ))}
+                                    </div>
+                                  </div>
                                 ))}
                               </div>
                             );
@@ -233,9 +357,7 @@ export function NavbarAuthClient({
                           )}
                         </>
                       ) : isLoading ? (
-                        <div className="p-4 text-center text-xs text-zinc-500">
-                          Loading...
-                        </div>
+                        <div className="p-4 text-center text-xs text-zinc-500">Loading...</div>
                       ) : (
                         <div className="p-4 text-center text-xs text-zinc-500">
                           No notifications yet
@@ -253,7 +375,10 @@ export function NavbarAuthClient({
                   <PopoverTrigger asChild>
                     <button
                       type="button"
-                      className={`${buttonVariants({ variant: "ghost", size: "icon" })} cursor-pointer h-9 w-9 rounded-lg shrink-0 flex items-center justify-center`}
+                      className={`${buttonVariants({
+                        variant: "ghost",
+                        size: "icon",
+                      })} cursor-pointer h-9 w-9 rounded-lg shrink-0 flex items-center justify-center`}
                     >
                       <div className="h-5 w-5 rounded-full overflow-hidden border border-border bg-muted shrink-0 flex items-center justify-center">
                         <img

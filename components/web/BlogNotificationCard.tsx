@@ -7,9 +7,8 @@ import { formatSmartDate } from "./ProfileHoverCard";
 export interface BlogNotificationCardProps {
   _id: string;
   title: string;
-  imageUrl: string;
+  imageUrl?: string;
   createdAt: number;
-  author?: string;
   isUnread?: boolean;
 }
 
