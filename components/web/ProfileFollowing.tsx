@@ -27,8 +27,6 @@ export function ProfileFollowing({ profile, currentUser }: ProfileFollowingProps
     { initialNumItems: 10 }
   );
 
-  console.log("IDDS", targetUserId);
-
   const isFirstLoad = !targetUserId || status === "LoadingFirstPage";
 
   if (isFirstLoad) {

@@ -26,7 +26,6 @@ export function ProfileFollows({ profile, currentUser }: ProfileFollowsProps) {
 
   const anim = "relative no-underline hover:no-underline after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100";
   
-  // 1. Extract Better Auth string userIds
   const currentUserId = currentUser?.profile?.userId;
   const targetUserId = profile?.profile?.userId;
 
@@ -77,9 +76,7 @@ function FollowersList({
 }: {
   targetUserId: string | undefined;
   currentUserId?: string;
-}) {
-  // 2. Query using targetUserId string
-  const { results, status } = usePaginatedQuery(
+}) {  const { results, status } = usePaginatedQuery(
     api.profiles.getPaginatedFollowersByProfile,
     targetUserId ? { userId: targetUserId } : "skip",
     { initialNumItems: 10 }
@@ -103,7 +100,6 @@ function FollowersList({
 
         const { profile, profilePicture, defaultProfilePicture, isFollowing, isBell } = item;
         
-        // 3. Compare using string userIds
         const isSelf = Boolean(currentUserId && profile.userId === currentUserId);
 
         return (
@@ -132,7 +128,6 @@ function FollowingList({
   targetUserId: string | undefined;
   currentUserId?: string;
 }) {
-  // 2. Query using targetUserId string
   const { results, status } = usePaginatedQuery(
     api.profiles.getPaginatedFollowingByProfile,
     targetUserId ? { userId: targetUserId } : "skip",
@@ -157,7 +152,6 @@ function FollowingList({
 
         const { profile, profilePicture, defaultProfilePicture, isFollowing, isBell } = item;
         
-        // 3. Compare using string userIds
         const isSelf = Boolean(currentUserId && profile.userId === currentUserId);
 
         return (

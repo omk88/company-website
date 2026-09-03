@@ -1,12 +1,11 @@
 "use client";
 
-import { Id } from "@/convex/_generated/dataModel";
 import { FollowButton } from "./FollowButton";
 import { ProfileHoverCard } from "./ProfileHoverCard";
 import Link from "next/link";
 
 interface ProfileCardProps {
-  userId: Id<"profiles"> | string;
+  userId: string;
   displayName: string;
   username: string;
   profilePicture: string | null;
@@ -63,7 +62,7 @@ export function ProfileCard({
             }}
           >
             <FollowButton 
-              targetProfileId={userId as Id<"profiles">} 
+              userId={userId} 
               username={username} 
               displayName={displayName} 
               initialIsFollowing={isFollowing}
