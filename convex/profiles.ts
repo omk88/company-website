@@ -121,9 +121,8 @@ export const getProfileByUsername = query({
           .query("comments")
           .withIndex("by_authorId", (q) => q.eq("authorId", profile.userId))
           .collect(),
-        // Get profilePic URL if storage ID exists, otherwise return null
+          
         profile.profilePic ? ctx.storage.getUrl(profile.profilePic) : null,
-        // defaultProfilePic is guaranteed to exist as a storage ID
         ctx.storage.getUrl(profile.defaultProfilePic),
       ]);
 

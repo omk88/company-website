@@ -47,6 +47,14 @@ export const getNotifications = query({
           .withIndex("by_userId", (q) => q.eq("userId", blog.author))
           .unique();
 
+        const profilePic = authorProfile?.profilePic 
+          ? await ctx.storage.getUrl(authorProfile.profilePic) 
+          : null;
+
+        const defaultProfilePic = authorProfile?.defaultProfilePic 
+          ? await ctx.storage.getUrl(authorProfile.defaultProfilePic) 
+          : null;
+
         return {
           _id: blog._id,
           title: blog.title,
@@ -55,6 +63,8 @@ export const getNotifications = query({
           author: blog.author,
           authorUsername: authorProfile?.username ?? "",
           authorDisplayName: authorProfile?.displayName ?? "",
+          profilePic,
+          defaultProfilePic,
           isUnread: blog.createdAt > lastRead,
         };
       })

@@ -170,7 +170,7 @@ export function NavbarAuthClient({
       const username = blog.authorUsername?.trim();
 
       const authorName = displayName || username || "Author";
-      const authorAvatar = blog.authorAvatar || "/comp1.png";
+      const authorAvatar = blog.profilePic || blog.defaultProfilePic;
 
       const isUnread = Boolean(blog.isUnread);
       const readBatchId = parseDate(blog.createdAt).toISOString().split("T")[0];
