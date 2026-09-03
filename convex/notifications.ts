@@ -2,7 +2,7 @@ import { paginationOptsValidator } from "convex/server";
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 
-export const getUnreadPosts = query({
+export const getNotifications = query({
   args: {
     userId: v.string(),
     paginationOpts: paginationOptsValidator,
@@ -13,46 +13,41 @@ export const getUnreadPosts = query({
       .withIndex("by_userId", (q) => q.eq("userId", args.userId))
       .unique();
 
-    if (!profile) {
-      return { page: [], isDone: true, continueCursor: "" };
-    }
+    if (!profile) return { page: [], isDone: true, continueCursor: "" };
 
-    const lastChecked = profile.lastCheckedNotificationsAt ?? 0;
+    const lastRead = profile.lastReadNotificationsAt ?? 0;
 
     const follows = await ctx.db
       .query("follows")
       .withIndex("by_follower", (q) => q.eq("followerId", args.userId))
       .collect();
 
-    if (follows.length === 0) {
-      return { page: [], isDone: true, continueCursor: "" };
-    }
+    if (follows.length === 0) return { page: [], isDone: true, continueCursor: "" };
 
-    const followingIds = follows.map((f) => f.followingId);
-
-    const paginatedBlogs = await ctx.db
-      .query("blogs")
-      .withIndex("by_createdAt")
-      .order("desc")
-      .filter((q) =>
-        q.and(
-          q.gt(q.field("createdAt"), lastChecked),
-          q.or(...followingIds.map((id) => q.eq(q.field("author"), id)))
+    const postPromises = follows.map((follow) =>
+      ctx.db
+        .query("blogs")
+        .withIndex("by_author_createdAt", (q) =>
+          q.eq("author", follow.followingId).gt("createdAt", follow._creationTime)
         )
-      )
-      .paginate(args.paginationOpts);
+        .order("desc")
+        .take(15)
+    );
 
-    return {
-      ...paginatedBlogs,
-      page: paginatedBlogs.page.map((blog) => ({
-        _id: blog._id,
-        title: blog.title,
-        imageUrl: blog.imageUrl,
-        createdAt: blog.createdAt,
-        author: blog.displayName || blog.username,
-        authorAvatarUrl: blog.authorAvatarUrl,
-      })),
-    };
+    const nestedPosts = await Promise.all(postPromises);
+    const allPosts = nestedPosts.flat().sort((a, b) => b.createdAt - a.createdAt);
+
+    const pageSize = args.paginationOpts.numItems;
+    const page = allPosts.slice(0, pageSize).map((blog) => ({
+      _id: blog._id,
+      title: blog.title,
+      imageUrl: blog.imageUrl,
+      createdAt: blog.createdAt,
+      author: blog.author,
+      isUnread: blog.createdAt > lastRead, 
+    }));
+
+    return { page, isDone: allPosts.length <= pageSize, continueCursor: "" };
   },
 });
 
@@ -64,12 +59,10 @@ export const markNotificationsAsRead = mutation({
       .withIndex("by_userId", (q) => q.eq("userId", args.userId))
       .unique();
 
-    if (!profile) {
-      throw new Error("Profile not found.");
+    if (profile) {
+      await ctx.db.patch(profile._id, {
+        lastReadNotificationsAt: Date.now(),
+      });
     }
-
-    await ctx.db.patch(profile._id, {
-      lastCheckedNotificationsAt: Date.now(),
-    });
   },
 });

@@ -23,7 +23,7 @@ export default function BlogNotificationCard({
 
   return (
     <Link
-      href={`/blog/${_id}`}
+      href={`/insights/${_id}`}
       className="w-full flex flex-col p-2 rounded-lg bg-zinc-50/80 dark:bg-zinc-900/50 hover:bg-accent transition-colors cursor-pointer group"
     >
       <div className="flex-1 min-w-0 flex flex-row justify-between gap-3">
@@ -45,7 +45,7 @@ export default function BlogNotificationCard({
           </div>
 
           {isUnread && (
-            <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-background" />
+            <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-red-500" />
           )}
         </div>
       </div>

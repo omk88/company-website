@@ -10,7 +10,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Separator } from "../ui/separator";
 import { Skeleton } from "../ui/skeleton";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useCurrentUser } from "@/app/ConvexClientProvider";
 import BlogNotificationCard from "./BlogNotificationCard";
 import { useMutation, usePaginatedQuery } from "convex/react";
@@ -35,6 +35,9 @@ export function NavbarAuthClient({
   const [openProfile, setOpenProfile] = useState(false);
   const [openNotifications, setOpenNotifications] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+
+  // Track if there were unread notifications during the active dropdown session
+  const hadUnreadOnOpen = useRef(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -75,15 +78,15 @@ export function NavbarAuthClient({
     ? userData?.profile?.profilePicUrl || clientSessionImage || initialImage || defaultAvatarUrl
     : initialImage || defaultAvatarUrl;
 
-  const markAsRead = useMutation(api.notifications.markNotificationsAsRead);
+  const markNotificationsAsRead = useMutation(api.notifications.markNotificationsAsRead);
 
   const { results: notificationsList, status, loadMore, isLoading } = usePaginatedQuery(
-    api.notifications.getUnreadPosts,
+    api.notifications.getNotifications,
     userId ? { userId } : "skip",
-    { initialNumItems: 5 }
+    { initialNumItems: 10 }
   );
 
-  const unreadCount = notificationsList.length;
+  const unreadCount = notificationsList.filter((item) => item.isUnread).length;
   const [showBadge, setShowBadge] = useState(unreadCount > 0);
 
   useEffect(() => {
@@ -99,8 +102,16 @@ export function NavbarAuthClient({
 
   const handleOpenNotifications = (open: boolean) => {
     setOpenNotifications(open);
-    if (!open && userId && unreadCount > 0) {
-      markAsRead({ userId });
+
+    if (open) {
+      if (unreadCount > 0) {
+        hadUnreadOnOpen.current = true;
+      }
+    } else {
+      if (userId && hadUnreadOnOpen.current) {
+        markNotificationsAsRead({ userId });
+        hadUnreadOnOpen.current = false;
+      }
     }
   };
 
@@ -157,6 +168,7 @@ export function NavbarAuthClient({
                               imageUrl={blog.imageUrl}
                               createdAt={blog.createdAt}
                               author={blog.author}
+                              isUnread={blog.isUnread}
                             />
                           ))}
 
@@ -183,7 +195,7 @@ export function NavbarAuthClient({
                         </div>
                       ) : (
                         <div className="p-4 text-center text-xs text-zinc-500">
-                          No unread posts
+                          No notifications yet
                         </div>
                       )}
                     </div>
