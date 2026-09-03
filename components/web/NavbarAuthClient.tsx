@@ -58,7 +58,7 @@ export function NavbarAuthClient({
 
   const isLoggedIn = isMounted ? !!session : initialIsAuth;
   const userData = useCurrentUser();
-  const profileId = userData?.profile?._id;
+  const userId = userData?.profile?.userId;
 
   const activeProfile = userData?.profile ?? initialProfile;
   const profileUsername = activeProfile?.username;
@@ -79,7 +79,7 @@ export function NavbarAuthClient({
 
   const { results: notificationsList, status, loadMore, isLoading } = usePaginatedQuery(
     api.notifications.getUnreadPosts,
-    profileId ? { profileId } : "skip",
+    userId ? { userId } : "skip",
     { initialNumItems: 5 }
   );
 
@@ -99,8 +99,8 @@ export function NavbarAuthClient({
 
   const handleOpenNotifications = (open: boolean) => {
     setOpenNotifications(open);
-    if (!open && profileId && unreadCount > 0) {
-      markAsRead({ profileId });
+    if (!open && userId && unreadCount > 0) {
+      markAsRead({ userId });
     }
   };
 
