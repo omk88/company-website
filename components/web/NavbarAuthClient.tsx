@@ -10,7 +10,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Separator } from "../ui/separator";
 import { Skeleton } from "../ui/skeleton";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { useCurrentUser } from "@/app/ConvexClientProvider";
 import BlogNotificationCard from "./BlogNotificationCard";
 import { useMutation, usePaginatedQuery } from "convex/react";
@@ -25,6 +25,21 @@ interface NavbarAuthClientProps {
   } | null;
 }
 
+const getCategory = (dateString: string | number) => {
+  const date = new Date(dateString);
+  const now = new Date();
+
+  const isToday = date.toDateString() === now.toDateString();
+
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  const isYesterday = date.toDateString() === yesterday.toDateString();
+
+  if (isToday) return "Today";
+  if (isYesterday) return "Yesterday";
+  return "Older";
+};
+
 export function NavbarAuthClient({ 
   initialIsAuth, 
   initialImage, 
@@ -36,7 +51,6 @@ export function NavbarAuthClient({
   const [openNotifications, setOpenNotifications] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
-  // Track if there were unread notifications during the active dropdown session
   const hadUnreadOnOpen = useRef(false);
 
   useEffect(() => {
@@ -86,7 +100,24 @@ export function NavbarAuthClient({
     { initialNumItems: 10 }
   );
 
-  const unreadCount = notificationsList.filter((item) => item.isUnread).length;
+  const groupedNotifications = useMemo(() => {
+    const groups: { Today: typeof notificationsList; Yesterday: typeof notificationsList; Older: typeof notificationsList } = {
+      Today: [],
+      Yesterday: [],
+      Older: [],
+    };
+
+    if (notificationsList) {
+      notificationsList.forEach((blog) => {
+        const category = getCategory(blog.createdAt);
+        groups[category].push(blog);
+      });
+    }
+
+    return groups;
+  }, [notificationsList]);
+
+  const unreadCount = notificationsList ? notificationsList.filter((item) => item.isUnread).length : 0;
   const [showBadge, setShowBadge] = useState(unreadCount > 0);
 
   useEffect(() => {
@@ -155,22 +186,34 @@ export function NavbarAuthClient({
                       )}
                     </div>
 
-                    <Separator />
+                    <Separator className="mb-1" />
 
                     <div className="flex flex-col gap-2 max-h-80 overflow-y-auto p-1">
-                      {notificationsList.length > 0 ? (
+                      {notificationsList && notificationsList.length > 0 ? (
                         <>
-                          {notificationsList.map((blog) => (
-                            <BlogNotificationCard
-                              key={blog._id}
-                              _id={blog._id}
-                              title={blog.title}
-                              imageUrl={blog.imageUrl}
-                              createdAt={blog.createdAt}
-                              author={blog.author}
-                              isUnread={blog.isUnread}
-                            />
-                          ))}
+                          {(["Today", "Yesterday", "Older"] as const).map((category) => {
+                            const items = groupedNotifications[category];
+                            if (!items || items.length === 0) return null;
+
+                            return (
+                              <div key={category} className="flex flex-col gap-1.5">
+                                <span className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 px-2 pt-1 tracking-wider">
+                                  {category}
+                                </span>
+                                {items.map((blog) => (
+                                  <BlogNotificationCard
+                                    key={blog._id}
+                                    _id={blog._id}
+                                    title={blog.title}
+                                    imageUrl={blog.imageUrl}
+                                    createdAt={blog.createdAt}
+                                    author={blog.author}
+                                    isUnread={blog.isUnread}
+                                  />
+                                ))}
+                              </div>
+                            );
+                          })}
 
                           {status === "CanLoadMore" && (
                             <Button
