@@ -1,6 +1,22 @@
 "use client";
 
-export default function CommentNotificationCard() {
+export interface CommentNotificationCardProps {
+  _id: string;
+  blogId: string;
+  title: string;
+  body: string;
+  createdAt: number;
+  isUnread?: boolean;
+}
+
+export default function CommentNotificationCard({
+  _id,
+  blogId,
+  title,
+  body,
+  createdAt,
+  isUnread = true,
+}: CommentNotificationCardProps) {
   return (
     <div className="relative w-full flex flex-row items-center gap-3 p-2 rounded-lg bg-zinc-50/80 hover:bg-accent transition-colors cursor-pointer group">
       <span className="absolute top-2 right-2 h-2.5 w-2.5 rounded-full bg-red-500" />

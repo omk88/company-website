@@ -313,16 +313,28 @@ export function NavbarAuthClient({
                                     </div>
 
                                     <div className="flex flex-col gap-1.5">
-                                      {group.items.map((blog) => (
-                                        <BlogNotificationCard
-                                          key={blog._id}
-                                          _id={blog._id}
-                                          title={blog.title}
-                                          imageUrl={blog.imageUrl}
-                                          createdAt={blog.createdAt as number}
-                                          isUnread={blog.isUnread}
-                                        />
-                                      ))}
+                                      {group.items.map((item: any) =>
+                                        item.notificationType === "comment" ? (
+                                          <CommentNotificationCard
+                                            key={item._id}
+                                            _id={item._id}
+                                            blogId={item.blogId}
+                                            title={item.blogTitle}
+                                            body={item.body}
+                                            createdAt={item.createdAt}
+                                            isUnread={item.isUnread}
+                                          />
+                                        ) : (
+                                          <BlogNotificationCard
+                                            key={item._id}
+                                            _id={item._id}
+                                            title={item.title}
+                                            imageUrl={item.imageUrl}
+                                            createdAt={item.createdAt}
+                                            isUnread={item.isUnread}
+                                          />
+                                        )
+                                      )}
                                     </div>
                                   </div>
                                 ))}

@@ -35,42 +35,103 @@ export const getNotifications = query({
     );
 
     const nestedPosts = await Promise.all(postPromises);
-    const allPosts = nestedPosts.flat().sort((a, b) => b.createdAt - a.createdAt);
+    const blogItems = nestedPosts.flat();
 
-    const pageSize = args.paginationOpts.numItems;
-    const selectedPosts = allPosts.slice(0, pageSize);
+    const profileBlogs = await ctx.db
+      .query("blogs")
+      .withIndex("by_author", (q) => q.eq("author", args.userId))
+      .collect();
 
-    const postsWithAuthors = await Promise.all(
-      selectedPosts.map(async (blog) => {
-        const authorProfile = await ctx.db
-          .query("profiles")
-          .withIndex("by_userId", (q) => q.eq("userId", blog.author))
-          .unique();
-
-        const profilePic = authorProfile?.profilePic 
-          ? await ctx.storage.getUrl(authorProfile.profilePic) 
-          : null;
-
-        const defaultProfilePic = authorProfile?.defaultProfilePic 
-          ? await ctx.storage.getUrl(authorProfile.defaultProfilePic) 
-          : null;
-
-        return {
-          _id: blog._id,
-          title: blog.title,
-          imageUrl: blog.imageUrl,
-          createdAt: blog.createdAt,
-          author: blog.author,
-          authorUsername: authorProfile?.username ?? "",
-          authorDisplayName: authorProfile?.displayName ?? "",
-          profilePic,
-          defaultProfilePic,
-          isUnread: blog.createdAt > lastRead,
-        };
-      })
+    const commentPromises = profileBlogs.map((blog) => 
+      ctx.db
+        .query("comments")
+        .withIndex("by_blog", (q) => q.eq("blogId", blog._id))
+        .order("desc")
+        .take(10)
     );
 
-    return { page: postsWithAuthors, isDone: allPosts.length <= pageSize, continueCursor: "" };
+    const nestedComments = await Promise.all(commentPromises);
+    const commentItems = nestedComments
+      .flat()
+      .filter((comment) => comment.authorId !== args.userId);
+
+    const [enrichedBlogs, enrichedComments] = await Promise.all([
+      Promise.all(
+        blogItems.map(async (blog) => {
+          const authorProfile = await ctx.db
+            .query("profiles")
+            .withIndex("by_userId", (q) => q.eq("userId", blog.author))
+            .unique();
+
+          const profilePic = authorProfile?.profilePic
+            ? await ctx.storage.getUrl(authorProfile.profilePic)
+            : null;
+
+          const defaultProfilePic = authorProfile?.defaultProfilePic
+            ? await ctx.storage.getUrl(authorProfile.defaultProfilePic)
+            : null;
+
+          return {
+            _id: blog._id,
+            notificationType: "blog" as const,
+            title: blog.title,
+            imageUrl: blog.imageUrl,
+            createdAt: blog.createdAt,
+            author: blog.author,
+            authorUsername: authorProfile?.username ?? "",
+            authorDisplayName: authorProfile?.displayName ?? "",
+            profilePic,
+            defaultProfilePic,
+            isUnread: blog.createdAt > lastRead,
+          };
+        })
+      ),
+
+      Promise.all(
+        commentItems.map(async (comment) => {
+          const authorProfile = await ctx.db
+            .query("profiles")
+            .withIndex("by_userId", (q) => q.eq("userId", comment.authorId))
+            .unique();
+
+          const profilePic = authorProfile?.profilePic
+            ? await ctx.storage.getUrl(authorProfile.profilePic)
+            : null;
+
+          const defaultProfilePic = authorProfile?.defaultProfilePic
+            ? await ctx.storage.getUrl(authorProfile.defaultProfilePic)
+            : null;
+
+          return {
+            _id: comment._id,
+            notificationType: "comment" as const,
+            blogId: comment.blogId,
+            blogTitle: comment.blogTitle,
+            body: comment.body,
+            createdAt: comment._creationTime,
+            author: comment.authorId,
+            authorUsername: comment.username,
+            authorDisplayName: comment.displayName || comment.username,
+            profilePic,
+            defaultProfilePic,
+            isUnread: comment._creationTime > lastRead,
+          };
+        })
+      ),
+    ]);
+
+    const allNotifications = [...enrichedBlogs, ...enrichedComments].sort(
+      (a, b) => b.createdAt - a.createdAt
+    );
+
+    const pageSize = args.paginationOpts.numItems;
+    const selectedPage = allNotifications.slice(0, pageSize);
+
+    return {
+      page: selectedPage,
+      isDone: allNotifications.length <= pageSize,
+      continueCursor: "",
+    };
   },
 });
 
