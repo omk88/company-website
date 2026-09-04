@@ -6,12 +6,10 @@ import { Id } from "@/convex/_generated/dataModel";
 
 const GRADIENT_PALETTES = [
   { color1: "#FF512F", color2: "#DD2476" },
-  { color1: "#8A2387", color2: "#E94057" },
   { color1: "#1FA2FF", color2: "#A6FFCB" },
-  { color1: "#f4c4f3", color2: "#fc67fa" },
   { color1: "#00c6ff", color2: "#0072ff" }, 
   { color1: "#f9d423", color2: "#ff4e50" }, 
-  { color1: "#11998e", color2: "#38ef7d" }, 
+  { color1: "#11998e", color2: "#119499" }, 
 ];
 
 function generateRandomGradientSVG() {
