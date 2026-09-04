@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button, buttonVariants } from "../ui/button";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
-import { LogOut, LogIn, ArrowUpRight, Plus, Bell, Loader2, Library } from "lucide-react";
+import { LogOut, LogIn, ArrowUpRight, Plus, Bell, Loader2, Library, MessageSquare } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Separator } from "../ui/separator";
@@ -29,6 +29,7 @@ interface NavbarAuthClientProps {
 
 type NotificationItem = {
   _id: string;
+  notificationType?: "blog" | "comment";
   title: string;
   imageUrl?: string;
   createdAt: number | string;
@@ -44,6 +45,7 @@ interface AuthorGroup {
   authorName: string;
   authorAvatar: string;
   isUnreadGroup: boolean;
+  type: "blog" | "comment";
   items: NotificationItem[];
 }
 
@@ -162,23 +164,21 @@ export function NavbarAuthClient({
       Older: new Map(),
     };
 
-    notificationsList.forEach((blog: any) => {
-      const timeCategory = getCategory(blog.createdAt) as "Today" | "Yesterday" | "Older";
+    notificationsList.forEach((item: any) => {
+      const timeCategory = getCategory(item.createdAt) as "Today" | "Yesterday" | "Older";
+      const authorId = item.author || "unknown";
+      const type = item.notificationType || "blog"; 
 
-      const authorId = blog.author || "unknown";
-      
-      const displayName = blog.authorDisplayName?.trim();
-      const username = blog.authorUsername?.trim();
+      const username = item.authorUsername?.trim();
+      const authorName = username || "Author";
+      const authorAvatar = item.profilePic || item.defaultProfilePic;
 
-      const authorName = displayName || username || "Author";
-      const authorAvatar = blog.profilePic || blog.defaultProfilePic;
-
-      const isUnread = Boolean(blog.isUnread);
-      const readBatchId = parseDate(blog.createdAt).toISOString().split("T")[0];
+      const isUnread = Boolean(item.isUnread);
+      const readBatchId = parseDate(item.createdAt).toISOString().split("T")[0];
 
       const groupKey = isUnread
-        ? `${authorId}-unread`
-        : `${authorId}-read-batch-${readBatchId}`;
+        ? `${authorId}-${type}-unread`
+        : `${authorId}-${type}-read-batch-${readBatchId}`;
 
       const categoryMap = tempMap[timeCategory];
 
@@ -189,11 +189,12 @@ export function NavbarAuthClient({
           authorName,
           authorAvatar,
           isUnreadGroup: isUnread,
+          type,
           items: [],
         });
       }
 
-      categoryMap.get(groupKey)!.items.push(blog);
+      categoryMap.get(groupKey)!.items.push(item);
     });
 
     (Object.keys(tempMap) as Array<"Today" | "Yesterday" | "Older">).forEach((cat) => {
@@ -301,15 +302,28 @@ export function NavbarAuthClient({
                                         />
                                       </div>
 
-                                      <span className="truncate">
-                                        <span>
-                                          {group.authorName}
-                                        </span>{" "}
-                                        added {group.items.length}{" "}
-                                        {group.items.length === 1 ? "insight" : "insights"}
+                                      <span className="font-medium truncate min-w-0 flex-1">
+                                        {group.authorName}
                                       </span>
 
-                                      <Library className="h-3.5 w-3.5 ml-auto shrink-0 text-muted-foreground" />
+                                      <div className="flex items-center gap-2 shrink-0 ml-auto">
+                                        <span className="whitespace-nowrap">
+                                          +{group.items.length}{" "}
+                                          {group.type === "comment"
+                                            ? group.items.length === 1
+                                              ? "comment"
+                                              : "comments"
+                                            : group.items.length === 1
+                                            ? "insight"
+                                            : "insights"}
+                                        </span>
+
+                                        {group.type === "comment" ? (
+                                          <MessageSquare className="h-3.5 w-3.5 text-muted-foreground" />
+                                        ) : (
+                                          <Library className="h-3.5 w-3.5 text-muted-foreground" />
+                                        )}
+                                      </div>
                                     </div>
 
                                     <div className="flex flex-col gap-1.5">
