@@ -15,6 +15,7 @@ import {
   Library,
   MessageSquare,
   UserPlus,
+  UserRoundPlus,
 } from "lucide-react";
 import {
   Tooltip,
@@ -33,6 +34,7 @@ import { api } from "@/convex/_generated/api";
 import { ScrollArea } from "../ui/scroll-area";
 import CommentNotificationCard from "./CommentNotificationCard";
 import FollowerNotificationCard from "./FollowerNotificationCard";
+import ReactionsNotificationCard from "./ReactionsNotificationCard";
 
 interface NavbarAuthClientProps {
   initialIsAuth: boolean;
@@ -378,7 +380,7 @@ export function NavbarAuthClient({
                                         </span>
 
                                         {group.type === "follow" ? (
-                                          <UserPlus className="h-3.5 w-3.5 text-muted-foreground" />
+                                          <UserRoundPlus className="h-3.5 w-3.5 text-muted-foreground" />
                                         ) : group.type === "comment" ? (
                                           <MessageSquare className="h-3.5 w-3.5 text-muted-foreground" />
                                         ) : (
@@ -386,6 +388,8 @@ export function NavbarAuthClient({
                                         )}
                                       </div>
                                     </div>
+
+                                    <ReactionsNotificationCard />
 
                                     <div className="flex flex-col gap-1.5">
                                       {group.items.map((item) =>
