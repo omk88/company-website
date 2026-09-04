@@ -22,27 +22,32 @@ export const getNotifications = query({
       .withIndex("by_follower", (q) => q.eq("followerId", args.userId))
       .collect();
 
-    if (follows.length === 0) return { page: [], isDone: true, continueCursor: "" };
+    const followers = await ctx.db
+      .query("follows")
+      .withIndex("by_following", (q) => q.eq("followingId", args.userId))
+      .collect();
 
-    const postPromises = follows.map((follow) =>
-      ctx.db
-        .query("blogs")
-        .withIndex("by_author_createdAt", (q) =>
-          q.eq("author", follow.followingId).gt("createdAt", follow._creationTime)
-        )
-        .order("desc")
-        .take(15)
-    );
-
-    const nestedPosts = await Promise.all(postPromises);
-    const blogItems = nestedPosts.flat();
+    let blogItems: Array<any> = [];
+    if (follows.length > 0) {
+      const postPromises = follows.map((follow) =>
+        ctx.db
+          .query("blogs")
+          .withIndex("by_author_createdAt", (q) =>
+            q.eq("author", follow.followingId).gt("createdAt", follow._creationTime)
+          )
+          .order("desc")
+          .take(15)
+      );
+      const nestedPosts = await Promise.all(postPromises);
+      blogItems = nestedPosts.flat();
+    }
 
     const profileBlogs = await ctx.db
       .query("blogs")
       .withIndex("by_author", (q) => q.eq("author", args.userId))
       .collect();
 
-    const commentPromises = profileBlogs.map((blog) => 
+    const commentPromises = profileBlogs.map((blog) =>
       ctx.db
         .query("comments")
         .withIndex("by_blog", (q) => q.eq("blogId", blog._id))
@@ -55,7 +60,7 @@ export const getNotifications = query({
       .flat()
       .filter((comment) => comment.authorId !== args.userId);
 
-    const [enrichedBlogs, enrichedComments] = await Promise.all([
+    const [enrichedBlogs, enrichedComments, enrichedFollowers] = await Promise.all([
       Promise.all(
         blogItems.map(async (blog) => {
           const authorProfile = await ctx.db
@@ -118,11 +123,41 @@ export const getNotifications = query({
           };
         })
       ),
+
+      Promise.all(
+        followers.map(async (follow) => {
+          const followerProfile = await ctx.db
+            .query("profiles")
+            .withIndex("by_userId", (q) => q.eq("userId", follow.followerId))
+            .unique();
+
+          const profilePicUrl = followerProfile?.profilePic
+            ? await ctx.storage.getUrl(followerProfile.profilePic)
+            : null;
+
+          const defaultProfilePicUrl = followerProfile?.defaultProfilePic
+            ? await ctx.storage.getUrl(followerProfile.defaultProfilePic)
+            : null;
+
+          return {
+            _id: follow._id,
+            notificationType: "follow" as const,
+            username: followerProfile?.username ?? "",
+            displayName: followerProfile?.displayName || followerProfile?.username || "",
+            profilePicUrl,
+            defaultProfilePicUrl,
+            createdAt: follow._creationTime,
+            isUnread: follow._creationTime > lastRead,
+          };
+        })
+      ),
     ]);
 
-    const allNotifications = [...enrichedBlogs, ...enrichedComments].sort(
-      (a, b) => b.createdAt - a.createdAt
-    );
+    const allNotifications = [
+      ...enrichedBlogs,
+      ...enrichedComments,
+      ...enrichedFollowers,
+    ].sort((a, b) => b.createdAt - a.createdAt);
 
     const pageSize = args.paginationOpts.numItems;
     const selectedPage = allNotifications.slice(0, pageSize);

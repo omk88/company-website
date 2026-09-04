@@ -5,8 +5,23 @@ import { useRouter } from "next/navigation";
 import { Button, buttonVariants } from "../ui/button";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
-import { LogOut, LogIn, ArrowUpRight, Plus, Bell, Loader2, Library, MessageSquare } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
+import {
+  LogOut,
+  LogIn,
+  ArrowUpRight,
+  Plus,
+  Bell,
+  Loader2,
+  Library,
+  MessageSquare,
+  UserPlus,
+} from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Separator } from "../ui/separator";
 import { Skeleton } from "../ui/skeleton";
@@ -28,17 +43,47 @@ interface NavbarAuthClientProps {
   } | null;
 }
 
-type NotificationItem = {
+type BlogNotification = {
   _id: string;
-  notificationType?: "blog" | "comment";
+  notificationType: "blog";
   title: string;
-  imageUrl?: string;
-  createdAt: number | string;
+  imageUrl?: string | null;
+  createdAt: number;
   author: string;
   authorUsername: string;
   authorDisplayName?: string;
+  profilePic?: string | null;
+  defaultProfilePic?: string | null;
   isUnread?: boolean;
 };
+
+type CommentNotification = {
+  _id: string;
+  notificationType: "comment";
+  blogId: string;
+  blogTitle: string;
+  body: string;
+  createdAt: number;
+  author: string;
+  authorUsername: string;
+  authorDisplayName?: string;
+  profilePic?: string | null;
+  defaultProfilePic?: string | null;
+  isUnread?: boolean;
+};
+
+type FollowNotification = {
+  _id: string;
+  notificationType: "follow";
+  username: string;
+  displayName: string;
+  profilePicUrl?: string | null;
+  defaultProfilePicUrl?: string | null;
+  createdAt: number;
+  isUnread?: boolean;
+};
+
+type NotificationItem = BlogNotification | CommentNotification | FollowNotification;
 
 interface AuthorGroup {
   groupKey: string;
@@ -46,7 +91,7 @@ interface AuthorGroup {
   authorName: string;
   authorAvatar: string;
   isUnreadGroup: boolean;
-  type: "blog" | "comment";
+  type: "blog" | "comment" | "follow";
   items: NotificationItem[];
 }
 
@@ -165,14 +210,23 @@ export function NavbarAuthClient({
       Older: new Map(),
     };
 
-    notificationsList.forEach((item: any) => {
+    (notificationsList as NotificationItem[]).forEach((item) => {
       const timeCategory = getCategory(item.createdAt) as "Today" | "Yesterday" | "Older";
-      const authorId = item.author || "unknown";
-      const type = item.notificationType || "blog"; 
+      const type = item.notificationType;
 
-      const username = item.authorUsername?.trim();
-      const authorName = username || "Author";
-      const authorAvatar = item.profilePic || item.defaultProfilePic;
+      let authorId = "unknown";
+      let authorName = "Author";
+      let authorAvatar = "/default.svg";
+
+      if (item.notificationType === "follow") {
+        authorId = item.username || "unknown";
+        authorName = item.displayName || item.username || "User";
+        authorAvatar = item.profilePicUrl || item.defaultProfilePicUrl || "/default.svg";
+      } else {
+        authorId = item.author || "unknown";
+        authorName = item.authorUsername?.trim() || "Author";
+        authorAvatar = item.profilePic || item.defaultProfilePic || "/default.svg";
+      }
 
       const isUnread = Boolean(item.isUnread);
       const readBatchId = parseDate(item.createdAt).toISOString().split("T")[0];
@@ -310,7 +364,11 @@ export function NavbarAuthClient({
                                       <div className="flex items-center gap-2 shrink-0 ml-auto">
                                         <span className="whitespace-nowrap">
                                           +{group.items.length}{" "}
-                                          {group.type === "comment"
+                                          {group.type === "follow"
+                                            ? group.items.length === 1
+                                              ? "follower"
+                                              : "followers"
+                                            : group.type === "comment"
                                             ? group.items.length === 1
                                               ? "comment"
                                               : "comments"
@@ -319,7 +377,9 @@ export function NavbarAuthClient({
                                             : "insights"}
                                         </span>
 
-                                        {group.type === "comment" ? (
+                                        {group.type === "follow" ? (
+                                          <UserPlus className="h-3.5 w-3.5 text-muted-foreground" />
+                                        ) : group.type === "comment" ? (
                                           <MessageSquare className="h-3.5 w-3.5 text-muted-foreground" />
                                         ) : (
                                           <Library className="h-3.5 w-3.5 text-muted-foreground" />
@@ -328,8 +388,18 @@ export function NavbarAuthClient({
                                     </div>
 
                                     <div className="flex flex-col gap-1.5">
-                                      {group.items.map((item: any) =>
-                                        item.notificationType === "comment" ? (
+                                      {group.items.map((item) =>
+                                        item.notificationType === "follow" ? (
+                                          <FollowerNotificationCard
+                                            key={item._id}
+                                            username={item.username}
+                                            displayName={item.displayName}
+                                            profilePicUrl={item.profilePicUrl ?? ""}
+                                            defaultProfilePicUrl={item.defaultProfilePicUrl ?? ""}
+                                            createdAt={item.createdAt}
+                                            isUnread={item.isUnread}
+                                          />
+                                        ) : item.notificationType === "comment" ? (
                                           <CommentNotificationCard
                                             key={item._id}
                                             _id={item._id}
@@ -344,7 +414,7 @@ export function NavbarAuthClient({
                                             key={item._id}
                                             _id={item._id}
                                             title={item.title}
-                                            imageUrl={item.imageUrl}
+                                            imageUrl={item.imageUrl ?? undefined}
                                             createdAt={item.createdAt}
                                             isUnread={item.isUnread}
                                           />
