@@ -16,6 +16,7 @@ import BlogNotificationCard from "./BlogNotificationCard";
 import { useMutation, usePaginatedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { ScrollArea } from "../ui/scroll-area";
+import CommentNotificationCard from "./CommentNotificationCard";
 
 interface NavbarAuthClientProps {
   initialIsAuth: boolean;

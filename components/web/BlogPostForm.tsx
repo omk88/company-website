@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { useState, useRef, useEffect, useMemo, memo, useDeferredValue, Suspense } from "react";
 import { cn } from "@/lib/utils";
 import { api } from "@/convex/_generated/api";
-import { useMutation, useQuery } from "convex/react";
+import { useMutation } from "convex/react";
 import { Badge } from "../ui/badge";
 import { Checkbox } from "../ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
@@ -31,6 +31,7 @@ import js from "highlight.js/lib/languages/javascript";
 import ts from "highlight.js/lib/languages/typescript";
 import "highlight.js/styles/github-dark.css";
 import { useBlogStore } from "@/stores/useBlogStore";
+import { ScrollArea } from "../ui/scroll-area";
 
 const lowlight = createLowlight();
 lowlight.register("javascript", js);
@@ -380,7 +381,7 @@ export default function BlogPostForm() {
     return (
         <div className="w-full h-[calc(100vh-4rem)] overflow-hidden">
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] items-stretch h-full overflow-hidden">
-                <div className="py-4 px-4 sm:px-6 h-full overflow-y-auto [scrollbar-gutter:stable] min-h-0 w-full">
+                <ScrollArea className="py-4 px-4 sm:px-6 h-full overflow-y-auto min-h-0 w-full [&>[data-radix-scroll-area-viewport]]:pt-2">
                     <div
                         className={cn(
                         "relative w-full rounded-md border p-2 my-auto transition-colors",
@@ -828,17 +829,17 @@ export default function BlogPostForm() {
                             </FieldGroup>
                         </form>
                     </div>
-                </div>
+                </ScrollArea>
 
                 <div className="hidden lg:flex items-stretch justify-center h-full">
                     <Separator orientation="vertical" className="h-full w-[1px]" />
                 </div>
 
-                <div className="w-full py-4 px-4 sm:px-6 overflow-y-auto [scrollbar-gutter:stable] h-full min-h-0">
+                <ScrollArea className="w-full py-4 px-4 sm:px-6 overflow-y-auto [&>[data-radix-scroll-area-viewport]]:pt-2 h-full min-h-0">
                     <div className="w-full">
                         <LivePostPreview control={control} previewImage={imagePreviewUrl} />
                     </div>
-                </div>
+                </ScrollArea>
             </div>
         </div>
     );
