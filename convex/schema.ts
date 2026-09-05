@@ -189,6 +189,7 @@ const schema = defineSchema({
     blogId: v.id("blogs"),
     type: v.string(), 
   })
+    .index("by_blog", ["blogId"])
     .index("by_user_blog_and_type", ["userId", "blogId", "type"]),
 
   featuredBlogs: defineTable({

@@ -27,6 +27,11 @@ export const getNotifications = query({
       .withIndex("by_following", (q) => q.eq("followingId", args.userId))
       .collect();
 
+    const profileBlogs = await ctx.db
+      .query("blogs")
+      .withIndex("by_author", (q) => q.eq("author", args.userId))
+      .collect();
+
     let blogItems: Array<any> = [];
     if (follows.length > 0) {
       const postPromises = follows.map((follow) =>
@@ -42,11 +47,6 @@ export const getNotifications = query({
       blogItems = nestedPosts.flat();
     }
 
-    const profileBlogs = await ctx.db
-      .query("blogs")
-      .withIndex("by_author", (q) => q.eq("author", args.userId))
-      .collect();
-
     const commentPromises = profileBlogs.map((blog) =>
       ctx.db
         .query("comments")
@@ -54,27 +54,58 @@ export const getNotifications = query({
         .order("desc")
         .take(10)
     );
-
     const nestedComments = await Promise.all(commentPromises);
     const commentItems = nestedComments
       .flat()
       .filter((comment) => comment.authorId !== args.userId);
 
-    const [enrichedBlogs, enrichedComments, enrichedFollowers] = await Promise.all([
+    const reactionPromises = profileBlogs.map((blog) =>
+      ctx.db
+        .query("blogReactions")
+        .withIndex("by_blog", (q) => q.eq("blogId", blog._id))
+        .order("desc")
+        .take(20)
+    );
+    const nestedReactions = await Promise.all(reactionPromises);
+    const rawReactions = nestedReactions
+      .flat()
+      .filter((reaction) => reaction.userId !== args.userId);
+
+    const groupedReactionsMap = new Map<string, {
+      userId: string;
+      blogId: any;
+      reactions: string[];
+      latestCreationTime: number;
+    }>();
+
+    for (const rx of rawReactions) {
+      const groupKey = `${rx.userId}_${rx.blogId}`;
+      const existing = groupedReactionsMap.get(groupKey);
+
+      if (existing) {
+        existing.reactions.push(rx.type);
+        if (rx._creationTime > existing.latestCreationTime) {
+          existing.latestCreationTime = rx._creationTime;
+        }
+      } else {
+        groupedReactionsMap.set(groupKey, {
+          userId: rx.userId,
+          blogId: rx.blogId,
+          reactions: [rx.type],
+          latestCreationTime: rx._creationTime,
+        });
+      }
+    }
+
+    const groupedReactions = Array.from(groupedReactionsMap.values());
+
+    const [enrichedBlogs, enrichedComments, enrichedFollowers, enrichedReactions] = await Promise.all([
       Promise.all(
         blogItems.map(async (blog) => {
           const authorProfile = await ctx.db
             .query("profiles")
             .withIndex("by_userId", (q) => q.eq("userId", blog.author))
             .unique();
-
-          const profilePic = authorProfile?.profilePic
-            ? await ctx.storage.getUrl(authorProfile.profilePic)
-            : null;
-
-          const defaultProfilePic = authorProfile?.defaultProfilePic
-            ? await ctx.storage.getUrl(authorProfile.defaultProfilePic)
-            : null;
 
           return {
             _id: blog._id,
@@ -85,8 +116,8 @@ export const getNotifications = query({
             author: blog.author,
             authorUsername: authorProfile?.username ?? "",
             authorDisplayName: authorProfile?.displayName ?? "",
-            profilePic,
-            defaultProfilePic,
+            profilePic: authorProfile?.profilePic ? await ctx.storage.getUrl(authorProfile.profilePic) : null,
+            defaultProfilePic: authorProfile?.defaultProfilePic ? await ctx.storage.getUrl(authorProfile.defaultProfilePic) : null,
             isUnread: blog.createdAt > lastRead,
           };
         })
@@ -99,14 +130,6 @@ export const getNotifications = query({
             .withIndex("by_userId", (q) => q.eq("userId", comment.authorId))
             .unique();
 
-          const profilePic = authorProfile?.profilePic
-            ? await ctx.storage.getUrl(authorProfile.profilePic)
-            : null;
-
-          const defaultProfilePic = authorProfile?.defaultProfilePic
-            ? await ctx.storage.getUrl(authorProfile.defaultProfilePic)
-            : null;
-
           return {
             _id: comment._id,
             notificationType: "comment" as const,
@@ -117,8 +140,8 @@ export const getNotifications = query({
             author: comment.authorId,
             authorUsername: comment.username,
             authorDisplayName: comment.displayName || comment.username,
-            profilePic,
-            defaultProfilePic,
+            profilePic: authorProfile?.profilePic ? await ctx.storage.getUrl(authorProfile.profilePic) : null,
+            defaultProfilePic: authorProfile?.defaultProfilePic ? await ctx.storage.getUrl(authorProfile.defaultProfilePic) : null,
             isUnread: comment._creationTime > lastRead,
           };
         })
@@ -131,23 +154,41 @@ export const getNotifications = query({
             .withIndex("by_userId", (q) => q.eq("userId", follow.followerId))
             .unique();
 
-          const profilePicUrl = followerProfile?.profilePic
-            ? await ctx.storage.getUrl(followerProfile.profilePic)
-            : null;
-
-          const defaultProfilePicUrl = followerProfile?.defaultProfilePic
-            ? await ctx.storage.getUrl(followerProfile.defaultProfilePic)
-            : null;
-
           return {
             _id: follow._id,
             notificationType: "follow" as const,
             username: followerProfile?.username ?? "",
             displayName: followerProfile?.displayName || followerProfile?.username || "",
-            profilePicUrl,
-            defaultProfilePicUrl,
+            profilePicUrl: followerProfile?.profilePic ? await ctx.storage.getUrl(followerProfile.profilePic) : null,
+            defaultProfilePicUrl: followerProfile?.defaultProfilePic ? await ctx.storage.getUrl(followerProfile.defaultProfilePic) : null,
             createdAt: follow._creationTime,
             isUnread: follow._creationTime > lastRead,
+          };
+        })
+      ),
+
+      Promise.all(
+        groupedReactions.map(async (group) => {
+          const targetBlog = profileBlogs.find((b) => b._id === group.blogId);
+
+          const actorProfile = await ctx.db
+            .query("profiles")
+            .withIndex("by_userId", (q) => q.eq("userId", group.userId))
+            .unique();
+
+          return {
+            _id: `${group.userId}_${group.blogId}`,
+            notificationType: "reaction" as const,
+            blogId: group.blogId,
+            blogTitle: targetBlog?.title ?? "",
+            reactions: group.reactions,
+            createdAt: group.latestCreationTime,
+            author: group.userId,
+            authorUsername: actorProfile?.username ?? "",
+            authorDisplayName: actorProfile?.displayName || actorProfile?.username || "",
+            profilePic: actorProfile?.profilePic ? await ctx.storage.getUrl(actorProfile.profilePic) : null,
+            defaultProfilePic: actorProfile?.defaultProfilePic ? await ctx.storage.getUrl(actorProfile.defaultProfilePic) : null,
+            isUnread: group.latestCreationTime > lastRead,
           };
         })
       ),
@@ -157,6 +198,7 @@ export const getNotifications = query({
       ...enrichedBlogs,
       ...enrichedComments,
       ...enrichedFollowers,
+      ...enrichedReactions,
     ].sort((a, b) => b.createdAt - a.createdAt);
 
     const pageSize = args.paginationOpts.numItems;

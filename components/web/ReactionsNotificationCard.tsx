@@ -1,33 +1,56 @@
 "use client";
 
-import { Button } from "../ui/button";
+import Link from "next/link";
 import { formatSmartDate } from "./ProfileHoverCard";
 import { EMOJI_REACTIONS } from "@/app/constants/reactions";
 
-export default function FollowerNotificationCard() {
+export interface ReactionsNotificationCardProps {
+    _id: string;
+    title: string;
+    reactions: string[];
+    createdAt: number;
+    isUnread?: boolean;
+}
 
-  return (
-    <div className="relative w-full flex flex-row items-center gap-3 p-2 rounded-lg bg-zinc-50/80 hover:bg-accent transition-colors cursor-pointer group overflow-hidden">
-      <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
-        <div className="flex flex-row items-center gap-2.5 min-w-0">
-          <div className="flex flex-row min-w-0 flex-1">
-            <span className="text-sm font-medium leading-snug text-zinc-800 dark:text-zinc-200 truncate">
-              Europe is nice to visit!
-            </span>
-            <span className="ml-auto text-md">
-                {EMOJI_REACTIONS[0].emoji}
-                {EMOJI_REACTIONS[1].emoji}
-                {EMOJI_REACTIONS[2].emoji}
-                {EMOJI_REACTIONS[3].emoji}
-                {EMOJI_REACTIONS[4].emoji}
-            </span>
-          </div>
-        </div>
+export default function ReactionsNotificationCard({
+    _id,
+    title,
+    reactions,
+    createdAt,
+    isUnread = true,
+}: ReactionsNotificationCardProps) {
 
-        <span className="text-xs text-zinc-400">
-          2m ago
-        </span>
-      </div>
-    </div>
-  );
+    const emojis = reactions
+        .map((reactionType) => EMOJI_REACTIONS.find((r) => r.type === reactionType)?.emoji)
+        .filter(Boolean);
+
+    return (
+        <Link
+            href={`/insights/${_id}`}
+        >
+            <div className="relative w-full flex flex-row items-center gap-3 p-2 rounded-lg bg-zinc-50/80 hover:bg-accent transition-colors cursor-pointer group overflow-hidden">
+                <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
+                    <div className="flex flex-row items-center gap-2.5 min-w-0">
+                        <div className="flex flex-row min-w-0 flex-1 items-center ">
+                            {isUnread && (
+                                <span className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-red-500" />
+                            )}
+                            <span className="text-sm font-medium leading-snug text-zinc-800 group-hover:text-blue-600 dark:group-hover:text-blue-400 dark:text-zinc-200 truncate">
+                                {title}
+                            </span>
+                            <div className="flex items-center text-lg shrink-0 ml-auto">
+                                {emojis.map((emoji, index) => (
+                                    <span key={`${emoji}-${index}`}>{emoji}</span>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    <time className="text-xs text-zinc-400">
+                        {formatSmartDate(createdAt, false)}
+                    </time>
+                </div>
+            </div>
+        </Link>
+    );
 }

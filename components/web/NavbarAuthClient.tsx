@@ -16,6 +16,8 @@ import {
   MessageSquare,
   UserPlus,
   UserRoundPlus,
+  Heart,
+  Smile,
 } from "lucide-react";
 import {
   Tooltip,
@@ -85,7 +87,26 @@ type FollowNotification = {
   isUnread?: boolean;
 };
 
-type NotificationItem = BlogNotification | CommentNotification | FollowNotification;
+type ReactionNotification = {
+  _id: string;
+  notificationType: "reaction";
+  blogId: string;
+  blogTitle: string;
+  reactions: string[];
+  createdAt: number;
+  author: string;
+  authorUsername: string;
+  authorDisplayName?: string;
+  profilePic?: string | null;
+  defaultProfilePic?: string | null;
+  isUnread?: boolean;
+};
+
+type NotificationItem = 
+  | BlogNotification 
+  | CommentNotification 
+  | FollowNotification 
+  | ReactionNotification;
 
 interface AuthorGroup {
   groupKey: string;
@@ -93,7 +114,7 @@ interface AuthorGroup {
   authorName: string;
   authorAvatar: string;
   isUnreadGroup: boolean;
-  type: "blog" | "comment" | "follow";
+  type: "blog" | "comment" | "follow" | "reaction";
   items: NotificationItem[];
 }
 
@@ -364,32 +385,47 @@ export function NavbarAuthClient({
                                       </span>
 
                                       <div className="flex items-center gap-2 shrink-0 ml-auto">
-                                        <span className="whitespace-nowrap">
-                                          +{group.items.length}{" "}
-                                          {group.type === "follow"
-                                            ? group.items.length === 1
-                                              ? "follower"
-                                              : "followers"
-                                            : group.type === "comment"
-                                            ? group.items.length === 1
-                                              ? "comment"
-                                              : "comments"
-                                            : group.items.length === 1
-                                            ? "insight"
-                                            : "insights"}
-                                        </span>
+                                        {(() => {
+                                          const totalCount = group.items.reduce((sum, item) => {
+                                            if (item.notificationType === "reaction" && Array.isArray(item.reactions)) {
+                                              return sum + item.reactions.length;
+                                            }
+                                            return sum + 1;
+                                          }, 0);
+
+                                          return (
+                                            <span className="whitespace-nowrap">
+                                              +{totalCount}{" "}
+                                              {group.type === "follow"
+                                                ? totalCount === 1
+                                                  ? "follower"
+                                                  : "followers"
+                                                : group.type === "comment"
+                                                ? totalCount === 1
+                                                  ? "comment"
+                                                  : "comments"
+                                                : group.type === "reaction"
+                                                ? totalCount === 1
+                                                  ? "reaction"
+                                                  : "reactions"
+                                                : totalCount === 1
+                                                ? "insight"
+                                                : "insights"}
+                                            </span>
+                                          );
+                                        })()}
 
                                         {group.type === "follow" ? (
                                           <UserRoundPlus className="h-3.5 w-3.5 text-muted-foreground" />
                                         ) : group.type === "comment" ? (
                                           <MessageSquare className="h-3.5 w-3.5 text-muted-foreground" />
+                                        ) : group.type === "reaction" ? (
+                                          <Smile className="h-3.5 w-3.5 text-muted-foreground" />
                                         ) : (
                                           <Library className="h-3.5 w-3.5 text-muted-foreground" />
                                         )}
                                       </div>
                                     </div>
-
-                                    <ReactionsNotificationCard />
 
                                     <div className="flex flex-col gap-1.5">
                                       {group.items.map((item) =>
@@ -413,6 +449,15 @@ export function NavbarAuthClient({
                                             createdAt={item.createdAt}
                                             isUnread={item.isUnread}
                                           />
+                                        ) : item.notificationType === "reaction" ? (
+                                          <ReactionsNotificationCard
+                                            key={item._id}
+                                            _id={item.blogId}
+                                            title={item.blogTitle}
+                                            reactions={item.reactions}
+                                            createdAt={item.createdAt}
+                                            isUnread={item.isUnread}
+                                          />
                                         ) : (
                                           <BlogNotificationCard
                                             key={item._id}
@@ -430,23 +475,6 @@ export function NavbarAuthClient({
                               </div>
                             );
                           })}
-
-                          {status === "CanLoadMore" && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="w-full text-xs text-muted-foreground mt-1"
-                              onClick={() => loadMore(5)}
-                            >
-                              Load earlier posts
-                            </Button>
-                          )}
-
-                          {status === "LoadingMore" && (
-                            <div className="flex justify-center p-2">
-                              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-                            </div>
-                          )}
                         </>
                       ) : isLoading ? (
                         <div className="p-4 text-center text-xs text-zinc-500">Loading...</div>
