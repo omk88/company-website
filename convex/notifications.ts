@@ -59,6 +59,19 @@ export const getNotifications = query({
       .flat()
       .filter((comment) => comment.authorId !== args.userId);
 
+    // Fetch likes (blogVotes) for the user's blogs
+    const votePromises = profileBlogs.map((blog) =>
+      ctx.db
+        .query("blogVotes")
+        .withIndex("by_blog", (q) => q.eq("blogId", blog._id))
+        .order("desc")
+        .take(20)
+    );
+    const nestedVotes = await Promise.all(votePromises);
+    const voteItems = nestedVotes
+      .flat()
+      .filter((vote) => vote.userId !== args.userId);
+
     const reactionPromises = profileBlogs.map((blog) =>
       ctx.db
         .query("blogReactions")
@@ -103,6 +116,7 @@ export const getNotifications = query({
       enrichedBlogs,
       enrichedComments,
       enrichedFollowers,
+      enrichedVotes,
       enrichedReactions,
     ] = await Promise.all([
       Promise.all(
@@ -207,6 +221,35 @@ export const getNotifications = query({
       ),
 
       Promise.all(
+        voteItems.map(async (vote) => {
+          const targetBlog = profileBlogs.find((b) => b._id === vote.blogId);
+          const actorProfile = await ctx.db
+            .query("profiles")
+            .withIndex("by_userId", (q) => q.eq("userId", vote.userId))
+            .unique();
+
+          return {
+            _id: vote._id,
+            notificationType: "like" as const,
+            blogId: vote.blogId,
+            blogTitle: targetBlog?.title ?? "",
+            createdAt: vote._creationTime,
+            author: vote.userId,
+            authorUsername: actorProfile?.username ?? "",
+            authorDisplayName:
+              actorProfile?.displayName || actorProfile?.username || "",
+            profilePic: actorProfile?.profilePic
+              ? await ctx.storage.getUrl(actorProfile.profilePic)
+              : null,
+            defaultProfilePic: actorProfile?.defaultProfilePic
+              ? await ctx.storage.getUrl(actorProfile.defaultProfilePic)
+              : null,
+            isUnread: vote._creationTime > lastRead,
+          };
+        })
+      ),
+
+      Promise.all(
         groupedReactions.map(async (group) => {
           const targetBlog = profileBlogs.find((b) => b._id === group.blogId);
 
@@ -242,6 +285,7 @@ export const getNotifications = query({
       ...enrichedBlogs,
       ...enrichedComments,
       ...enrichedFollowers,
+      ...enrichedVotes,
       ...enrichedReactions,
     ].sort((a, b) => b.createdAt - a.createdAt);
 

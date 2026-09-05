@@ -37,6 +37,7 @@ import { ScrollArea } from "../ui/scroll-area";
 import CommentNotificationCard from "./CommentNotificationCard";
 import FollowerNotificationCard from "./FollowerNotificationCard";
 import ReactionsNotificationCard from "./ReactionsNotificationCard";
+import BlogLikesNotificationCard from "./BlogLikesNotificationCard";
 
 interface NavbarAuthClientProps {
   initialIsAuth: boolean;
@@ -52,6 +53,20 @@ type BlogNotification = {
   notificationType: "blog";
   title: string;
   imageUrl?: string | null;
+  createdAt: number;
+  author: string;
+  authorUsername: string;
+  authorDisplayName?: string;
+  profilePic?: string | null;
+  defaultProfilePic?: string | null;
+  isUnread?: boolean;
+};
+
+type BlogLikesNotification = {
+  _id: string;
+  notificationType: "like";
+  blogId: string;
+  blogTitle: string;
   createdAt: number;
   author: string;
   authorUsername: string;
@@ -111,7 +126,8 @@ type NotificationItem =
   | BlogNotification 
   | CommentNotification 
   | FollowNotification 
-  | ReactionNotification;
+  | ReactionNotification
+  | BlogLikesNotification;
 
 interface AuthorGroup {
   groupKey: string;
@@ -119,7 +135,7 @@ interface AuthorGroup {
   authorName: string;
   authorAvatar: string;
   isUnreadGroup: boolean;
-  type: "blog" | "comment" | "follow" | "reaction";
+  type: "blog" | "comment" | "follow" | "reaction" | "like";
   items: NotificationItem[];
 }
 
@@ -436,7 +452,7 @@ export function NavbarAuthClient({
                                       {group.items.map((item) =>
                                         item.notificationType === "follow" ? (
                                           <FollowerNotificationCard
-                                            _id={item._id} 
+                                            userId={item._id} 
                                             key={item._id}
                                             username={item.username}
                                             displayName={item.displayName}
@@ -455,6 +471,14 @@ export function NavbarAuthClient({
                                             blogId={item.blogId}
                                             title={item.blogTitle}
                                             body={item.body}
+                                            createdAt={item.createdAt}
+                                            isUnread={item.isUnread}
+                                          />
+                                        ) : item.notificationType === "like" ? (
+                                          <BlogLikesNotificationCard
+                                            key={item._id}
+                                            _id={item.blogId}
+                                            title={item.blogTitle}
                                             createdAt={item.createdAt}
                                             isUnread={item.isUnread}
                                           />
