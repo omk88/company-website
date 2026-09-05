@@ -33,7 +33,7 @@ export default function ReactionsNotificationCard({
                     <div className="flex flex-row items-center gap-2.5 min-w-0">
                         <div className="flex flex-row min-w-0 flex-1 items-center ">
                             {isUnread && (
-                                <span className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-red-500" />
+                                <span className="absolute top-1.5 right-1.5 h-2.5 w-2.5 rounded-full bg-red-500" />
                             )}
                             <span className="text-sm font-medium leading-snug text-zinc-800 group-hover:text-blue-600 dark:group-hover:text-blue-400 dark:text-zinc-200 truncate">
                                 {title}

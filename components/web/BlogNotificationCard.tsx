@@ -45,7 +45,7 @@ export default function BlogNotificationCard({
         </div>
 
         {isUnread && (
-          <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-red-500" />
+          <span className="absolute -top-1.5 -right-1.5 h-2.5 w-2.5 rounded-full bg-red-500" />
         )}
       </div>
     </Link>

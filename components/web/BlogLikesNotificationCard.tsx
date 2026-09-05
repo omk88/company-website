@@ -32,7 +32,7 @@ export default function BlogLikesNotificationCard({
                             <span className="text-sm font-medium leading-snug text-zinc-800 group-hover:text-blue-600 dark:group-hover:text-blue-400 dark:text-zinc-200 truncate">
                                 {title}
                             </span>
-                            <div className="flex items-center shrink-0 ml-auto px-4">
+                            <div className="flex items-center shrink-0 ml-auto">
                                 <ThumbsUp
                                     className={`w-5 h-5 shrink-0 transition-none text-emerald-500 fill-emerald-500`}
                                 />
