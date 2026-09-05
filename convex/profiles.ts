@@ -126,14 +126,14 @@ export const getProfileByUsername = query({
         ctx.storage.getUrl(profile.defaultProfilePic),
       ]);
 
-    const isSelf = currentProfile?._id === profile._id;
+    const isSelf = currentProfile?.userId === profile.userId;
 
     const followRecord =
       currentProfile && !isSelf
         ? await ctx.db
             .query("follows")
             .withIndex("by_follower_and_following", (q) =>
-              q.eq("followerId", currentProfile._id).eq("followingId", profile._id)
+              q.eq("followerId", currentProfile.userId).eq("followingId", profile.userId)
             )
             .unique()
         : null;
