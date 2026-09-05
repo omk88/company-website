@@ -18,6 +18,7 @@ import {
   UserRoundPlus,
   Heart,
   Smile,
+  ThumbsUp,
 } from "lucide-react";
 import {
   Tooltip,
@@ -446,9 +447,18 @@ export function NavbarAuthClient({
                                                 ? totalCount === 1
                                                   ? "reaction"
                                                   : "reactions"
+                                                : group.type === "blog"
+                                                ? totalCount === 1
+                                                  ? "insight"
+                                                  : "insights"
+                                                : group.type === "blogLike"
+                                                ? totalCount === 1
+                                                  ? "like"
+                                                  : "likes"
                                                 : totalCount === 1
-                                                ? "insight"
-                                                : "insights"}
+                                                  ? "like"
+                                                  : "likes" 
+                                              }
                                             </span>
                                           );
                                         })()}
@@ -459,8 +469,12 @@ export function NavbarAuthClient({
                                           <MessageSquare className="h-3.5 w-3.5 text-muted-foreground" />
                                         ) : group.type === "reaction" ? (
                                           <Smile className="h-3.5 w-3.5 text-muted-foreground" />
-                                        ) : (
+                                        ) : group.type === "blog" ? (
                                           <Library className="h-3.5 w-3.5 text-muted-foreground" />
+                                        ) : group.type === "blogLike" ? (
+                                          <ThumbsUp className="h-3.5 w-3.5 text-muted-foreground" />
+                                        ) : (
+                                          <ThumbsUp className="h-3.5 w-3.5 text-muted-foreground" />
                                         )}
                                       </div>
                                     </div>
