@@ -32,6 +32,11 @@ export const getNotifications = query({
       .withIndex("by_author", (q) => q.eq("author", args.userId))
       .collect();
 
+    const userComments = await ctx.db
+      .query("comments")
+      .withIndex("by_authorId", (q) => q.eq("authorId", args.userId))
+      .collect();
+
     let blogItems: Array<any> = [];
     if (follows.length > 0) {
       const postPromises = follows.map((follow) =>
@@ -59,7 +64,6 @@ export const getNotifications = query({
       .flat()
       .filter((comment) => comment.authorId !== args.userId);
 
-    // Fetch likes (blogVotes) for the user's blogs
     const votePromises = profileBlogs.map((blog) =>
       ctx.db
         .query("blogVotes")
@@ -69,6 +73,18 @@ export const getNotifications = query({
     );
     const nestedVotes = await Promise.all(votePromises);
     const voteItems = nestedVotes
+      .flat()
+      .filter((vote) => vote.userId !== args.userId);
+
+    const commentVotePromises = userComments.map((comment) =>
+      ctx.db
+        .query("commentVotes")
+        .withIndex("by_comment", (q) => q.eq("commentId", comment._id))
+        .order("desc")
+        .take(20)
+    );
+    const nestedCommentVotes = await Promise.all(commentVotePromises);
+    const commentVoteItems = nestedCommentVotes
       .flat()
       .filter((vote) => vote.userId !== args.userId);
 
@@ -117,6 +133,7 @@ export const getNotifications = query({
       enrichedComments,
       enrichedFollowers,
       enrichedVotes,
+      enrichedCommentVotes,
       enrichedReactions,
     ] = await Promise.all([
       Promise.all(
@@ -230,9 +247,39 @@ export const getNotifications = query({
 
           return {
             _id: vote._id,
-            notificationType: "like" as const,
+            notificationType: "blogLike" as const,
             blogId: vote.blogId,
             blogTitle: targetBlog?.title ?? "",
+            createdAt: vote._creationTime,
+            author: vote.userId,
+            authorUsername: actorProfile?.username ?? "",
+            authorDisplayName:
+              actorProfile?.displayName || actorProfile?.username || "",
+            profilePic: actorProfile?.profilePic
+              ? await ctx.storage.getUrl(actorProfile.profilePic)
+              : null,
+            defaultProfilePic: actorProfile?.defaultProfilePic
+              ? await ctx.storage.getUrl(actorProfile.defaultProfilePic)
+              : null,
+            isUnread: vote._creationTime > lastRead,
+          };
+        })
+      ),
+
+      Promise.all(
+        commentVoteItems.map(async (vote) => {
+          const targetComment = userComments.find((c) => c._id === vote.commentId);
+          const actorProfile = await ctx.db
+            .query("profiles")
+            .withIndex("by_userId", (q) => q.eq("userId", vote.userId))
+            .unique();
+
+          return {
+            _id: vote._id,
+            notificationType: "commentLike" as const,
+            commentId: vote.commentId,
+            commentBody: targetComment?.body ?? "",
+            blogId: targetComment?.blogId,
             createdAt: vote._creationTime,
             author: vote.userId,
             authorUsername: actorProfile?.username ?? "",
@@ -286,6 +333,7 @@ export const getNotifications = query({
       ...enrichedComments,
       ...enrichedFollowers,
       ...enrichedVotes,
+      ...enrichedCommentVotes,
       ...enrichedReactions,
     ].sort((a, b) => b.createdAt - a.createdAt);
 

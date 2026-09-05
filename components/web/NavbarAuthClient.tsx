@@ -38,6 +38,7 @@ import CommentNotificationCard from "./CommentNotificationCard";
 import FollowerNotificationCard from "./FollowerNotificationCard";
 import ReactionsNotificationCard from "./ReactionsNotificationCard";
 import BlogLikesNotificationCard from "./BlogLikesNotificationCard";
+import CommentLikesNotificationCard from "./CommentLikesNotificationCard";
 
 interface NavbarAuthClientProps {
   initialIsAuth: boolean;
@@ -64,9 +65,24 @@ type BlogNotification = {
 
 type BlogLikesNotification = {
   _id: string;
-  notificationType: "like";
+  notificationType: "blogLike";
   blogId: string;
   blogTitle: string;
+  createdAt: number;
+  author: string;
+  authorUsername: string;
+  authorDisplayName?: string;
+  profilePic?: string | null;
+  defaultProfilePic?: string | null;
+  isUnread?: boolean;
+};
+
+type CommentLikesNotification = {
+  _id: string;
+  notificationType: "commentLike";
+  blogId: string;
+  blogTitle: string;
+  commentBody: string;
   createdAt: number;
   author: string;
   authorUsername: string;
@@ -126,6 +142,7 @@ type NotificationItem =
   | BlogNotification 
   | CommentNotification 
   | FollowNotification 
+  | CommentLikesNotification
   | ReactionNotification
   | BlogLikesNotification;
 
@@ -135,7 +152,7 @@ interface AuthorGroup {
   authorName: string;
   authorAvatar: string;
   isUnreadGroup: boolean;
-  type: "blog" | "comment" | "follow" | "reaction" | "like";
+  type: "blog" | "comment" | "follow" | "reaction" | "blogLike" | "commentLike";
   items: NotificationItem[];
 }
 
@@ -474,11 +491,19 @@ export function NavbarAuthClient({
                                             createdAt={item.createdAt}
                                             isUnread={item.isUnread}
                                           />
-                                        ) : item.notificationType === "like" ? (
+                                        ) : item.notificationType === "blogLike" ? (
                                           <BlogLikesNotificationCard
                                             key={item._id}
                                             _id={item.blogId}
                                             title={item.blogTitle}
+                                            createdAt={item.createdAt}
+                                            isUnread={item.isUnread}
+                                          />
+                                        ) : item.notificationType === "commentLike" ? (
+                                          <CommentLikesNotificationCard
+                                            key={item._id}
+                                            _id={item.blogId}
+                                            commentBody={item.commentBody}
                                             createdAt={item.createdAt}
                                             isUnread={item.isUnread}
                                           />
@@ -491,7 +516,7 @@ export function NavbarAuthClient({
                                             createdAt={item.createdAt}
                                             isUnread={item.isUnread}
                                           />
-                                        ) : (
+                                        ) : item.notificationType === "blog" ? (
                                           <BlogNotificationCard
                                             key={item._id}
                                             _id={item._id}
@@ -500,7 +525,7 @@ export function NavbarAuthClient({
                                             createdAt={item.createdAt}
                                             isUnread={item.isUnread}
                                           />
-                                        )
+                                        ) : null
                                       )}
                                     </div>
                                   </div>
