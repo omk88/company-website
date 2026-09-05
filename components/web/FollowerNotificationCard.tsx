@@ -60,7 +60,13 @@ export default function FollowerNotificationCard({
             </span>
           </div>
 
-          <div className="shrink-0 ml-1">
+          <div
+            className="shrink-0 ml-1"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+          >
             <FollowButton userId={userId} username={username} displayName={displayName} variant="xs" initialIsFollowing={initialIsFollowing} initialIsBell={initialIsBell} isSelf={isSelf} />
           </div>
         </div>
