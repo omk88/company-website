@@ -70,8 +70,6 @@ export function RightSidebarProfile({ preloadedProfile, preloadedCurrentUser }: 
   const avatarSrc = profileData.profilePicture;
   const defaultAvatarSrc = profileData.defaultProfilePicture;
 
-  console.log("Resolved Storage URLs:", { avatarSrc, defaultAvatarSrc });
-
   const displayAvatar = avatarSrc || defaultAvatarSrc;
 
   const isFollowing = profileData.viewerStatus.isFollowing;

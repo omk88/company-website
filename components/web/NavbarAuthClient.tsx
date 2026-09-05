@@ -85,6 +85,11 @@ type FollowNotification = {
   defaultProfilePicUrl?: string | null;
   createdAt: number;
   isUnread?: boolean;
+  viewerStatus?: {
+      isFollowing: boolean;
+      isBell: boolean;
+      isSelf: boolean;
+  };
 };
 
 type ReactionNotification = {
@@ -438,7 +443,11 @@ export function NavbarAuthClient({
                                             profilePicUrl={item.profilePicUrl ?? ""}
                                             defaultProfilePicUrl={item.defaultProfilePicUrl ?? ""}
                                             createdAt={item.createdAt}
-                                            isUnread={item.isUnread}                                         />
+                                            isUnread={item.isUnread}    
+                                            initialIsFollowing={item.viewerStatus?.isFollowing}
+                                            initialIsBell={item.viewerStatus?.isBell}
+                                            isSelf={item.viewerStatus?.isSelf}                       
+                                          />
                                         ) : item.notificationType === "comment" ? (
                                           <CommentNotificationCard
                                             key={item._id}

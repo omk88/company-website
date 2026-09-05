@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "../ui/button";
 import { FollowButton } from "./FollowButton";
 import { formatSmartDate } from "./ProfileHoverCard";
 
@@ -12,6 +11,9 @@ export interface FollowerNotificationCardProps {
   defaultProfilePicUrl: string;
   createdAt: number;
   isUnread?: boolean;
+  initialIsFollowing?: boolean;
+  initialIsBell?: boolean;
+  isSelf?: boolean;
 }
 
 export default function FollowerNotificationCard({
@@ -22,6 +24,9 @@ export default function FollowerNotificationCard({
   defaultProfilePicUrl,
   createdAt,
   isUnread = true,
+  initialIsFollowing,
+  initialIsBell,
+  isSelf,
 }: FollowerNotificationCardProps) {
 
   return (
@@ -52,7 +57,7 @@ export default function FollowerNotificationCard({
           </div>
 
           <div className="shrink-0 ml-1">
-            <FollowButton userId={_id} username={username} displayName={displayName} variant="xs" />
+            <FollowButton userId={_id} username={username} displayName={displayName} variant="xs" initialIsFollowing={initialIsFollowing} initialIsBell={initialIsBell} isSelf={isSelf} />
           </div>
         </div>
 

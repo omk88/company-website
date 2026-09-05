@@ -99,7 +99,12 @@ export const getNotifications = query({
 
     const groupedReactions = Array.from(groupedReactionsMap.values());
 
-    const [enrichedBlogs, enrichedComments, enrichedFollowers, enrichedReactions] = await Promise.all([
+    const [
+      enrichedBlogs,
+      enrichedComments,
+      enrichedFollowers,
+      enrichedReactions,
+    ] = await Promise.all([
       Promise.all(
         blogItems.map(async (blog) => {
           const authorProfile = await ctx.db
@@ -116,8 +121,12 @@ export const getNotifications = query({
             author: blog.author,
             authorUsername: authorProfile?.username ?? "",
             authorDisplayName: authorProfile?.displayName ?? "",
-            profilePic: authorProfile?.profilePic ? await ctx.storage.getUrl(authorProfile.profilePic) : null,
-            defaultProfilePic: authorProfile?.defaultProfilePic ? await ctx.storage.getUrl(authorProfile.defaultProfilePic) : null,
+            profilePic: authorProfile?.profilePic
+              ? await ctx.storage.getUrl(authorProfile.profilePic)
+              : null,
+            defaultProfilePic: authorProfile?.defaultProfilePic
+              ? await ctx.storage.getUrl(authorProfile.defaultProfilePic)
+              : null,
             isUnread: blog.createdAt > lastRead,
           };
         })
@@ -140,8 +149,12 @@ export const getNotifications = query({
             author: comment.authorId,
             authorUsername: comment.username,
             authorDisplayName: comment.displayName || comment.username,
-            profilePic: authorProfile?.profilePic ? await ctx.storage.getUrl(authorProfile.profilePic) : null,
-            defaultProfilePic: authorProfile?.defaultProfilePic ? await ctx.storage.getUrl(authorProfile.defaultProfilePic) : null,
+            profilePic: authorProfile?.profilePic
+              ? await ctx.storage.getUrl(authorProfile.profilePic)
+              : null,
+            defaultProfilePic: authorProfile?.defaultProfilePic
+              ? await ctx.storage.getUrl(authorProfile.defaultProfilePic)
+              : null,
             isUnread: comment._creationTime > lastRead,
           };
         })
@@ -154,14 +167,40 @@ export const getNotifications = query({
             .withIndex("by_userId", (q) => q.eq("userId", follow.followerId))
             .unique();
 
+          const isSelf = Boolean(
+            followerProfile && followerProfile.userId === profile.userId
+          );
+
+          const followRecord =
+            followerProfile && !isSelf
+              ? await ctx.db
+                  .query("follows")
+                  .withIndex("by_follower_and_following", (q) =>
+                    q
+                      .eq("followerId", profile.userId)
+                      .eq("followingId", followerProfile.userId)
+                  )
+                  .unique()
+              : null;
+
           return {
             _id: follow.followerId,
             notificationType: "follow" as const,
             username: followerProfile?.username ?? "",
-            displayName: followerProfile?.displayName || followerProfile?.username || "",
-            profilePicUrl: followerProfile?.profilePic ? await ctx.storage.getUrl(followerProfile.profilePic) : null,
-            defaultProfilePicUrl: followerProfile?.defaultProfilePic ? await ctx.storage.getUrl(followerProfile.defaultProfilePic) : null,
+            displayName:
+              followerProfile?.displayName || followerProfile?.username || "",
+            profilePicUrl: followerProfile?.profilePic
+              ? await ctx.storage.getUrl(followerProfile.profilePic)
+              : null,
+            defaultProfilePicUrl: followerProfile?.defaultProfilePic
+              ? await ctx.storage.getUrl(followerProfile.defaultProfilePic)
+              : null,
             createdAt: follow._creationTime,
+            viewerStatus: {
+              isFollowing: Boolean(followRecord),
+              isBell: followRecord?.isBell ?? false,
+              isSelf,
+            },
             isUnread: follow._creationTime > lastRead,
           };
         })
@@ -185,9 +224,14 @@ export const getNotifications = query({
             createdAt: group.latestCreationTime,
             author: group.userId,
             authorUsername: actorProfile?.username ?? "",
-            authorDisplayName: actorProfile?.displayName || actorProfile?.username || "",
-            profilePic: actorProfile?.profilePic ? await ctx.storage.getUrl(actorProfile.profilePic) : null,
-            defaultProfilePic: actorProfile?.defaultProfilePic ? await ctx.storage.getUrl(actorProfile.defaultProfilePic) : null,
+            authorDisplayName:
+              actorProfile?.displayName || actorProfile?.username || "",
+            profilePic: actorProfile?.profilePic
+              ? await ctx.storage.getUrl(actorProfile.profilePic)
+              : null,
+            defaultProfilePic: actorProfile?.defaultProfilePic
+              ? await ctx.storage.getUrl(actorProfile.defaultProfilePic)
+              : null,
             isUnread: group.latestCreationTime > lastRead,
           };
         })
