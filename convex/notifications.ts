@@ -155,7 +155,7 @@ export const getNotifications = query({
             .unique();
 
           return {
-            _id: follow._id,
+            _id: follow.followerId,
             notificationType: "follow" as const,
             username: followerProfile?.username ?? "",
             displayName: followerProfile?.displayName || followerProfile?.username || "",

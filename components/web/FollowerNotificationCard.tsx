@@ -1,10 +1,11 @@
 "use client";
 
 import { Button } from "../ui/button";
+import { FollowButton } from "./FollowButton";
 import { formatSmartDate } from "./ProfileHoverCard";
 
 export interface FollowerNotificationCardProps {
-  _id?: string;
+  _id: string;
   username: string;
   displayName: string;
   profilePicUrl: string;
@@ -14,6 +15,7 @@ export interface FollowerNotificationCardProps {
 }
 
 export default function FollowerNotificationCard({
+  _id,
   username,
   displayName,
   profilePicUrl,
@@ -21,12 +23,9 @@ export default function FollowerNotificationCard({
   createdAt,
   isUnread = true,
 }: FollowerNotificationCardProps) {
-  const handleFollow = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
 
   return (
-    <div className="relative w-full flex flex-row items-center gap-3 p-2 rounded-lg bg-zinc-50/80 hover:bg-accent transition-colors cursor-pointer group overflow-hidden">
+    <div className="relative w-full flex flex-row items-center gap-3 p-2 rounded-lg bg-zinc-50/80 hover:bg-accent has-[button:hover]:bg-zinc-50/80 transition-colors cursor-pointer group overflow-hidden">
       {isUnread && (
         <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-red-500" />
       )}
@@ -44,7 +43,7 @@ export default function FollowerNotificationCard({
           </div>
 
           <div className="flex flex-col min-w-0 flex-1">
-            <span className="text-sm font-medium leading-snug text-zinc-800 dark:text-zinc-200 truncate">
+            <span className="text-sm font-medium leading-snug text-zinc-800 group-hover:text-blue-600 dark:group-hover:text-blue-400 dark:text-zinc-200 truncate">
               {displayName}
             </span>
             <span className="text-xs font-medium leading-snug text-muted-foreground truncate transition-colors">
@@ -53,15 +52,7 @@ export default function FollowerNotificationCard({
           </div>
 
           <div className="shrink-0 ml-1">
-            <Button
-              type="button"
-              variant="default"
-              className="cursor-pointer text-xs w-fit h-full box-border leading-none rounded-full px-2.5 py-1"
-              size="xs"
-              onClick={handleFollow}
-            >
-              Follow
-            </Button>
+            <FollowButton userId={_id} username={username} displayName={displayName} variant="xs" />
           </div>
         </div>
 

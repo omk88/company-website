@@ -13,7 +13,7 @@ interface FollowButtonProps {
   initialIsFollowing?: boolean;
   initialIsBell?: boolean;
   isSelf?: boolean;
-  variant?: "default" | "compact";
+  variant?: "default" | "compact" | "xs";
 }
 
 export function FollowButton({
@@ -40,6 +40,7 @@ export function FollowButton({
   }, [initialIsBell]);
 
   const isCompact = variant === "compact";
+  const isXS = variant === "xs";
 
   const followMutation = useMutation(api.profiles.toggleFollow);
   const bellMutation = useMutation(api.profiles.toggleBell);
@@ -122,6 +123,58 @@ export function FollowButton({
           <Button
             variant={isFollowing ? "outline" : "default"}
             className="cursor-pointer text-xs px-3 w-full h-full box-border leading-none rounded-full font-medium"
+            size="xs"
+            disabled={isPending}
+            onClick={handleFollowClick}
+          >
+            {isPending ? (
+              <Loader2 className="h-3 w-3 animate-spin" />
+            ) : isFollowing ? (
+              "Unfollow"
+            ) : (
+              "Follow"
+            )}
+          </Button>
+        </motion.div>
+      </motion.div>
+    );
+  }
+
+  if (isXS) {
+    return (
+      <motion.div layout className="flex flex-row gap-1.5 w-full items-center h-6">
+        <AnimatePresence mode="popLayout" initial={false}>
+          {isFollowing && (
+            <motion.div
+              key="bell-compact"
+              initial={{ scale: 0, opacity: 0, width: 0 }}
+              animate={{ scale: 1, opacity: 1, width: "auto" }}
+              exit={{ scale: 0, opacity: 0, width: 0 }}
+              className="shrink-0 flex items-center h-full overflow-hidden"
+            >
+              <Button
+                size="icon"
+                variant="ghost"
+                className="h-6 w-6 rounded-full cursor-pointer shrink-0"
+                disabled={isBellPending}
+                onClick={handleBellClick}
+              >
+                {isBellPending ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                ) : isBell ? (
+                  <Bell className="h-3 w-3 fill-current stroke-[2.3]" />
+                ) : (
+                  <BellPlus className="h-3 w-3 stroke-[2.3]" />
+                )}
+              </Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <motion.div layout className="flex-1 h-full">
+          <Button
+            variant={isFollowing ? "outline" : "default"}
+            className="cursor-pointer text-xs w-fit h-full box-border leading-none rounded-full px-2.5 py-1"
             size="xs"
             disabled={isPending}
             onClick={handleFollowClick}

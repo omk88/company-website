@@ -338,7 +338,7 @@ export function NavbarAuthClient({
 
                   <PopoverContent
                     align="end"
-                    className="w-80 p-1.5 rounded-xl border border-border bg-popover"
+                    className="w-90 p-1.5 rounded-xl border border-border bg-popover"
                   >
                     <div className="flex flex-row gap-2 items-center text-sm px-2 pt-2 pb-1.5">
                       <Bell className="h-4 w-4 text-foreground transition-all" />
@@ -431,14 +431,14 @@ export function NavbarAuthClient({
                                       {group.items.map((item) =>
                                         item.notificationType === "follow" ? (
                                           <FollowerNotificationCard
+                                            _id={item._id} 
                                             key={item._id}
                                             username={item.username}
                                             displayName={item.displayName}
                                             profilePicUrl={item.profilePicUrl ?? ""}
                                             defaultProfilePicUrl={item.defaultProfilePicUrl ?? ""}
                                             createdAt={item.createdAt}
-                                            isUnread={item.isUnread}
-                                          />
+                                            isUnread={item.isUnread}                                         />
                                         ) : item.notificationType === "comment" ? (
                                           <CommentNotificationCard
                                             key={item._id}
