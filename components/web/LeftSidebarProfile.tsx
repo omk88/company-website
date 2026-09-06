@@ -33,9 +33,9 @@ const NAV_ITEMS = [
 export function LeftSidebarProfile({ preloadedProfile }: LeftSidebarProfileProps) {
   const profileData = usePreloadedQuery(preloadedProfile);
 
-  const bookmarkCount = profileData.bookmarkCount ?? 0;
-  const articleCount = profileData.articleCount ?? 0;
-  const commentCount = profileData.commentCount ?? 0;
+  const bookmarkCount = profileData.bookmarkCount;
+  const articleCount = profileData.articleCount;
+  const commentCount = profileData.commentCount;
   const followerCount = profileData.profile?.followerCount ?? 0;
   const followingCount = profileData.profile?.followingCount ?? 0;
 

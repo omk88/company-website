@@ -80,20 +80,19 @@ export function CommentCard({ comment, index, variant }: CommentProps) {
 
     if (isCompact) {
         return (
-            <div className="group flex flex-col px-3 pt-1.5 pb-3 bg-zinc-50/80 hover:bg-zinc-100/90 rounded-xl transition-colors duration-100 dark:bg-muted/30">
-                <div className="flex items-center justify-between text-[11px] font-sans uppercase tracking-wider text-zinc-600 dark:text-zinc-400 leading-none">
-                    <span className="line-clamp-1"><time>{formatSmartDate(comment._creationTime, false)}</time>  •  {comment.blogTitle}</span>
-                    <ShareMenu />
-                </div>
+            <div className="group flex flex-col p-3 gap-2 bg-zinc-50/80 hover:bg-zinc-100/90 rounded-xl transition-colors duration-100 dark:bg-muted/30">
                 <div className="text-sm line-clamp-3">
                     {comment.body}
                 </div>
-                <div className="mt-4 flex items-center justify-between text-xs font-extralight tracking-tight select-none">
+                <div className="flex items-center justify-between text-xs font-extralight tracking-tight select-none">
                     <div className="flex items-center gap-3">
                         <div className="flex items-center gap-1">
                             <ThumbsUp className="w-3.5 h-3.5" />
                             <span>{comment.likes}</span>
                         </div>
+                        <time className="text-xs text-zinc-400">
+                            {formatSmartDate(comment._creationTime, false)}
+                        </time>
                     </div>
                 </div>
             </div>

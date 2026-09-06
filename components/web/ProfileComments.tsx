@@ -5,8 +5,6 @@ import { usePaginatedQuery } from "convex/react";
 import { useRef } from "react";
 import { CommentCard } from "./CommentCard";
 import { Doc } from "@/convex/_generated/dataModel";
-import { MessageSquareText } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { FunctionReturnType } from "convex/server";
 import { CompactCommentCardSkeleton } from "./LoadingSkeletons/CompactCommentCardSkeleton";
 import { EmptyState } from "./EmptyState";

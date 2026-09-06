@@ -19,25 +19,23 @@ export function ProfileContent({ preloadedProfile, preloadedCurrentUser }: Profi
   const currentUser = usePreloadedQuery(preloadedCurrentUser);
   const selectedMetric = useProfileStore((state) => state.selectedMetric);
 
-  const renderActiveTab = () => {
-    switch (selectedMetric) {
-      case "comments":
-        return <ProfileComments profile={profileData} />;
-      case "bookmarks":
-        return <ProfileBookmarks profile={profileData} />;
-      case "followers":
-        return <ProfileFollowers profile={profileData} currentUser={currentUser} />;
-      case "following":
-        return <ProfileFollowing profile={profileData} currentUser={currentUser} />;
-      case "insights":
-      default:
-        return <ProfileBlogs profile={profileData} />;
-    }
-  };
-
   return (
     <div className="flex flex-col flex-1">
-      {renderActiveTab()}
+      <div className={selectedMetric === "insights" ? "block" : "hidden"}>
+        <ProfileBlogs profile={profileData} />
+      </div>
+      <div className={selectedMetric === "comments" ? "block" : "hidden"}>
+        <ProfileComments profile={profileData} />
+      </div>
+      <div className={selectedMetric === "bookmarks" ? "block" : "hidden"}>
+        <ProfileBookmarks profile={profileData} />
+      </div>
+      <div className={selectedMetric === "followers" ? "block" : "hidden"}>
+        <ProfileFollowers profile={profileData} currentUser={currentUser} />
+      </div>
+      <div className={selectedMetric === "following" ? "block" : "hidden"}>
+        <ProfileFollowing profile={profileData} currentUser={currentUser} />
+      </div>
     </div>
   );
 }
