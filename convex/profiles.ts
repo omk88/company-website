@@ -543,13 +543,14 @@ export const getPaginatedFollowersByProfile = query({
           defaultProfilePicture,
           isFollowing,
           isBell,
+          followedAt: followDoc._creationTime,
         };
       })
     );
 
     return {
       ...paginated,
-      page: page.filter(Boolean),
+      page: page.filter((item): item is NonNullable<typeof item> => item !== null),
     };
   },
 });
@@ -609,13 +610,14 @@ export const getPaginatedFollowingByProfile = query({
           defaultProfilePicture,
           isFollowing,
           isBell,
+          followedAt: followDoc._creationTime,
         };
       })
     );
 
     return {
       ...paginated,
-      page: page.filter(Boolean),
+      page: page.filter((item): item is NonNullable<typeof item> => item !== null),
     };
   },
 });

@@ -48,7 +48,7 @@ export function ProfileFollowing({ profile, currentUser }: ProfileFollowingProps
           const item = rawItem as unknown as FollowingItem;
           if (!item?.profile) return null;
 
-          const { profile: targetProfile, profilePicture, defaultProfilePicture, isFollowing, isBell } = item;
+          const { profile: targetProfile, profilePicture, defaultProfilePicture, isFollowing, isBell, followedAt } = item;
           
           const isSelf = Boolean(currentUserId && targetProfile.userId === currentUserId);
 
@@ -63,6 +63,7 @@ export function ProfileFollowing({ profile, currentUser }: ProfileFollowingProps
                 isFollowing={isFollowing}
                 isBell={isBell}
                 isSelf={isSelf}
+                followedAt={followedAt}
               />
             </li>
           );

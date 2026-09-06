@@ -101,22 +101,13 @@ export function BlogCard({
 
   if (isCompact) {
     return (
-      <div className="group flex flex-col p-3 bg-zinc-50/80 hover:bg-zinc-100/90 rounded-xl transition-colors duration-100 dark:bg-muted/30">
-        <div className="flex items-center justify-between text-[11px] font-sans uppercase tracking-wider text-zinc-600 dark:text-zinc-400 leading-none">
-          <div>
-            {formatSmartDate(date, false)} • {readTime} min read
-          </div>
-          <div className="shrink-0 -mr-2 -my-1.5">
-            <ShareMenu />
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between gap-4 mt-1 mb-2">
+      <div className="group flex flex-col gap-2 p-2 bg-zinc-50/80 hover:bg-zinc-100/90 rounded-xl transition-colors duration-100 dark:bg-muted/30">
+        <div className="flex items-center justify-between p-1 gap-2">
           <Link href={`/insights/${id}`} className="block hover:no-underline flex-1 min-w-0">
             <h3 className="leading-tight text-sm font-bold tracking-tight line-clamp-1 text-foreground transition-colors group-hover:text-blue-600">
               {title}
             </h3>
-            <p className="leading-tight text-zinc-600 dark:text-zinc-400 line-clamp-1 text-xs mt-0.5">
+            <p className="leading-tight text-zinc-600 dark:text-zinc-400 line-clamp-2 text-xs mt-0.5">
               {subtitle}
             </p>
           </Link>
@@ -124,7 +115,7 @@ export function BlogCard({
           {imageUrl && (
             <Link 
               href={`/insights/${id}`} 
-              className="relative w-12 h-12 shrink-0 overflow-hidden rounded-xl block"
+              className="relative w-14 h-14 shrink-0 overflow-hidden rounded-xl block"
             >
               <Image
                 src={imageUrl}
@@ -138,7 +129,7 @@ export function BlogCard({
         </div>
 
         <div className="flex items-center justify-between text-xs font-extralight tracking-tight select-none">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4 px-1">
             <div className="flex items-center gap-1">
               <Eye className="w-3.5 h-3.5" />
               <span>{totalViews}</span>
@@ -151,6 +142,9 @@ export function BlogCard({
               <MessageSquare className="w-3.5 h-3.5" />
               <span>{commentCount}</span>
             </div>
+            <time className="text-xs text-zinc-400">
+              {formatSmartDate(date, false)}
+            </time>
           </div>
 
           <div className="flex items-center gap-2 shrink-0 max-w-[55%] justify-end">
@@ -229,7 +223,7 @@ export function BlogCard({
         </div>
       </Link>
 
-      <div className="flex flex-col flex-1 justify-start px-4 py-2 min-w-0">
+      <div className="flex flex-col flex-1 justify-start p-4 min-w-0">
         <div className="min-w-0">
           <div className="font-roboto flex items-center justify-between text-xs uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
             <div>
@@ -240,12 +234,11 @@ export function BlogCard({
             </div>
             <div className="flex flex-row items-center gap-8">
               <span>{readTime} min read</span>
-              <ShareMenu />
             </div>
           </div>
         </div>
 
-        <Link href={`/insights/${id}`} className="space-y-2 block hover:no-underline">
+        <Link href={`/insights/${id}`} className="space-y-2 py-2 block hover:no-underline">
           <h3 className="leading-tight text-xl font-bold tracking-tight line-clamp-2 text-foreground transition-colors duration-100 group-hover:text-blue-600 break-words">
             {title}
           </h3>
