@@ -1,6 +1,6 @@
 "use client";
 
-import { MapPin, Cake, ThumbsUp, MessageSquareText, Library, User, ArrowUpRight, Zap } from "lucide-react";
+import { MapPin, Cake, ThumbsUp, MessageSquareText, Library, User, ArrowUpRight, Zap, MessageSquare, UsersRound } from "lucide-react";
 import { HoverCard, HoverCardTrigger, HoverCardContent } from "../ui/hover-card";
 import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
@@ -104,7 +104,7 @@ export function ProfileHoverCard({ displayName, authorUsername, children, align 
                             </div>
                         </Link>
 
-                        <div className="gap-2 p-2 flex flex-col font-extralight text-[14px] font-sans tracking-tight select-none w-full">
+                        <div className="gap-4 p-2 flex flex-col font-extralight text-[14px] font-sans tracking-tight select-none w-full">
                             <TooltipProvider delayDuration={200}>
                                 <Tooltip>
                                     <TooltipTrigger asChild>
@@ -124,9 +124,25 @@ export function ProfileHoverCard({ displayName, authorUsername, children, align 
                                 </Tooltip>
                             </TooltipProvider>
 
-                            <div className="flex items-start gap-1.5 min-w-[3rem] justify-start">
-                                <Cake className="w-4 h-4 stroke-[2.3] shrink-0 mt-0.5" />
-                                <p>{ formattedProfileDate }</p>
+                            <div className="flex flex-row">
+                                <div className="flex items-start gap-1.5 min-w-[3rem] justify-start">
+                                    <Cake className="w-4 h-4 stroke-[2.3] shrink-0 mt-0.5" />
+                                    <p>{ formattedProfileDate }</p>
+                                </div>
+                                <div className="flex flex-row ml-auto">
+                                    <div className="flex items-start gap-1.5 min-w-[3rem] justify-start">
+                                        <Library className="w-4 h-4 stroke-[2.3] shrink-0 mt-0.5" />
+                                        <p>{ profileData?.articleCount }</p>
+                                    </div>
+                                    <div className="flex items-start gap-1.5 min-w-[3rem] justify-start">
+                                        <MessageSquare className="w-4 h-4 stroke-[2.3] shrink-0 mt-0.5" />
+                                        <p>{ profileData?.commentCount }</p>
+                                    </div>
+                                    <div className="flex items-start gap-1.5 min-w-[3rem] justify-start">
+                                        <UsersRound className="w-4 h-4 stroke-[2.3] shrink-0 mt-0.5" />
+                                        <p>{ profileData?.profile?.followerCount }</p>
+                                    </div>
+                                </div>
                             </div>
 
                             {profile?.bio && (
