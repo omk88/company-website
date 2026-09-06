@@ -65,7 +65,6 @@ const ScrollBar = React.forwardRef<
         ? {
             top: `${inset}px`,
             height: `calc(100% - ${inset * 2}px)`,
-            right: `${inset}px`,
           }
         : undefined
     }

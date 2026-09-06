@@ -101,7 +101,17 @@ export function RightSidebarProfile({ preloadedProfile, preloadedCurrentUser }: 
     >
       <SidebarContent className="!p-0 bg-white h-full">
         <ScrollArea className="h-full" scrollbarInset={6}>
-          <div className="relative m-3 mr-6 p-3 rounded-xl bg-zinc-50/80">
+          <div className="relative m-3 mr-4 p-3 rounded-xl bg-zinc-50/80">
+            {isOwnProfile && (
+              <div className="absolute -top-1 -right-1 p-4 flex items-center z-10">
+                <ProfileSettingsButton />
+                <EditProfileButton
+                  profile={profile}
+                  avatarSrc={avatarSrc || ""}
+                  defaultAvatarSrc={defaultAvatarSrc || ""}
+                />
+              </div>
+            )}
             <div className="p-2 pb-0">
               <div className="flex flex-row items-center gap-4 w-full">
                 <div className="relative h-16 w-16 shrink-0 rounded-full overflow-hidden border-2 border-muted bg-muted">
@@ -130,27 +140,6 @@ export function RightSidebarProfile({ preloadedProfile, preloadedCurrentUser }: 
                       <p className="text-sm text-muted-foreground">{`@${profile.username}`}</p>
                     </div>
                   </div>
-
-                  {isOwnProfile && (
-                    <div className="flex items-center z-10">
-                      <ProfileSettingsButton />
-                      <EditProfileButton
-                        profile={profile}
-                        avatarSrc={avatarSrc || ""}
-                        defaultAvatarSrc={defaultAvatarSrc || ""}
-                      />
-                    </div>
-                  )}
-
-                  {!isSelf && (
-                    <FollowButton
-                      userId={profile.userId}
-                      displayName={displayName}
-                      username={profile.username}
-                      initialIsFollowing={isFollowing}
-                      initialIsBell={isBell}
-                    />
-                  )}
                 </div>
               </div>
             </div>
@@ -160,9 +149,22 @@ export function RightSidebarProfile({ preloadedProfile, preloadedCurrentUser }: 
               <TooltipProvider delayDuration={200}>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="inline-flex w-fit items-center gap-1 text-xs font-sans font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/60 cursor-help select-none">
-                      <Zap className="w-3 h-3 fill-amber-500 stroke-amber-500 shrink-0" />
-                      <span>{profile.totalLikes ?? 0}</span>
+                    <div className="flex flex-row items-center">
+                      <div className="inline-flex w-fit items-center gap-1 text-xs font-sans font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/60 cursor-help select-none">
+                        <Zap className="w-3 h-3 fill-amber-500 stroke-amber-500 shrink-0" />
+                        <span>{profile.totalLikes ?? 0}</span>
+                      </div>
+                      {!isSelf && (
+                        <div className="ml-auto">
+                          <FollowButton
+                            userId={profile.userId}
+                            displayName={displayName}
+                            username={profile.username}
+                            initialIsFollowing={isFollowing}
+                            initialIsBell={isBell}
+                          />
+                        </div>
+                      )}
                     </div>
                   </TooltipTrigger>
                   <TooltipContent side="bottom" align="start">
