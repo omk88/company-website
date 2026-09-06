@@ -253,8 +253,10 @@ export function NavbarAuthClient({
   const { results: notificationsList, status, loadMore, isLoading } = usePaginatedQuery(
     api.notifications.getNotifications,
     userId ? { userId } : "skip",
-    { initialNumItems: 10 }
+    { initialNumItems: 4 }
   );
+
+  const observerTarget = useRef<HTMLDivElement>(null);
 
   const groupedNotifications = useMemo(() => {
     const categories: Record<"Today" | "Yesterday" | "Older", AuthorGroup[]> = {
@@ -395,7 +397,14 @@ export function NavbarAuthClient({
 
                     <Separator className="mb-1" />
 
-                    <ScrollArea className="h-80 pr-3">
+                    <ScrollArea 
+                      className="h-80 pr-3"
+                      onReachBottom={() => {
+                        if (status === "CanLoadMore") {
+                          loadMore(10);
+                        }
+                      }}
+                    >
                       {notificationsList && notificationsList.length > 0 ? (
                         <>
                           {(["Today", "Yesterday", "Older"] as const).map((timeCategory) => {
@@ -550,6 +559,12 @@ export function NavbarAuthClient({
                               </div>
                             );
                           })}
+
+                          {status === "LoadingMore" && (
+                            <div className="py-2 text-center text-xs text-zinc-500">
+                              Loading more...
+                            </div>
+                          )}
                         </>
                       ) : isLoading ? (
                         <div className="p-4 text-center text-xs text-zinc-500">Loading...</div>
