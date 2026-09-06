@@ -1,12 +1,13 @@
 "use client";
 
-import { MapPin, Cake, ThumbsUp, MessageSquareText, Library, User, ArrowUpRight } from "lucide-react";
+import { MapPin, Cake, ThumbsUp, MessageSquareText, Library, User, ArrowUpRight, Zap } from "lucide-react";
 import { HoverCard, HoverCardTrigger, HoverCardContent } from "../ui/hover-card";
 import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "../ui/tooltip";
 import { ReactNode } from "react";
 import Link from "next/link";
+import { FollowButton } from "./FollowButton";
 
 interface ProfileHoverCardProps {
     displayName: string | undefined;
@@ -75,7 +76,7 @@ export function ProfileHoverCard({ displayName, authorUsername, children, align 
                     <div className="flex flex-col p-2">
                         <Link 
                             href={`/${profileUsername}`}
-                            className="group flex items-center justify-between p-2.5 rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors duration-100 cursor-pointer"
+                            className="group flex items-center justify-between p-2.5 rounded-xl hover:bg-accent hover:text-accent-foreground transition-colors duration-100 cursor-pointer"
                         >
                             <div className="flex items-center gap-3 min-w-0">
                                 <div className="h-10 w-10 border border-border rounded-full overflow-hidden bg-muted shrink-0">
@@ -103,19 +104,29 @@ export function ProfileHoverCard({ displayName, authorUsername, children, align 
                             </div>
                         </Link>
 
-                        <div className="p-4 gap-4 flex flex-col font-extralight text-[14px] font-sans tracking-tight select-none w-full">
-                            <div>
-                                <div className="flex items-start gap-1.5 min-w-[3rem] justify-start">
-                                    <Cake className="w-4 h-4 stroke-[2.3] shrink-0 mt-0.5" />
-                                    <p>{ formattedProfileDate }</p>
-                                </div>
-                    
-                                {profile?.location && (
-                                    <div className="flex items-start gap-1.5 min-w-[3rem] justify-start">
-                                        <MapPin className="w-4 h-4 stroke-[2.3] shrink-0 mt-0.5" />
-                                        <p>{ profile?.location }</p>
-                                    </div>
-                                )}
+                        <div className="gap-2 p-2 flex flex-col font-extralight text-[14px] font-sans tracking-tight select-none w-full">
+                            <TooltipProvider delayDuration={200}>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <div className="flex flex-row items-center">
+                                            <div className="inline-flex w-fit items-center gap-1 text-xs font-sans font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/60 cursor-help select-none">
+                                                <Zap className="w-3 h-3 fill-amber-500 stroke-amber-500 shrink-0" />
+                                                <span>{profileData?.profile?.totalLikes}</span>
+                                            </div>
+                                            <div className="ml-auto">
+                                                <FollowButton userId={profileData?.profile?.userId || ""} username={profileData?.profile?.username || ""} displayName={profileData?.profile?.displayName || ""} initialIsFollowing={profileData?.viewerStatus.isFollowing} initialIsBell={profileData?.viewerStatus.isBell} isSelf={profileData?.viewerStatus.isSelf} />
+                                            </div>
+                                        </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="bottom" align="start">
+                                        <p className="text-xs font-medium">{profileData?.profile?.totalLikes} Total Likes</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+
+                            <div className="flex items-start gap-1.5 min-w-[3rem] justify-start">
+                                <Cake className="w-4 h-4 stroke-[2.3] shrink-0 mt-0.5" />
+                                <p>{ formattedProfileDate }</p>
                             </div>
 
                             {profile?.bio && (
@@ -123,58 +134,6 @@ export function ProfileHoverCard({ displayName, authorUsername, children, align 
                                     <p>{ profile?.bio }</p>
                                 </div>
                             )}
-                            <div className="font-sans flex items-center justify-between w-full -m-2">
-                                <TooltipProvider delayDuration={200}>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <div className="flex items-center gap-1.5 min-w-[3rem] justify-start p-2 rounded-2xl hover:bg-zinc-100 transition-colors cursor-pointer">
-                                                <User className="w-4 h-4 stroke-[2.3] shrink-0 mt-0.5" />
-                                                <span>{profile?.followerCount}</span>
-                                            </div>
-                                        </TooltipTrigger>
-                                        <TooltipContent side="bottom" align="center">
-                                            <p className="text-xs">{ profile?.followerCount } Followers </p>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <div className="flex items-center gap-1.5 min-w-[3rem] justify-start p-2 rounded-2xl hover:bg-zinc-100 transition-colors cursor-pointer">
-                                                <ThumbsUp className="w-4 h-4 stroke-[2.3] shrink-0" />
-                                                <span>{ profile?.totalLikes }</span>
-                                            </div>
-                                        </TooltipTrigger>
-                                        <TooltipContent side="bottom" align="center">
-                                            <p className="text-xs">{ profile?.totalLikes } Total Likes</p>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                    </TooltipProvider>
-                                    <TooltipProvider delayDuration={200}>
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                            <div className="flex items-center gap-1.5 min-w-[3rem] justify-start p-2 rounded-2xl hover:bg-zinc-100 transition-colors cursor-pointer">
-                                                <Library className="w-4 h-4 stroke-[2.3] shrink-0" />
-                                                <span>{ 0 }</span>
-                                            </div>
-                                            </TooltipTrigger>
-                                            <TooltipContent side="bottom" align="center">
-                                            <p className="text-xs">{ 0 } Insights Published</p>
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </TooltipProvider>
-                                    <TooltipProvider delayDuration={200}>
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <div className="flex items-center gap-1.5 min-w-[3rem] justify-start p-2 rounded-2xl hover:bg-zinc-100 transition-colors cursor-pointer">
-                                                    <MessageSquareText className="w-4 h-4 stroke-[2.3] shrink-0" />
-                                                    <span>{ 0 }</span>
-                                                </div>
-                                            </TooltipTrigger>
-                                            <TooltipContent side="bottom" align="center">
-                                                <p className="text-xs">{ 0 } Comments Published</p>
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </TooltipProvider>
-                                </div>
                         </div>
                     </div>
                 </HoverCardContent>

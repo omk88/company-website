@@ -592,7 +592,7 @@ export function NavbarAuthClient({
                     <Link
                       href={`/${profileUsername || ""}`}
                       onClick={() => setOpenProfile(false)}
-                      className="group flex items-center justify-between p-2.5 rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors duration-100 cursor-pointer"
+                      className="group flex items-center justify-between p-2.5 rounded-xl hover:bg-accent hover:text-accent-foreground transition-colors duration-100 cursor-pointer"
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <div className="h-10 w-10 border border-border rounded-full overflow-hidden bg-muted shrink-0">
