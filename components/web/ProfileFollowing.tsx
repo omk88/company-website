@@ -42,7 +42,7 @@ export function ProfileFollowing({ profile, currentUser }: ProfileFollowingProps
   }
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-6 pt-4 flex-1">
+    <div className="w-fullmx-auto flex-1 p-2">
       <ul className="flex flex-col gap-2">
         {results.map((rawItem) => {
           const item = rawItem as unknown as FollowingItem;
@@ -74,7 +74,7 @@ export function ProfileFollowing({ profile, currentUser }: ProfileFollowingProps
 
 function LoadingSkeleton() {
   return (
-    <div className="w-full max-w-2xl mx-auto px-6 pt-4">
+    <div className="w-full mx-auto p-2">
       <ul className="flex flex-col gap-2 w-full">
         {[1, 2, 3, 4, 5].map((i) => (
           <li key={i}>

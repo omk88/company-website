@@ -118,7 +118,7 @@ export function FollowButton({
       <motion.div
         layout
         transition={springConfig}
-        className={`flex flex-row items-center gap-1.5 w-full ${heightClass} overflow-hidden`}
+        className={`flex flex-row items-center gap-1.5 w-full ${heightClass}`}
       >
         <AnimatePresence mode="sync" initial={false}>
           {isFollowing && (

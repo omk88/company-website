@@ -42,7 +42,7 @@ export function ProfileFollowers({ profile, currentUser }: ProfileFollowersProps
   }
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-6 pt-4 flex-1">
+    <div className="w-full mx-auto flex-1 p-2">
       <ul className="flex flex-col gap-2">
         {results.map((rawItem) => {
           const item = rawItem as unknown as FollowerItem;
