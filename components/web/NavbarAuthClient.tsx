@@ -40,6 +40,7 @@ import FollowerNotificationCard from "./FollowerNotificationCard";
 import ReactionsNotificationCard from "./ReactionsNotificationCard";
 import BlogLikesNotificationCard from "./BlogLikesNotificationCard";
 import CommentLikesNotificationCard from "./CommentLikesNotificationCard";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface NavbarAuthClientProps {
   initialIsAuth: boolean;
@@ -322,28 +323,24 @@ export function NavbarAuthClient({
   }, [notificationsList]);
 
   const unreadCount = notificationsList ? notificationsList.filter((item) => item.isUnread).length : 0;
-  const [showBadge, setShowBadge] = useState(unreadCount > 0);
+  const [isOptimisticallyRead, setIsOptimisticallyRead] = useState(false);
 
   useEffect(() => {
-    if (!openNotifications) {
-      if (unreadCount > 0) {
-        setShowBadge(true);
-      } else {
-        const timer = setTimeout(() => setShowBadge(false), 200);
-        return () => clearTimeout(timer);
-      }
-    }
-  }, [unreadCount, openNotifications]);
+    setIsOptimisticallyRead(false);
+  }, [notificationsList]);
+
+  const hasUnread = unreadCount > 0 && !isOptimisticallyRead;
 
   const handleOpenNotifications = (open: boolean) => {
     setOpenNotifications(open);
 
     if (open) {
-      if (unreadCount > 0) {
+      if (hasUnread) {
         hadUnreadOnOpen.current = true;
       }
     } else {
       if (userId && hadUnreadOnOpen.current) {
+        setIsOptimisticallyRead(true); 
         markNotificationsAsRead({ userId });
         hadUnreadOnOpen.current = false;
       }
@@ -366,12 +363,18 @@ export function NavbarAuthClient({
                     >
                       <Bell className="h-4 w-4 text-foreground transition-all" />
 
-                      {showBadge && (
-                        <span
-                          data-state={unreadCount > 0 ? "open" : "closed"}
-                          className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500 transition-all duration-200 ease-in-out data-[state=open]:animate-in data-[state=open]:fade-in data-[state=open]:zoom-in-50 data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=closed]:zoom-out-0"
-                        />
-                      )}
+                      <AnimatePresence>
+                        {hasUnread && (
+                          <motion.span
+                            key="unread-badge"
+                            initial={{ opacity: 0, scale: 0 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0 }}
+                            transition={{ duration: 0.2, ease: "easeInOut" }}
+                            className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500 pointer-events-none"
+                          />
+                        )}
+                      </AnimatePresence>
                     </Button>
                   </PopoverTrigger>
 
