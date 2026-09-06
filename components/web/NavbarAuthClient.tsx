@@ -253,10 +253,8 @@ export function NavbarAuthClient({
   const { results: notificationsList, status, loadMore, isLoading } = usePaginatedQuery(
     api.notifications.getNotifications,
     userId ? { userId } : "skip",
-    { initialNumItems: 4 }
+    { initialNumItems: 8 }
   );
-
-  const observerTarget = useRef<HTMLDivElement>(null);
 
   const groupedNotifications = useMemo(() => {
     const categories: Record<"Today" | "Yesterday" | "Older", AuthorGroup[]> = {
@@ -269,13 +267,11 @@ export function NavbarAuthClient({
       return categories;
     }
 
-    const tempMap: Record<"Today" | "Yesterday" | "Older", Map<string, AuthorGroup>> = {
-      Today: new Map(),
-      Yesterday: new Map(),
-      Older: new Map(),
-    };
+    const uniqueNotifications = Array.from(
+      new Map((notificationsList as NotificationItem[]).map((item) => [item._id, item])).values()
+    );
 
-    (notificationsList as NotificationItem[]).forEach((item) => {
+    uniqueNotifications.forEach((item) => {
       const timeCategory = getCategory(item.createdAt) as "Today" | "Yesterday" | "Older";
       const type = item.notificationType;
 
@@ -294,31 +290,28 @@ export function NavbarAuthClient({
       }
 
       const isUnread = Boolean(item.isUnread);
-      const readBatchId = parseDate(item.createdAt).toISOString().split("T")[0];
+      const categoryList = categories[timeCategory];
+      const lastGroup = categoryList[categoryList.length - 1];
 
-      const groupKey = isUnread
-        ? `${authorId}-${type}-unread`
-        : `${authorId}-${type}-read-batch-${readBatchId}`;
+      const isConsecutiveMatch =
+        lastGroup &&
+        lastGroup.authorId === authorId &&
+        lastGroup.type === type &&
+        lastGroup.isUnreadGroup === isUnread;
 
-      const categoryMap = tempMap[timeCategory];
-
-      if (!categoryMap.has(groupKey)) {
-        categoryMap.set(groupKey, {
-          groupKey,
+      if (isConsecutiveMatch) {
+        lastGroup.items.push(item);
+      } else {
+        categoryList.push({
+          groupKey: `${authorId}-${type}-${item._id}`,
           authorId,
           authorName,
           authorAvatar,
           isUnreadGroup: isUnread,
           type,
-          items: [],
+          items: [item],
         });
       }
-
-      categoryMap.get(groupKey)!.items.push(item);
-    });
-
-    (Object.keys(tempMap) as Array<"Today" | "Yesterday" | "Older">).forEach((cat) => {
-      categories[cat] = Array.from(tempMap[cat].values());
     });
 
     return categories;
@@ -401,7 +394,7 @@ export function NavbarAuthClient({
                       className="h-80 pr-3"
                       onReachBottom={() => {
                         if (status === "CanLoadMore") {
-                          loadMore(10);
+                          loadMore(8);
                         }
                       }}
                     >
