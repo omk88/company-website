@@ -381,21 +381,13 @@ export default function BlogPostForm() {
     return (
         <div className="w-full h-[calc(100vh-4rem)] overflow-hidden">
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] items-stretch h-full overflow-hidden">
-                <ScrollArea className="py-4 px-4 sm:px-6 h-full overflow-y-auto min-h-0 w-full [&>[data-radix-scroll-area-viewport]]:pt-2">
+                <ScrollArea className="w-full my-4 sm:px-6 overflow-y-auto h-[calc(100%-2rem)] min-h-0">
                     <div
                         className={cn(
                         "relative w-full rounded-md border p-2 my-auto transition-colors",
                         hasErrors ? "border-destructive" : "border-border"
                         )}
                     >
-                        <span
-                            className={cn(
-                                "absolute -top-2.5 left-3 bg-background px-1.5 text-xs font-medium transition-colors",
-                                hasErrors ? "text-destructive" : "text-muted-foreground"
-                            )}
-                        >
-                            Post content
-                        </span>
 
                         <form onSubmit={handleSubmit(onSubmit)}>
                             <FieldGroup className="gap-y-2">
@@ -835,7 +827,7 @@ export default function BlogPostForm() {
                     <Separator orientation="vertical" className="h-full w-[1px]" />
                 </div>
 
-                <ScrollArea className="w-full py-4 px-4 sm:px-6 overflow-y-auto [&>[data-radix-scroll-area-viewport]]:pt-2 h-full min-h-0">
+                <ScrollArea className="w-full my-4 sm:px-6 overflow-y-auto h-[calc(100%-2rem)] min-h-0">
                     <div className="w-full">
                         <LivePostPreview control={control} previewImage={imagePreviewUrl} />
                     </div>
