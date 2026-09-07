@@ -113,6 +113,12 @@ const schema = defineSchema({
     createdAt: v.number(),
   }),
 
+  profileSettings: defineTable({
+    userId: v.string(),
+    emailNotifications: v.boolean(),
+  })
+    .index("by_user", ["userId"]),
+
   comments: defineTable({
     blogId: v.string(),
     authorId: v.string(),

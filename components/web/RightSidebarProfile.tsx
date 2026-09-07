@@ -104,7 +104,7 @@ export function RightSidebarProfile({ preloadedProfile, preloadedCurrentUser }: 
           <div className="relative m-3 mr-4 p-3 rounded-xl bg-zinc-50/80">
             {isOwnProfile && (
               <div className="absolute -top-1 -right-1 p-4 flex items-center z-10">
-                <ProfileSettingsButton />
+                <ProfileSettingsButton userId={profile.userId} />
                 <EditProfileButton
                   profile={profile}
                   avatarSrc={avatarSrc || ""}

@@ -52,6 +52,11 @@ export const initialiseProfile = mutation({
       followingCount: 0,
     });
 
+    await ctx.db.insert("profileSettings", {
+      userId: args.userId,
+      emailNotifications: true,
+    });
+
     return newProfileId;
   },
 });
