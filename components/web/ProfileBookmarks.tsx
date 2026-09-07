@@ -6,17 +6,16 @@ import { useRef } from "react";
 import { BlogCard } from "./BlogCard";
 import { EmptyState } from "./EmptyState";
 import { CompactBlogCardSkeleton } from "./LoadingSkeletons/CompactBlogCardSkeleton";
-import { cn } from "@/lib/utils";
-import { Bookmark } from "lucide-react";
 import { FunctionReturnType } from "convex/server";
 
 type ProfileData = FunctionReturnType<typeof api.profiles.getProfileByUsername>;
 
 interface ProfileBookmarksProps {
   profile: ProfileData;
+  preloadedData?: any;
 }
 
-export function ProfileBookmarks({ profile }: ProfileBookmarksProps) {
+export function ProfileBookmarks({ profile, preloadedData }: ProfileBookmarksProps) {
   const userId = profile?.profile?.userId;
 
   const { results, status } = usePaginatedQuery(
@@ -25,14 +24,24 @@ export function ProfileBookmarks({ profile }: ProfileBookmarksProps) {
     { initialNumItems: 6 }
   );
 
-  const isFirstLoad = !userId || status === "LoadingFirstPage";
+  const isFirstLoad = status === "LoadingFirstPage";
 
   const lastResultsRef = useRef<any[]>([]);
   if (results.length > 0) {
     lastResultsRef.current = results;
   }
 
-  const displayResults = results.length > 0 ? results : lastResultsRef.current;
+  const preloadedItems = Array.isArray(preloadedData)
+    ? preloadedData
+    : preloadedData?.page ?? [];
+
+  const displayResults =
+    results.length > 0
+      ? results
+      : isFirstLoad && preloadedItems.length > 0
+      ? preloadedItems
+      : lastResultsRef.current;
+
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
   return (

@@ -1,6 +1,6 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { CompactBlogCardSkeleton } from "@/components/web/LoadingSkeletons/CompactBlogCardSkeleton";
 import { LeftSidebarProfileSkeleton } from "@/components/web/LoadingSkeletons/LeftSidebarProfileSkeleton";
-import { ProfileContentSkeleton } from "@/components/web/LoadingSkeletons/ProfileContentSkeleton";
 import { RightSidebarProfileSkeleton } from "@/components/web/LoadingSkeletons/RightSidebarProfileSkeleton";
 
 export default function ProfileLoading() {
@@ -8,12 +8,16 @@ export default function ProfileLoading() {
     <SidebarProvider>
       <LeftSidebarProfileSkeleton />
 
-      <div className="flex w-full min-h-screen">
-        <main className="flex-1 bg-white pt-16 flex justify-center">
-          <div className="w-full max-w-2xl px-6 mx-auto">
-            <ProfileContentSkeleton />
-          </div>
-        </main>
+      <div className="flex-1 flex flex-row min-w-0 w-full min-h-screen pt-16">
+        <section className="flex-1 min-w-0 flex flex-col h-full p-2">
+          <ul className="flex flex-col gap-2">
+            {[1, 2, 3].map((i) => (
+              <li key={i}>
+                <CompactBlogCardSkeleton />
+              </li>
+            ))}
+          </ul>
+        </section>
 
         <RightSidebarProfileSkeleton />
       </div>

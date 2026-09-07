@@ -12,9 +12,10 @@ type ProfileData = FunctionReturnType<typeof api.profiles.getProfileByUsername>;
 
 interface ProfileBlogsProps {
   profile: ProfileData;
+  preloadedData?: any;
 }
 
-export function ProfileBlogs({ profile }: ProfileBlogsProps) {
+export function ProfileBlogs({ profile, preloadedData }: ProfileBlogsProps) {
   const userId = profile?.profile?.userId;
 
   const { results, status } = usePaginatedQuery(
@@ -23,14 +24,24 @@ export function ProfileBlogs({ profile }: ProfileBlogsProps) {
     { initialNumItems: 6 }
   );
 
-  const isFirstLoad = !userId || status === "LoadingFirstPage";
+  const isFirstLoad = status === "LoadingFirstPage";
 
   const lastResultsRef = useRef<any[]>([]);
   if (results.length > 0) {
     lastResultsRef.current = results;
   }
 
-  const displayResults = results.length > 0 ? results : lastResultsRef.current;
+  const preloadedItems = Array.isArray(preloadedData)
+    ? preloadedData
+    : preloadedData?.page ?? [];
+
+  const displayResults =
+    results.length > 0
+      ? results
+      : isFirstLoad && preloadedItems.length > 0
+      ? preloadedItems
+      : lastResultsRef.current;
+
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
   return (

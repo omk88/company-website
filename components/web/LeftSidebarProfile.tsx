@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 
-import { Library, MessageSquareText, Bookmark, UsersRound, Plus, UserRoundCheck } from "lucide-react";
+import { Library, MessageSquareText, Bookmark, UsersRound, UserRoundCheck } from "lucide-react";
 
 interface LeftSidebarProfileProps {
   preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;

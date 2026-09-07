@@ -2,6 +2,7 @@ import { connection } from "next/server";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { api } from "@/convex/_generated/api";
 import { preloadAuthQuery } from "@/lib/auth-server";
+import { fetchQuery } from "convex/nextjs";
 import { LeftSidebarProfile } from "@/components/web/LeftSidebarProfile";
 import { ProfileContent } from "@/components/web/ProfileContent";
 import { RightSidebarProfile } from "@/components/web/RightSidebarProfile";
@@ -18,6 +19,16 @@ export default async function Profile({ params }: ProfileRouteProps) {
     preloadAuthQuery(api.profiles.getProfileByUsername, { username }),
     preloadAuthQuery(api.auth.getCurrentUser),
   ]);
+
+  const profileData = await fetchQuery(api.profiles.getProfileByUsername, { username });
+  const userId = profileData?.profile?.userId;
+
+  const preloadedBlogs = userId
+    ? await preloadAuthQuery(api.blogs.getPaginatedPostsByAuthor, {
+        author: userId,
+        paginationOpts: { numItems: 6, cursor: null },
+      })
+    : null;
 
   return (
     <SidebarProvider>
@@ -38,7 +49,8 @@ export default async function Profile({ params }: ProfileRouteProps) {
         >
           <ProfileContent 
             preloadedProfile={preloadedProfile} 
-            preloadedCurrentUser={preloadedCurrentUser} 
+            preloadedCurrentUser={preloadedCurrentUser}
+            preloadedBlogs={preloadedBlogs}
           />
         </section>
 

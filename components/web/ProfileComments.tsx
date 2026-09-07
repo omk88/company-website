@@ -13,9 +13,10 @@ type ProfileData = FunctionReturnType<typeof api.profiles.getProfileByUsername>;
 
 interface ProfileCommentsProps {
   profile: ProfileData;
+  preloadedData?: any;
 }
 
-export function ProfileComments({ profile }: ProfileCommentsProps) {
+export function ProfileComments({ profile, preloadedData }: ProfileCommentsProps) {
   const userId = profile?.profile?.userId;
 
   const { results, status } = usePaginatedQuery(
@@ -24,17 +25,27 @@ export function ProfileComments({ profile }: ProfileCommentsProps) {
     { initialNumItems: 6 }
   );
 
-  const isFirstLoad = !userId || status === "LoadingFirstPage";
+  const isFirstLoad = status === "LoadingFirstPage";
 
   const lastResultsRef = useRef<Doc<"comments">[]>([]);
   if (results.length > 0) {
     lastResultsRef.current = results as Doc<"comments">[];
   }
 
-  const displayResults = results.length > 0 ? (results as Doc<"comments">[]) : lastResultsRef.current;
+  const preloadedItems = Array.isArray(preloadedData)
+    ? preloadedData
+    : preloadedData?.page ?? [];
+
+  const displayResults =
+    results.length > 0
+      ? (results as Doc<"comments">[])
+      : isFirstLoad && preloadedItems.length > 0
+      ? (preloadedItems as Doc<"comments">[])
+      : lastResultsRef.current;
+
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
-return (
+  return (
     <div className="flex flex-col flex-1 h-full min-h-0 w-full p-2">
       <div className="w-full mx-auto flex flex-col flex-1 h-full min-h-0">
         {isFirstLoad && displayResults.length === 0 ? (
