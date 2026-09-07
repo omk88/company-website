@@ -35,7 +35,7 @@ export function ProfileFollowing({ profile, currentUser }: ProfileFollowingProps
 
   if (results.length === 0) {
     return (
-      <div className="w-full max-w-2xl mx-auto px-6 pt-4">
+      <div className="flex flex-col flex-1 h-full min-h-0">
         <EmptyState size="sm" title="No users found" description="This user isn't following anyone yet." />
       </div>
     );

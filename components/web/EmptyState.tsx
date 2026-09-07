@@ -33,15 +33,15 @@ export function EmptyState({
 
   return (
     <div className="flex flex-1 h-full w-full flex-col items-center justify-center rounded-none p-8 text-center">      
-      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted border border-border">
-        <Inbox className="h-4 w-4 text-muted-foreground stroke-[1.8]" />
+      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted border border-border">
+        <Inbox className="h-5 w-5 text-muted-foreground stroke-[1.8]" />
       </div>
 
-      <div className="mt-4 max-w-sm space-y-1">
-        <h3 className="text-sm font-bold tracking-tight text-foreground">
+      <div className="mt-2 max-w-sm space-y-1">
+        <h3 className="text-base font-bold tracking-tight text-foreground">
           {title}
         </h3>
-        <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+        <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
           {description}
         </p>
       </div>

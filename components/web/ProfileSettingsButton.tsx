@@ -110,7 +110,7 @@ function ProfileSettingsDialog({ userId, children }: ProfileSettingsDialogProps)
 
                 <FormProvider {...form}>
                     <form id="profile-settings-form" onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-1 overflow-hidden">
-                        <Field className="flex items-center justify-between py-2">
+                        <Field className="flex">
                             <FieldLabel htmlFor="emailNotifications">Email Notifications</FieldLabel>
                                 <Controller
                                     control={form.control}
@@ -127,11 +127,11 @@ function ProfileSettingsDialog({ userId, children }: ProfileSettingsDialogProps)
                         </Field>
                     </form>
                 </FormProvider>
-                <DialogFooter className="p-6 pt-2 border-t bg-background gap-2 sm:gap-2">
+                <DialogFooter className="border-t bg-background gap-2 sm:gap-2">
                     <DialogClose asChild>
-                        <Button type="button" variant="outline">Cancel</Button>
+                        <Button className="cursor-pointer" type="button" variant="outline">Cancel</Button>
                     </DialogClose>
-                    <Button type="submit" form="profile-settings-form" disabled={form.formState.isSubmitting}>
+                    <Button className="cursor-pointer" type="submit" form="profile-settings-form" disabled={form.formState.isSubmitting}>
                         {form.formState.isSubmitting ? "Saving..." : "Save Changes"}
                     </Button>
                 </DialogFooter>

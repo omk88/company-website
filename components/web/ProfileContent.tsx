@@ -20,20 +20,20 @@ export function ProfileContent({ preloadedProfile, preloadedCurrentUser }: Profi
   const selectedMetric = useProfileStore((state) => state.selectedMetric);
 
   return (
-    <div className="flex flex-col flex-1">
-      <div className={selectedMetric === "insights" ? "block" : "hidden"}>
+    <div className="flex flex-col h-full flex-1">
+      <div className={selectedMetric === "insights" ? "flex flex-col flex-1 h-full" : "hidden"}>
         <ProfileBlogs profile={profileData} />
       </div>
-      <div className={selectedMetric === "comments" ? "block" : "hidden"}>
+      <div className={selectedMetric === "comments" ? "flex flex-col flex-1 h-full" : "hidden"}>
         <ProfileComments profile={profileData} />
       </div>
-      <div className={selectedMetric === "bookmarks" ? "block" : "hidden"}>
+      <div className={selectedMetric === "bookmarks" ? "flex flex-col flex-1 h-full" : "hidden"}>
         <ProfileBookmarks profile={profileData} />
       </div>
-      <div className={selectedMetric === "followers" ? "block" : "hidden"}>
+      <div className={selectedMetric === "followers" ? "flex flex-col flex-1 h-full" : "hidden"}>
         <ProfileFollowers profile={profileData} currentUser={currentUser} />
       </div>
-      <div className={selectedMetric === "following" ? "block" : "hidden"}>
+      <div className={selectedMetric === "following" ? "flex flex-col flex-1 h-full" : "hidden"}>
         <ProfileFollowing profile={profileData} currentUser={currentUser} />
       </div>
     </div>

@@ -31,17 +31,18 @@ export default async function Profile({ params }: ProfileRouteProps) {
         />
       </aside>
       
-      <div className="flex w-full min-h-screen">
-        <main className="flex-1 bg-white pt-16 flex justify-center">
-          <div className="w-full mx-auto">
-            <ProfileContent 
-              preloadedProfile={preloadedProfile} 
-              preloadedCurrentUser={preloadedCurrentUser} 
-            />
-          </div>
-        </main>
+      <div className="flex-1 flex flex-row min-w-0 w-full min-h-screen pt-16">
+        <section
+          id="profile-content-section" 
+          className="flex-1 min-w-0 flex flex-col h-full"
+        >
+          <ProfileContent 
+            preloadedProfile={preloadedProfile} 
+            preloadedCurrentUser={preloadedCurrentUser} 
+          />
+        </section>
 
-        <aside style={{ "--sidebar-width": "24rem" } as React.CSSProperties} className="w-96 shrink-0">
+        <aside style={{ "--sidebar-width": "24rem" } as React.CSSProperties} className="w-[24rem] shrink-0">
           <RightSidebarProfile 
             preloadedProfile={preloadedProfile} 
             preloadedCurrentUser={preloadedCurrentUser} 
