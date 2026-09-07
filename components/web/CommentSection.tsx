@@ -12,7 +12,7 @@ import { Preloaded, useMutation, usePreloadedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import z from "zod";
 import { toast } from "sonner";
-import { useTransition } from "react";
+import { useEffect, useTransition } from "react";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import { IncrementCommentLikesDislikes } from "./IncrementCommentLikesDislikes"; 
 import { formatSmartDate } from "./ProfileHoverCard";
@@ -45,6 +45,20 @@ export function CommentSection(props: { preloadedComments: Preloaded<typeof api.
   }
 
   if (data === undefined) return null;
+
+  useEffect(() => {
+    if (data && typeof window !== "undefined") {
+      const hash = window.location.hash;
+      if (hash) {
+        const timer = setTimeout(() => {
+          const element = document.querySelector(hash);
+          element?.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 100);
+
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [data]);
 
   return (
     <div className="space-y-8 my-8">
@@ -93,7 +107,7 @@ export function CommentSection(props: { preloadedComments: Preloaded<typeof api.
 
       <div className="divide-y divide-zinc-100 dark:divide-zinc-800/60 pt-4">
         {data.map((comment) => (
-            <div key={comment._id} className="flex items-start gap-3 py-4 border-b border-zinc-100 dark:border-zinc-800/60 last:border-0">
+            <div key={comment._id} id={`comment-${comment._id}`} className="flex items-start gap-3 py-4 border-b border-zinc-100 dark:border-zinc-800/60 last:border-0">
                 <Avatar className="w-8 h-8 shrink-0 mt-0.5">
                     <AvatarImage src={comment.authorProfilePicUrl || comment.defaultAuthorProfilePicUrl || undefined} />
                 </Avatar>
