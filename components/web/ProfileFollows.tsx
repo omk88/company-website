@@ -98,7 +98,7 @@ function FollowersList({
         const item = rawItem as unknown as FollowerItem;
         if (!item?.profile) return null;
 
-        const { profile, profilePicture, defaultProfilePicture, isFollowing, isBell } = item;
+        const { profile, profilePicture, defaultProfilePicture, isFollowing, isBell, followedAt } = item;
         
         const isSelf = Boolean(currentUserId && profile.userId === currentUserId);
 
@@ -113,6 +113,7 @@ function FollowersList({
               isFollowing={isFollowing}
               isBell={isBell}
               isSelf={isSelf}
+              followedAt={followedAt}
             />
           </li>
         );
@@ -150,7 +151,7 @@ function FollowingList({
         const item = rawItem as unknown as FollowingItem;
         if (!item?.profile) return null;
 
-        const { profile, profilePicture, defaultProfilePicture, isFollowing, isBell } = item;
+        const { profile, profilePicture, defaultProfilePicture, isFollowing, isBell, followedAt } = item;
         
         const isSelf = Boolean(currentUserId && profile.userId === currentUserId);
 
@@ -165,6 +166,7 @@ function FollowingList({
               isFollowing={isFollowing}
               isBell={isBell}
               isSelf={isSelf}
+              followedAt={followedAt}
             />
           </li>
         );
