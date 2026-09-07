@@ -1,56 +1,73 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { formatSmartDate } from "./ProfileHoverCard";
 import { EMOJI_REACTIONS } from "@/app/constants/reactions";
 
 export interface ReactionsNotificationCardProps {
-    _id: string;
-    title: string;
-    reactions: string[];
-    createdAt: number;
-    isUnread?: boolean;
+  _id: string;
+  title: string;
+  reactions: string[];
+  createdAt: number;
+  isUnread?: boolean;
+  onNotificationClick?: () => void;
 }
 
 export default function ReactionsNotificationCard({
-    _id,
-    title,
-    reactions,
-    createdAt,
-    isUnread = true,
+  _id,
+  title,
+  reactions,
+  createdAt,
+  isUnread = true,
+  onNotificationClick,
 }: ReactionsNotificationCardProps) {
+  const router = useRouter();
 
-    const emojis = reactions
-        .map((reactionType) => EMOJI_REACTIONS.find((r) => r.type === reactionType)?.emoji)
-        .filter(Boolean);
+  const emojis = reactions
+    .map((reactionType) => EMOJI_REACTIONS.find((r) => r.type === reactionType)?.emoji)
+    .filter(Boolean);
 
-    return (
-        <Link
-            href={`/insights/${_id}`}
-            className="relative w-full flex flex-row items-center gap-3 p-2 rounded-lg bg-zinc-50/80 hover:bg-accent transition-colors cursor-pointer group"
-        >
-            {isUnread && (
-                <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-red-500 z-10" />
-            )}
-            
-            <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
-                <div className="flex flex-row items-center gap-2.5 min-w-0">
-                    <div className="flex flex-row min-w-0 flex-1 items-center ">
-                        <span className="text-sm font-medium leading-snug text-zinc-800 group-hover:text-blue-600 dark:group-hover:text-blue-400 dark:text-zinc-200 truncate">
-                            {title}
-                        </span>
-                        <div className="flex items-center text-lg shrink-0 ml-auto">
-                            {emojis.map((emoji, index) => (
-                                <span key={`${emoji}-${index}`}>{emoji}</span>
-                            ))}
-                        </div>
-                    </div>
-                </div>
+  const handleClick = () => {
+    onNotificationClick?.();
 
-                <time className="text-xs text-zinc-400">
-                    {formatSmartDate(createdAt, false)}
-                </time>
+    const targetPath = `/insights/${_id}`;
+    const currentPathWithoutHash = window.location.pathname;
+
+    if (currentPathWithoutHash === targetPath) {
+      window.history.replaceState(null, "", currentPathWithoutHash);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      router.push(targetPath);
+    }
+  };
+
+  return (
+    <div
+      onClick={handleClick}
+      className="relative w-full flex flex-row items-center gap-3 p-2 rounded-lg bg-zinc-50/80 hover:bg-accent transition-colors cursor-pointer group"
+    >
+      {isUnread && (
+        <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-red-500 z-10" />
+      )}
+      
+      <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
+        <div className="flex flex-row items-center gap-2.5 min-w-0">
+          <div className="flex flex-row min-w-0 flex-1 items-center ">
+            <span className="text-sm font-medium leading-snug text-zinc-800 group-hover:text-blue-600 dark:group-hover:text-blue-400 dark:text-zinc-200 truncate">
+              {title}
+            </span>
+            <div className="flex items-center text-lg shrink-0 ml-auto">
+              {emojis.map((emoji, index) => (
+                <span key={`${emoji}-${index}`}>{emoji}</span>
+              ))}
             </div>
-        </Link>
-    );
+          </div>
+        </div>
+
+        <time className="text-xs text-zinc-400">
+          {formatSmartDate(createdAt, false)}
+        </time>
+      </div>
+    </div>
+  );
 }

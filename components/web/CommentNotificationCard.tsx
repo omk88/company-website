@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { formatSmartDate } from "./ProfileHoverCard";
 
 export interface CommentNotificationCardProps {
@@ -9,6 +10,7 @@ export interface CommentNotificationCardProps {
   body: string;
   createdAt: number;
   isUnread?: boolean;
+  onNotificationClick?: () => void;
 }
 
 export default function CommentNotificationCard({
@@ -18,9 +20,34 @@ export default function CommentNotificationCard({
   body,
   createdAt,
   isUnread = true,
+  onNotificationClick,
 }: CommentNotificationCardProps) {
+  const router = useRouter();
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    onNotificationClick?.();
+
+    const targetPath = `/insights/${blogId}`;
+    const commentHash = `#comment-${_id}`;
+    const currentPathWithoutHash = window.location.pathname;
+
+    if (currentPathWithoutHash === targetPath) {
+      window.history.replaceState(null, "", `${currentPathWithoutHash}${commentHash}`);
+      const el = document.getElementById(`comment-${_id}`);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      router.push(`${targetPath}${commentHash}`);
+    }
+  };
+
   return (
-    <div className="relative w-full flex flex-row items-center gap-3 p-2 rounded-lg bg-zinc-50/80 hover:bg-accent transition-colors cursor-pointer group">
+    <div
+      onClick={handleClick}
+      className="relative w-full flex flex-row items-center gap-3 p-2 rounded-lg bg-zinc-50/80 hover:bg-accent transition-colors cursor-pointer group"
+    >
       {isUnread && (
         <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-red-500 z-10" />
       )}

@@ -15,6 +15,7 @@ export interface FollowerNotificationCardProps {
   initialIsFollowing?: boolean;
   initialIsBell?: boolean;
   isSelf?: boolean;
+  onNotificationClick?: () => void;
 }
 
 export default function FollowerNotificationCard({
@@ -28,11 +29,13 @@ export default function FollowerNotificationCard({
   initialIsFollowing,
   initialIsBell,
   isSelf,
+  onNotificationClick,
 }: FollowerNotificationCardProps) {
 
   return (
     <Link
       href={`/${username}`}
+      onClick={() => onNotificationClick?.()}
       className="relative w-full flex flex-row items-center gap-3 p-2 rounded-lg bg-zinc-50/80 hover:bg-accent has-[button:hover]:bg-zinc-50/80 transition-colors cursor-pointer group"
     >
       {isUnread && (

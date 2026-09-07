@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { formatSmartDate } from "./ProfileHoverCard";
 
 export interface BlogNotificationCardProps {
@@ -10,6 +10,7 @@ export interface BlogNotificationCardProps {
   imageUrl?: string;
   createdAt: number;
   isUnread?: boolean;
+  onNotificationClick?: () => void;
 }
 
 export default function BlogNotificationCard({
@@ -18,10 +19,29 @@ export default function BlogNotificationCard({
   imageUrl,
   createdAt,
   isUnread = true,
+  onNotificationClick,
 }: BlogNotificationCardProps) {
+  const router = useRouter();
+
+  const handleClick = () => {
+    onNotificationClick?.();
+
+    const targetPath = `/insights/${_id}`;
+    const currentPathWithoutHash = window.location.pathname;
+
+    if (currentPathWithoutHash === targetPath) {
+      // Clear any active comment hash from the URL and scroll back to top
+      window.history.replaceState(null, "", currentPathWithoutHash);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      // Clean push to the blog post route without carrying over lingering hashes
+      router.push(targetPath);
+    }
+  };
+
   return (
-    <Link
-      href={`/insights/${_id}`}
+    <div
+      onClick={handleClick}
       className="relative w-full flex flex-row items-center justify-between gap-3 p-2.5 rounded-lg bg-zinc-50/80 dark:bg-zinc-900/50 hover:bg-accent transition-colors cursor-pointer group"
     >
       {isUnread && (
@@ -48,6 +68,6 @@ export default function BlogNotificationCard({
           />
         </div>
       </div>
-    </Link>
+    </div>
   );
 }

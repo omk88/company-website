@@ -498,7 +498,8 @@ export function NavbarAuthClient({
                                             isUnread={item.isUnread}    
                                             initialIsFollowing={item.viewerStatus?.isFollowing}
                                             initialIsBell={item.viewerStatus?.isBell}
-                                            isSelf={item.viewerStatus?.isSelf}                       
+                                            isSelf={item.viewerStatus?.isSelf}  
+                                            onNotificationClick={() => setOpenNotifications(false)}                     
                                           />
                                         ) : item.notificationType === "comment" ? (
                                           <CommentNotificationCard
@@ -509,6 +510,7 @@ export function NavbarAuthClient({
                                             body={item.body}
                                             createdAt={item.createdAt}
                                             isUnread={item.isUnread}
+                                            onNotificationClick={() => setOpenNotifications(false)}
                                           />
                                         ) : item.notificationType === "blogLike" ? (
                                           <BlogLikesNotificationCard
@@ -517,6 +519,7 @@ export function NavbarAuthClient({
                                             title={item.blogTitle}
                                             createdAt={item.createdAt}
                                             isUnread={item.isUnread}
+                                            onNotificationClick={() => setOpenNotifications(false)}
                                           />
                                         ) : item.notificationType === "commentLike" ? (
                                           <CommentLikesNotificationCard
@@ -525,6 +528,7 @@ export function NavbarAuthClient({
                                             commentBody={item.commentBody}
                                             createdAt={item.createdAt}
                                             isUnread={item.isUnread}
+                                            onNotificationClick={() => setOpenNotifications(false)}
                                           />
                                         ) : item.notificationType === "reaction" ? (
                                           <ReactionsNotificationCard
@@ -534,6 +538,7 @@ export function NavbarAuthClient({
                                             reactions={item.reactions}
                                             createdAt={item.createdAt}
                                             isUnread={item.isUnread}
+                                            onNotificationClick={() => setOpenNotifications(false)}
                                           />
                                         ) : item.notificationType === "blog" ? (
                                           <BlogNotificationCard
@@ -543,6 +548,7 @@ export function NavbarAuthClient({
                                             imageUrl={item.imageUrl ?? undefined}
                                             createdAt={item.createdAt}
                                             isUnread={item.isUnread}
+                                            onNotificationClick={() => setOpenNotifications(false)}
                                           />
                                         ) : null
                                       )}

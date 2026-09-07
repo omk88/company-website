@@ -134,7 +134,7 @@ interface EditProfileDialogProps {
   children: React.ReactNode;
 }
 
-export function EditProfileDialog({ profile, avatarSrc, defaultAvatarSrc, children }: EditProfileDialogProps) {
+function EditProfileDialog({ profile, avatarSrc, defaultAvatarSrc, children }: EditProfileDialogProps) {
   const router = useRouter();
   const [, startTransition] = useTransition();
 
