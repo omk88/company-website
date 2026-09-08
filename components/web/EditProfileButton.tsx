@@ -24,6 +24,7 @@ import { UploadAvatar } from "./UploadAvatar";
 import { Doc, Id } from "@/convex/_generated/dataModel";
 import { useLocationSearch } from "@/stores/useLocationSearch";
 import { useDebounce } from "@/hooks/use-debounce";
+import { ScrollArea } from "../ui/scroll-area";
 
 const formatPlatformName = (name: string) => {
   if (name.toLowerCase() === "x") return "Twitter / X";
@@ -342,132 +343,135 @@ function EditProfileDialog({ profile, avatarSrc, defaultAvatarSrc, children }: E
 
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-1 overflow-hidden">
-            <div className="flex-1 overflow-y-auto px-6 pb-4 grid gap-4 no-scrollbar">
-              
-              <UploadAvatar
-                avatarSrc={avatarSrc}
-                defaultAvatarSrc={defaultAvatarSrc}
-                onPendingIdChange={(id) => {
-                  setPendingStorageId(id);
-                  setIsAvatarChanged(true);
-                }}
-                onUploadingStatusChange={setIsAvatarUploading}
-                onPromiseCreated={(promise) => {
-                  uploadPromiseRef.current = promise;
-                }}
-              />
-
-              <Field>
-                <FieldLabel>Username</FieldLabel>
-                <div className="relative w-full">
-                  <Input
-                    type="text"
-                    {...form.register("username")}
-                    placeholder="john.doe48"
-                    className="pr-14"
+            <div className="w-full">
+              <ScrollArea className="h-[500px] max-h-[60vh] w-full px-2" rightOffset={10}>
+                <div className="grid gap-4 pl-4 pr-6 pb-6">
+                  <UploadAvatar
+                    avatarSrc={avatarSrc}
+                    defaultAvatarSrc={defaultAvatarSrc}
+                    onPendingIdChange={(id) => {
+                      setPendingStorageId(id);
+                      setIsAvatarChanged(true);
+                    }}
+                    onUploadingStatusChange={setIsAvatarUploading}
+                    onPromiseCreated={(promise) => {
+                      uploadPromiseRef.current = promise;
+                    }}
                   />
 
-                  <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
-                    {isCheckingUsername && (
-                      <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-                    )}
+                  <Field>
+                    <FieldLabel>Username</FieldLabel>
+                    <div className="relative w-full">
+                      <Input
+                        type="text"
+                        {...form.register("username")}
+                        placeholder="john.doe48"
+                        className="pr-14"
+                      />
 
-                    {!isCheckingUsername &&
-                      shouldCheckUsername &&
-                      isUsernameTaken === false &&
-                      !form.formState.errors.username && (
-                        <Check className="h-4 w-4 text-emerald-500" />
+                      <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+                        {isCheckingUsername && (
+                          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                        )}
+
+                        {!isCheckingUsername &&
+                          shouldCheckUsername &&
+                          isUsernameTaken === false &&
+                          !form.formState.errors.username && (
+                            <Check className="h-4 w-4 text-emerald-500" />
+                          )}
+
+                        {watchedUsername && (
+                          <button
+                            onClick={() => form.setValue("username", "", { shouldValidate: true })}
+                            type="button"
+                            className="cursor-pointer text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted"
+                          >
+                            <X className="h-3.5 w-3.5 stroke-[2]" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {form.formState.errors.username && (
+                      <span className="text-xs text-destructive">
+                        {form.formState.errors.username.message}
+                      </span>
+                    )}
+                  </Field>
+
+                  <Field>
+                    <FieldLabel>Display Name</FieldLabel>
+                    <div className="relative w-full">
+                      <Input type="text" {...form.register("displayName")} placeholder="John Doe" className="pr-9" />
+                      {form.watch("displayName") && (
+                        <ClearButton onClick={() => form.setValue("displayName", "", { shouldValidate: true })} />
                       )}
+                    </div>
+                  </Field>
 
-                    {watchedUsername && (
-                      <button
-                        onClick={() => form.setValue("username", "", { shouldValidate: true })}
-                        type="button"
-                        className="text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted"
-                      >
-                        <X className="h-3.5 w-3.5 stroke-[2]" />
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {form.formState.errors.username && (
-                  <span className="text-xs text-destructive">
-                    {form.formState.errors.username.message}
-                  </span>
-                )}
-              </Field>
-
-              <Field>
-                <FieldLabel>Display Name</FieldLabel>
-                <div className="relative w-full">
-                  <Input type="text" {...form.register("displayName")} placeholder="John Doe" className="pr-9" />
-                  {form.watch("displayName") && (
-                    <ClearButton onClick={() => form.setValue("displayName", "", { shouldValidate: true })} />
-                  )}
-                </div>
-              </Field>
-
-              <LocationField
-                locationCountryCode={profile.locationCountryCode || ""}
-                openDropdown={openDropdown}
-                setOpenDropdown={setOpenDropdown}
-                locationQuery={locationQuery}
-                setLocationQuery={setLocationQuery}
-                locationOptions={locationOptions}
-                isLoadingLocation={isLoadingLocation}
-              />
-
-              <Field>
-                <FieldLabel>Bio</FieldLabel>
-                <div className="relative w-full">
-                  <Textarea
-                    {...form.register("bio")}
-                    placeholder="Hi! My name is John Doe and I am a tech professional..."
-                    className="pr-9 pt-2.5"
+                  <LocationField
+                    locationCountryCode={profile.locationCountryCode || ""}
+                    openDropdown={openDropdown}
+                    setOpenDropdown={setOpenDropdown}
+                    locationQuery={locationQuery}
+                    setLocationQuery={setLocationQuery}
+                    locationOptions={locationOptions}
+                    isLoadingLocation={isLoadingLocation}
                   />
-                  {form.watch("bio") && (
-                    <button
-                      onClick={() => form.setValue("bio", "", { shouldValidate: true })}
-                      type="button"
-                      className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted"
-                    >
-                      <X className="h-3.5 w-3.5 stroke-[2]" />
-                    </button>
-                  )}
+
+                  <Field>
+                    <FieldLabel>Bio</FieldLabel>
+                    <div className="relative w-full">
+                      <Textarea
+                        {...form.register("bio")}
+                        placeholder="Hi! My name is John Doe and I am a tech professional..."
+                        className="pr-9 pt-2.5"
+                      />
+                      {form.watch("bio") && (
+                        <button
+                          onClick={() => form.setValue("bio", "", { shouldValidate: true })}
+                          type="button"
+                          className="absolute right-2.5 top-2.5 cursor-pointer text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted"
+                        >
+                          <X className="h-3.5 w-3.5 stroke-[2]" />
+                        </button>
+                      )}
+                    </div>
+                  </Field>
+
+                  <EducationFields
+                    editingEduIndex={editingEduIndex}
+                    setEditingEduIndex={setEditingEduIndex}
+                    openDropdown={openDropdown}
+                    setOpenDropdown={setOpenDropdown}
+                    handleStartAddingEducation={handleStartAddingEducation}
+                    handleCommitEducation={handleCommitEducation}
+                    ALLOWED_SUBJECTS={majorsData}
+                  />
+
+                  <SkillsFields comboboxOpen={comboboxOpen} setComboboxOpen={setComboboxOpen} ALLOWED_SKILLS={SKILLS} />
+
+                  <SocialLinksFields
+                    fields={socialFields}
+                    remove={removeSocial}
+                    editingSocialIndex={editingSocialIndex}
+                    setEditingSocialIndex={setEditingSocialIndex}
+                    handleStartAddingSocial={handleStartAddingSocial}
+                    handleCommitSocial={handleCommitSocial}
+                    ICON_MAP={ICON_MAP}
+                    AVAILABLE_PLATFORMS={AVAILABLE_PLATFORMS}
+                    formatPlatformName={formatPlatformName}
+                  />
                 </div>
-              </Field>
-
-              <EducationFields
-                editingEduIndex={editingEduIndex}
-                setEditingEduIndex={setEditingEduIndex}
-                openDropdown={openDropdown}
-                setOpenDropdown={setOpenDropdown}
-                handleStartAddingEducation={handleStartAddingEducation}
-                handleCommitEducation={handleCommitEducation}
-                ALLOWED_SUBJECTS={majorsData}
-              />
-
-              <SkillsFields comboboxOpen={comboboxOpen} setComboboxOpen={setComboboxOpen} ALLOWED_SKILLS={SKILLS} />
-
-              <SocialLinksFields
-                fields={socialFields}
-                remove={removeSocial}
-                editingSocialIndex={editingSocialIndex}
-                setEditingSocialIndex={setEditingSocialIndex}
-                handleStartAddingSocial={handleStartAddingSocial}
-                handleCommitSocial={handleCommitSocial}
-                ICON_MAP={ICON_MAP}
-                AVAILABLE_PLATFORMS={AVAILABLE_PLATFORMS}
-                formatPlatformName={formatPlatformName}
-              />
+              </ScrollArea>
             </div>
 
             <DialogFooter className="p-6 pt-2 border-t bg-background gap-2 sm:gap-2">
               <DialogClose asChild>
-                <Button type="button" variant="outline">Cancel</Button>
+                <Button className="cursor-pointer" type="button" variant="outline">Cancel</Button>
               </DialogClose>
-              <Button type="submit" disabled={isCheckingUsername || isUsernameTaken === true}>
+              <Button className="cursor-pointer" type="submit" disabled={isCheckingUsername || isUsernameTaken === true}>
                 Save Changes
               </Button>
             </DialogFooter>
@@ -502,7 +506,7 @@ function ClearButton({ onClick }: { onClick: () => void }) {
     <button
       onClick={onClick}
       type="button"
-      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted"
+      className="cursor-pointer absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted"
     >
       <X className="h-3.5 w-3.5 stroke-[2]" />
     </button>

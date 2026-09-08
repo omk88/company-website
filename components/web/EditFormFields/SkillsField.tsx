@@ -7,6 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { ProfileFormValues } from "../EditProfileButton";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface SkillsFieldsProps {
   comboboxOpen: boolean;
@@ -73,7 +74,7 @@ export const SkillsFields: React.FC<SkillsFieldsProps> = ({
         <FieldLabel>Skills ({watchedSkills.length}/6)</FieldLabel>
       </div>
       
-      <Popover open={comboboxOpen} onOpenChange={setComboboxOpen}>
+      <Popover modal={true} open={comboboxOpen} onOpenChange={setComboboxOpen}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
@@ -100,30 +101,34 @@ export const SkillsFields: React.FC<SkillsFieldsProps> = ({
             />
             
             <CommandList>
-              {filteredSkills.length === 0 && (
-                <CommandEmpty>No skills found.</CommandEmpty>
-              )}
-              
-              <CommandGroup className="max-h-[200px] overflow-y-auto">
-                {filteredSkills.map((skill) => {
-                  const isSelected = watchedSkillsSet.has(skill);
-                  return (
-                    <CommandItem
-                      key={skill}
-                      value={skill}
-                      onSelect={() => handleToggleSkill(skill)}
-                      className="cursor-pointer text-xs"
-                    >
-                      <Check
-                        className={`mr-2 h-3.5 w-3.5 ${
-                          isSelected ? "opacity-100" : "opacity-0"
-                        }`}
-                      />
-                      {skill}
-                    </CommandItem>
-                  );
-                })}
-              </CommandGroup>
+              <ScrollArea className="h-[200px]">
+                {filteredSkills.length === 0 && (
+                  <CommandEmpty>No skills found.</CommandEmpty>
+                )}
+                
+                {filteredSkills.length > 0 && (
+                  <CommandGroup>
+                    {filteredSkills.map((skill) => {
+                      const isSelected = watchedSkillsSet.has(skill);
+                      return (
+                        <CommandItem
+                          key={skill}
+                          value={skill}
+                          onSelect={() => handleToggleSkill(skill)}
+                          className="mr-4 cursor-pointer text-xs"
+                        >
+                          <Check
+                            className={`mr-2 h-3.5 w-3.5 ${
+                              isSelected ? "opacity-100" : "opacity-0"
+                            }`}
+                          />
+                          {skill}
+                        </CommandItem>
+                      );
+                    })}
+                  </CommandGroup>
+                )}
+              </ScrollArea>
             </CommandList>
           </Command>
         </PopoverContent>
@@ -149,7 +154,7 @@ export const SkillsFields: React.FC<SkillsFieldsProps> = ({
           ))}
           
           {watchedSkills.length === 0 && (
-            <p className="text-xs text-zinc-600 dark:text-zinc-400 self-center pl-1">
+            <p className="text-sm text-zinc-600 dark:text-zinc-400 self-center pl-1">
               No skills added yet.
             </p>
           )}

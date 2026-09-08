@@ -8,6 +8,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Field, FieldLabel } from "@/components/ui/field";
 import { ProfileFormValues } from "../EditProfileButton";
 import { DEGREE_TYPES } from "@/data/degrees";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface EducationFieldsProps {
   editingEduIndex: number;
@@ -161,7 +162,7 @@ export const EducationFields: React.FC<EducationFieldsProps> = ({
                         <SelectItem 
                           key={degree} 
                           value={degree} 
-                          className="text-xs"
+                          className="cursor-pointer text-xs"
                         >
                           {degree}
                         </SelectItem>
@@ -177,6 +178,7 @@ export const EducationFields: React.FC<EducationFieldsProps> = ({
 
                 <div>
                   <Popover
+                    modal={true}
                     open={openDropdown === `subject-${index}`}
                     onOpenChange={(open) => {
                       setOpenDropdown(open ? `subject-${index}` : null);
@@ -202,39 +204,41 @@ export const EducationFields: React.FC<EducationFieldsProps> = ({
                           onValueChange={setSearchQuery}
                         />
                         <CommandList>
-                          {(() => {
-                            const filtered = ALLOWED_SUBJECTS.filter((subject) =>
-                              subject.toLowerCase().includes(searchQuery.toLowerCase())
-                            ).slice(0, 15);
+                          <ScrollArea className="h-[200px]">
+                            {(() => {
+                              const filtered = ALLOWED_SUBJECTS.filter((subject) =>
+                                subject.toLowerCase().includes(searchQuery.toLowerCase())
+                              ).slice(0, 15);
 
-                            if (filtered.length === 0) {
-                              return <CommandEmpty>No subject found.</CommandEmpty>;
-                            }
+                              if (filtered.length === 0) {
+                                return <CommandEmpty>No subject found.</CommandEmpty>;
+                              }
 
-                            return (
-                              <CommandGroup className="max-h-[200px] overflow-y-auto">
-                                {filtered.map((subject) => (
-                                  <CommandItem
-                                    key={subject}
-                                    value={subject}
-                                    onSelect={() => {
-                                      setValue(`education.${index}.subject`, subject, { shouldValidate: true });
-                                      setOpenDropdown(null);
-                                      setSearchQuery("");
-                                    }}
-                                    className="text-xs"
-                                  >
-                                    <Check 
-                                      className={`mr-2 h-3.5 w-3.5 ${
-                                        selectedSubject === subject ? "opacity-100" : "opacity-0"
-                                      }`} 
-                                    />
-                                    {subject}
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
-                            );
-                          })()}
+                              return (
+                                <CommandGroup>
+                                  {filtered.map((subject) => (
+                                    <CommandItem
+                                      key={subject}
+                                      value={subject}
+                                      onSelect={() => {
+                                        setValue(`education.${index}.subject`, subject, { shouldValidate: true });
+                                        setOpenDropdown(null);
+                                        setSearchQuery("");
+                                      }}
+                                      className="mr-4 cursor-pointer text-xs"
+                                    >
+                                      <Check 
+                                        className={`mr-2 h-3.5 w-3.5 ${
+                                          selectedSubject === subject ? "opacity-100" : "opacity-0"
+                                        }`} 
+                                      />
+                                      {subject}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              );
+                            })()}
+                          </ScrollArea>
                         </CommandList>
                       </Command>
                     </PopoverContent>
@@ -248,6 +252,7 @@ export const EducationFields: React.FC<EducationFieldsProps> = ({
 
                 <div>
                   <Popover
+                    modal={true}
                     open={openDropdown === `institution-${index}`}
                     onOpenChange={(open) => setOpenDropdown(open ? `institution-${index}` : null)}
                   >
@@ -264,39 +269,43 @@ export const EducationFields: React.FC<EducationFieldsProps> = ({
                     <PopoverContent className="w-[340px] p-0" align="start">
                       <Command shouldFilter={false}>
                         <CommandInput 
-                          placeholder="Type to search global universities..." 
+                          placeholder="Search university..." 
                           className="text-xs"
                           value={searchQuery}
                           onValueChange={setSearchQuery}
                         />
                         <CommandList>
-                          {isLoading && (
-                            <div className="flex items-center justify-center py-6 text-xs text-muted-foreground gap-2">
-                              <Loader2 className="h-3 w-3 animate-spin" /> Fetching universities...
-                            </div>
-                          )}
-                          {!isLoading && institutions.length === 0 && searchQuery.trim().length > 0 && (
-                            <CommandEmpty>No universities found.</CommandEmpty>
-                          )}
-                          {!isLoading && searchQuery.trim().length === 0 && (
-                            <div className="p-4 text-xs text-muted-foreground text-center">Start typing to search...</div>
-                          )}
-                          <CommandGroup className="max-h-[200px] overflow-y-auto">
-                            {institutions.map((inst) => (
-                              <CommandItem
-                                key={inst}
-                                value={inst}
-                                onSelect={() => {
-                                  setValue(`education.${index}.institution`, inst, { shouldValidate: true });
-                                  setOpenDropdown(null);
-                                }}
-                                className="text-xs"
-                              >
-                                <Check className={`mr-2 h-3.5 w-3.5 ${selectedInstitution === inst ? "opacity-100" : "opacity-0"}`} />
-                                {inst}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
+                          <ScrollArea className="h-[200px]">
+                            {isLoading && (
+                              <div className="flex items-center justify-center py-6 text-xs text-muted-foreground gap-2">
+                                <Loader2 className="h-3 w-3 animate-spin" /> Fetching universities...
+                              </div>
+                            )}
+                            {!isLoading && institutions.length === 0 && searchQuery.trim().length > 0 && (
+                              <CommandEmpty>No universities found.</CommandEmpty>
+                            )}
+                            {!isLoading && searchQuery.trim().length === 0 && (
+                              <div className="p-4 text-xs text-muted-foreground text-center">Start typing to search...</div>
+                            )}
+                            {!isLoading && institutions.length > 0 && (
+                              <CommandGroup>
+                                {institutions.map((inst) => (
+                                  <CommandItem
+                                    key={inst}
+                                    value={inst}
+                                    onSelect={() => {
+                                      setValue(`education.${index}.institution`, inst, { shouldValidate: true });
+                                      setOpenDropdown(null);
+                                    }}
+                                    className="mr-4 cursor-pointer text-xs"
+                                  >
+                                    <Check className={`mr-2 h-3.5 w-3.5 ${selectedInstitution === inst ? "opacity-100" : "opacity-0"}`} />
+                                    {inst}
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            )}
+                          </ScrollArea>
                         </CommandList>
                       </Command>
                     </PopoverContent>
@@ -341,7 +350,7 @@ export const EducationFields: React.FC<EducationFieldsProps> = ({
         })}
 
         {educationFields.length === 0 && (
-          <p className="text-xs text-zinc-600 dark:text-zinc-400">No education history added yet.</p>
+          <p className="text-sm text-zinc-600 dark:text-zinc-400">No education history added yet.</p>
         )}
       </div>
       {errors.education?.root && (

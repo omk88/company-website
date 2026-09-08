@@ -10,12 +10,13 @@ interface ScrollAreaProps
   onReachBottom?: () => void;
   bottomOffset?: number;
   scrollbarInset?: number;
+  rightOffset?: number;
 }
 
 const ScrollArea = React.forwardRef<
   React.ElementRef<typeof ScrollAreaPrimitive.Root>,
   ScrollAreaProps
->(({ className, children, onReachBottom, bottomOffset = 50, scrollbarInset = 12, ...props }, ref) => {
+>(({ className, children, onReachBottom, bottomOffset = 50, scrollbarInset = 12, rightOffset = 0, ...props }, ref) => {
   const viewportRef = React.useRef<HTMLDivElement>(null);
 
   const handleScroll = React.useCallback(() => {
@@ -41,7 +42,7 @@ const ScrollArea = React.forwardRef<
       >
         {children}
       </ScrollAreaPrimitive.Viewport>
-      <ScrollBar inset={scrollbarInset} />
+      <ScrollBar inset={scrollbarInset} rightOffset={rightOffset} />
       <ScrollAreaPrimitive.Corner />
     </ScrollAreaPrimitive.Root>
   );
@@ -51,23 +52,26 @@ ScrollArea.displayName = ScrollAreaPrimitive.Root.displayName;
 interface ScrollBarProps
   extends React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Scrollbar> {
   inset?: number;
+  rightOffset?: number;
 }
 
 const ScrollBar = React.forwardRef<
   React.ElementRef<typeof ScrollAreaPrimitive.Scrollbar>,
   ScrollBarProps
->(({ className, orientation = "vertical", inset = 0, ...props }, ref) => (
+>(({ className, orientation = "vertical", inset = 0, rightOffset = 0, style, ...props }, ref) => (
   <ScrollAreaPrimitive.Scrollbar
     ref={ref}
     orientation={orientation}
-    style={
-      inset && orientation === "vertical"
+    style={{
+      ...(inset && orientation === "vertical"
         ? {
             top: `${inset}px`,
             height: `calc(100% - ${inset * 2}px)`,
           }
-        : undefined
-    }
+        : {}),
+      ...(orientation === "vertical" ? { right: `${rightOffset}px` } : {}),
+      ...style,
+    }}
     className={cn(
       "flex touch-none select-none transition-colors absolute",
       orientation === "vertical" &&

@@ -47,7 +47,7 @@ export const SocialLinksFields: React.FC<SocialLinksFieldsProps> = ({
             type="button"
             variant="outline"
             size="sm"
-            className="h-7 px-2 text-xs"
+            className="cursor-pointer h-7 px-2 text-xs"
             onClick={handleStartAddingSocial}
             disabled={editingSocialIndex !== -1}
           >
@@ -81,7 +81,7 @@ export const SocialLinksFields: React.FC<SocialLinksFieldsProps> = ({
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 shrink-0 hover:bg-destructive/10"
+                  className="cursor-pointer h-8 w-8 shrink-0 hover:bg-destructive/10"
                   onClick={() => {
                     remove(index);
                     if (editingSocialIndex === index) setEditingSocialIndex(-1);
@@ -94,7 +94,7 @@ export const SocialLinksFields: React.FC<SocialLinksFieldsProps> = ({
           }
 
           return (
-            <div key={field.id} className="flex items-start gap-2 p-3 border rounded-md bg-muted/30 w-full flex-col space-y-2">
+            <div key={field.id} className="flex items-start gap-2 p-3 border rounded-md w-full flex-col space-y-2">
               <div className="flex items-start gap-2 w-full">
                 <div className="flex-1 flex flex-col gap-2">
                   <div className="w-fit min-w-[140px]">
@@ -102,7 +102,7 @@ export const SocialLinksFields: React.FC<SocialLinksFieldsProps> = ({
                       value={activePlatform}
                       onValueChange={(val) => form.setValue(`socials.${index}.platform`, val)}
                     >
-                      <SelectTrigger className="h-9 text-xs bg-white">
+                      <SelectTrigger className="cursor-pointer h-9 text-xs bg-white">
                         <div className="flex items-center gap-2">
                           {ICON_MAP[activePlatform] && (() => {
                             const CurrentIcon = ICON_MAP[activePlatform];
@@ -121,7 +121,7 @@ export const SocialLinksFields: React.FC<SocialLinksFieldsProps> = ({
 
                           const DropdownIcon = ICON_MAP[p];
                           return (
-                            <SelectItem key={p} value={p} className="text-xs">
+                            <SelectItem key={p} value={p} className="cursor-pointer text-xs">
                               <div className="flex items-center gap-2">
                                 {DropdownIcon && <DropdownIcon className="h-3.5 w-3.5 opacity-70" />}
                                 <span>{formatPlatformName(p)}</span>
@@ -152,7 +152,7 @@ export const SocialLinksFields: React.FC<SocialLinksFieldsProps> = ({
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="h-9 w-9 text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700"
+                    className="cursor-pointer h-9 w-9 text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700"
                     onClick={() => handleCommitSocial(index)}
                   >
                     <Check className="h-4 w-4" />
@@ -161,7 +161,7 @@ export const SocialLinksFields: React.FC<SocialLinksFieldsProps> = ({
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="h-9 w-9 hover:bg-destructive/10 text-destructive"
+                    className="cursor-pointer h-9 w-9 hover:bg-destructive/10 text-destructive"
                     onClick={() => {
                       remove(index);
                       setEditingSocialIndex(-1);
@@ -182,7 +182,7 @@ export const SocialLinksFields: React.FC<SocialLinksFieldsProps> = ({
         })}
 
         {fields.length === 0 && (
-          <p className="text-xs text-muted-foreground italic">No social links added yet.</p>
+          <p className="text-sm text-zinc-600 dark:text-zinc-400">No social links added yet.</p>
         )}
       </div>
     </Field>

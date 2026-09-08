@@ -106,7 +106,7 @@ export const LocationField: React.FC<LocationFieldProps> = ({
                   setLocationQuery(""); 
                   setOpenDropdown(null); 
                 }} 
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted"
+                className="cursor-pointer absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted"
               >
                 <X className="h-3.5 w-3.5 stroke-[2]" />
               </button>
