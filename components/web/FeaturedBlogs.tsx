@@ -107,7 +107,7 @@ export function FeaturedBlogs({ preloadedData }: { preloadedData: Preloaded<type
                   {displayName}
                 </span>
               </ProfileHoverCard>
-              <span className="shrink-0">•</span>
+              &middot;
               <span className="shrink-0">{formattedDate}</span>
             </div>
 

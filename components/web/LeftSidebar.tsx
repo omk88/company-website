@@ -1,6 +1,6 @@
 "use client";
 
-import { TrendingUp, Users2, Globe, Library } from "lucide-react";
+import { TrendingUp, Users2, Globe, Library, Newspaper, Rss, UserRoundCheck, NotepadText } from "lucide-react";
 import { Separator } from "../ui/separator";
 import { 
   Sidebar, 
@@ -18,7 +18,7 @@ import { useSearchStore, FeedType } from "@/stores/useSearchStore";
 
 const NAV_ITEMS = [
   { id: "all", label: "All Insights", icon: Library },
-  { id: "popular", label: "Popular", icon: TrendingUp },
+  { id: "feed", label: "My Feed", icon: UserRoundCheck },
   { id: "team", label: "Team", icon: Users2 },
   { id: "community", label: "Community", icon: Globe },
 ];

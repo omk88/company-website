@@ -9,7 +9,7 @@ import { EmptyState } from "./EmptyState";
 
 interface BlogFeedProps {
   postType?: "community" | "team";
-  isPopularOnly?: boolean;
+  myFeed?: boolean;
   searchTerm: string;
   activeTags: string[];
   sortOrder: string;
@@ -24,7 +24,7 @@ export function BlogFeed(props: BlogFeedProps) {
 
 function StandardBlogFeed({
   postType,
-  isPopularOnly,
+  myFeed,
   searchTerm,
   activeTags,
   sortOrder,
@@ -38,7 +38,7 @@ function StandardBlogFeed({
     api.blogs.getPaginatedPostsByType,
     {
       postType,
-      isPopularOnly,
+      myFeed,
       searchTerm: trimmedSearch || undefined,
       activeTags: activeTags.length > 0 ? activeTags : undefined,
       sortOrder,

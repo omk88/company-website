@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-export type FeedType = "all" | "popular" | "team" | "community";
+export type FeedType = "all" | "feed" | "team" | "community";
 
 interface SearchState {
     searchTerm: string;

@@ -5,9 +5,9 @@ import { useSearchStore, FeedType } from "@/stores/useSearchStore";
 import { Preloaded, usePreloadedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 
-const FEEDS: { id: FeedType; dbPostType?: "community" | "team"; isPopularOnly?: boolean }[] = [
+const FEEDS: { id: FeedType; dbPostType?: "community" | "team"; myFeed?: boolean }[] = [
     { id: "all" },
-    { id: "popular", isPopularOnly: true },
+    { id: "feed", myFeed: false },
     { id: "team", dbPostType: "team" },
     { id: "community", dbPostType: "community" },
 ];
@@ -32,7 +32,7 @@ export function BlogFeedWrapper({ preloadedData }: {preloadedData: Preloaded<typ
                     >
                         <BlogFeed
                             postType={feed.dbPostType}
-                            isPopularOnly={feed.isPopularOnly}
+                            myFeed={feed.myFeed}
                             searchTerm={searchTerm}
                             activeTags={activeTags}
                             sortOrder={sortOrder}

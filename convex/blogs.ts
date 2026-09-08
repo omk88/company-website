@@ -709,16 +709,30 @@ export const getPaginatedBookmarkedPostsByUser = query({
 export const getPaginatedPostsByType = query({
   args: {
     postType: v.optional(v.union(v.literal("team"), v.literal("community"))),
-    isPopularOnly: v.optional(v.boolean()),
+    myFeed: v.optional(v.boolean()),
     activeTags: v.optional(v.array(v.string())),
     searchTerm: v.optional(v.string()),
     sortOrder: v.optional(v.string()),
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
-    const addBookmarks = async <T extends { _id: Id<"blogs"> }>(blogs: T[]) => {
-      const identity = await ctx.auth.getUserIdentity();
+    const identity = await ctx.auth.getUserIdentity();
 
+    let followedUserIds: Set<string> | null = null;
+    if (args.myFeed) {
+      if (!identity) {
+        return { page: [], isDone: true, continueCursor: "" };
+      }
+      const userId = identity.subject;
+      const follows = await ctx.db
+        .query("follows")
+        .withIndex("by_follower", (q) => q.eq("followerId", userId))
+        .collect();
+
+      followedUserIds = new Set(follows.map((f) => f.followingId));
+    }
+
+    const addBookmarks = async <T extends { _id: Id<"blogs"> }>(blogs: T[]) => {
       if (!identity) {
         return blogs.map((blog) => ({ ...blog, isBookmarked: false }));
       }
@@ -747,6 +761,11 @@ export const getPaginatedPostsByType = query({
       .filter((t) => t && t !== "all")
       .map((t) => t.trim().toLowerCase());
 
+    const isFromFollowedUser = (authorId?: string) => {
+      if (!followedUserIds) return true;
+      return authorId ? followedUserIds.has(authorId) : false;
+    };
+
     if (cleanSearchTerm) {
       const searchResults = await ctx.db
         .query("blogs")
@@ -760,7 +779,7 @@ export const getPaginatedPostsByType = query({
         .paginate(args.paginationOpts);
 
       const filteredPage = searchResults.page.filter((blog) => {
-        if (args.isPopularOnly && !blog.isPopular) return false;
+        if (!isFromFollowedUser(blog.author)) return false;
 
         if (tags.length > 0) {
           const blogTagsLower = (blog.tags || []).map((t) => t.toLowerCase());
@@ -815,7 +834,7 @@ export const getPaginatedPostsByType = query({
           const blog = await ctx.db.get(entry.blogId);
           if (!blog) return null;
 
-          if (args.isPopularOnly && !blog.isPopular) return null;
+          if (!isFromFollowedUser(blog.author)) return null;
 
           if (tags.length > 1) {
             const blogTagsLower = (blog.tags || []).map((t) => t.toLowerCase());
@@ -836,28 +855,6 @@ export const getPaginatedPostsByType = query({
     }
 
     const buildQuery = () => {
-      if (args.isPopularOnly) {
-        if (args.postType) {
-          if (sortOrder === "top") {
-            return ctx.db.query("blogs").withIndex("by_type_popular_likes", (q) =>
-              q.eq("postType", args.postType!).eq("isPopular", true)
-            );
-          }
-          return ctx.db.query("blogs").withIndex("by_type_popular_createdAt", (q) =>
-            q.eq("postType", args.postType!).eq("isPopular", true)
-          );
-        }
-
-        if (sortOrder === "top") {
-          return ctx.db.query("blogs").withIndex("by_popular_likes", (q) =>
-            q.eq("isPopular", true)
-          );
-        }
-        return ctx.db.query("blogs").withIndex("by_popular_createdAt", (q) =>
-          q.eq("isPopular", true)
-        );
-      }
-
       if (args.postType) {
         switch (sortOrder) {
           case "hot":
@@ -889,9 +886,13 @@ export const getPaginatedPostsByType = query({
       .order("desc")
       .paginate(args.paginationOpts);
 
+    const filteredBlogs = followedUserIds
+      ? paginatedBlogs.page.filter((blog) => isFromFollowedUser(blog.author))
+      : paginatedBlogs.page;
+
     return {
       ...paginatedBlogs,
-      page: await addBookmarks(paginatedBlogs.page),
+      page: await addBookmarks(filteredBlogs),
     };
   },
 });

@@ -230,7 +230,7 @@ export function BlogCard({
               <ProfileHoverCard authorUsername={username} displayName={displayName || username}>
                 <span className="cursor-pointer">{displayName || username}</span>
               </ProfileHoverCard>
-              {" "}• {formatSmartDate(date, false)}
+              {" "} &middot; {formatSmartDate(date, false)}
             </div>
             <div className="flex flex-row items-center gap-8">
               <span>{readTime} min read</span>

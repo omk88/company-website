@@ -26,7 +26,7 @@ export function FeaturedBlogsSkeleton() {
           <div>
             <div className="flex items-center gap-1.5 text-[11px] mb-1 py-[1.5px]">
               <Skeleton className="h-2.5 w-16" />
-              <span className="text-zinc-400 dark:text-zinc-600">•</span>
+              <span className="text-muted-foreground/40">&middot;</span>
               <Skeleton className="h-2.5 w-12" />
             </div>
 
