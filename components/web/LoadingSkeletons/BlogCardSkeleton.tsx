@@ -15,7 +15,7 @@ export function BlogCardSkeleton() {
             
             <div className="flex items-center gap-1.5 py-1">
               <Skeleton className="h-3 w-24" />
-              <span className="text-muted-foreground">•</span>
+              <span className="text-muted-foreground/40">&middot;</span>
               <Skeleton className="h-3 w-16" />
             </div>
 

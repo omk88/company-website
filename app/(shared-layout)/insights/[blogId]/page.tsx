@@ -23,19 +23,46 @@ export async function generateMetadata({ params }: BlogPageProps): Promise<Metad
 
   if (!blogData?.blog) {
     return {
-      title: "Post not found",
+      title: "Post Not Found",
+      robots: { index: false, follow: false },
     };
   }
 
   const { blog } = blogData;
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.taqtiq.tech";
+  const postUrl = `${baseUrl}/blog/${blog._id}`;
 
   return {
     title: blog.title,
     description: blog.subtitle,
+    alternates: {
+      canonical: postUrl,
+    },
     openGraph: {
       title: blog.title,
       description: blog.subtitle,
+      url: postUrl,
+      type: "article",
+      publishedTime: new Date(blog._creationTime).toISOString(),
+      authors: [blog.displayName || blog.username],
+      images: blog.imageUrl
+        ? [
+            {
+              url: blog.imageUrl,
+              alt: blog.title,
+            },
+          ]
+        : [],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: blog.title,
+      description: blog.subtitle,
       images: blog.imageUrl ? [blog.imageUrl] : [],
+    },
+    robots: {
+      index: true,
+      follow: true,
     },
   };
 }
@@ -57,9 +84,32 @@ export default async function BlogPage({ params }: BlogPageProps) {
   }
 
   const { blog, authorPosts, interactionState } = blogData;
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://yourdomain.com";
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: blog.title,
+    description: blog.subtitle,
+    image: blog.imageUrl ? [blog.imageUrl] : [],
+    datePublished: new Date(blog._creationTime).toISOString(),
+    author: {
+      "@type": "Person",
+      name: blog.displayName || blog.username,
+      image: blog.authorAvatarUrl,
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${baseUrl}/blog/${blog._id}`,
+    },
+  };
 
   return (
     <SidebarProvider className="bg-white dark:bg-zinc-950 w-full min-h-screen relative flex">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <BlogStoreHydrator blog={blog} />
       
       <LeftSidebarControls blog={blog} interactionState={interactionState} />

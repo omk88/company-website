@@ -556,7 +556,7 @@ export default function BlogPostForm() {
                                     name="subtitle"
                                     control={control}
                                     rules={{ 
-                                        required: "A subtitle summary is required", 
+                                        required: "A summary is required", 
                                         minLength: { value: 100, message: "Summary must be at least 100 characters" } 
                                     }}
                                     render={({ field, fieldState }) => {

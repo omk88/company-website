@@ -1020,6 +1020,7 @@ export const getBlogWithAuthorPosts = query({
     const userId = identity ? (identity.subject as Id<"profiles">) : null;
 
     const [
+      authorProfile,
       rawAuthorPosts,
       blogImageUrl,
       vote,
@@ -1027,6 +1028,11 @@ export const getBlogWithAuthorPosts = query({
       featured,
       bookmark,
     ] = await Promise.all([
+      ctx.db
+        .query("profiles")
+        .withIndex("by_username", (q) => q.eq("username", blog.username))
+        .first(),
+
       ctx.db
         .query("blogs")
         .withIndex("by_username", (q) => q.eq("username", blog.username))
@@ -1074,6 +1080,15 @@ export const getBlogWithAuthorPosts = query({
         : Promise.resolve(null),
     ]);
 
+    const [profilePicUrl, defaultProfilePicUrl] = await Promise.all([
+      authorProfile?.profilePic
+        ? ctx.storage.getUrl(authorProfile.profilePic)
+        : Promise.resolve(null),
+      authorProfile?.defaultProfilePic
+        ? ctx.storage.getUrl(authorProfile.defaultProfilePic)
+        : Promise.resolve(null),
+    ]);
+
     const filteredAuthorPosts = rawAuthorPosts
       .filter((post) => post._id !== blog._id)
       .slice(0, 5);
@@ -1097,6 +1112,8 @@ export const getBlogWithAuthorPosts = query({
       blog: {
         ...blog,
         imageUrl: blogImageUrl ?? "/noImage.png",
+        profilePicUrl, 
+        defaultProfilePicUrl, 
       },
       authorPosts: authorPostsWithImages,
       interactionState: {

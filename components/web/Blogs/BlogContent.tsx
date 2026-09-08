@@ -24,14 +24,23 @@ lowlight.register("js", js);
 lowlight.register("typescript", ts);
 lowlight.register("ts", ts);
 
+interface ExtendedBlog extends Doc<"blogs"> {
+  imageUrl: string;
+  profilePicUrl: string | null;
+  defaultProfilePicUrl: string | null;
+}
+
 interface BlogContentProps {
-    blog: Doc<"blogs">;
-    preloadedComments: Preloaded<typeof api.comments.getCommentsByBlog>;
+  blog: ExtendedBlog;
+  preloadedComments: Preloaded<typeof api.comments.getCommentsByBlog>;
 }
 
 export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
+  const authorName = blog.displayName || blog.username;
+  const avatarSrc = blog.profilePicUrl || blog.defaultProfilePicUrl || "/noImage.png";
+
   return (
-    <div className="p-2">
+    <article className="p-2">
       <ViewTracker blogId={blog._id} />
 
       <div className="relative w-full h-[400px] mb-6 rounded-lg overflow-hidden">
@@ -40,22 +49,27 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
           alt={blog.title}
           fill
           priority
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 70vw, 800px"
           className="object-cover"
         />
       </div>
 
-      <div className="flex flex-col">
+      <header className="flex flex-col">
         <h1 className="text-4xl font-bold tracking-tight text-neutral-950 dark:text-neutral-50">
           {blog.title}
         </h1>
         
         <div className="flex items-center justify-between text-sm text-zinc-600 dark:text-zinc-400 font-normal my-4">
           <div className="flex items-center gap-2">
-            <img
-              src={blog.authorAvatarUrl}
-              alt={blog.displayName || blog.username}
-              className="w-5 h-5 rounded-full object-cover shrink-0"
-            />
+            <div className="relative w-5 h-5 rounded-full overflow-hidden shrink-0">
+              <Image
+                src={avatarSrc}
+                alt={`${authorName}'s avatar`}
+                fill
+                sizes="20px"
+                className="object-cover"
+              />
+            </div>
 
             <BlogName username={blog.username} displayName={blog.displayName} />
 
@@ -82,25 +96,25 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
         <p className="text-lg text-neutral-600 dark:text-neutral-400 font-medium">
           {blog.subtitle}
         </p>
-      </div>
+      </header>
 
       <Separator className="my-8" />
 
-      <div className="prose prose-neutral dark:prose-invert max-w-none text-lg leading-relaxed">
+      <section className="prose prose-neutral dark:prose-invert max-w-none text-lg leading-relaxed">
         <ReactMarkdown
           rehypePlugins={[[rehypeHighlight, { lowlight }]]}
           components={{ pre: CodeBlock }}
         >
           {blog.content}
         </ReactMarkdown>
-      </div>
+      </section>
 
       <BlogCTA />
       <Separator className="my-10" />
 
-      <div id="comments">
+      <section id="comments">
         <CommentSection preloadedComments={preloadedComments} />
-      </div>
-    </div>
+      </section>
+    </article>
   );
 }
