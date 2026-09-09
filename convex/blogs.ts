@@ -717,31 +717,34 @@ export const getPaginatedPostsByType = query({
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
+    const currentUserId = identity?.subject;
 
     let followedUserIds: Set<string> | null = null;
     if (args.myFeed) {
-      if (!identity) {
+      if (!identity || !currentUserId) {
         return { page: [], isDone: true, continueCursor: "" };
       }
-      const userId = identity.subject;
+      
       const follows = await ctx.db
         .query("follows")
-        .withIndex("by_follower", (q) => q.eq("followerId", userId))
+        .withIndex("by_follower", (q) => q.eq("followerId", currentUserId))
         .collect();
 
-      followedUserIds = new Set(follows.map((f) => f.followingId));
+      followedUserIds = new Set(
+        follows
+          .map((f) => f.followingId)
+          .filter((id) => id !== currentUserId)
+      );
     }
 
     const addBookmarks = async <T extends { _id: Id<"blogs"> }>(blogs: T[]) => {
-      if (!identity) {
+      if (!identity || !currentUserId) {
         return blogs.map((blog) => ({ ...blog, isBookmarked: false }));
       }
 
-      const userId = identity.subject;
-
       const userBookmarks = await ctx.db
         .query("bookmarks")
-        .withIndex("by_user_and_blog", (q) => q.eq("userId", userId))
+        .withIndex("by_user_and_blog", (q) => q.eq("userId", currentUserId))
         .collect();
 
       const bookmarkedBlogIds = new Set(
@@ -762,6 +765,9 @@ export const getPaginatedPostsByType = query({
       .map((t) => t.trim().toLowerCase());
 
     const isFromFollowedUser = (authorId?: string) => {
+      if (args.myFeed && authorId && authorId === currentUserId) {
+        return false;
+      }
       if (!followedUserIds) return true;
       return authorId ? followedUserIds.has(authorId) : false;
     };
@@ -886,9 +892,9 @@ export const getPaginatedPostsByType = query({
       .order("desc")
       .paginate(args.paginationOpts);
 
-    const filteredBlogs = followedUserIds
-      ? paginatedBlogs.page.filter((blog) => isFromFollowedUser(blog.author))
-      : paginatedBlogs.page;
+    const filteredBlogs = paginatedBlogs.page.filter((blog) =>
+      isFromFollowedUser(blog.author)
+    );
 
     return {
       ...paginatedBlogs,

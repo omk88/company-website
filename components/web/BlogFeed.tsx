@@ -53,12 +53,10 @@ function StandardBlogFeed({
     sortOrder !== "new";
 
   const canUsePreloadedData =
-    Boolean(isInitialFeed) && Boolean(preloadedData) && !hasActiveFilters;
-
-  const lastResultsRef = useRef<any[]>([]);
-  if (results.length > 0) {
-    lastResultsRef.current = results;
-  }
+    Boolean(isInitialFeed) && 
+    Boolean(preloadedData) && 
+    !hasActiveFilters && 
+    !myFeed;
 
   const preloadedItems = Array.isArray(preloadedData)
     ? preloadedData
@@ -69,7 +67,7 @@ function StandardBlogFeed({
       ? results
       : isFirstLoad && canUsePreloadedData
       ? preloadedItems
-      : lastResultsRef.current;
+      : [];
 
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const isDone = status === "Exhausted";
