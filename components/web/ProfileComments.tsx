@@ -93,9 +93,11 @@ export function ProfileComments({ profile, preloadedData }: ProfileCommentsProps
               ))}
             </ul>
             
-            <div ref={loadMoreRef} className="w-full py-4 flex justify-center">
+            <div ref={loadMoreRef} className="w-full">
               {isLoading && status === "LoadingMore" && (
-                <CompactCommentCardSkeleton />
+                <div className="py-4 flex justify-center">
+                  <CompactCommentCardSkeleton />
+                </div>
               )}
             </div>
           </>

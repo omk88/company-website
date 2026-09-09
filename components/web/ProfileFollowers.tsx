@@ -2,7 +2,7 @@
 
 import { api } from "@/convex/_generated/api";
 import { usePaginatedQuery } from "convex/react";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { ProfileCard } from "./ProfileCard";
 import { FunctionReturnType } from "convex/server";
 import { EmptyState } from "./EmptyState";
@@ -23,13 +23,14 @@ export function ProfileFollowers({ profile, currentUser, preloadedData }: Profil
   const currentUserId = currentUser?.profile?.userId;
   const targetUserId = profile?.profile?.userId;
 
-  const { results, status } = usePaginatedQuery(
+  const { results, status, loadMore, isLoading } = usePaginatedQuery(
     api.profiles.getPaginatedFollowersByProfile,
     targetUserId ? { userId: targetUserId } : "skip",
     { initialNumItems: 10 }
   );
 
   const isFirstLoad = status === "LoadingFirstPage";
+  const canLoadMore = status === "CanLoadMore";
 
   const lastResultsRef = useRef<any[]>([]);
   if (results.length > 0) {
@@ -46,6 +47,26 @@ export function ProfileFollowers({ profile, currentUser, preloadedData }: Profil
       : isFirstLoad && preloadedItems.length > 0
       ? preloadedItems
       : lastResultsRef.current;
+
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && canLoadMore) {
+          loadMore(10);
+        }
+      },
+      { rootMargin: "200px" }
+    );
+
+    const el = loadMoreRef.current;
+    if (el) observer.observe(el);
+
+    return () => {
+      if (el) observer.unobserve(el);
+    };
+  }, [canLoadMore, loadMore]);
 
   if (isFirstLoad && displayResults.length === 0) {
     return <LoadingSkeleton />;
@@ -87,6 +108,14 @@ export function ProfileFollowers({ profile, currentUser, preloadedData }: Profil
           );
         })}
       </ul>
+
+      <div ref={loadMoreRef} className="h-0 w-full clear-both" />
+
+      {isLoading && status === "LoadingMore" && (
+        <div className="pt-2">
+          <ProfileCardSkeleton />
+        </div>
+      )}
     </div>
   );
 }

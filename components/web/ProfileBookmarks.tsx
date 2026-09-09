@@ -2,7 +2,7 @@
 
 import { api } from "@/convex/_generated/api";
 import { usePaginatedQuery } from "convex/react";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { BlogCard } from "./BlogCard";
 import { EmptyState } from "./EmptyState";
 import { CompactBlogCardSkeleton } from "./LoadingSkeletons/CompactBlogCardSkeleton";
@@ -18,13 +18,14 @@ interface ProfileBookmarksProps {
 export function ProfileBookmarks({ profile, preloadedData }: ProfileBookmarksProps) {
   const userId = profile?.profile?.userId;
 
-  const { results, status } = usePaginatedQuery(
+  const { results, status, loadMore, isLoading } = usePaginatedQuery(
     api.blogs.getPaginatedBookmarkedPostsByUser,
     userId ? { userId: userId } : "skip",
-    { initialNumItems: 10 }
+    { initialNumItems: 7 }
   );
 
   const isFirstLoad = status === "LoadingFirstPage";
+  const canLoadMore = status === "CanLoadMore";
 
   const lastResultsRef = useRef<any[]>([]);
   if (results.length > 0) {
@@ -44,6 +45,24 @@ export function ProfileBookmarks({ profile, preloadedData }: ProfileBookmarksPro
 
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && canLoadMore) {
+          loadMore(7);
+        }
+      },
+      { rootMargin: "200px" }
+    );
+
+    const el = loadMoreRef.current;
+    if (el) observer.observe(el);
+
+    return () => {
+      if (el) observer.unobserve(el);
+    };
+  }, [canLoadMore, loadMore]);
+
   return (
     <div className="flex flex-col flex-1 h-full min-h-0 w-full p-2">
       <div className="w-full mx-auto flex-1">
@@ -57,7 +76,11 @@ export function ProfileBookmarks({ profile, preloadedData }: ProfileBookmarksPro
           </ul>
         ) : displayResults.length === 0 ? (
           <div className="flex flex-col flex-1 h-full min-h-0">
-            <EmptyState size="sm" title="No bookmarked posts found" description="This user hasn't added any bookmarks yet." />
+            <EmptyState
+              size="sm"
+              title="No bookmarked posts found"
+              description="This user hasn't added any bookmarks yet."
+            />
           </div>
         ) : (
           <>
@@ -83,7 +106,13 @@ export function ProfileBookmarks({ profile, preloadedData }: ProfileBookmarksPro
               ))}
             </ul>
 
-            <div ref={loadMoreRef} className="w-full" />
+            <div ref={loadMoreRef} className="h-0 w-full clear-both" />
+
+            {isLoading && status === "LoadingMore" && (
+              <div className="pt-2">
+                <CompactBlogCardSkeleton />
+              </div>
+            )}
           </>
         )}
       </div>

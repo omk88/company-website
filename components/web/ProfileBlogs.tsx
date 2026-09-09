@@ -102,9 +102,11 @@ export function ProfileBlogs({ profile, preloadedData }: ProfileBlogsProps) {
               ))}
             </ul>
 
-            <div ref={loadMoreRef} className="w-full h-10 flex items-center justify-center py-4">
+            <div ref={loadMoreRef} className="w-full">
               {isLoading && status === "LoadingMore" && (
-                <CompactBlogCardSkeleton />
+                <div className="py-4 flex justify-center">
+                  <CompactBlogCardSkeleton />
+                </div>
               )}
             </div>
           </>

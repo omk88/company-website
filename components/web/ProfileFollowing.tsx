@@ -2,6 +2,7 @@
 
 import { api } from "@/convex/_generated/api";
 import { usePaginatedQuery } from "convex/react";
+import { useEffect, useRef } from "react";
 import { ProfileCard } from "./ProfileCard";
 import { FunctionReturnType } from "convex/server";
 import { EmptyState } from "./EmptyState";
@@ -15,25 +16,63 @@ type FollowingItem = FunctionReturnType<typeof api.profiles.getPaginatedFollowin
 interface ProfileFollowingProps {
   profile: ProfileData;
   currentUser?: CurrentUserData;
+  preloadedData?: any;
 }
 
-export function ProfileFollowing({ profile, currentUser }: ProfileFollowingProps) {
+export function ProfileFollowing({ profile, currentUser, preloadedData }: ProfileFollowingProps) {
   const currentUserId = currentUser?.profile?.userId;
   const targetUserId = profile?.profile?.userId;
 
-  const { results, status } = usePaginatedQuery(
+  const { results, status, loadMore, isLoading } = usePaginatedQuery(
     api.profiles.getPaginatedFollowingByProfile,
     targetUserId ? { userId: targetUserId } : "skip",
     { initialNumItems: 10 }
   );
 
   const isFirstLoad = !targetUserId || status === "LoadingFirstPage";
+  const canLoadMore = status === "CanLoadMore";
 
-  if (isFirstLoad) {
+  const lastResultsRef = useRef<any[]>([]);
+  if (results.length > 0) {
+    lastResultsRef.current = results;
+  }
+
+  const preloadedItems = Array.isArray(preloadedData)
+    ? preloadedData
+    : preloadedData?.page ?? [];
+
+  const displayResults =
+    results.length > 0
+      ? results
+      : isFirstLoad && preloadedItems.length > 0
+      ? preloadedItems
+      : lastResultsRef.current;
+
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && canLoadMore) {
+          loadMore(10);
+        }
+      },
+      { rootMargin: "200px" }
+    );
+
+    const el = loadMoreRef.current;
+    if (el) observer.observe(el);
+
+    return () => {
+      if (el) observer.unobserve(el);
+    };
+  }, [canLoadMore, loadMore]);
+
+  if (isFirstLoad && displayResults.length === 0) {
     return <LoadingSkeleton />;
   }
 
-  if (results.length === 0) {
+  if (displayResults.length === 0) {
     return (
       <div className="flex flex-col flex-1 h-full min-h-0">
         <EmptyState size="sm" title="No users found" description="This user isn't following anyone yet." />
@@ -42,9 +81,9 @@ export function ProfileFollowing({ profile, currentUser }: ProfileFollowingProps
   }
 
   return (
-    <div className="w-fullmx-auto flex-1 p-2">
+    <div className="w-full mx-auto flex-1 p-2">
       <ul className="flex flex-col gap-2">
-        {results.map((rawItem) => {
+        {displayResults.map((rawItem: any) => {
           const item = rawItem as unknown as FollowingItem;
           if (!item?.profile) return null;
 
@@ -69,6 +108,14 @@ export function ProfileFollowing({ profile, currentUser }: ProfileFollowingProps
           );
         })}
       </ul>
+
+      <div ref={loadMoreRef} className="h-0 w-full clear-both" />
+
+      {isLoading && status === "LoadingMore" && (
+        <div className="pt-2">
+          <ProfileCardSkeleton />
+        </div>
+      )}
     </div>
   );
 }
