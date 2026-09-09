@@ -263,7 +263,8 @@ export const createProfile = mutation({
     socials: v.array(
       v.object({
         platform: v.string(),
-        url: v.string()
+        url: v.string(),
+        isPrimary: v.boolean(),
       })
     ),
     totalLikes: v.number(),
@@ -310,7 +311,8 @@ export const updateProfile = mutation({
       v.array(
         v.object({
           platform: v.string(),
-          url: v.string()
+          url: v.string(),
+          isPrimary: v.boolean(),
         })
       )
     ),

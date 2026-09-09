@@ -49,10 +49,6 @@ interface BlogFormValues {
     coverImage?: File | string | null;
 }
 
-interface BlogPostFormProps {
-  editingBlogId?: string; 
-}
-
 export type User = FunctionReturnType<typeof api.auth.getCurrentUser>;
 
 function toTitleCase(str: string): string {

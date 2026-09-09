@@ -1,6 +1,6 @@
 import React from "react";
 import { useFormContext } from "react-hook-form";
-import { Plus, Check, Trash2 } from "lucide-react";
+import { Plus, Check, Trash2, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
@@ -11,6 +11,7 @@ interface SocialFieldItem {
   id: string;
   platform: string;
   url: string;
+  isPrimary?: boolean;
 }
 
 interface SocialLinksFieldsProps {
@@ -38,6 +39,14 @@ export const SocialLinksFields: React.FC<SocialLinksFieldsProps> = ({
 }) => {
   const form = useFormContext<ProfileFormValues>();
 
+  const handleSetPrimary = (selectedIndex: number) => {
+    fields.forEach((_, idx) => {
+      form.setValue(`socials.${idx}.isPrimary`, idx === selectedIndex, {
+        shouldDirty: true,
+      });
+    });
+  };
+
   return (
     <Field>
       <div className="flex items-center justify-between mb-1">
@@ -56,16 +65,22 @@ export const SocialLinksFields: React.FC<SocialLinksFieldsProps> = ({
         )}
       </div>
 
-      <div className="flex flex-col-reverse gap-3">
+      <div className="flex flex-col gap-3">
         {fields.map((field, index) => {
           const isCommitted = index !== editingSocialIndex;
           const SavedIcon = ICON_MAP[field.platform];
           const rowError = form.formState.errors.socials?.[index]?.url;
           const activePlatform = form.watch(`socials.${index}.platform`);
+          const isPrimary = form.watch(`socials.${index}.isPrimary`);
 
           if (isCommitted) {
             return (
-              <div key={field.id} className="flex items-center justify-between p-2.5 border rounded-md bg-secondary/20">
+              <div 
+                key={field.id} 
+                className={`flex items-center justify-between p-2.5 border rounded-md transition-colors ${
+                  isPrimary ? "bg-amber-500/10 border-amber-400/50" : "bg-secondary/20"
+                }`}
+              >
                 <div className="flex items-center gap-2.5 overflow-hidden pr-2">
                   {SavedIcon && <SavedIcon className="h-4 w-4 text-muted-foreground shrink-0" />}
                   <a 
@@ -76,19 +91,44 @@ export const SocialLinksFields: React.FC<SocialLinksFieldsProps> = ({
                   >
                     {form.getValues(`socials.${index}.url`)}
                   </a>
+                  {isPrimary && (
+                    <span className="text-[10px] bg-amber-500/20 text-amber-700 dark:text-amber-300 font-medium px-1.5 py-0.5 rounded shrink-0">
+                      Primary
+                    </span>
+                  )}
                 </div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="cursor-pointer h-8 w-8 shrink-0 hover:bg-destructive/10"
-                  onClick={() => {
-                    remove(index);
-                    if (editingSocialIndex === index) setEditingSocialIndex(-1);
-                  }}
-                >
-                  <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                </Button>
+
+                <div className="flex items-center gap-1 shrink-0">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    title={isPrimary ? "Primary Link" : "Set as Primary"}
+                    className={`h-8 w-8 cursor-pointer ${
+                      isPrimary ? "text-amber-500 hover:text-amber-600" : "text-muted-foreground hover:text-amber-500"
+                    }`}
+                    onClick={() => handleSetPrimary(index)}
+                  >
+                    <Star className={`h-4 w-4 ${isPrimary ? "fill-amber-500" : ""}`} />
+                  </Button>
+
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="cursor-pointer h-8 w-8 hover:bg-destructive/10"
+                    onClick={() => {
+                      remove(index);
+                      if (editingSocialIndex === index) setEditingSocialIndex(-1);
+                      if (isPrimary && fields.length > 1) {
+                        const newPrimaryIndex = index === 0 ? 1 : 0;
+                        handleSetPrimary(newPrimaryIndex);
+                      }
+                    }}
+                  >
+                    <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                  </Button>
+                </div>
               </div>
             );
           }
@@ -153,7 +193,12 @@ export const SocialLinksFields: React.FC<SocialLinksFieldsProps> = ({
                     variant="ghost"
                     size="icon"
                     className="cursor-pointer h-9 w-9 text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700"
-                    onClick={() => handleCommitSocial(index)}
+                    onClick={() => {
+                      handleCommitSocial(index);
+                      if (fields.length === 1 || !fields.some((_, i) => form.getValues(`socials.${i}.isPrimary`))) {
+                        handleSetPrimary(index);
+                      }
+                    }}
                   >
                     <Check className="h-4 w-4" />
                   </Button>

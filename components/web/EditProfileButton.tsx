@@ -71,6 +71,7 @@ const profileFormSchema = z.object({
       z.object({
         platform: z.string(),
         url: z.string().min(1, "URL is required"),
+        isPrimary: z.boolean(),
       })
     )
     .superRefine((socials, ctx) => {
@@ -246,7 +247,11 @@ function EditProfileDialog({ profile, avatarSrc, defaultAvatarSrc, children }: E
       (platform) => !socialFields.some((field) => field.platform === platform)
     );
 
-    appendSocial({ platform: firstFreePlatform || AVAILABLE_PLATFORMS[0] || "x", url: "" });
+    appendSocial({
+      platform: firstFreePlatform || AVAILABLE_PLATFORMS[0] || "x",
+      url: "",
+      isPrimary: socialFields.length === 0,
+    });
     setEditingSocialIndex(socialFields.length);
   };
 
@@ -317,7 +322,7 @@ function EditProfileDialog({ profile, avatarSrc, defaultAvatarSrc, children }: E
       bio: data.bio,
       education: data.education.map(({ degree, subject, institution }) => ({ degree, subject, institution })),
       skills: data.skills,
-      socials: data.socials.map(({ platform, url }) => ({ platform, url })),
+      socials: data.socials.map(({ platform, url, isPrimary }) => ({ platform, url, isPrimary: isPrimary ?? false })),
     });
 
     if (isAvatarChanged) {
@@ -494,8 +499,9 @@ function getProfileDefaultValues(profile: Doc<"profiles">): ProfileFormValues {
       isCommitted: true,
     })),
     skills: profile.skills || [],
-    socials: ((profile.socials as { platform: string; url: string }[]) || []).map((s) => ({
+    socials: ((profile.socials as { platform: string; url: string; isPrimary: boolean; }[]) || []).map((s) => ({
       ...s,
+      isPrimary: s.isPrimary ?? false,
       isCommitted: true,
     })),
   };

@@ -84,7 +84,9 @@ export function RightSidebarProfile({ preloadedProfile, preloadedCurrentUser }: 
   const { displayName } = profile;
   const isOwnProfile = Boolean(currentUser?.userId && profile?.userId && currentUser.userId === profile.userId);
 
-  const additionalSocials = profile.socials?.slice(1) ?? [];
+  const primarySocial = profile.socials?.find((s) => s.isPrimary) ?? profile.socials?.[0];
+  const additionalSocials = profile.socials?.filter((s) => s !== primarySocial) ?? [];
+
   const hasEducation = Boolean(profile.education && profile.education.length > 0);
   const hasSkills = Boolean(profile.skills && profile.skills.length > 0);
   const hasExtraSocials = additionalSocials.length > 0;
@@ -192,16 +194,16 @@ export function RightSidebarProfile({ preloadedProfile, preloadedCurrentUser }: 
                   </div>
                 )}
 
-                {profile.socials && profile.socials.length > 0 && (
+                {primarySocial && (
                   <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
-                    <LinkIcon className="w-4 h-4 stroke-[2.3] shrink-0 text-foreground" />
+                    <SocialPlatformIcon platform={primarySocial.platform} className="w-4 h-4 shrink-0 text-foreground" />
                     <Link 
-                      href={profile.socials[0].url} 
+                      href={primarySocial.url} 
                       target="_blank" 
                       rel="noopener noreferrer" 
                       className="underline text-blue-600 break-all"
                     >
-                      {profile.socials[0].url}
+                      {primarySocial.url}
                     </Link>
                   </div>
                 )}

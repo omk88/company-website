@@ -161,7 +161,8 @@ const schema = defineSchema({
     socials: v.optional(v.array(
       v.object({
         platform: v.string(),
-        url: v.string()
+        url: v.string(),
+        isPrimary: v.boolean(),
       })
     )),
 
