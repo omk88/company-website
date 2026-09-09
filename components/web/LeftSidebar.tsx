@@ -8,8 +8,8 @@ import { SidebarNav } from "./SidebarNav";
 export async function LeftSidebar() {
   return (
     <Sidebar 
-      className="flex flex-col !top-16 !z-40 bg-white border-r"
-      bgClass="bg-white" 
+      className="flex flex-col !top-16 !z-40 border-r"
+      bgClass="bg-background/95" 
       collapsible="icon"
     >
       <SidebarContent className="!p-0 w-full">

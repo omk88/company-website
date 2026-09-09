@@ -111,7 +111,7 @@ export function FeaturedBlogs({ preloadedData }: { preloadedData: Preloaded<type
               <span className="shrink-0">{formattedDate}</span>
             </div>
 
-            <h3 className="text-[13px] font-medium leading-snug text-zinc-900 dark:text-zinc-100 group-hover/card:text-blue-600 transition-colors line-clamp-2">
+            <h3 className="text-[13px] font-medium leading-snug text-zinc-900 dark:text-zinc-100 group-hover/card:text-blue-600 dark:group-hover/card:text-blue-400 transition-colors line-clamp-2">
               {currentPost.title}
             </h3>
           </div>

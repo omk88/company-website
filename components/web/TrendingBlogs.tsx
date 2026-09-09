@@ -3,7 +3,7 @@
 import Link from "next/link"; 
 import Image from "next/image";
 import { api } from "@/convex/_generated/api";
-import { Preloaded, usePreloadedQuery, useQuery } from "convex/react";
+import { Preloaded, usePreloadedQuery } from "convex/react";
 import { Eye, MessageSquare, ThumbsUp, TrendingUp } from "lucide-react";
 
 const compactFormatter = new Intl.NumberFormat("en", {
@@ -31,11 +31,11 @@ export function TrendingBlogs({ preloadedData }: { preloadedData: Preloaded<type
           <li key={blog._id} className="w-full block">
             <Link 
               href={`/insights/${blog._id}`} 
-              className="group/trending block w-full p-3 rounded-xl bg-zinc-50/80 hover:bg-zinc-100/90 transition-all duration-100"
+              className="group/trending block w-full p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 hover:bg-zinc-100/90 dark:hover:bg-zinc-800/60 transition-all duration-100"
             >
               <div className="w-full flex flex-row items-center justify-between gap-3">
                 <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
-                  <h3 className="text-[13px] font-medium leading-snug text-zinc-800 group-hover/trending:text-blue-600 line-clamp-1 transition-colors">
+                  <h3 className="text-[13px] font-medium leading-snug text-zinc-900 dark:text-zinc-100 group-hover/trending:text-blue-600 dark:group-hover/trending:text-blue-400 line-clamp-1 transition-colors">
                     {blog.title}
                   </h3>
                   
@@ -55,7 +55,7 @@ export function TrendingBlogs({ preloadedData }: { preloadedData: Preloaded<type
                   </div>
                 </div>
 
-                <div className="relative w-11 h-11 shrink-0 overflow-hidden rounded-lg bg-zinc-100">
+                <div className="relative w-11 h-11 shrink-0 overflow-hidden rounded-lg bg-zinc-100 dark:bg-zinc-800">
                   <Image
                     src={blog.imageUrl}
                     alt={blog.title}

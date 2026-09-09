@@ -19,18 +19,19 @@ export function SidebarSort({ fullWidth = false, className }: SidebarSortProps) 
       value={sortOrder}
       onValueChange={setSortOrder}
     >
-      <SelectTrigger 
+      <SelectTrigger
+        chevronClassName="text-zinc-500 dark:text-zinc-400" 
         className={cn(
-          "flex h-9 shrink-0 items-center justify-between gap-2 rounded-lg border border-zinc-200 bg-white px-2.5 text-[13px] font-medium text-zinc-700 whitespace-nowrap hover:bg-zinc-50 focus:ring-1 focus:ring-zinc-400 cursor-pointer transition-colors",
+          "flex h-9 shrink-0 items-center justify-between gap-2 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white px-2.5 text-[13px] font-medium text-zinc-700 whitespace-nowrap hover:bg-zinc-50 focus:ring-1 focus:ring-zinc-400 cursor-pointer transition-colors",
           fullWidth ? "w-full" : "w-fit",
           className
         )}
       >
         <SelectValue placeholder="Sort order">
-          {sortOrder === "new" && <span className="flex items-center gap-2"><CalendarArrowUp className="h-4 w-4 text-zinc-500" />New</span>}
-          {sortOrder === "hot" && <span className="flex items-center gap-2"><Flame className="h-4 w-4 text-zinc-500" />Hot</span>}
-          {sortOrder === "top" && <span className="flex items-center gap-2"><ArrowUp className="h-4 w-4 text-zinc-500" />Top</span>}
-          {sortOrder === "controversial" && <span className="flex items-center gap-2"><Swords className="h-4 w-4 text-zinc-500" />Controversial</span>}
+          {sortOrder === "new" && <span className="flex items-center gap-2 text-zinc-500"><CalendarArrowUp className="h-4 w-4" />New</span>}
+          {sortOrder === "hot" && <span className="flex items-center gap-2 text-zinc-500"><Flame className="h-4 w-4" />Hot</span>}
+          {sortOrder === "top" && <span className="flex items-center gap-2 text-zinc-500"><ArrowUp className="h-4 w-4" />Top</span>}
+          {sortOrder === "controversial" && <span className="flex items-center gap-2 text-zinc-500"><Swords className="h-4 w-4" />Controversial</span>}
         </SelectValue>
       </SelectTrigger>
       

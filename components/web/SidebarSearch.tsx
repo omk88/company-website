@@ -46,7 +46,7 @@ export function SidebarSearch({
         placeholder={fullPlaceholder}
         value={localValue}
         onChange={(e) => setLocalValue(e.target.value)}
-        className={`pl-8.5 ${rightPaddingClass} h-9 text-[13px] text-zinc-800 placeholder:text-zinc-500 bg-white border-zinc-200 rounded-lg hover:border-zinc-300 focus-visible:ring-1 focus-visible:ring-zinc-400 transition-colors ${
+        className={`pl-8.5 ${rightPaddingClass} h-9 text-[13px] text-zinc-800 placeholder:text-zinc-500 bg-white border-zinc-200 dark:border-zinc-800 rounded-lg hover:border-zinc-300 focus-visible:ring-1 focus-visible:ring-zinc-400 transition-colors ${
           fullWidth ? "w-full" : "w-auto"
         }`}
       />

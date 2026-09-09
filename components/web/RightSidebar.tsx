@@ -30,7 +30,7 @@ export function RightSidebar() {
   
   return (
     <Sidebar 
-      bgClass="bg-white" 
+      bgClass="bg-background/95" 
       showBorder={true}
       side="right" 
       className="!top-16 !z-40 flex flex-col overflow-hidden"

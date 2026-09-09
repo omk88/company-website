@@ -56,7 +56,7 @@ export function SidebarTags({ fullWidth, className }: SidebarTagsProps) {
         <button
           type="button"
           className={cn(
-            "flex h-9 shrink-0 items-center justify-between gap-2 rounded-lg border border-zinc-200 bg-white px-2.5 text-[13px] font-medium text-zinc-700 whitespace-nowrap hover:bg-zinc-50 focus:ring-1 focus:ring-zinc-400 cursor-pointer transition-colors",
+            "flex h-9 shrink-0 items-center justify-between gap-2 rounded-lg border border-zinc-200 bg-white px-2.5 text-[13px] font-medium text-zinc-500 dark:bg-input/30 dark:border-zinc-800 whitespace-nowrap hover:bg-zinc-50 focus:ring-1 focus:ring-zinc-400 cursor-pointer transition-colors",
             fullWidth ? "w-full" : "w-fit",
             className
           )}
@@ -68,7 +68,7 @@ export function SidebarTags({ fullWidth, className }: SidebarTagsProps) {
               <span className="text-zinc-500 font-normal">({activeTags.length})</span>
             )}
           </span>
-          <ChevronDown className="h-4 w-4 shrink-0 text-zinc-400" />
+          <ChevronDown className="h-4 w-4 shrink-0 text-zinc-500" />
         </button>
       </PopoverTrigger>
 
