@@ -8,7 +8,7 @@ import { ProfileFollowing } from "./ProfileFollowing";
 import { Preloaded, usePreloadedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useProfileStore } from "@/stores/useProfileStore";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 interface ProfileContentProps {
   preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;

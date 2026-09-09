@@ -21,7 +21,7 @@ export function ProfileBookmarks({ profile, preloadedData }: ProfileBookmarksPro
   const { results, status } = usePaginatedQuery(
     api.blogs.getPaginatedBookmarkedPostsByUser,
     userId ? { userId: userId } : "skip",
-    { initialNumItems: 6 }
+    { initialNumItems: 10 }
   );
 
   const isFirstLoad = status === "LoadingFirstPage";

@@ -2,7 +2,7 @@
 
 import { api } from "@/convex/_generated/api";
 import { usePaginatedQuery } from "convex/react";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { CommentCard } from "./CommentCard";
 import { Doc } from "@/convex/_generated/dataModel";
 import { FunctionReturnType } from "convex/server";
@@ -19,13 +19,14 @@ interface ProfileCommentsProps {
 export function ProfileComments({ profile, preloadedData }: ProfileCommentsProps) {
   const userId = profile?.profile?.userId;
 
-  const { results, status } = usePaginatedQuery(
+  const { results, status, loadMore, isLoading } = usePaginatedQuery(
     api.comments.getPaginatedCommentsByAuthor,
     userId ? { author: userId } : "skip",
-    { initialNumItems: 6 }
+    { initialNumItems: 7 }
   );
 
   const isFirstLoad = status === "LoadingFirstPage";
+  const canLoadMore = status === "CanLoadMore";
 
   const lastResultsRef = useRef<Doc<"comments">[]>([]);
   if (results.length > 0) {
@@ -44,6 +45,24 @@ export function ProfileComments({ profile, preloadedData }: ProfileCommentsProps
       : lastResultsRef.current;
 
   const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && canLoadMore) {
+          loadMore(7);
+        }
+      },
+      { rootMargin: "200px" }
+    );
+
+    const el = loadMoreRef.current;
+    if (el) observer.observe(el);
+
+    return () => {
+      if (el) observer.unobserve(el);
+    };
+  }, [canLoadMore, loadMore]);
 
   return (
     <div className="flex flex-col flex-1 h-full min-h-0 w-full p-2">
@@ -73,7 +92,12 @@ export function ProfileComments({ profile, preloadedData }: ProfileCommentsProps
                 </li>
               ))}
             </ul>
-            <div ref={loadMoreRef} className="w-full" />
+            
+            <div ref={loadMoreRef} className="w-full py-4 flex justify-center">
+              {isLoading && status === "LoadingMore" && (
+                <CompactCommentCardSkeleton />
+              )}
+            </div>
           </>
         )}
       </div>

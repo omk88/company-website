@@ -2,7 +2,7 @@
 
 import { api } from "@/convex/_generated/api";
 import { usePaginatedQuery } from "convex/react";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { BlogCard } from "./BlogCard";
 import { EmptyState } from "./EmptyState";
 import { CompactBlogCardSkeleton } from "./LoadingSkeletons/CompactBlogCardSkeleton";
@@ -18,13 +18,14 @@ interface ProfileBlogsProps {
 export function ProfileBlogs({ profile, preloadedData }: ProfileBlogsProps) {
   const userId = profile?.profile?.userId;
 
-  const { results, status } = usePaginatedQuery(
+  const { results, status, loadMore, isLoading } = usePaginatedQuery(
     api.blogs.getPaginatedPostsByAuthor,
     userId ? { author: userId } : "skip",
-    { initialNumItems: 6 }
+    { initialNumItems: 7 }
   );
 
   const isFirstLoad = status === "LoadingFirstPage";
+  const canLoadMore = status === "CanLoadMore";
 
   const lastResultsRef = useRef<any[]>([]);
   if (results.length > 0) {
@@ -43,6 +44,24 @@ export function ProfileBlogs({ profile, preloadedData }: ProfileBlogsProps) {
       : lastResultsRef.current;
 
   const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && canLoadMore) {
+          loadMore(7);
+        }
+      },
+      { rootMargin: "200px" }
+    );
+
+    const el = loadMoreRef.current;
+    if (el) observer.observe(el);
+
+    return () => {
+      if (el) observer.unobserve(el);
+    };
+  }, [canLoadMore, loadMore]);
 
   return (
     <div className="flex flex-col flex-1 h-full min-h-0 w-full p-2">
@@ -83,7 +102,11 @@ export function ProfileBlogs({ profile, preloadedData }: ProfileBlogsProps) {
               ))}
             </ul>
 
-            <div ref={loadMoreRef} className="w-full" />
+            <div ref={loadMoreRef} className="w-full h-10 flex items-center justify-center py-4">
+              {isLoading && status === "LoadingMore" && (
+                <CompactBlogCardSkeleton />
+              )}
+            </div>
           </>
         )}
       </div>
