@@ -1,15 +1,17 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { Space_Grotesk } from 'next/font/google';
 import { ArrowRight, ChevronRight, Terminal } from 'lucide-react';
-import { FaXTwitter } from 'react-icons/fa6';
+import { FaXTwitter } from 'react-icons/fa6'; 
 import { AiOutlineInstagram } from 'react-icons/ai';
 import { RxLinkedinLogo } from 'react-icons/rx';
 import Footer from '@/components/web/Footer';
 import { cn } from '@/lib/utils';
+import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'framer-motion';
+import TrustedToolsSection from '@/components/web/TrustedToolsSection';
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
@@ -47,17 +49,64 @@ function TypewriterEffect({ className }: { className?: string }) {
   );
 }
 
+function BackgroundGrid() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  
+  const { scrollYProgress } = useScroll();
+  
+  const xMovement = useTransform(scrollYProgress, [0, 1], ['20%', '60%']);
+  const yMovement = useTransform(scrollYProgress, [0, 1], ['30%', '70%']);
+  const spotlightX = useSpring(xMovement, { stiffness: 50, damping: 20 });
+  const spotlightY = useSpring(yMovement, { stiffness: 50, damping: 20 });
+
+  return (
+    <div ref={containerRef} className="absolute inset-0 w-full h-full -z-10 overflow-hidden isolate">
+      <div 
+        className="absolute inset-0 w-full h-full opacity-[0.03] dark:opacity-[0.05]"
+        style={{
+          backgroundImage: `
+            linear-gradient(#888 1px, transparent 1px),
+            linear-gradient(90deg, #888 1px, transparent 1px)
+          `,
+          backgroundSize: '32px 32px',
+        }}
+      />
+
+      <motion.div
+        className="absolute w-[600px] h-[600px] rounded-full blur-[140px] opacity-20 dark:opacity-30 bg-emerald-300/60 dark:bg-emerald-600/50"
+        style={{
+          x: spotlightX,
+          y: spotlightY,
+          translateX: '-50%',
+          translateY: '-50%',
+        }}
+        animate={{
+          scale: [1, 1.1, 1],
+        }}
+        transition={{
+          duration: 12,
+          ease: "easeInOut",
+          repeat: Infinity,
+        }}
+      />
+    </div>
+  );
+}
+
 export default function Home() {
   return (
-    <div className="pt-16 w-full relative bg-neutral-50 dark:bg-neutral-950 min-h-screen text-foreground antialiased">
+    <div className="pt-16 w-full relative bg-neutral-50 dark:bg-neutral-950 min-h-screen text-foreground antialiased isolate">
+      
+      <BackgroundGrid />
+
       <section className="w-full flex items-center justify-center pt-10 pb-14 min-h-[calc(100vh-4rem)]">
         <div className="w-full max-w-5xl mx-auto px-4 sm:px-6">
           
-          <div className="w-full bg-white dark:bg-neutral-900/70 backdrop-blur-md rounded-2xl border border-neutral-200/70 dark:border-neutral-800/80 shadow-md overflow-hidden">
+          <div className="w-full bg-white/90 dark:bg-neutral-900/80 backdrop-blur-lg rounded-2xl border border-neutral-200/70 dark:border-neutral-800/80 shadow-md overflow-hidden isolate">
             
             <div className="p-8 sm:p-12 lg:p-14 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
               
-              <div className="lg:col-span-7 flex flex-col items-start text-left gap-7">
+              <div className="lg:col-span-7 flex flex-col items-start text-left gap-7 isolate">
                 
                 <Link
                   href="/insights"
@@ -70,7 +119,7 @@ export default function Home() {
                   <ChevronRight className="h-3.5 w-3.5 text-neutral-400" strokeWidth={1.5} />
                 </Link>
 
-                <div className="space-y-3.5">
+                <div className="space-y-3.5 isolate">
                   <h1 className={cn(spaceGrotesk.className, "text-4xl sm:text-5xl font-semibold tracking-tight text-foreground leading-[1.15]")}>
                     <TypewriterEffect />
                   </h1>
@@ -80,7 +129,7 @@ export default function Home() {
                   </p>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3 pt-1">
+                <div className="flex flex-wrap items-center gap-3 pt-1 isolate">
                   <Link 
                     href="/products" 
                     className="group px-4.5 py-2.5 bg-foreground hover:bg-foreground/90 text-background font-medium text-xs sm:text-sm rounded-lg transition-all duration-150 active:scale-[0.98] inline-flex items-center gap-2 shadow-sm"
@@ -101,9 +150,9 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="lg:col-span-5 w-full">
-                <div className="rounded-xl border border-neutral-200/60 dark:border-neutral-800/80 bg-neutral-50/70 dark:bg-neutral-950/50 p-5 font-mono text-xs leading-relaxed text-neutral-600 dark:text-neutral-400">
-                  <div className="flex items-center justify-between pb-3.5 mb-3.5 border-b border-neutral-200/50 dark:border-neutral-800/60">
+              <div className="lg:col-span-5 w-full isolate">
+                <div className="rounded-xl border border-neutral-200/60 dark:border-neutral-800/80 bg-neutral-50/70 dark:bg-neutral-950/50 p-5 font-mono text-xs leading-relaxed text-neutral-600 dark:text-neutral-400 isolate">
+                  <div className="flex items-center justify-between pb-3.5 mb-3.5 border-b border-neutral-200/50 dark:border-neutral-800/60 isolate">
                     <div className="flex items-center gap-2 text-neutral-400">
                       <Terminal className="w-4 h-4" />
                       <span className="text-xs">taqtiq.config.ts</span>
@@ -111,7 +160,7 @@ export default function Home() {
                     <span className="text-[10px] uppercase tracking-wider text-emerald-500 font-semibold bg-emerald-500/10 px-2 py-0.5 rounded-full">Active</span>
                   </div>
 
-                  <div className="space-y-1.5">
+                  <div className="space-y-1.5 isolate">
                     <p><span className="text-purple-400">export default</span> &#123;</p>
                     <p className="pl-4"><span className="text-neutral-400">engine</span>: <span className="text-amber-500">&quot;v6.8&quot;</span>,</p>
                     <p className="pl-4"><span className="text-neutral-400">status</span>: <span className="text-emerald-500">&quot;optimized&quot;</span></p>
@@ -122,9 +171,9 @@ export default function Home() {
 
             </div>
 
-            <div className="px-8 sm:px-12 py-3.5 bg-neutral-50/50 dark:bg-neutral-950/30 border-t border-neutral-200/50 dark:border-neutral-800/50 flex items-center justify-between text-xs text-neutral-500">
+            <div className="px-8 sm:px-12 py-3.5 bg-neutral-50/50 dark:bg-neutral-950/30 border-t border-neutral-200/50 dark:border-neutral-800/50 flex items-center justify-between text-xs text-neutral-500 isolate">
               <span className="text-[11px] uppercase tracking-wider font-mono">TaQtiQ Engine</span>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 isolate">
                 <Link href="https://x.com/TaQtiQ_tech" target="_blank" rel="noopener noreferrer" aria-label="X">
                   <FaXTwitter className="h-4 w-4 hover:text-foreground transition-colors" />
                 </Link>
@@ -142,6 +191,7 @@ export default function Home() {
         </div>
       </section>
 
+      <TrustedToolsSection />
       <Footer />
     </div>
   );
