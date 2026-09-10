@@ -12,6 +12,7 @@ import Footer from '@/components/web/Footer';
 import { cn } from '@/lib/utils';
 import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'framer-motion';
 import TrustedToolsSection from '@/components/web/TrustedToolsSection';
+import VisionCards from '@/components/web/VisionCards';
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
@@ -192,6 +193,7 @@ export default function Home() {
       </section>
 
       <TrustedToolsSection />
+      <VisionCards />
       <Footer />
     </div>
   );
