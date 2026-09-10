@@ -334,7 +334,7 @@ export default function VisionCards() {
             Innovating where it's desperately desired.
           </h3>
           <p className="text-sm text-neutral-500 dark:text-neutral-400 leading-relaxed">
-            Architecting effective platforms. Addressing novel challenges with pace and perspective.
+            Architecting effective platforms. Addressing novel challenges with aggressive pace.
           </p>
         </div>
       </div>

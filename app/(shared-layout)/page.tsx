@@ -14,6 +14,7 @@ import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import TrustedToolsSection from '@/components/web/TrustedToolsSection';
 import VisionCards from '@/components/web/VisionCards';
 import InteractiveCodeBox from '@/components/web/InteractiveCodeBox';
+import { GlobalReachMap } from '@/components/web/GlobalReachMap';
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
@@ -105,7 +106,7 @@ export default function Home() {
         <section className="w-full flex items-center justify-center pb-14 min-h-[calc(100vh-4rem)]">
           <div className="w-full px-4 sm:px-8 mt-4">
             
-            <div className="w-full bg-white/90 dark:bg-neutral-900/80 backdrop-blur-lg rounded-lg border border-neutral-200/70 dark:border-neutral-800/80 shadow-md overflow-hidden isolate px-4">
+            <div className="w-full bg-white/90 dark:bg-neutral-900/80 backdrop-blur-lg rounded-lg border border-neutral-200/70 dark:border-neutral-800/80 shadow-md overflow-hidden isolate">
               
               <div className="flex flex-row p-8 my-10 sm:p-12 lg:p-14 grid grid-cols-1 lg:grid-cols-15 gap-4 items-center">
                 
@@ -153,15 +154,12 @@ export default function Home() {
                   </div>
                 </div>
 
-                
                 <InteractiveCodeBox />
-                
 
               </div>
 
               <div className="px-8 sm:px-12 py-3.5 bg-neutral-50/50 dark:bg-neutral-950/30 border-t border-neutral-200/50 dark:border-neutral-800/50 flex items-center justify-between text-xs text-neutral-500 isolate">
-                <span className="text-[11px] uppercase tracking-wider font-mono">TaQtiQ Engine</span>
-                <div className="flex items-center gap-4 isolate">
+                <div className="flex items-center gap-4 isolate ml-auto">
                   <Link href="https://x.com/TaQtiQ_tech" target="_blank" rel="noopener noreferrer" aria-label="X">
                     <FaXTwitter className="h-4 w-4 hover:text-foreground transition-colors" />
                   </Link>
@@ -211,7 +209,31 @@ export default function Home() {
           </div>
         </div>
 
-        <VisionCards />
+        <div className='my-10'>
+          <VisionCards />
+        </div>
+
+        <div className="flex flex-col items-center mt-16 text-center gap-4 px-4">
+          <h1
+            className={cn(
+              spaceGrotesk.className,
+              "text-3xl sm:text-4xl md:text-5xl", 
+              "font-semibold", 
+              "tracking-tight", 
+              "text-foreground",
+              "leading-tight",
+              "max-w-3xl"
+            )}
+          >
+            Designed for Global Reach, built for Zero Latency.
+          </h1>
+          
+          <p className="text-neutral-600 dark:text-neutral-400 text-sm sm:text-base font-light max-w-lg">
+            Solutions that are truly boundless.
+          </p>
+        </div>
+
+        <GlobalReachMap />
       </div>
 
       <Footer />
