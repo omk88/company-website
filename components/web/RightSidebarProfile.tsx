@@ -97,13 +97,13 @@ export function RightSidebarProfile({ preloadedProfile, preloadedCurrentUser }: 
   return (
     <Sidebar
       side="right" 
-      bgClass="bg-white" 
-      className="flex flex-col !top-16 !z-40 overflow-hidden !p-0 bg-white"
+      bgClass="bg-background/95" 
+      className="flex flex-col !top-16 !z-40 overflow-hidden !p-0"
       style={{ height: "calc(100vh - 4rem)" }}
     >
-      <SidebarContent className="!p-0 bg-white h-full">
+      <SidebarContent className="!p-0 h-full">
         <ScrollArea className="h-full" scrollbarInset={6}>
-          <div className="relative m-3 mr-4 p-3 rounded-xl bg-zinc-50/80">
+          <div className="relative m-3 mr-4 p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50">
             {isOwnProfile && (
               <div className="absolute -top-1 -right-1 p-4 flex items-center z-10">
                 <ProfileSettingsButton userId={profile.userId} />
@@ -152,8 +152,8 @@ export function RightSidebarProfile({ preloadedProfile, preloadedCurrentUser }: 
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <div className="flex flex-row items-center">
-                      <div className="inline-flex w-fit items-center gap-1 text-xs font-sans font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/60 cursor-help select-none">
-                        <Zap className="w-3 h-3 fill-amber-500 stroke-amber-500 shrink-0" />
+                      <div className="inline-flex w-fit items-center gap-1 text-xs font-sans font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-full border border-amber-200/60 dark:border-amber-800/50 cursor-help select-none">
+                        <Zap className="w-3 h-3 fill-amber-500 stroke-amber-500 dark:fill-amber-400 dark:stroke-amber-400 shrink-0" />
                         <span>{profile.totalLikes ?? 0}</span>
                       </div>
                       {!isSelf && (

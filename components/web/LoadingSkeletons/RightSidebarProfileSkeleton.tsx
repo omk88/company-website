@@ -11,12 +11,12 @@ export function RightSidebarProfileSkeleton() {
     >
       <Sidebar
         side="right" 
-        bgClass="bg-white" 
-        className="flex flex-col !top-16 !z-40 overflow-hidden !p-0 bg-white"
+        bgClass="bg-background/95" 
+        className="flex flex-col !top-16 !z-40 overflow-hidden !p-0"
         style={{ height: "calc(100vh - 4rem)" }}
       >
-        <SidebarContent className="!p-0 bg-white">
-          <div className="relative m-3 p-3 rounded-xl bg-zinc-50/80 space-y-4">
+        <SidebarContent className="!p-0">
+          <div className="relative m-3 p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 space-y-4">
             
             <div className="p-2 pb-0">
               <div className="flex flex-row items-center gap-4 w-full">

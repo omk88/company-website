@@ -52,11 +52,11 @@ export function LeftSidebarProfile({ preloadedProfile }: LeftSidebarProfileProps
 
   return (
     <Sidebar 
-      className="flex flex-col !top-16 !z-40 bg-white border-r"
-      bgClass="bg-white" 
+      className="flex flex-col !top-16 !z-40 border-r"
+      bgClass="bg-background/95" 
       collapsible="icon"
     >
-      <SidebarContent className="!p-0 w-full bg-white">
+      <SidebarContent className="!p-0 w-full">
         <SidebarGroup className="pt-3 !px-2 w-full">
           
           <SidebarMenu className="w-full flex flex-col gap-0.5">
@@ -74,17 +74,15 @@ export function LeftSidebarProfile({ preloadedProfile }: LeftSidebarProfileProps
                       group w-full !cursor-pointer justify-start px-2.5 py-1.5 rounded-lg text-[13px] transition-colors
                       ${
                         isActive 
-                          ? "bg-zinc-100 text-foreground font-semibold" 
-                          : "text-zinc-600 hover:text-foreground hover:bg-zinc-50 font-medium"
+                          ? "bg-accent text-accent-foreground font-semibold" 
+                          : "text-muted-foreground hover:text-foreground hover:bg-accent/50 dark:hover:bg-zinc-800/60 font-medium"
                       }
                     `}
                   >
-                    <Icon className="h-4 w-4 shrink-0 stroke-[2.5] transition-colors currentColor" />
+                    <Icon className="h-4 w-4 shrink-0 stroke-[2.5] transition-colors" />
                     
                     <span className="flex items-center gap-1">
-                      <span>
-                        {count}
-                      </span>
+                      <span>{count}</span>
                       <span>{item.label}</span>
                     </span>
                   </SidebarMenuButton>

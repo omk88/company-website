@@ -11,11 +11,11 @@ export function LeftSidebarProfileSkeleton() {
       style={{ "--sidebar-width": "20rem" } as React.CSSProperties}
     >
       <Sidebar 
-        className="flex flex-col !top-16 !z-40 bg-white border-r"
-        bgClass="bg-white" 
+        className="flex flex-col !top-16 !z-40 border-r"
+        bgClass="bg-background/95" 
         collapsible="icon"
       >
-        <SidebarContent className="!p-0 w-full bg-white">
+        <SidebarContent className="!p-0 w-full">
           <SidebarGroup className="pt-3 !px-2 w-full">
             
             <SidebarMenu className="w-full flex flex-col gap-0.5">

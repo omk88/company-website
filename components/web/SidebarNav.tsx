@@ -57,12 +57,12 @@ export function SidebarNav() {
                 group w-full !cursor-pointer justify-start px-2.5 py-1.5 rounded-lg text-[13px] transition-colors
                 ${
                   isActive
-                    ? "bg-zinc-100 text-foreground font-semibold"
-                    : "text-zinc-600 hover:text-foreground hover:bg-zinc-50 font-medium"
+                    ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-semibold"
+                    : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/60 font-medium"
                 }
               `}
             >
-              <Icon className="h-4 w-4 shrink-0 stroke-[2.5] transition-colors currentColor" />
+              <Icon className="h-4 w-4 shrink-0 stroke-[2.5] transition-colors" />
               <span>{item.label}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
