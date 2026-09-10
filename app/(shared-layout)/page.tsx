@@ -1,81 +1,147 @@
-import { Space_Grotesk } from 'next/font/google';
-import Link from 'next/link';
+"use client";
 
-import TypewriterEffect from "@/components/web/TypeWriter";
-import GridCube from '@/components/3d/GridCube';
-import Technologies from '@/components/web/Technologies';
-import VisionCards from '@/components/web/VisionCards';
-import VisionDescription from '@/components/web/VisionDescription';
-import { ArrowRight, TrendingUp } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
+import Link from 'next/link';
+import { Space_Grotesk } from 'next/font/google';
+import { ArrowRight, ChevronRight, Terminal } from 'lucide-react';
+import { FaXTwitter } from 'react-icons/fa6';
+import { AiOutlineInstagram } from 'react-icons/ai';
+import { RxLinkedinLogo } from 'react-icons/rx';
 import Footer from '@/components/web/Footer';
+import { cn } from '@/lib/utils';
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
-  weight: ['700'],
+  weight: ['500', '600', '700'],
 });
 
-const HOME_MODELS = ['/cube2.glb', '/cube4.glb', '/cube5.glb', '/cube7.glb', '/cube8.glb']
+const DynamicTypewriter = dynamic(() => import('typewriter-effect'), {
+  ssr: false
+});
+
+function TypewriterEffect({ className }: { className?: string }) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  return (
+    <span className={`text-foreground inline-flex items-center gap-2 ${className || ''}`}>
+      <span className="text-neutral-400 dark:text-neutral-600 font-mono select-none">&gt;</span>
+      {mounted ? (
+        <DynamicTypewriter
+          options={{
+            strings: ['Agility', 'Velocity', 'Ingenuity', 'Disruption', 'Innovation', 'Transformation'],
+            autoStart: true,
+            loop: true,
+            delay: 45, 
+            deleteSpeed: 25, 
+          }}
+        />
+      ) : (
+        <span className="opacity-0">Transformation</span>
+      )}
+    </span>
+  );
+}
 
 export default function Home() {
   return (
-    <div className="w-full relative">
-      <section className="w-full flex items-center justify-center pt-16 min-h-[calc(100vh-4rem)]">
-        <div className="w-full max-w-6xl mx-auto px-6 box-border">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-center w-full justify-items-center">
+    <div className="pt-16 w-full relative bg-neutral-50 dark:bg-neutral-950 min-h-screen text-foreground antialiased">
+      <section className="w-full flex items-center justify-center pt-10 pb-14 min-h-[calc(100vh-4rem)]">
+        <div className="w-full max-w-5xl mx-auto px-4 sm:px-6">
+          
+          <div className="w-full bg-white dark:bg-neutral-900/70 backdrop-blur-md rounded-2xl border border-neutral-200/70 dark:border-neutral-800/80 shadow-md overflow-hidden">
             
-            <div className="flex flex-col items-center lg:items-start text-center lg:text-left w-full max-w-lg gap-8 lg:justify-self-center">
-              <div className="flex flex-col items-center lg:items-start gap-6 w-full">
-                <TypewriterEffect className={`${spaceGrotesk.className} text-4xl sm:text-5xl font-extrabold text-foreground tracking-tight leading-none`} /> 
-                
-                <p className="text-lg leading-relaxed text-foreground font-semibold max-w-md opacity-85">
-                  Building software that pushes boundaries. <br />
-                  We are where the future happens.
-                </p>
-              </div>
+            <div className="p-8 sm:p-12 lg:p-14 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
               
-              <div className="flex flex-row items-center gap-4 mt-2">
-                <Link 
-                  href="/sign-in" 
-                  className="inline-block px-7 py-3.5 bg-background dark:bg-neutral-900 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-foreground font-semibold text-sm rounded-full border border-neutral-200 dark:border-neutral-800 transition-all duration-200 active:scale-98 shadow-sm text-center"
-                >
-                  Sign in
-                </Link>
+              <div className="lg:col-span-7 flex flex-col items-start text-left gap-7">
                 
-                <Link 
-                  href="/products" 
-                  className="group px-6 py-3.5 bg-foreground hover:bg-foreground/90 text-background font-semibold text-sm rounded-full transition-all duration-100 active:scale-98 inline-flex items-center gap-2 shadow-sm"
+                <Link
+                  href="/insights"
+                  className={cn(
+                    "inline-flex items-center gap-2 rounded-full bg-neutral-100/90 dark:bg-neutral-800/80 hover:bg-neutral-200/70 dark:hover:bg-neutral-800 px-3.5 py-1.5 text-xs font-medium text-neutral-700 dark:text-neutral-300 transition-colors border border-neutral-200 dark:border-neutral-700/60 shadow-xs"
+                  )}
                 >
-                  <span>See our products</span>
-                  <ArrowRight 
-                    className="w-4 h-4 text-background transform transition-transform duration-100 group-hover:translate-x-0.5" 
-                    strokeWidth={2.5} 
-                  />
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>TaQtiQ insights</span>
+                  <ChevronRight className="h-3.5 w-3.5 text-neutral-400" strokeWidth={1.5} />
                 </Link>
+
+                <div className="space-y-3.5">
+                  <h1 className={cn(spaceGrotesk.className, "text-4xl sm:text-5xl font-semibold tracking-tight text-foreground leading-[1.15]")}>
+                    <TypewriterEffect />
+                  </h1>
+                  
+                  <p className="text-sm sm:text-base leading-relaxed text-neutral-600 dark:text-neutral-400 max-w-md font-normal">
+                    Building software that pushes boundaries. We are where the future of digital engineering happens.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3 pt-1">
+                  <Link 
+                    href="/products" 
+                    className="group px-4.5 py-2.5 bg-foreground hover:bg-foreground/90 text-background font-medium text-xs sm:text-sm rounded-lg transition-all duration-150 active:scale-[0.98] inline-flex items-center gap-2 shadow-sm"
+                  >
+                    <span>See our solutions</span>
+                    <ArrowRight 
+                      className="w-4 h-4 transform transition-transform duration-150 group-hover:translate-x-0.5" 
+                      strokeWidth={2} 
+                    />
+                  </Link>
+
+                  <Link 
+                    href="/sign-in" 
+                    className="px-4.5 py-2.5 bg-transparent hover:bg-neutral-100 dark:hover:bg-neutral-800/80 text-foreground font-medium text-xs sm:text-sm rounded-lg border border-neutral-200 dark:border-neutral-800 transition-colors duration-150 active:scale-[0.98] text-center"
+                  >
+                    Sign in
+                  </Link>
+                </div>
               </div>
+
+              <div className="lg:col-span-5 w-full">
+                <div className="rounded-xl border border-neutral-200/60 dark:border-neutral-800/80 bg-neutral-50/70 dark:bg-neutral-950/50 p-5 font-mono text-xs leading-relaxed text-neutral-600 dark:text-neutral-400">
+                  <div className="flex items-center justify-between pb-3.5 mb-3.5 border-b border-neutral-200/50 dark:border-neutral-800/60">
+                    <div className="flex items-center gap-2 text-neutral-400">
+                      <Terminal className="w-4 h-4" />
+                      <span className="text-xs">taqtiq.config.ts</span>
+                    </div>
+                    <span className="text-[10px] uppercase tracking-wider text-emerald-500 font-semibold bg-emerald-500/10 px-2 py-0.5 rounded-full">Active</span>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <p><span className="text-purple-400">export default</span> &#123;</p>
+                    <p className="pl-4"><span className="text-neutral-400">engine</span>: <span className="text-amber-500">&quot;v6.8&quot;</span>,</p>
+                    <p className="pl-4"><span className="text-neutral-400">status</span>: <span className="text-emerald-500">&quot;optimized&quot;</span></p>
+                    <p>&#125;</p>
+                  </div>
+                </div>
+              </div>
+
             </div>
 
-            <div className="w-full aspect-square max-w-md lg:max-w-[460px] mx-auto">
-              <GridCube models={HOME_MODELS} storageKey="homepage_cube_path" glitchEnabled={true} />
+            <div className="px-8 sm:px-12 py-3.5 bg-neutral-50/50 dark:bg-neutral-950/30 border-t border-neutral-200/50 dark:border-neutral-800/50 flex items-center justify-between text-xs text-neutral-500">
+              <span className="text-[11px] uppercase tracking-wider font-mono">TaQtiQ Engine</span>
+              <div className="flex items-center gap-4">
+                <Link href="https://x.com/TaQtiQ_tech" target="_blank" rel="noopener noreferrer" aria-label="X">
+                  <FaXTwitter className="h-4 w-4 hover:text-foreground transition-colors" />
+                </Link>
+                <Link href="https://www.instagram.com/taqtiq_tech" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                  <AiOutlineInstagram className="h-4.5 w-4.5 hover:text-foreground transition-colors" />
+                </Link>
+                <Link href="https://www.linkedin.com/company/taqtiq-tech" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                  <RxLinkedinLogo className="h-4.5 w-4.5 hover:text-foreground transition-colors" />
+                </Link>
+              </div>
             </div>
 
           </div>
+
         </div>
       </section>
 
-      <section className="w-full max-w-[92vw] lg:max-w-[95vw] mx-auto px-4 box-border pb-24">
-        <div className="py-12 flex items-center justify-center gap-2.5 text-foreground">
-          <TrendingUp className="w-5 h-5 md:w-6 md:h-6 stroke-[2.3] shrink-0" />
-          <h1 className="font-bold text-xl md:text-2xl tracking-tight text-center">
-            Building software that delivers.
-          </h1>
-        </div>
-        
-        <div className="w-full flex flex-col gap-12">
-          <VisionCards />
-          <VisionDescription />
-          <Technologies />
-        </div>
-      </section>
       <Footer />
     </div>
   );

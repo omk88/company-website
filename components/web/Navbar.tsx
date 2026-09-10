@@ -44,7 +44,7 @@ export function Navbar() {
             <NavLink href="/vision" anim={anim}>About</NavLink>
             <NavLink href="/insights" anim={anim}>Insights</NavLink>
             <NavLink href="/contact" anim={anim}>Contact</NavLink>
-            <NavLink href="/products" anim={anim}>Products</NavLink>
+            <NavLink href="/products" anim={anim}>Solutions</NavLink>
           </div>
 
           <div className="ml-4">
@@ -55,20 +55,6 @@ export function Navbar() {
         </div>
 
         <div className="hidden md:flex items-center gap-5 text-foreground">
-
-          <div className="flex items-center gap-4 border-r border-border pr-4">
-            <Link href="https://x.com/TaQtiQ_tech" target="_blank" rel="noopener noreferrer">
-              <FaXTwitter className="h-4 w-4 transition-transform hover:scale-105 cursor-pointer opacity-80 hover:opacity-100" />
-            </Link>
-            
-            <Link href="https://www.instagram.com/taqtiq_tech" target="_blank" rel="noopener noreferrer">
-              <AiOutlineInstagram className="h-4.5 w-4.5 transition-transform hover:scale-105 cursor-pointer opacity-80 hover:opacity-100" />
-            </Link>
-            
-            <Link href="https://www.linkedin.com/company/taqtiq-tech" target="_blank" rel="noopener noreferrer">
-              <RxLinkedinLogo className="h-4.5 w-4.5 transition-transform hover:scale-105 cursor-pointer opacity-80 hover:opacity-100" />
-            </Link>
-          </div>
           
           <div className="flex items-center gap-2">
             <ThemeToggle />
