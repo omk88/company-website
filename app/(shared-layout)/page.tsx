@@ -225,7 +225,7 @@ export default function Home() {
               "max-w-3xl"
             )}
           >
-            Designed for Global Reach, built for Zero Latency.
+            Designed for Global Reach, built for Zero Latency
           </h1>
           
           <p className="text-neutral-600 dark:text-neutral-400 text-sm sm:text-base font-light max-w-lg">
