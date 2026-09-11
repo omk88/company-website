@@ -55,8 +55,28 @@ const itemVariants = {
 
 export default function ValuesSection() {
   return (
-    <section className="w-full my-16 border-y border-neutral-200/80 dark:border-neutral-800/80 bg-neutral-50/50 dark:bg-neutral-900/30">
-      <div className="max-w-6xl mx-auto py-12 px-4 sm:px-6">
+    <section 
+      className={cn(
+        "relative overflow-hidden w-full my-16 py-12 px-4 sm:px-6",
+        "border-y border-neutral-200/80 dark:border-neutral-800/80",
+        "bg-background text-foreground"
+      )}
+    >
+      {/* 1. Linear Grid Overlay */}
+      <div 
+        className={cn(
+          "absolute inset-0 pointer-events-none opacity-40 dark:opacity-30",
+          "bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)]",
+          "bg-[size:24px_24px]"
+        )} 
+      />
+
+      {/* 2. Soft Gradient Glows (Mesh Effect) */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-emerald-500/10 dark:bg-emerald-500/15 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute top-1/3 left-1/4 w-[400px] h-[250px] bg-amber-500/10 dark:bg-amber-500/10 blur-[100px] rounded-full pointer-events-none" />
+
+      {/* 3. Content Container */}
+      <div className="relative z-10 max-w-6xl mx-auto">
         
         <div className="text-center max-w-2xl mx-auto mb-12">
           <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-foreground">
@@ -82,7 +102,7 @@ export default function ValuesSection() {
                 className={cn(
                   "relative group p-6 sm:p-8 rounded-xl",
                   "border border-neutral-200/80 dark:border-neutral-800/80",
-                  "bg-background/80 backdrop-blur-sm shadow-xs",
+                  "bg-background/80 backdrop-blur-md shadow-xs",
                   "hover:shadow-md hover:border-neutral-300 dark:hover:border-neutral-700",
                   "transition-all ease-out"
                 )}
