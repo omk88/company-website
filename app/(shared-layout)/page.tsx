@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { Space_Grotesk } from 'next/font/google';
-import { ArrowRight, ChevronRight, Terminal } from 'lucide-react';
+import { ArrowRight, ChevronRight } from 'lucide-react';
 import { FaXTwitter } from 'react-icons/fa6'; 
 import { AiOutlineInstagram } from 'react-icons/ai';
 import { RxLinkedinLogo } from 'react-icons/rx';
@@ -108,9 +108,10 @@ export default function Home() {
             
             <div className="w-full bg-white/90 dark:bg-neutral-900/80 backdrop-blur-lg rounded-lg border border-neutral-200/70 dark:border-neutral-800/80 shadow-md overflow-hidden isolate">
               
-              <div className="flex flex-row p-8 my-10 sm:p-12 lg:p-14 grid grid-cols-1 lg:grid-cols-15 gap-4 items-center">
+              <div className="p-8 sm:p-12 lg:p-14 my-4 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
                 
-                <div className="lg:col-span-7 flex flex-col items-start text-left gap-7 isolate">
+                {/* Left Side Content (5 Columns) */}
+                <div className="lg:col-span-5 flex flex-col items-start text-left gap-7 isolate">
                   
                   <Link
                     href="/insights"
@@ -154,7 +155,10 @@ export default function Home() {
                   </div>
                 </div>
 
-                <InteractiveCodeBox />
+                {/* Right Side Interactive Code Box (7 Columns) */}
+                <div className="lg:col-span-7 w-full flex justify-center lg:justify-end min-w-0">
+                  <InteractiveCodeBox />
+                </div>
 
               </div>
 

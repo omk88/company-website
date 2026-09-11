@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Terminal, Play, CheckCircle2, FileCode, Cpu, LucideIcon } from "lucide-react";
+import { Terminal, Play, CheckCircle2, FileCode, Cpu, ChevronDown, ChevronUp, X, LucideIcon } from "lucide-react";
 
 interface CodeLine {
   text: string;
@@ -23,7 +23,7 @@ const codeFiles: Record<"config" | "api", FileConfig> = {
     icon: Terminal,
     content: [
       { text: "export default {", color: "text-purple-400" },
-      { text: "  engine: \"v6.8\",", color: "text-neutral-400", highlight: "\"v6.8\"", highlightColor: "text-amber-400" },
+      { text: "  engine: \"v2.4\",", color: "text-neutral-400", highlight: "\"v2.4\"", highlightColor: "text-amber-400" },
       { text: "  architecture: \"microservices\",", color: "text-neutral-400", highlight: "\"microservices\"", highlightColor: "text-amber-400" },
       { text: "  status: \"optimized\"", color: "text-neutral-400", highlight: "\"optimized\"", highlightColor: "text-emerald-400" },
       { text: "};", color: "text-purple-400" },
@@ -68,9 +68,13 @@ export default function InteractiveCodeBox() {
   const [activeTab, setActiveTab] = useState<keyof typeof codeFiles>("config");
   const [isRunning, setIsRunning] = useState(false);
   const [logs, setLogs] = useState<string[]>([]);
+  const [isConsoleOpen, setIsConsoleOpen] = useState(true);
+  const [isConsoleCollapsed, setIsConsoleCollapsed] = useState(false);
 
   const handleRun = () => {
     setIsRunning(true);
+    setIsConsoleOpen(true);
+    setIsConsoleCollapsed(false);
     setLogs(["Building AST...", "Optimizing bundle size..."]);
 
     setTimeout(() => {
@@ -83,7 +87,7 @@ export default function InteractiveCodeBox() {
   let cumulativeDelay = 0;
 
   return (
-    <div className="lg:col-span-8 w-full max-w-3xl mx-auto isolate">
+    <div className="w-full relative isolate min-w-0">
       <style jsx global>{`
         @keyframes cssTypewriter {
           from { width: 0; }
@@ -105,6 +109,13 @@ export default function InteractiveCodeBox() {
           opacity: 0;
           animation: cssLineFade 0.01s linear var(--delay) forwards;
         }
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
       `}</style>
 
       <motion.div
@@ -115,9 +126,9 @@ export default function InteractiveCodeBox() {
       >
         <div className="absolute -top-12 -right-12 w-48 h-48 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
 
-        <div className="flex items-center justify-between gap-4 pb-3 mb-3 border-b border-neutral-200/60 dark:border-neutral-800/80 flex-wrap">
-          <div className="flex items-center gap-2 overflow-x-auto py-0.5">
-            <div className="flex gap-1.5 mr-3 shrink-0">
+        <div className="flex items-center justify-between gap-3 pb-3 mb-3 border-b border-neutral-200/60 dark:border-neutral-800/80 min-w-0">
+          <div className="flex items-center gap-2 overflow-x-auto min-w-0 py-0.5 no-scrollbar">
+            <div className="flex gap-1.5 mr-2 shrink-0">
               <span className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
               <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
@@ -132,10 +143,11 @@ export default function InteractiveCodeBox() {
                 <button
                   key={key}
                   onClick={() => setActiveTab(key)}
-                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs transition-all whitespace-nowrap ${
+                  disabled={isActive}
+                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs transition-all whitespace-nowrap shrink-0 ${
                     isActive
-                      ? "bg-neutral-200/60 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 font-medium"
-                      : "text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
+                      ? "bg-neutral-200/60 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 font-medium cursor-default"
+                      : "text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 cursor-pointer"
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
@@ -148,14 +160,14 @@ export default function InteractiveCodeBox() {
           <button
             onClick={handleRun}
             disabled={isRunning}
-            className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-emerald-500 font-semibold bg-emerald-500/10 hover:bg-emerald-500/20 px-2.5 py-1 rounded-full transition-all border border-emerald-500/20 active:scale-95 disabled:opacity-50 shrink-0 ml-auto"
+            className="inline-flex items-center justify-center gap-1.5 text-[10px] uppercase tracking-wider text-emerald-500 font-semibold bg-emerald-500/10 hover:bg-emerald-500/20 px-3 py-1 rounded-full transition-all border border-emerald-500/20 active:scale-95 disabled:opacity-50 shrink-0 ml-auto cursor-pointer leading-none"
           >
             {isRunning ? (
-              <Cpu className="w-3 h-3 animate-spin" />
+              <Cpu className="w-3 h-3 animate-spin shrink-0" />
             ) : (
-              <Play className="w-3 h-3 fill-emerald-500" />
+              <Play className="w-2.5 h-2.5 fill-emerald-500 shrink-0" />
             )}
-            <span>{isRunning ? "Compiling..." : "Run"}</span>
+            <span className="leading-none pt-[0.5px]">{isRunning ? "Compiling..." : "Run"}</span>
           </button>
         </div>
 
@@ -198,22 +210,61 @@ export default function InteractiveCodeBox() {
         </div>
 
         <AnimatePresence>
-          {logs.length > 0 && (
+          {logs.length > 0 && isConsoleOpen && (
             <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="mt-3 pt-3 border-t border-neutral-200/50 dark:border-neutral-800/60 bg-neutral-100/50 dark:bg-neutral-900/50 rounded-lg p-2.5 text-[11px]"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.2 }}
+              className="absolute left-4 right-4 bottom-3 z-20 bg-neutral-900/95 border border-neutral-800 rounded-lg text-[11px] shadow-2xl backdrop-blur-md overflow-hidden"
             >
-              <div className="flex items-center gap-1.5 text-neutral-400 mb-1">
-                <CheckCircle2 className="w-3 h-3 text-emerald-500" />
-                <span className="font-semibold text-neutral-500 dark:text-neutral-400">Output</span>
+              <div className="flex items-center justify-between px-3 py-1.5 bg-neutral-900/90 border-b border-neutral-800/80">
+                <div className="flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                  <span className="font-semibold text-neutral-200">Output</span>
+                  <span className="text-[10px] text-neutral-500 font-mono">
+                    ({logs.length} logs)
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => setIsConsoleCollapsed(!isConsoleCollapsed)}
+                    className="p-1 hover:bg-neutral-800 rounded text-neutral-400 hover:text-neutral-200 transition-colors cursor-pointer"
+                    title={isConsoleCollapsed ? "Expand Console" : "Collapse Console"}
+                    aria-label={isConsoleCollapsed ? "Expand Console" : "Collapse Console"}
+                  >
+                    {isConsoleCollapsed ? (
+                      <ChevronUp className="w-3.5 h-3.5" />
+                    ) : (
+                      <ChevronDown className="w-3.5 h-3.5" />
+                    )}
+                  </button>
+
+                  <button
+                    onClick={() => setIsConsoleOpen(false)}
+                    className="p-1 hover:bg-neutral-800 rounded text-neutral-400 hover:text-neutral-200 transition-colors cursor-pointer"
+                    title="Close Console"
+                    aria-label="Close Console"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
-              <div className="space-y-0.5 text-neutral-600 dark:text-neutral-400">
-                {logs.map((log, index) => (
-                  <p key={index}>{log}</p>
-                ))}
-              </div>
+
+              <motion.div
+                animate={{ height: isConsoleCollapsed ? 0 : "auto" }}
+                transition={{ duration: 0.2 }}
+                className="overflow-hidden"
+              >
+                <div className="p-3 space-y-1 font-mono text-neutral-300 max-h-28 overflow-y-auto">
+                  {logs.map((log, index) => (
+                    <p key={index} className="leading-relaxed">
+                      {log}
+                    </p>
+                  ))}
+                </div>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
