@@ -22,7 +22,7 @@ function NavLinkInner({ href, children, anim }: NavLinkProps) {
       className={cn(
         buttonVariants({ variant: "link" }),
         anim,
-        "font-mono text-foreground hover:opacity-70 font-medium text-sm px-2",
+        "text-foreground hover:opacity-70 font-medium text-sm px-2",
         isActive && "after:scale-x-100 after:origin-bottom-left"
       )}
     >
@@ -38,7 +38,7 @@ function NavLinkFallback({ href, children, anim }: NavLinkProps) {
       className={cn(
         buttonVariants({ variant: "link" }),
         anim,
-        "font-mono text-foreground hover:opacity-70 font-medium text-sm px-2"
+        "text-foreground hover:opacity-70 font-medium text-sm px-2"
       )}
     >
       {children}

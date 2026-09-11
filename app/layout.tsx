@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import { JetBrains_Mono, Lexend, Poppins, Roboto } from "next/font/google"; 
+import { Inter, JetBrains_Mono, Lexend, Poppins, Roboto } from "next/font/google"; 
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "next-themes";
-import GridBackground from "@/components/web/GridBackground"; 
 import { ConvexClientProvider } from "./ConvexClientProvider";
 
 const roboto = Roboto({
@@ -12,7 +11,7 @@ const roboto = Roboto({
   variable: "--font-roboto",
 });
 
-const lexend = Lexend({
+const inter = Inter({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-lexend",
@@ -45,7 +44,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${lexend.variable} ${poppins.variable} ${jetBrainsMono.variable} ${roboto.variable} font-sans flex flex-col bg-background text-foreground`}>
+      <body className={`${inter.variable} ${poppins.variable} ${jetBrainsMono.variable} ${roboto.variable} font-sans flex flex-col bg-background text-foreground`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

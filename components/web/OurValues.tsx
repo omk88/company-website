@@ -7,7 +7,7 @@ import { Compass, Lightbulb, Rocket, Zap } from "lucide-react";
 const values = [
   {
     icon: Lightbulb,
-    title: "Innovate First",
+    title: "Innovation First",
     description:
       "We spot gaps in current technologies and rapidly build novel solutions, pushing the boundaries of what is possible.",
   },
