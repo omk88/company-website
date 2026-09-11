@@ -1,5 +1,6 @@
 import PersonCard from "@/components/PersonCard";
 import Footer from "@/components/web/Footer";
+import OurValues from "@/components/web/OurValues";
 import { cn } from "@/lib/utils";
 import { ArrowRight } from "lucide-react";
 import { Metadata } from "next";
@@ -75,6 +76,8 @@ export default function About() {
 
             <PersonCard />
           </div>
+
+          <OurValues />
 
         </div>
         
