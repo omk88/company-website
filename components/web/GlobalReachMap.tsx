@@ -125,14 +125,14 @@ export function GlobalReachMap() {
                   fill="none"
                   initial={{ pathLength: 0, pathOffset: 0 }}
                   animate={{
-                    pathLength: [0, 0.35, 0],
+                    pathLength: [0, 0.4, 0],
                     pathOffset: [0, 1, 1],
                   }}
                   transition={{
                     duration: 3.5,
                     repeat: Infinity,
                     ease: "easeInOut",
-                    delay: i * 0.3,
+                    delay: (i % 5) * 0.4,
                   }}
                 />
               </g>
@@ -151,13 +151,13 @@ export function GlobalReachMap() {
                 onMouseLeave={() => setActiveNode(null)}
               >
                 <motion.circle
-                  cx={node.x}
-                  cy={node.y}
-                  r="12"
-                  className={`${styles.pulse} ${styles.glow}`}
-                  strokeWidth="0.75"
-                  animate={{ scale: [0.7, 1.6, 0.7], opacity: [0.7, 0.1, 0.7] }}
-                  transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
+                    cx={node.x}
+                    cy={node.y}
+                    r="10"
+                    className={`${styles.pulse} ${styles.glow}`}
+                    strokeWidth="0.75"
+                    animate={{ opacity: [0.6, 0.2, 0.6] }}
+                    transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: (node.x % 5) * 0.4, }}
                 />
 
                 <circle
