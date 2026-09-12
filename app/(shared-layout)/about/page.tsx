@@ -37,7 +37,7 @@ export default function About() {
             </Link>
             <HeroTitle />
             
-            <p className="text-neutral-600 dark:text-neutral-400 text-sm sm:text-base font-light max-w-lg">
+            <p className="text-neutral-600 dark:text-neutral-400 text-xl font-light max-w-lg">
               TaQtiQ is a dedicated team of software engineers and IT professionals delivering innovative digital solutions. 
             </p>
 

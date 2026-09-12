@@ -1,17 +1,13 @@
 "use client";
 
-import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
+import { useState, useEffect } from 'react';
 
 const DynamicTypewriter = dynamic(() => import('typewriter-effect'), {
   ssr: false
 });
 
-interface TypewriterEffectProps {
-  className?: string;
-}
-
-export default function TypewriterEffect({ className }: TypewriterEffectProps) {
+export default function TypewriterEffect({ className }: { className?: string }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -19,21 +15,20 @@ export default function TypewriterEffect({ className }: TypewriterEffectProps) {
   }, []);
 
   return (
-    <span className={`text-foreground flex flex-row items-center justify-start gap-2 ${className || ''}`}>
-      <span>{">"}</span>
-      
+    <span className={`text-foreground inline-flex items-center gap-2 ${className || ''}`}>
+      <span className="text-neutral-400 dark:text-neutral-600 font-mono select-none">&gt;</span>
       {mounted ? (
         <DynamicTypewriter
           options={{
-            strings: ['Agility.', 'Velocity.', 'Ingenuity.', 'Disruption.', 'Innovation.', 'Transformation.'],
+            strings: ['Agility', 'Velocity', 'Ingenuity', 'Disruption', 'Innovation', 'Transformation'],
             autoStart: true,
             loop: true,
-            delay: 40,     
-            deleteSpeed: 30, 
+            delay: 45, 
+            deleteSpeed: 25, 
           }}
         />
       ) : (
-        <span className="opacity-0">Transformation.</span>
+        <span className="opacity-0">Transformation</span>
       )}
     </span>
   );

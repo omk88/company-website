@@ -1,7 +1,3 @@
-"use client";
-
-import { useState, useEffect, useRef } from 'react';
-import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { Space_Grotesk } from 'next/font/google';
 import { ArrowRight, ChevronRight } from 'lucide-react';
@@ -10,91 +6,17 @@ import { AiOutlineInstagram } from 'react-icons/ai';
 import { RxLinkedinLogo } from 'react-icons/rx';
 import Footer from '@/components/web/Footer';
 import { cn } from '@/lib/utils';
-import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import TrustedToolsSection from '@/components/web/TrustedToolsSection';
 import VisionCards from '@/components/web/VisionCards';
 import InteractiveCodeBox from '@/components/web/InteractiveCodeBox';
 import { GlobalReachMap } from '@/components/web/GlobalReachMap';
+import TypewriterEffect from '@/components/web/TypeWriter';
+import BackgroundGrid from '@/components/web/BackgroundGrid';
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
   weight: ['500', '600', '700'],
 });
-
-const DynamicTypewriter = dynamic(() => import('typewriter-effect'), {
-  ssr: false
-});
-
-function TypewriterEffect({ className }: { className?: string }) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  return (
-    <span className={`text-foreground inline-flex items-center gap-2 ${className || ''}`}>
-      <span className="text-neutral-400 dark:text-neutral-600 font-mono select-none">&gt;</span>
-      {mounted ? (
-        <DynamicTypewriter
-          options={{
-            strings: ['Agility', 'Velocity', 'Ingenuity', 'Disruption', 'Innovation', 'Transformation'],
-            autoStart: true,
-            loop: true,
-            delay: 45, 
-            deleteSpeed: 25, 
-          }}
-        />
-      ) : (
-        <span className="opacity-0">Transformation</span>
-      )}
-    </span>
-  );
-}
-
-function BackgroundGrid() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  
-  const { scrollYProgress } = useScroll();
-  
-  const xMovement = useTransform(scrollYProgress, [0, 1], ['20%', '60%']);
-  const yMovement = useTransform(scrollYProgress, [0, 1], ['30%', '70%']);
-  const spotlightX = useSpring(xMovement, { stiffness: 50, damping: 20 });
-  const spotlightY = useSpring(yMovement, { stiffness: 50, damping: 20 });
-
-  return (
-    <div ref={containerRef} className="absolute inset-0 w-full h-full -z-10 overflow-hidden isolate pointer-events-none">
-      <div 
-        className="absolute inset-0 w-full h-full opacity-[0.03] dark:opacity-[0.05]"
-        style={{
-          backgroundImage: `
-            linear-gradient(#888 1px, transparent 1px),
-            linear-gradient(90deg, #888 1px, transparent 1px)
-          `,
-          backgroundSize: '32px 32px',
-        }}
-      />
-
-      <motion.div
-        className="absolute w-[600px] h-[600px] rounded-full blur-[140px] opacity-20 dark:opacity-30 bg-emerald-300/60 dark:bg-emerald-600/50"
-        style={{
-          x: spotlightX,
-          y: spotlightY,
-          translateX: '-50%',
-          translateY: '-50%',
-        }}
-        animate={{
-          scale: [1, 1.1, 1],
-        }}
-        transition={{
-          duration: 12,
-          ease: "easeInOut",
-          repeat: Infinity,
-        }}
-      />
-    </div>
-  );
-}
 
 export default function Home() {
   return (
@@ -110,7 +32,6 @@ export default function Home() {
               
               <div className="p-8 sm:p-12 lg:p-14 my-4 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
                 
-                {/* Left Side Content (5 Columns) */}
                 <div className="lg:col-span-5 flex flex-col items-start text-left gap-7 isolate">
                   
                   <Link
@@ -129,8 +50,8 @@ export default function Home() {
                       <TypewriterEffect />
                     </h1>
                     
-                    <p className="text-sm sm:text-base leading-relaxed text-neutral-600 dark:text-neutral-400 max-w-md font-normal">
-                      Building software that pushes boundaries. We are where the future of digital engineering happens.
+                    <p className="text-xl leading-relaxed text-neutral-600 dark:text-neutral-400 max-w-md font-normal">
+                      Building software that pushes boundaries. We are where the future happens.
                     </p>
                   </div>
 
@@ -155,7 +76,6 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* Right Side Interactive Code Box (7 Columns) */}
                 <div className="lg:col-span-7 w-full flex justify-center lg:justify-end min-w-0">
                   <InteractiveCodeBox />
                 </div>
@@ -198,13 +118,13 @@ export default function Home() {
             Engineering the Next Generation of Software
           </h1>
           
-          <p className="text-neutral-600 dark:text-neutral-400 text-sm sm:text-base font-light max-w-lg">
+          <p className="text-neutral-600 dark:text-neutral-400 text-xl font-light max-w-lg">
             Building with precision, speed, and modern architectural principles.
           </p>
 
           <div className="pt-2">
             <Link
-              href="#vision"
+              href="/about"
               className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-neutral-900 dark:bg-neutral-100 text-neutral-100 dark:text-neutral-900 text-sm font-medium transition-all duration-200 hover:bg-neutral-800 dark:hover:bg-neutral-200 active:scale-[0.98] shadow-sm"
             >
               <span>Explore our vision</span>
@@ -232,7 +152,7 @@ export default function Home() {
             Designed for Global Reach, built for Zero Latency
           </h1>
           
-          <p className="text-neutral-600 dark:text-neutral-400 text-sm sm:text-base font-light max-w-lg">
+          <p className="text-neutral-600 dark:text-neutral-400 text-xl font-light max-w-lg">
             Solutions that are truly boundless.
           </p>
         </div>

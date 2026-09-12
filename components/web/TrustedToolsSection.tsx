@@ -20,7 +20,7 @@ export default function TrustedToolsSection() {
       <div className="w-full max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12">
         
         <div className="shrink-0 text-left max-w-[200px]">
-          <p className="text-xs sm:text-sm font-normal text-neutral-500 dark:text-neutral-400 leading-tight">
+          <p className="text-xl font-light text-neutral-500 dark:text-neutral-400 leading-tight">
             Working with tools <br />
             <span className="text-neutral-700 dark:text-neutral-200 font-medium">you trust</span>
           </p>

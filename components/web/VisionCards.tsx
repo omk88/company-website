@@ -1,178 +1,87 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Wrench,
-  Database,
-  Cpu,
-  Globe,
-  CheckCircle2,
-  ChevronsUp,
-  Sparkles,
-  Zap,
-  SlidersHorizontal,
-  Bot,
-  Activity,
-  ArrowRight,
-  Layers,
-  ShieldAlert,
-} from "lucide-react";
+import { Wrench, ChevronsUp, Zap, Check, Sparkles, Code2, ShieldCheck } from "lucide-react";
 
-const toolsData = [
+// Code snippets for Card 1
+const codeExamples = [
   {
-    id: "api",
-    name: "REST & GraphQL",
-    icon: Globe,
-    metrics: { status: "Active", latency: "12ms", uptime: "99.99%" },
-    color: "from-blue-500/10 to-indigo-500/10",
-    border: "border-blue-500/20",
-    badge: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
+    type: "REST & GraphQL",
+    code: `const user = await api.get("/user");\nreturn user.hasAccess;`,
   },
   {
-    id: "db",
-    name: "Database Architect",
-    icon: Database,
-    metrics: { status: "Synced", queries: "1.2k/s", engine: "PostgreSQL" },
-    color: "from-emerald-500/10 to-teal-500/10",
-    border: "border-emerald-500/20",
-    badge: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
-  },
-  {
-    id: "ops",
-    name: "CI/CD Pipeline",
-    icon: Cpu,
-    metrics: { status: "Deployed", edge: "240 Nodes", speed: "Instant" },
-    color: "from-amber-500/10 to-orange-500/10",
-    border: "border-amber-500/20",
-    badge: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+    type: "Database Schema",
+    code: `SELECT * FROM users\nWHERE status = 'active';`,
   },
 ];
 
-const pipelineNodes = [
-  {
-    id: "ingest",
-    label: "Ingest",
-    icon: Activity,
-    desc: "Sub-10ms event streamer",
-    color: "text-blue-500 bg-blue-500/10 border-blue-500/30",
-  },
-  {
-    id: "model",
-    label: "AI Engine",
-    icon: Bot,
-    desc: "Edge-hosted LLM inference",
-    color: "text-purple-500 bg-purple-500/10 border-purple-500/30",
-  },
-  {
-    id: "output",
-    label: "Output",
-    icon: Zap,
-    desc: "Optimized state sync",
-    color: "text-emerald-500 bg-emerald-500/10 border-emerald-500/30",
-  },
-];
+export default function RedesignedVisionCards() {
+  // Card 1 state cycle
+  const [codeIndex, setCodeIndex] = useState(0);
 
-export default function VisionCards() {
-  const [activeTool, setActiveTool] = useState(toolsData[0]);
+  // Card 3 step state cycle (0: prompt typing, 1: rendering UI)
+  const [aiStep, setAiStep] = useState(0);
 
-  const [sliderValue, setSliderValue] = useState(75);
+  useEffect(() => {
+    // Card 1 loop (4s)
+    const codeTimer = setInterval(() => {
+      setCodeIndex((prev) => (prev + 1) % codeExamples.length);
+    }, 4000);
 
-  const [activeNode, setActiveNode] = useState(pipelineNodes[1]);
+    // Card 3 loop (3.5s)
+    const aiTimer = setInterval(() => {
+      setAiStep((prev) => (prev === 0 ? 1 : 0));
+    }, 3500);
+
+    return () => {
+      clearInterval(codeTimer);
+      clearInterval(aiTimer);
+    };
+  }, []);
 
   return (
     <div className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-4 font-sans">
-      <div className="w-full rounded-3xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-xl overflow-hidden flex flex-col justify-between">
+      
+      {/* Card 1: Developer Suite */}
+      <div className="w-full rounded-3xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-xl flex flex-col justify-between">
         <div>
           <div className="flex items-center gap-2 mb-4 text-neutral-800 dark:text-neutral-200 font-semibold text-sm">
             <div className="p-2 rounded-xl bg-neutral-100 dark:bg-neutral-900 border border-neutral-200/60 dark:border-neutral-800">
-              <Wrench className="w-4 h-4" />
+              <Wrench className="w-4 h-4 text-neutral-700 dark:text-neutral-300" />
             </div>
             <span>Developer Suite</span>
           </div>
 
-          <div className="relative h-56 rounded-2xl bg-neutral-50 dark:bg-neutral-900/50 p-4 flex flex-col justify-between overflow-hidden border border-neutral-100 dark:border-neutral-800/50">
-            <motion.div
-              key={activeTool.id}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3 }}
-              className={`absolute inset-0 bg-gradient-to-br ${activeTool.color} blur-xl pointer-events-none`}
-            />
-
-            <div className="relative z-10 flex items-center gap-1.5 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md p-1 rounded-xl border border-neutral-200/60 dark:border-neutral-800">
-              {toolsData.map((tool) => {
-                const Icon = tool.icon;
-                const isSelected = activeTool.id === tool.id;
-                return (
-                  <button
-                    key={tool.id}
-                    onClick={() => setActiveTool(tool)}
-                    className={`relative flex-1 flex items-center justify-center py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                      isSelected
-                        ? "text-neutral-900 dark:text-white"
-                        : "text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
-                    }`}
-                  >
-                    {isSelected && (
-                      <motion.div
-                        layoutId="activeToolTab"
-                        className="absolute inset-0 bg-white dark:bg-neutral-800 rounded-lg shadow-sm"
-                        transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                      />
-                    )}
-                    <span className="relative z-10 flex items-center gap-1">
-                      <Icon className="w-3.5 h-3.5" />
-                    </span>
-                  </button>
-                );
-              })}
+          <div className="relative h-56 rounded-2xl bg-neutral-900 p-4 flex flex-col justify-between border border-neutral-800 overflow-hidden font-mono text-xs">
+            <div className="flex items-center justify-between text-neutral-400 border-b border-neutral-800 pb-2">
+              <span className="flex items-center gap-1.5 text-[11px] text-neutral-300">
+                <Code2 className="w-3.5 h-3.5 text-blue-400" />
+                {codeExamples[codeIndex].type}
+              </span>
+              <span className="flex items-center gap-1 text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                <ShieldCheck className="w-3 h-3" /> Ready
+              </span>
             </div>
 
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeTool.id}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2 }}
-                className={`relative z-10 p-3.5 rounded-xl bg-white/90 dark:bg-neutral-900/90 backdrop-blur-md border ${activeTool.border} shadow-sm`}
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <div className={`p-1.5 rounded-md ${activeTool.badge}`}>
-                      <activeTool.icon className="w-4 h-4" />
-                    </div>
-                    <span className="text-xs font-semibold text-neutral-800 dark:text-neutral-200">
-                      {activeTool.name}
-                    </span>
-                  </div>
-                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${activeTool.badge} flex items-center gap-1`}>
-                    <CheckCircle2 className="w-3 h-3" />
-                    {activeTool.metrics.status}
-                  </span>
-                </div>
+            <div className="my-auto">
+              <AnimatePresence mode="wait">
+                <motion.pre
+                  key={codeIndex}
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.3 }}
+                  className="text-neutral-300 leading-relaxed text-[11px]"
+                >
+                  <code>{codeExamples[codeIndex].code}</code>
+                </motion.pre>
+              </AnimatePresence>
+            </div>
 
-                <div className="grid grid-cols-2 gap-2 text-[11px]">
-                  {Object.entries(activeTool.metrics)
-                    .filter(([key]) => key !== "status")
-                    .map(([key, value]) => (
-                      <div key={key} className="bg-neutral-100/60 dark:bg-neutral-800/50 p-2 rounded-lg">
-                        <p className="text-neutral-400 capitalize text-[9px]">{key}</p>
-                        <p className="font-mono font-medium text-neutral-700 dark:text-neutral-300">
-                          {value}
-                        </p>
-                      </div>
-                    ))}
-                </div>
-              </motion.div>
-            </AnimatePresence>
-
-            <div className="relative z-10 flex items-center justify-between text-[10px] text-neutral-400">
-              <span className="flex items-center gap-1">
-                <Zap className="w-3 h-3 text-amber-500 fill-amber-500" /> Modular Setup
-              </span>
-              <span className="font-mono">Click tabs to switch</span>
+            <div className="flex justify-between items-center text-[10px] text-neutral-500 pt-2 border-t border-neutral-800/60">
+              <span>Type-Safe Integration</span>
+              <span>200 OK</span>
             </div>
           </div>
         </div>
@@ -187,7 +96,8 @@ export default function VisionCards() {
         </div>
       </div>
 
-      <div className="w-full rounded-3xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-xl overflow-hidden flex flex-col justify-between">
+      {/* Card 2: Performance Agility */}
+      <div className="w-full rounded-3xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-xl flex flex-col justify-between">
         <div>
           <div className="flex items-center gap-2 mb-4 text-neutral-800 dark:text-neutral-200 font-semibold text-sm">
             <div className="p-2 rounded-xl bg-neutral-100 dark:bg-neutral-900 border border-neutral-200/60 dark:border-neutral-800">
@@ -196,56 +106,46 @@ export default function VisionCards() {
             <span>Performance Agility</span>
           </div>
 
-          <div className="relative h-56 rounded-2xl bg-neutral-50 dark:bg-neutral-900/50 p-4 flex flex-col justify-between overflow-hidden border border-neutral-100 dark:border-neutral-800/50">
-            <div className="flex items-center justify-between text-xs font-semibold text-neutral-700 dark:text-neutral-300">
-              <span className="flex items-center gap-1.5">
-                <SlidersHorizontal className="w-3.5 h-3.5 text-emerald-500" /> Efficiency Meter
-              </span>
-              <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
-                {sliderValue}% Agility
-              </span>
-            </div>
-
-            <div className="space-y-2 my-auto">
-              <div className="p-3 rounded-xl bg-white/90 dark:bg-neutral-900/90 border border-emerald-500/20 shadow-sm">
-                <div className="flex justify-between items-center text-xs mb-1">
-                  <span className="font-semibold text-neutral-800 dark:text-neutral-200 flex items-center gap-1">
-                    <Layers className="w-3.5 h-3.5 text-emerald-500" /> Lean Shipping
-                  </span>
-                  <span className="font-mono text-emerald-500 font-bold text-[11px]">
-                    {Math.round((sliderValue / 100) * 14)} Days
-                  </span>
-                </div>
-                <div className="w-full h-1.5 bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-emerald-500 transition-all duration-150"
-                    style={{ width: `${sliderValue}%` }}
-                  />
-                </div>
+          <div className="relative h-56 rounded-2xl bg-neutral-50 dark:bg-neutral-900/50 p-4 flex flex-col justify-center space-y-5 border border-neutral-100 dark:border-neutral-800/50">
+            {/* Modern Fast Bar */}
+            <div className="space-y-1.5">
+              <div className="flex justify-between text-xs font-semibold text-neutral-800 dark:text-neutral-200">
+                <span>Modern Stack</span>
+                <span className="text-emerald-500 font-mono text-[11px] flex items-center gap-1">
+                  <Check className="w-3 h-3" /> 0.2s
+                </span>
               </div>
-
-              <div className="p-2.5 rounded-xl bg-neutral-100/60 dark:bg-neutral-900/40 border border-neutral-200/50 dark:border-neutral-800/50 opacity-60">
-                <div className="flex justify-between items-center text-[11px]">
-                  <span className="text-neutral-500 flex items-center gap-1">
-                    <ShieldAlert className="w-3 h-3 text-neutral-400" /> Legacy Process
-                  </span>
-                  <span className="font-mono text-neutral-400">180 Days</span>
-                </div>
+              <div className="h-2.5 w-full bg-neutral-200/60 dark:bg-neutral-800 rounded-full overflow-hidden">
+                <motion.div
+                  className="h-full bg-emerald-500 rounded-full"
+                  animate={{ width: ["0%", "100%", "100%", "0%"] }}
+                  transition={{
+                    duration: 4,
+                    repeat: Infinity,
+                    times: [0, 0.2, 0.8, 1],
+                    ease: "easeInOut",
+                  }}
+                />
               </div>
             </div>
 
-            <div className="relative z-10 pt-1">
-              <input
-                type="range"
-                min="10"
-                max="100"
-                value={sliderValue}
-                onChange={(e) => setSliderValue(Number(e.target.value))}
-                className="w-full h-1.5 bg-neutral-200 dark:bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
-              />
-              <div className="flex justify-between text-[9px] text-neutral-400 mt-1">
-                <span>Enterprise Bloat</span>
-                <span>Lean Velocity</span>
+            {/* Legacy Slow Bar */}
+            <div className="space-y-1.5 opacity-50">
+              <div className="flex justify-between text-xs text-neutral-500">
+                <span>Traditional Setup</span>
+                <span className="font-mono text-[11px]">3.8s</span>
+              </div>
+              <div className="h-2.5 w-full bg-neutral-200/60 dark:bg-neutral-800 rounded-full overflow-hidden">
+                <motion.div
+                  className="h-full bg-neutral-400 dark:bg-neutral-600 rounded-full"
+                  animate={{ width: ["0%", "30%", "30%", "0%"] }}
+                  transition={{
+                    duration: 4,
+                    repeat: Infinity,
+                    times: [0, 0.8, 0.9, 1],
+                    ease: "linear",
+                  }}
+                />
               </div>
             </div>
           </div>
@@ -261,71 +161,61 @@ export default function VisionCards() {
         </div>
       </div>
 
-      <div className="w-full rounded-3xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-xl overflow-hidden flex flex-col justify-between">
+      {/* Card 3: Next-Gen Systems */}
+      <div className="w-full rounded-3xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-xl flex flex-col justify-between">
         <div>
           <div className="flex items-center gap-2 mb-4 text-neutral-800 dark:text-neutral-200 font-semibold text-sm">
             <div className="p-2 rounded-xl bg-neutral-100 dark:bg-neutral-900 border border-neutral-200/60 dark:border-neutral-800">
-              <Zap className="w-4 h-4 text-amber-500" />
+              <Zap className="w-4 h-4 text-purple-500" />
             </div>
             <span>Next-Gen Systems</span>
           </div>
 
-          <div className="relative h-56 rounded-2xl bg-neutral-50 dark:bg-neutral-900/50 p-4 flex flex-col justify-between overflow-hidden border border-neutral-100 dark:border-neutral-800/50">
-            <div className="flex items-center justify-between text-xs font-semibold text-neutral-700 dark:text-neutral-300">
-              <span className="flex items-center gap-1">
-                <Sparkles className="w-3.5 h-3.5 text-purple-500" /> Architecture Flow
-              </span>
-              <span className="text-[10px] font-mono text-purple-500 bg-purple-500/10 px-2 py-0.5 rounded-full">
-                Live Pipeline
+          <div className="relative h-56 rounded-2xl bg-neutral-50 dark:bg-neutral-900/50 p-4 flex flex-col justify-between border border-neutral-100 dark:border-neutral-800/50">
+            {/* Input Prompt Box */}
+            <div className="flex items-center gap-2 bg-white dark:bg-neutral-900 p-2.5 rounded-xl border border-neutral-200/80 dark:border-neutral-800 shadow-sm text-xs text-neutral-600 dark:text-neutral-300">
+              <Sparkles className="w-3.5 h-3.5 text-purple-500 shrink-0" />
+              <span className="font-mono text-[11px] truncate">
+                {aiStep === 0 ? "Prompt: Build login form..." : "Generating UI components..."}
               </span>
             </div>
 
-            <div className="relative z-10 flex items-center justify-between my-auto px-1">
-              {pipelineNodes.map((node, i) => {
-                const Icon = node.icon;
-                const isSelected = activeNode.id === node.id;
-
-                return (
-                  <div key={node.id} className="flex items-center">
-                    <button
-                      onClick={() => setActiveNode(node)}
-                      className={`relative p-2.5 rounded-xl border transition-all ${
-                        isSelected
-                          ? `${node.color} scale-110 shadow-md`
-                          : "bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-400 hover:text-neutral-600"
-                      }`}
-                    >
-                      <Icon className="w-4 h-4" />
-                    </button>
-
-                    {i < pipelineNodes.length - 1 && (
-                      <ArrowRight className="w-3 h-3 text-neutral-300 dark:text-neutral-700 mx-1.5 animate-pulse" />
-                    )}
-                  </div>
-                );
-              })}
+            {/* Generated UI Elements Output */}
+            <div className="space-y-2 my-auto">
+              <AnimatePresence mode="wait">
+                {aiStep === 1 ? (
+                  <motion.div
+                    key="rendered-ui"
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.3 }}
+                    className="space-y-2 bg-white/60 dark:bg-neutral-900/60 p-3 rounded-xl border border-neutral-200/50 dark:border-neutral-800/50"
+                  >
+                    <div className="h-3 w-3/4 bg-neutral-200 dark:bg-neutral-800 rounded" />
+                    <div className="h-6 w-full bg-neutral-100 dark:bg-neutral-800/80 rounded-md border border-neutral-200/60 dark:border-neutral-700/50" />
+                    <div className="h-6 w-full bg-purple-500/10 text-purple-600 dark:text-purple-400 rounded-md flex items-center justify-center font-semibold text-[10px]">
+                      Submit
+                    </div>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="placeholder"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="h-20 flex items-center justify-center text-[11px] text-neutral-400 font-mono"
+                  >
+                    Waiting for input...
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeNode.id}
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
-                transition={{ duration: 0.15 }}
-                className="p-2.5 rounded-xl bg-white/90 dark:bg-neutral-900/90 border border-neutral-200/80 dark:border-neutral-800 text-xs"
-              >
-                <div className="flex justify-between items-center mb-0.5">
-                  <span className="font-semibold text-neutral-800 dark:text-neutral-200">
-                    {activeNode.label}
-                  </span>
-                  <span className="text-[9px] font-mono text-emerald-500 font-medium">Ready</span>
-                </div>
-                <p className="text-[10px] text-neutral-500 dark:text-neutral-400">
-                  {activeNode.desc}
-                </p>
-              </motion.div>
-            </AnimatePresence>
+            <div className="flex justify-between items-center text-[10px] font-mono text-neutral-400">
+              <span>AI Component Engine</span>
+              <span className="text-purple-500">Live</span>
+            </div>
           </div>
         </div>
 
