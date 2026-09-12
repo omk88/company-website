@@ -14,7 +14,7 @@ export default function CreatePostButton() {
     const setSelectedBlog = useBlogStore((state) => state.setSelectedBlog);
 
     const allowedStatic = ["/insights"];
-    const excludedStatic = ["/vision", "/insights", "/contact", "/products", "/sign-in"];
+    const excludedStatic = ["/about", "/insights", "/contact", "/products", "/sign-in"];
     const isSingleSegmentRoute = /^\/[^\/]+$/.test(pathname);
     const isUsernamePage = isSingleSegmentRoute && !excludedStatic.includes(pathname);
     const shouldShow = allowedStatic.includes(pathname) || isUsernamePage;

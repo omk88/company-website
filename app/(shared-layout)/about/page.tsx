@@ -12,12 +12,6 @@ export const metadata: Metadata = {
   title: "Vision",
 };
 
-const spaceGrotesk = Space_Grotesk({
-  subsets: ['latin'],
-  weight: ['500', '600', '700'],
-});
-
-
 export default function About() {
   return (
     <>
@@ -72,7 +66,7 @@ export default function About() {
               Redefining standards, not just following them
             </h2>
 
-            <p className="max-w-lg mx-auto text-center font-light text-sm sm:text-base leading-relaxed">
+            <p className="max-w-lg mx-auto text-center font-light text-xl leading-relaxed">
               Spotting gaps in current technologies and rapidly developing novel solutions. TaQtiQ combines deep systems expertise with an action-oriented approach to software design. At TaQtiQ, we're not just writing code. We're architecting effective, scalable platforms and redefining problems to get technology to deliver on its promises.
             </p>
           </div>

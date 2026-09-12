@@ -73,7 +73,7 @@ export function GlobalReachMap() {
   const [activeNode, setActiveNode] = useState<RegionNode | null>(null);
 
   return (
-    <div className="w-full bg-transparent py-12 my-4 relative">
+    <div className="w-full bg-transparent relative">
 
       <div className="relative w-full aspect-[2/1] bg-transparent overflow-hidden flex items-center justify-center">
         

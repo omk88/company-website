@@ -2,30 +2,30 @@
 
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { Compass, Lightbulb, Rocket, Zap } from "lucide-react";
+import {  Crosshair, Eye, Handshake, Lightbulb } from "lucide-react";
 
 const values = [
   {
     icon: Lightbulb,
     title: "Innovation First",
     description:
-      "We spot gaps in current technologies and rapidly build novel solutions, pushing the boundaries of what is possible.",
+      "We don't consider ourselves to be an average software company. At TaQtiQ, we want to redefine problems, challenge existing thinking and pioneer new paradigms in computing.",
   },
   {
-    icon: Compass,
-    title: "Redefine Problems",
+    icon: Handshake,
+    title: "Community Collaboration",
     description:
-      "We don't just solve problems as given; we rethink the fundamental constraints to discover new approaches.",
+      "Our community is the backbone of our business. We unite developers, clients, and industry partners in a trusted ecosystem, leveraging our collective insight to tackle hard technical problems and open up meaningful new horizons for the world through software.",
   },
   {
-    icon: Zap,
-    title: "Deep Systems Expertise",
+    icon: Crosshair,
+    title: "Outcome-Oriented Design",
     description:
-      "Combining deep technical fundamentals with rapid execution to architect scalable, resilient platforms.",
+      "We measure success by real world impact and the ability to get things done. With laser focus on our goals, we build bridges to transformative outcomes.",
   },
   {
-    icon: Rocket,
-    title: "Action-Oriented Design",
+    icon: Eye,
+    title: "Uncompromising Transparency",
     description:
       "We turn complex architectural theories into real-world code that delivers on technology's true promise.",
   },
@@ -62,7 +62,6 @@ export default function ValuesSection() {
         "bg-background text-foreground"
       )}
     >
-      {/* 1. Linear Grid Overlay */}
       <div 
         className={cn(
           "absolute inset-0 pointer-events-none opacity-40 dark:opacity-30",
@@ -71,11 +70,9 @@ export default function ValuesSection() {
         )} 
       />
 
-      {/* 2. Soft Gradient Glows (Mesh Effect) */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-emerald-500/10 dark:bg-emerald-500/15 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute top-1/3 left-1/4 w-[400px] h-[250px] bg-amber-500/10 dark:bg-amber-500/10 blur-[100px] rounded-full pointer-events-none" />
 
-      {/* 3. Content Container */}
       <div className="relative z-10 max-w-6xl mx-auto">
         
         <div className="text-center max-w-2xl mx-auto mb-12">
@@ -118,7 +115,7 @@ export default function ValuesSection() {
                     <h3 className="text-lg font-semibold text-foreground mb-2">
                       {item.title}
                     </h3>
-                    <p className="text-sm font-light leading-relaxed text-neutral-600 dark:text-neutral-400">
+                    <p className="text-base font-light leading-relaxed text-neutral-600 dark:text-neutral-400">
                       {item.description}
                     </p>
                   </div>

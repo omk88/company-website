@@ -101,9 +101,12 @@ export default function Home() {
           </div>
         </section>
 
-        <TrustedToolsSection />
+        <div>
+          <TrustedToolsSection />
+        </div>
+        
 
-        <div className="flex flex-col items-center mt-16 text-center gap-4 px-4">
+        <div className="flex flex-col items-center mt-24 text-center gap-4 px-4">
           <h1
             className={cn(
               spaceGrotesk.className,
@@ -137,7 +140,7 @@ export default function Home() {
           <VisionCards />
         </div>
 
-        <div className="flex flex-col items-center mt-16 text-center gap-4 px-4">
+        <div className="flex flex-col items-center mt-28 text-center gap-4 px-4">
           <h1
             className={cn(
               spaceGrotesk.className,
