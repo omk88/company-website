@@ -1,8 +1,5 @@
 import Link from "next/link";
 import { ThemeToggle } from "./ThemeToggle";
-import { RxLinkedinLogo } from "react-icons/rx";
-import { AiOutlineInstagram } from "react-icons/ai";
-import { FaXTwitter } from "react-icons/fa6";
 import { MobileMenu } from "./MobileMenu";
 import { NavbarAuthClient } from "./NavbarAuthClient";
 import { Suspense } from "react";
@@ -10,6 +7,8 @@ import { getServerAuth } from "@/lib/auth-server";
 import { Skeleton } from "../ui/skeleton";
 import { NavLink } from "./NavLink";
 import CreatePostButton from "./CreatePostButton";
+import { ChevronDown } from "lucide-react";
+import NavbarResourcesDropdown from "./NavbarResourcesDropdown";
 
 async function NavbarAuthServer() {
   const { isAuth, initialImage, initialProfile } = await getServerAuth();
@@ -41,11 +40,14 @@ export function Navbar() {
 
           <div className="hidden md:flex items-center gap-6">
             <NavLink href="/" anim={anim}>Home</NavLink>
-            <NavLink href="/about" anim={anim}>About</NavLink>
+            <NavbarResourcesDropdown />
             <NavLink href="/insights" anim={anim}>Insights</NavLink>
+
+            {/*<NavLink href="/about" anim={anim}>About</NavLink>
             <NavLink href="/contact" anim={anim}>Contact</NavLink>
-            <NavLink href="/products" anim={anim}>Solutions</NavLink>
+            <NavLink href="/products" anim={anim}>Solutions</NavLink>*/}
           </div>
+
 
           <div className="ml-4">
             <Suspense fallback={<div className="w-24 h-8" />}>
