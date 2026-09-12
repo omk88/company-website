@@ -5,31 +5,31 @@ import { NavbarAuthClient } from "./NavbarAuthClient";
 import { Suspense } from "react";
 import { getServerAuth } from "@/lib/auth-server";
 import { Skeleton } from "../ui/skeleton";
-import { NavLink } from "./NavLink";
 import CreatePostButton from "./CreatePostButton";
-import { ChevronDown } from "lucide-react";
-import NavbarResourcesDropdown from "./NavbarResourcesDropdown";
+import { NavLinksGroup } from "./NavLinksGroup";
 
 async function NavbarAuthServer() {
   const { isAuth, initialImage, initialProfile } = await getServerAuth();
 
   return (
-      <NavbarAuthClient
-        initialIsAuth={isAuth}
-        initialImage={initialImage}
-        initialProfile={initialProfile}
-      />
-    );
+    <NavbarAuthClient
+      initialIsAuth={isAuth}
+      initialImage={initialImage}
+      initialProfile={initialProfile}
+    />
+  );
 }
 
 function AuthSkeleton() {
   return <Skeleton className="h-9 w-9 rounded-lg shrink-0" />;
 }
-export function Navbar() { 
-  const anim = "relative no-underline hover:no-underline after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100";
+
+export function Navbar() {
+  const anim =
+    "relative no-underline hover:no-underline after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100";
 
   return (
-    <header className="w-full fixed top-0 z-50 bg-background/95 backdrop-blur-sm border-b"> 
+    <header className="w-full fixed top-0 z-50 bg-background/95 backdrop-blur-sm border-b">
       <nav className="w-full px-12 h-16 flex items-center justify-between relative">
         <div className="flex items-center gap-8">
           <Link href="/">
@@ -38,18 +38,9 @@ export function Navbar() {
             </h1>
           </Link>
 
-          <div className="hidden md:flex items-center gap-6">
-            <NavLink href="/" anim={anim}>Home</NavLink>
-            <NavbarResourcesDropdown />
-            <NavLink href="/insights" anim={anim}>Insights</NavLink>
+          <NavLinksGroup />
 
-            {/*<NavLink href="/about" anim={anim}>About</NavLink>
-            <NavLink href="/contact" anim={anim}>Contact</NavLink>
-            <NavLink href="/products" anim={anim}>Solutions</NavLink>*/}
-          </div>
-
-
-          <div className="ml-4">
+          <div className="ml-2">
             <Suspense fallback={<div className="w-24 h-8" />}>
               <CreatePostButton />
             </Suspense>
@@ -57,7 +48,6 @@ export function Navbar() {
         </div>
 
         <div className="hidden md:flex items-center gap-5 text-foreground">
-          
           <div className="flex items-center gap-2">
             <ThemeToggle />
             <Suspense fallback={<AuthSkeleton />}>
@@ -68,13 +58,13 @@ export function Navbar() {
 
         <div className="flex md:hidden items-center gap-4">
           <ThemeToggle />
-          <MobileMenu 
-            anim={anim} 
-            navbarAuth={ 
+          <MobileMenu
+            anim={anim}
+            navbarAuth={
               <Suspense fallback={<AuthSkeleton />}>
                 <NavbarAuthServer />
-              </Suspense> 
-            } 
+              </Suspense>
+            }
           />
         </div>
       </nav>

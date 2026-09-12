@@ -40,35 +40,61 @@ const legalPages = [
   { title: "Cookie Policy", href: "/cookies", icon: Cookie },
 ];
 
-export default function NavbarResourcesDropdown() {
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+// 1. Declare the props interface
+interface NavbarResourcesDropdownProps {
+  hoveredPath: string | null;
+  setHoveredPath: (path: string | null) => void;
+}
+
+// 2. Accept props in component signature
+export default function NavbarResourcesDropdown({
+  hoveredPath,
+  setHoveredPath,
+}: NavbarResourcesDropdownProps) {
+  const [hoveredCardIndex, setHoveredCardIndex] = useState<number | null>(null);
+  const isTriggerHovered = hoveredPath === "/resources";
 
   return (
     <NavigationMenu>
       <NavigationMenuList>
         <NavigationMenuItem>
-          <NavigationMenuTrigger className="bg-transparent hover:bg-neutral-100 dark:hover:bg-neutral-800 text-sm font-medium">
-            Resources
+          <NavigationMenuTrigger
+            onMouseEnter={() => setHoveredPath("/resources")}
+            className="relative h-auto px-3 py-1.5 text-sm font-medium rounded-lg text-foreground bg-transparent hover:bg-transparent data-[state=open]:bg-transparent focus:bg-transparent transition-colors shadow-none"
+          >
+            {/* Shared sliding hover pill */}
+            {isTriggerHovered && (
+              <motion.div
+                layoutId="navbar-hover-pill"
+                className="absolute inset-0 bg-neutral-100 dark:bg-neutral-800 rounded-lg -z-10"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ type: "spring", stiffness: 350, damping: 30 }}
+              />
+            )}
+            <span className="relative z-10">Resources</span>
           </NavigationMenuTrigger>
 
-          <NavigationMenuContent>
-            <div className="w-[600px] bg-background/95 backdrop-blur-md overflow-hidden grid grid-cols-12 rounded-xl">
-              <div className="col-span-8 p-4">
-                <div className="flex flex-col gap-1 relative">
+          <NavigationMenuContent className="p-0 overflow-hidden shadow-xl rounded-xl">
+            <div className="w-[580px] grid grid-cols-12 bg-background">
+              
+              <div className="col-span-7 p-3">
+                <div className="flex flex-col gap-0.5 relative">
                   {mainPages.map((item, index) => {
                     const Icon = item.icon;
                     return (
                       <NavigationMenuLink key={item.title} asChild>
                         <Link
                           href={item.href}
-                          onMouseEnter={() => setHoveredIndex(index)}
-                          onMouseLeave={() => setHoveredIndex(null)}
+                          onMouseEnter={() => setHoveredCardIndex(index)}
+                          onMouseLeave={() => setHoveredCardIndex(null)}
                           className="relative group p-2.5 rounded-lg flex items-start gap-3 transition-colors"
                         >
                           <AnimatePresence>
-                            {hoveredIndex === index && (
+                            {hoveredCardIndex === index && (
                               <motion.div
-                                layoutId="nav-hover-pill"
+                                layoutId="dropdown-item-pill"
                                 initial={{ opacity: 0, scale: 0.96 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.96 }}
@@ -97,26 +123,25 @@ export default function NavbarResourcesDropdown() {
                 </div>
               </div>
 
-              <div className="col-span-4 bg-neutral-50/80 dark:bg-neutral-900/50 p-4 border-l border-neutral-200/60 dark:border-neutral-800/60 flex flex-col justify-between">
-                <div>
-                  <div className="flex flex-col gap-0.5">
-                    {legalPages.map((legal) => {
-                      const Icon = legal.icon;
-                      return (
-                        <NavigationMenuLink key={legal.title} asChild>
-                          <Link
-                            href={legal.href}
-                            className="p-2 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-neutral-200/50 dark:hover:bg-neutral-800/60 flex items-center gap-2 transition-colors"
-                          >
-                            <Icon className="w-3.5 h-3.5 shrink-0" />
-                            <span>{legal.title}</span>
-                          </Link>
-                        </NavigationMenuLink>
-                      );
-                    })}
-                  </div>
+              <div className="col-span-5 bg-neutral-50/80 dark:bg-neutral-900/50 p-3 border-l border-neutral-200/60 dark:border-neutral-800/60 flex flex-col justify-between">
+                <div className="flex flex-col gap-0.5">
+                  {legalPages.map((legal) => {
+                    const Icon = legal.icon;
+                    return (
+                      <NavigationMenuLink key={legal.title} asChild>
+                        <Link
+                          href={legal.href}
+                          className="p-2.5 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-neutral-200/50 dark:hover:bg-neutral-800/60 flex items-center gap-2 transition-colors"
+                        >
+                          <Icon className="w-3.5 h-3.5 shrink-0" />
+                          <span>{legal.title}</span>
+                        </Link>
+                      </NavigationMenuLink>
+                    );
+                  })}
                 </div>
               </div>
+
             </div>
           </NavigationMenuContent>
         </NavigationMenuItem>
