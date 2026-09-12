@@ -104,7 +104,7 @@ export function ProfileHoverCard({ displayName, authorUsername, children, align 
                             </div>
                         </Link>
 
-                        <div className="gap-4 p-2 flex flex-col font-extralight text-[14px] font-sans tracking-tight select-none w-full">
+                        <div className="gap-4 p-2 flex flex-col text-[14px] font-sans tracking-tight select-none w-full">
                             <TooltipProvider delayDuration={200}>
                                 <Tooltip>
                                     <TooltipTrigger asChild>
