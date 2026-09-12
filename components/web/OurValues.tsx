@@ -27,7 +27,7 @@ const values = [
     icon: Eye,
     title: "Uncompromising Transparency",
     description:
-      "We turn complex architectural theories into real-world code that delivers on technology's true promise.",
+      "Trust is built on openness and honesty. From clear communication to straightforward roadmaps, we cut through the noise to ensure that no one is left in the dark.",
   },
 ];
 
