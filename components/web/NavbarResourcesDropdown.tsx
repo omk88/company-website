@@ -40,13 +40,11 @@ const legalPages = [
   { title: "Cookie Policy", href: "/cookies", icon: Cookie },
 ];
 
-// 1. Declare the props interface
 interface NavbarResourcesDropdownProps {
   hoveredPath: string | null;
   setHoveredPath: (path: string | null) => void;
 }
 
-// 2. Accept props in component signature
 export default function NavbarResourcesDropdown({
   hoveredPath,
   setHoveredPath,
@@ -62,18 +60,18 @@ export default function NavbarResourcesDropdown({
             onMouseEnter={() => setHoveredPath("/resources")}
             className="relative h-auto px-3 py-1.5 text-sm font-medium rounded-lg text-foreground bg-transparent hover:bg-transparent data-[state=open]:bg-transparent focus:bg-transparent transition-colors shadow-none"
           >
-            {/* Shared sliding hover pill */}
             {isTriggerHovered && (
               <motion.div
-                layoutId="navbar-hover-pill"
+                layoutId="navbar-pill"
                 className="absolute inset-0 bg-neutral-100 dark:bg-neutral-800 rounded-lg -z-10"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 380,
+                  damping: 30,
+                }}
               />
             )}
-            <span className="relative z-10">Resources</span>
+            <span className="relative z-10 cursor-pointer">Resources</span>
           </NavigationMenuTrigger>
 
           <NavigationMenuContent className="p-0 overflow-hidden shadow-xl rounded-xl">
