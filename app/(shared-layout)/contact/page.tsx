@@ -32,7 +32,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import GridCube from "@/components/3d/GridCube";
+import { cn } from "@/lib/utils";
 
 const CONTACT_MODELS = ['/pipes.glb'];
 
@@ -111,32 +111,30 @@ export default function ContactPage() {
 
   return (
     <>
-      <section className="w-full max-w-7xl mx-auto px-6 md:px-12 pt-4 pb-16 flex flex-col items-center h-[calc(100vh-64px)] justify-start overflow-hidden">
-        <div className="flex flex-col items-center w-full flex-1 justify-start gap-4 md:gap-6">
-          
-          <div className="w-full h-30 max-w-md lg:max-w-[460px] flex items-center justify-center relative overflow-hidden shrink-0 transform-gpu">
-            <GridCube models={CONTACT_MODELS} storageKey="contact_sphere_path" glitchEnabled={false} />
+      <section
+        className={cn(
+          "relative w-full pt-4 pb-16 flex flex-col items-center justify-between min-h-[calc(100vh-64px)] overflow-hidden",
+          "text-neutral-600 dark:text-neutral-400",
+          "bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] dark:bg-[radial-gradient(#262626_1px,transparent_1px)] [background-size:16px_16px]"
+        )}
+      >
+        <div className="max-w-7xl mx-auto px-6 md:px-12 w-full flex-1 flex flex-col justify-end items-center gap-6 py-12">
+          <div className="text-center space-y-1.5 max-w-xl shrink-0">
+            <h1 className="flex items-center justify-center gap-2.5 font-bold text-3xl text-foreground tracking-tight">
+              <MessageCircleQuestionMark className="w-5 h-5 md:w-6 md:h-6 stroke-[2.3] shrink-0" />
+              <span>Get in touch.</span>
+            </h1>
+            <p className="text-lg text-muted-foreground max-w-md mx-auto leading-normal">
+              Have a question or want to work together? Drop us a message and our team will get back to you shortly.
+            </p>
           </div>
 
-          <div className="w-full flex flex-col items-center gap-6 -mt-2 md:-mt-4">
-            <div className="text-center space-y-1.5 max-w-xl shrink-0">
-              <h1 className="flex items-center justify-center gap-2.5 font-bold text-xl md:text-2xl text-foreground tracking-tight">
-                <MessageCircleQuestionMark className="w-5 h-5 md:w-6 md:h-6 stroke-[2.3] shrink-0" />
-                <span>Get in touch.</span>
-              </h1>
-              <p className="text-sm md:text-base text-muted-foreground max-w-md mx-auto leading-normal">
-                Have a question or want to work together? Drop us a message and our team will get back to you shortly.
-              </p>
-            </div>
-            
-            <div className="w-full shrink-0">
-              <ContactCards 
-                onMessageClick={() => setIsSheetOpen(true)} 
-                onChatbotClick={() => setIsChatbotOpen(true)}
-              />
-            </div>
+          <div className="w-full shrink-0">
+            <ContactCards 
+              onMessageClick={() => setIsSheetOpen(true)} 
+              onChatbotClick={() => setIsChatbotOpen(true)}
+            />
           </div>
-
         </div>
       </section>
 
