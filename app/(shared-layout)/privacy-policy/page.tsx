@@ -1,3 +1,4 @@
+import Footer from "@/components/web/Footer";
 import { Metadata } from "next";
 import React from "react";
 
@@ -347,48 +348,51 @@ export default function PrivacyPolicy() {
   ];
 
   return (
-    <div className="min-h-screen bg-background text-foreground py-16 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto">
-        <header className="border-b border-border pb-8 mb-12">
-          <h1 className="text-4xl font-bold tracking-tight mb-3 sm:text-5xl">
-            Privacy Policy
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Last Updated: <time dateTime={lastUpdated}>{lastUpdated}</time>
-          </p>
-        </header>
+    <>
+      <div className="min-h-screen bg-background text-foreground py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-3xl mx-auto">
+          <header className="border-b border-border pb-8 mb-12">
+            <h1 className="text-4xl font-bold tracking-tight mb-3 sm:text-5xl">
+              Privacy Policy
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Last Updated: <time dateTime={lastUpdated}>{lastUpdated}</time>
+            </p>
+          </header>
 
-        <div className="space-y-6 text-base leading-relaxed text-muted-foreground mb-16">
-          <p>
-            TaQtiQ (“we,” “our,” or “us”) is committed to protecting your privacy. This Privacy Policy explains how your personal information is collected, used, and disclosed by TaQtiQ.
-          </p>
-          <p>
-            This Privacy Policy applies to our website, and its associated subdomains (collectively, our “Service”) alongside our application, TaQtiQ. By accessing or using our Service, you signify that you have read, understood, and agree to our collection, storage, use, and disclosure of your personal information as described in this Privacy Policy and our Terms of Service. This Privacy Policy was created with{" "}
-            <a 
-              href="https://termify.io" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="text-primary font-medium underline underline-offset-4 hover:text-primary/80 transition-colors"
-            >
-              Termify
-            </a>
-            .
-          </p>
-        </div>
+          <div className="space-y-6 text-base leading-relaxed text-muted-foreground mb-16">
+            <p>
+              TaQtiQ (“we,” “our,” or “us”) is committed to protecting your privacy. This Privacy Policy explains how your personal information is collected, used, and disclosed by TaQtiQ.
+            </p>
+            <p>
+              This Privacy Policy applies to our website, and its associated subdomains (collectively, our “Service”) alongside our application, TaQtiQ. By accessing or using our Service, you signify that you have read, understood, and agree to our collection, storage, use, and disclosure of your personal information as described in this Privacy Policy and our Terms of Service. This Privacy Policy was created with{" "}
+              <a 
+                href="https://termify.io" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-primary font-medium underline underline-offset-4 hover:text-primary/80 transition-colors"
+              >
+                Termify
+              </a>
+              .
+            </p>
+          </div>
 
-        <div className="space-y-14">
-          {sections.map((section) => (
-            <section key={section.id} id={section.id} className="scroll-mt-20 border-t border-border/40 pt-8">
-              <h2 className="text-xl font-semibold tracking-tight text-foreground mb-4">
-                {section.title}
-              </h2>
-              <div className="text-base leading-relaxed text-muted-foreground space-y-4">
-                {section.content}
-              </div>
-            </section>
-          ))}
+          <div className="space-y-14">
+            {sections.map((section) => (
+              <section key={section.id} id={section.id} className="scroll-mt-20 border-t border-border/40 pt-8">
+                <h2 className="text-xl font-semibold tracking-tight text-foreground mb-4">
+                  {section.title}
+                </h2>
+                <div className="text-base leading-relaxed text-muted-foreground space-y-4">
+                  {section.content}
+                </div>
+              </section>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
+      <Footer />
+    </>
   );
 }

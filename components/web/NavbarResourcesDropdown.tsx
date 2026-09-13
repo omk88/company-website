@@ -35,9 +35,9 @@ const mainPages = [
 ];
 
 const legalPages = [
-  { title: "Privacy Policy", href: "/privacy", icon: Shield },
-  { title: "Terms & Conditions", href: "/terms", icon: FileText },
-  { title: "Cookie Policy", href: "/cookies", icon: Cookie },
+  { title: "Privacy Policy", href: "/privacy-policy", icon: Shield },
+  { title: "Terms & Conditions", href: "/terms-and-conditions", icon: FileText },
+  { title: "Cookie Policy", href: "/cookie-policy", icon: Cookie },
 ];
 
 interface NavbarResourcesDropdownProps {
