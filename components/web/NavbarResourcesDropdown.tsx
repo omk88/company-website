@@ -11,7 +11,7 @@ import {
   NavigationMenuContent,
   NavigationMenuLink,
 } from "@/components/ui/navigation-menu";
-import { Info, Sparkles, HelpCircle, Shield, FileText, Cookie, Layers } from "lucide-react";
+import { Info, HelpCircle, Shield, FileText, Cookie, Layers, Briefcase } from "lucide-react";
 
 const mainPages = [
   {
@@ -25,6 +25,12 @@ const mainPages = [
     description: "View our digital solutions and products.",
     href: "/solutions",
     icon: Layers,
+  },
+  {
+    title: "Careers",
+    description: "Interested in working for us? View our open positions.",
+    href: "/careers",
+    icon: Briefcase,
   },
   {
     title: "Help & Support",

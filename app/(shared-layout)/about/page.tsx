@@ -35,7 +35,7 @@ export default function About() {
             </p>
 
             <Link 
-              href="/products" 
+              href="/careers" 
               className="group px-4.5 py-2.5 bg-foreground hover:bg-foreground/90 text-background font-medium text-xs sm:text-sm rounded-lg transition-all duration-150 active:scale-[0.98] inline-flex items-center gap-2 shadow-sm"
             >
               <span>View careers</span>
