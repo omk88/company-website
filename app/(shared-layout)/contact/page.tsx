@@ -111,22 +111,33 @@ export default function ContactPage() {
 
   return (
     <>
-      <section
-        className={cn(
-          "relative w-full pt-4 pb-16 flex flex-col items-center justify-between min-h-[calc(100vh-64px)] overflow-hidden",
-          "text-neutral-600 dark:text-neutral-400",
-          "bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] dark:bg-[radial-gradient(#262626_1px,transparent_1px)] [background-size:16px_16px]"
-        )}
-      >
-        <div className="max-w-7xl mx-auto px-6 md:px-12 w-full flex-1 flex flex-col justify-end items-center gap-6 py-12">
-          <div className="text-center space-y-1.5 max-w-xl shrink-0">
-            <h1 className="flex items-center justify-center gap-2.5 font-bold text-3xl text-foreground tracking-tight">
-              <MessageCircleQuestionMark className="w-5 h-5 md:w-6 md:h-6 stroke-[2.3] shrink-0" />
-              <span>Get in touch.</span>
-            </h1>
-            <p className="text-lg text-muted-foreground max-w-md mx-auto leading-normal">
-              Have a question or want to work together? Drop us a message and our team will get back to you shortly.
-            </p>
+      <div className="pt-16 max-w-6xl mx-auto w-full border-x border-neutral-200 dark:border-neutral-800 flex-1">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 w-full flex-1 flex flex-col justify-end items-center gap-6">
+          <div className="text-center space-y-3 max-w-xl shrink-0 flex flex-col items-center">
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white border border-gray-200/80 shadow-sm text-sm font-medium text-foreground">
+              <MessageCircleQuestionMark className="w-4 h-4 text-foreground" />
+              <span>Contact</span>
+            </div>
+
+            <div 
+              className={cn(
+                "relative flex flex-col items-center w-full",
+                "text-neutral-600 dark:text-neutral-400",
+              )}
+            >
+              <h1
+                className={cn(
+                  "pb-2 text-2xl sm:text-3xl md:text-4xl", 
+                  "font-semibold tracking-tight text-foreground",
+                  "leading-tight max-w-3xl text-center"
+                )}
+              >
+                Get in touch.
+              </h1>
+              <p className="max-w-lg mx-auto text-center font-light text-xl leading-relaxed">
+                Have a question or want to work together? Drop us a message and our team will get back to you shortly.
+              </p>
+            </div>
           </div>
 
           <div className="w-full shrink-0">
@@ -136,171 +147,207 @@ export default function ContactPage() {
             />
           </div>
         </div>
-      </section>
 
-      <div id="faq-section" className="w-full bg-white dark:bg-zinc-950 border-t border-border/50">
-        <div className="max-w-7xl mx-auto px-6 pt-16 pb-24">
-          <div className="mb-8 md:mb-6 flex items-center justify-center md:justify-start gap-2.5 text-foreground">
-            <CircleHelp className="w-5 h-5 md:w-6 md:h-6 stroke-[2.3] shrink-0" />
-            <h2 className="font-bold text-xl md:text-2xl tracking-tight">
-              Frequently Asked Questions
-            </h2>
-          </div>
-          
-          <FAQSection 
-            onMessageClick={() => setIsSheetOpen(true)} 
-            onChatbotClick={() => setIsChatbotOpen(true)} 
-          />
-
-        </div>
-      </div>
-
-      <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-        <SheetContent
-          side="right"
-          className="w-full sm:max-w-md bg-card flex flex-col h-full gap-0 overflow-hidden"
+        <div 
+          className={cn(
+            "relative flex flex-col items-center w-full my-12 py-12 px-4",
+            "border-y border-neutral-200/80 dark:border-neutral-800/80",
+            "text-neutral-600 dark:text-neutral-400",
+            "bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] dark:bg-[radial-gradient(#262626_1px,transparent_1px)]",
+            "[background-size:16px_16px]"
+          )}
         >
-          <form onSubmit={handleSubmit} className="flex flex-col h-full w-full">
-            <SheetHeader className="text-left shrink-0 p-6 pb-0 space-y-1">
-              <SheetTitle className="text-lg font-semibold tracking-tight text-foreground font-sans leading-none">
-                Send us a Message
-              </SheetTitle>
-              <SheetDescription className="text-sm text-muted-foreground font-sans leading-snug tracking-normal">
-                Fill out the form fields below and we will get back to you shortly.
-              </SheetDescription>
-            </SheetHeader>
+          <h2
+            className={cn(
+              "pb-4 text-2xl sm:text-3xl md:text-4xl", 
+              "font-semibold tracking-tight text-foreground",
+              "leading-tight max-w-3xl text-center"
+            )}
+          >
+            We're working round the clock to get you the answers you need
+          </h2>
 
-            <div className="p-6 flex-1 w-full overflow-y-auto">
-              <FieldGroup className="gap-y-4">
-                <Field>
-                  <FieldLabel>Name</FieldLabel>
-                  <Input required name="name" placeholder="John Doe" type="text" />
-                </Field>
+          <p className="max-w-lg mx-auto text-center font-light text-xl leading-relaxed">
+            Our support team works day and night to answer your questions. If you haven't recieved an answer yet - hang tight! We're moving fast to get you the information you need.
+          </p>
+        </div>
 
-                <Field>
-                  <FieldLabel>Email</FieldLabel>
-                  <Input required name="email" placeholder="john@doe.com" type="email" />
-                </Field>
-
-                <Field>
-                  <FieldLabel>Subject</FieldLabel>
-                  <Input required name="subject" placeholder="How can we help?" type="text" />
-                </Field>
-
-                <Field>
-                  <FieldLabel>Message</FieldLabel>
-                  <textarea
-                    required
-                    name="message"
-                    rows={4}
-                    placeholder="Leave your message here..."
-                    className="flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-xs transition-colors placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm resize-none"
-                  />
-                </Field>
-              </FieldGroup>
-            </div>
-
-            <SheetFooter className="shrink-0 p-6 pt-4 flex flex-col gap-2 sm:flex-col mt-auto">
-              <Button type="submit" className="w-full font-medium" disabled={isPending}>
-                {isPending ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Sending
-                  </>
-                ) : (
-                  "Send Message"
-                )}
-              </Button>
-              <SheetClose asChild>
-                <Button variant="outline" className="w-full font-medium" type="button">
-                  Close
-                </Button>
-              </SheetClose>
-            </SheetFooter>
-          </form>
-        </SheetContent>
-      </Sheet>
-
-      <Dialog open={isChatbotOpen} onOpenChange={setIsChatbotOpen}>
-        <DialogContent className="sm:max-w-[500px] h-[550px] flex flex-col p-0 overflow-hidden">
-          
-          <DialogHeader className="p-6 pb-4 border-b border-border/50 shrink-0">
-            <DialogTitle className="text-lg font-semibold tracking-tight flex items-center gap-2">
-              <Bot className="w-5 h-5 text-primary" />
-              AI Assistant
-            </DialogTitle>
-            <DialogDescription>
-              Ask our chatbot anything about our services and products.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-muted/10">
-            {chatHistory.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-muted-foreground gap-1 text-center px-4">
-                <Bot className="h-8 w-8 stroke-[1.2] text-muted-foreground/50 mb-1" />
-                <p className="text-sm font-medium">Hello! How can I help you today?</p>
+        <div id="faq-section" className="w-full bg-white dark:bg-zinc-950">
+          <div className="max-w-7xl mx-auto px-6 pt-16 pb-24">
+            <div className="mb-8 md:mb-6 flex flex-col justify-center md:justify-start gap-2.5 text-foreground">
+              <div className="inline-flex w-fit items-center gap-1.5 px-3.5 py-1 rounded-full bg-white border border-gray-200/80 shadow-sm text-sm font-medium text-foreground">
+                <CircleHelp className="w-4 h-4 text-foreground" />
+                <span>FAQ</span>
               </div>
-            ) : (
-              chatHistory.map((msg, index) => (
-                <div
-                  key={index}
-                  className={`flex items-start gap-2.5 w-full ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-                >
-                  {msg.role === "assistant" && (
-                    <div className="p-1 bg-primary/10 rounded-md shrink-0 text-primary mt-0.5">
-                      <Bot className="w-3.5 h-3.5" />
-                    </div>
+              <h3
+                className={cn(
+                  "text-2xl sm:text-3xl md:text-4xl", 
+                  "font-semibold tracking-tight text-foreground",
+                  "leading-tight max-w-3xl"
+                )}
+              >
+                Frequently Asked Questions
+              </h3>
+              <p className="max-w-lg font-light text-xl leading-relaxed">
+                  Common questions asked by our users about our services.
+              </p>
+            </div>
+            
+            <FAQSection 
+              onMessageClick={() => setIsSheetOpen(true)} 
+              onChatbotClick={() => setIsChatbotOpen(true)} 
+            />
+
+          </div>
+        </div>
+
+        <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+          <SheetContent
+            side="right"
+            className="w-full sm:max-w-md bg-card flex flex-col h-full gap-0 overflow-hidden"
+          >
+            <form onSubmit={handleSubmit} className="flex flex-col h-full w-full">
+              <SheetHeader className="text-left shrink-0 p-6 pb-0 space-y-1">
+                <SheetTitle className="text-lg font-semibold tracking-tight text-foreground font-sans leading-none">
+                  Send us a Message
+                </SheetTitle>
+                <SheetDescription className="text-sm text-muted-foreground font-sans leading-snug tracking-normal">
+                  Fill out the form fields below and we will get back to you shortly.
+                </SheetDescription>
+              </SheetHeader>
+
+              <div className="p-6 flex-1 w-full overflow-y-auto">
+                <FieldGroup className="gap-y-4">
+                  <Field>
+                    <FieldLabel>Name</FieldLabel>
+                    <Input required name="name" placeholder="John Doe" type="text" />
+                  </Field>
+
+                  <Field>
+                    <FieldLabel>Email</FieldLabel>
+                    <Input required name="email" placeholder="john@doe.com" type="email" />
+                  </Field>
+
+                  <Field>
+                    <FieldLabel>Subject</FieldLabel>
+                    <Input required name="subject" placeholder="How can we help?" type="text" />
+                  </Field>
+
+                  <Field>
+                    <FieldLabel>Message</FieldLabel>
+                    <textarea
+                      required
+                      name="message"
+                      rows={4}
+                      placeholder="Leave your message here..."
+                      className="flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-xs transition-colors placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm resize-none"
+                    />
+                  </Field>
+                </FieldGroup>
+              </div>
+
+              <SheetFooter className="shrink-0 p-6 pt-4 flex flex-col gap-2 sm:flex-col mt-auto">
+                <Button type="submit" className="w-full font-medium" disabled={isPending}>
+                  {isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Sending
+                    </>
+                  ) : (
+                    "Send Message"
                   )}
+                </Button>
+                <SheetClose asChild>
+                  <Button variant="outline" className="w-full font-medium" type="button">
+                    Close
+                  </Button>
+                </SheetClose>
+              </SheetFooter>
+            </form>
+          </SheetContent>
+        </Sheet>
+
+        <Dialog open={isChatbotOpen} onOpenChange={setIsChatbotOpen}>
+          <DialogContent className="sm:max-w-[500px] h-[550px] flex flex-col p-0 overflow-hidden">
+            
+            <DialogHeader className="p-6 pb-4 border-b border-border/50 shrink-0">
+              <DialogTitle className="text-lg font-semibold tracking-tight flex items-center gap-2">
+                <Bot className="w-5 h-5 text-primary" />
+                AI Assistant
+              </DialogTitle>
+              <DialogDescription>
+                Ask our chatbot anything about our services and products.
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-muted/10">
+              {chatHistory.length === 0 ? (
+                <div className="h-full flex flex-col items-center justify-center text-muted-foreground gap-1 text-center px-4">
+                  <Bot className="h-8 w-8 stroke-[1.2] text-muted-foreground/50 mb-1" />
+                  <p className="text-sm font-medium">Hello! How can I help you today?</p>
+                </div>
+              ) : (
+                chatHistory.map((msg, index) => (
                   <div
-                    className={`max-w-[75%] rounded-lg px-3.5 py-2 text-sm shadow-xs ${
-                      msg.role === "user"
-                        ? "bg-[#0B0F19] text-white dark:bg-white dark:text-black rounded-tr-none"
-                        : "bg-white dark:bg-card border border-border/60 text-foreground rounded-tl-none"
-                    }`}
+                    key={index}
+                    className={`flex items-start gap-2.5 w-full ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                   >
-                    <p className="leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                    {msg.role === "assistant" && (
+                      <div className="p-1 bg-primary/10 rounded-md shrink-0 text-primary mt-0.5">
+                        <Bot className="w-3.5 h-3.5" />
+                      </div>
+                    )}
+                    <div
+                      className={`max-w-[75%] rounded-lg px-3.5 py-2 text-sm shadow-xs ${
+                        msg.role === "user"
+                          ? "bg-[#0B0F19] text-white dark:bg-white dark:text-black rounded-tr-none"
+                          : "bg-white dark:bg-card border border-border/60 text-foreground rounded-tl-none"
+                      }`}
+                    >
+                      <p className="leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                    </div>
+                  </div>
+                ))
+              )}
+              
+              {isChatLoading && (
+                <div className="flex items-start gap-2.5 w-full justify-start">
+                  <div className="p-1 bg-primary/10 rounded-md shrink-0 text-primary mt-0.5 animate-pulse">
+                    <Bot className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="bg-white dark:bg-card border border-border/60 text-muted-foreground rounded-lg rounded-tl-none px-4 py-2 text-xs flex items-center gap-1.5">
+                    <Loader2 className="h-3 w-3 animate-spin text-primary" />
+                    Assistant is compiling answer...
                   </div>
                 </div>
-              ))
-            )}
-            
-            {isChatLoading && (
-              <div className="flex items-start gap-2.5 w-full justify-start">
-                <div className="p-1 bg-primary/10 rounded-md shrink-0 text-primary mt-0.5 animate-pulse">
-                  <Bot className="w-3.5 h-3.5" />
-                </div>
-                <div className="bg-white dark:bg-card border border-border/60 text-muted-foreground rounded-lg rounded-tl-none px-4 py-2 text-xs flex items-center gap-1.5">
-                  <Loader2 className="h-3 w-3 animate-spin text-primary" />
-                  Assistant is compiling answer...
-                </div>
-              </div>
-            )}
-            <div ref={chatEndRef} />
-          </div>
+              )}
+              <div ref={chatEndRef} />
+            </div>
 
-          <form 
-            onSubmit={handleSendMessage} 
-            className="p-4 border-t border-border/50 flex items-center gap-2 bg-white dark:bg-card shrink-0"
-          >
-            <Input
-              value={chatInput}
-              onChange={(e) => setChatInput(e.target.value)}
-              placeholder="Type your message here..."
-              disabled={isChatLoading}
-              className="flex-1 h-10 border-border/60 focus-visible:ring-1 focus-visible:ring-primary shadow-none bg-transparent"
-            />
-            <Button 
-              type="submit" 
-              size="icon" 
-              disabled={isChatLoading || !chatInput.trim()} 
-              className="h-10 w-10 shrink-0 cursor-pointer bg-[#0B0F19] text-white hover:bg-[#161B26] dark:bg-white dark:text-black dark:hover:bg-white/90"
+            <form 
+              onSubmit={handleSendMessage} 
+              className="p-4 border-t border-border/50 flex items-center gap-2 bg-white dark:bg-card shrink-0"
             >
-              <Send className="h-4 w-4" />
-            </Button>
-          </form>
-          
-        </DialogContent>
-      </Dialog>
+              <Input
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                placeholder="Type your message here..."
+                disabled={isChatLoading}
+                className="flex-1 h-10 border-border/60 focus-visible:ring-1 focus-visible:ring-primary shadow-none bg-transparent"
+              />
+              <Button 
+                type="submit" 
+                size="icon" 
+                disabled={isChatLoading || !chatInput.trim()} 
+                className="h-10 w-10 shrink-0 cursor-pointer bg-[#0B0F19] text-white hover:bg-[#161B26] dark:bg-white dark:text-black dark:hover:bg-white/90"
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+            </form>
+            
+          </DialogContent>
+        </Dialog>
+      </div>
     </>
   );
 }

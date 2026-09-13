@@ -10,7 +10,7 @@ import {
   AccordionTrigger,
 } from "../ui/accordion";
 import { Button } from "../ui/button";
-import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "../ui/tabs";
 import {
   Smile,
   Layers,
@@ -173,9 +173,7 @@ export default function UnifiedFAQCard({ onMessageClick, onChatbotClick }: Unifi
 
   return (
     <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-      
       <div className="w-full flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-        
         <div className="flex-1 overflow-x-auto no-scrollbar min-w-0 pr-4">
           <TabsList className="flex w-max gap-1 p-1">
             <TabsTrigger value="pricing" className="flex items-center gap-1.5 px-4 whitespace-nowrap">
@@ -226,13 +224,7 @@ export default function UnifiedFAQCard({ onMessageClick, onChatbotClick }: Unifi
       </div>
 
       <Card className="w-full pt-4 pb-8 flex flex-col items-center bg-white dark:bg-card border-border/50 rounded-none shadow-md shadow-black/5 dark:shadow-black/40 transition-all duration-300 ease-out">
-        <div 
-          className="w-full"
-          style={{
-            animation: `slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards`,
-            opacity: 0,
-          }}
-        >
+        <TabsContent value={activeTab} className="w-full mt-0 border-0 p-0 outline-none">
           {filteredFaqs.length > 0 ? (
             <Accordion type="single" collapsible className="w-full">
               {visibleFaqs.map((faq: FAQItem) => {
@@ -296,9 +288,9 @@ export default function UnifiedFAQCard({ onMessageClick, onChatbotClick }: Unifi
               </div>
             </div>
           )}
-        </div>
+        </TabsContent>
 
-        {!showAll && filteredFaqs.length > 3 && (
+        {!showAll && filteredFaqs.length > 5 && (
           <Button
             onClick={() => setShowAll(true)}
             className="mt-6 px-6 py-2 rounded-full bg-[#0B0F19] text-white hover:bg-[#161B26] dark:bg-white dark:text-black dark:hover:bg-white/90 text-sm font-medium transition-colors shadow-xs"
