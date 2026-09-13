@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: BlogPageProps): Promise<Metad
 
   const { blog } = blogData;
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.taqtiq.tech";
-  const postUrl = `${baseUrl}/blog/${blog._id}`;
+  const postUrl = `${baseUrl}/insights/${blog._id}`;
 
   const imageUrl = blog.imageUrl?.startsWith("http")
     ? blog.imageUrl
