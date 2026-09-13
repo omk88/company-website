@@ -49,7 +49,7 @@ export default function NewsletterSubscriptionForm() {
       <Button 
         type="submit" 
         disabled={isSubmitting}
-        className="h-10 px-4 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 text-xs font-semibold rounded-lg shrink-0 gap-2"
+        className="cursor-pointer h-10 px-4 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 text-xs font-semibold rounded-lg shrink-0 gap-2"
       >
         {isSubmitting ? (
           <Loader2 className="w-3.5 h-3.5 animate-spin" />
