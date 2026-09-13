@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { RiAliensFill } from "react-icons/ri";
 
 export const metadata: Metadata = {
-  title: "Products",
+  title: "Solutions",
 };
 
 export default function Products() {

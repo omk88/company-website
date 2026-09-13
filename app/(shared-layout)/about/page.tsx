@@ -5,11 +5,10 @@ import OurValues from "@/components/web/OurValues";
 import { cn } from "@/lib/utils";
 import { ArrowRight, ChevronRight } from "lucide-react";
 import { Metadata } from "next";
-import { Space_Grotesk } from "next/font/google";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Vision",
+  title: "About",
 };
 
 export default function About() {
