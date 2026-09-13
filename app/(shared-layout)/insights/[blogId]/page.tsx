@@ -1,12 +1,13 @@
 import { cache } from "react";
 import { Metadata } from "next";
+import { fetchQuery } from "convex/nextjs";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { LeftSidebarControls } from "@/components/web/LeftSidebarControls";
 import { RightSidebarArticles } from "@/components/web/RightSidebarArticles";
 import { BlogContent } from "@/components/web/Blogs/BlogContent";
-import { fetchAuthQuery, preloadAuthQuery } from "@/lib/auth-server";
+import { preloadAuthQuery } from "@/lib/auth-server";
 import { BlogStoreHydrator } from "@/components/web/BlogStoreHydrator";
 
 interface BlogPageProps {
@@ -14,7 +15,7 @@ interface BlogPageProps {
 }
 
 const getBlogData = cache(async (blogId: Id<"blogs">) => {
-  return await fetchAuthQuery(api.blogs.getBlogWithAuthorPosts, { blogId });
+  return await fetchQuery(api.blogs.getBlogWithAuthorPosts, { blogId });
 });
 
 export async function generateMetadata({ params }: BlogPageProps): Promise<Metadata> {
@@ -32,6 +33,10 @@ export async function generateMetadata({ params }: BlogPageProps): Promise<Metad
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.taqtiq.tech";
   const postUrl = `${baseUrl}/blog/${blog._id}`;
 
+  const imageUrl = blog.imageUrl?.startsWith("http")
+    ? blog.imageUrl
+    : `${baseUrl}${blog.imageUrl || "/noImage.png"}`;
+
   return {
     title: blog.title,
     description: blog.subtitle,
@@ -45,20 +50,18 @@ export async function generateMetadata({ params }: BlogPageProps): Promise<Metad
       type: "article",
       publishedTime: new Date(blog._creationTime).toISOString(),
       authors: [blog.displayName || blog.username],
-      images: blog.imageUrl
-        ? [
-            {
-              url: blog.imageUrl,
-              alt: blog.title,
-            },
-          ]
-        : [],
+      images: [
+        {
+          url: imageUrl,
+          alt: blog.title,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title: blog.title,
       description: blog.subtitle,
-      images: blog.imageUrl ? [blog.imageUrl] : [],
+      images: [imageUrl],
     },
     robots: {
       index: true,
@@ -84,7 +87,7 @@ export default async function BlogPage({ params }: BlogPageProps) {
   }
 
   const { blog, authorPosts, interactionState } = blogData;
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://yourdomain.com";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.taqtiq.tech";
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -111,7 +114,7 @@ export default async function BlogPage({ params }: BlogPageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <BlogStoreHydrator blog={blog} />
-      
+
       <LeftSidebarControls blog={blog} interactionState={interactionState} />
 
       <main className="flex-1 min-w-0 pt-16">
