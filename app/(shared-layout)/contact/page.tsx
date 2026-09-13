@@ -142,8 +142,6 @@ export default function ContactPage() {
 
           <div className="w-full shrink-0">
             <ContactCards 
-              onMessageClick={() => setIsSheetOpen(true)} 
-              onChatbotClick={() => setIsChatbotOpen(true)}
             />
           </div>
         </div>
@@ -189,7 +187,7 @@ export default function ContactPage() {
                 Frequently Asked Questions
               </h3>
               <p className="max-w-lg font-light text-xl leading-relaxed">
-                  Common questions asked by our users about our services.
+                Common questions asked by our users about our services.
               </p>
             </div>
             
@@ -266,87 +264,6 @@ export default function ContactPage() {
             </form>
           </SheetContent>
         </Sheet>
-
-        <Dialog open={isChatbotOpen} onOpenChange={setIsChatbotOpen}>
-          <DialogContent className="sm:max-w-[500px] h-[550px] flex flex-col p-0 overflow-hidden">
-            
-            <DialogHeader className="p-6 pb-4 border-b border-border/50 shrink-0">
-              <DialogTitle className="text-lg font-semibold tracking-tight flex items-center gap-2">
-                <Bot className="w-5 h-5 text-primary" />
-                AI Assistant
-              </DialogTitle>
-              <DialogDescription>
-                Ask our chatbot anything about our services and products.
-              </DialogDescription>
-            </DialogHeader>
-            
-            <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-muted/10">
-              {chatHistory.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-muted-foreground gap-1 text-center px-4">
-                  <Bot className="h-8 w-8 stroke-[1.2] text-muted-foreground/50 mb-1" />
-                  <p className="text-sm font-medium">Hello! How can I help you today?</p>
-                </div>
-              ) : (
-                chatHistory.map((msg, index) => (
-                  <div
-                    key={index}
-                    className={`flex items-start gap-2.5 w-full ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-                  >
-                    {msg.role === "assistant" && (
-                      <div className="p-1 bg-primary/10 rounded-md shrink-0 text-primary mt-0.5">
-                        <Bot className="w-3.5 h-3.5" />
-                      </div>
-                    )}
-                    <div
-                      className={`max-w-[75%] rounded-lg px-3.5 py-2 text-sm shadow-xs ${
-                        msg.role === "user"
-                          ? "bg-[#0B0F19] text-white dark:bg-white dark:text-black rounded-tr-none"
-                          : "bg-white dark:bg-card border border-border/60 text-foreground rounded-tl-none"
-                      }`}
-                    >
-                      <p className="leading-relaxed whitespace-pre-wrap">{msg.content}</p>
-                    </div>
-                  </div>
-                ))
-              )}
-              
-              {isChatLoading && (
-                <div className="flex items-start gap-2.5 w-full justify-start">
-                  <div className="p-1 bg-primary/10 rounded-md shrink-0 text-primary mt-0.5 animate-pulse">
-                    <Bot className="w-3.5 h-3.5" />
-                  </div>
-                  <div className="bg-white dark:bg-card border border-border/60 text-muted-foreground rounded-lg rounded-tl-none px-4 py-2 text-xs flex items-center gap-1.5">
-                    <Loader2 className="h-3 w-3 animate-spin text-primary" />
-                    Assistant is compiling answer...
-                  </div>
-                </div>
-              )}
-              <div ref={chatEndRef} />
-            </div>
-
-            <form 
-              onSubmit={handleSendMessage} 
-              className="p-4 border-t border-border/50 flex items-center gap-2 bg-white dark:bg-card shrink-0"
-            >
-              <Input
-                value={chatInput}
-                onChange={(e) => setChatInput(e.target.value)}
-                placeholder="Type your message here..."
-                disabled={isChatLoading}
-                className="flex-1 h-10 border-border/60 focus-visible:ring-1 focus-visible:ring-primary shadow-none bg-transparent"
-              />
-              <Button 
-                type="submit" 
-                size="icon" 
-                disabled={isChatLoading || !chatInput.trim()} 
-                className="h-10 w-10 shrink-0 cursor-pointer bg-[#0B0F19] text-white hover:bg-[#161B26] dark:bg-white dark:text-black dark:hover:bg-white/90"
-              >
-                <Send className="h-4 w-4" />
-              </Button>
-            </form>
-            
-          </DialogContent>
-        </Dialog>
       </div>
     </>
   );

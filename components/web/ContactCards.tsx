@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { HelpCircle, MessageSquare, Mail, LucideIcon } from "lucide-react";
+import { HelpCircle, Mail, LucideIcon } from "lucide-react";
 
 interface CardData {
   id: string;
@@ -13,7 +13,6 @@ interface CardData {
 
 interface ContactCardsProps {
   onMessageClick?: () => void;
-  onChatbotClick?: () => void;
 }
 
 const cardsData: CardData[] = [
@@ -23,12 +22,6 @@ const cardsData: CardData[] = [
     title: "Frequently asked questions",
     description:
       "Need more information about what we do? Take a look at our frequently asked questions.",
-  },
-  {
-    id: "chatbot",
-    icon: MessageSquare,
-    title: "Talk with our chatbot",
-    description: "Harness the power of AI to get the answers you need.",
   },
   {
     id: "contact",
@@ -63,14 +56,10 @@ const itemVariants = {
 
 export default function ContactCards({
   onMessageClick,
-  onChatbotClick,
 }: ContactCardsProps) {
   const handleCardClick = (id: string) => {
     if (id === "contact" && onMessageClick) {
       onMessageClick();
-    }
-    if (id === "chatbot" && onChatbotClick) {
-      onChatbotClick();
     }
     if (id === "faq") {
       document
@@ -86,7 +75,7 @@ export default function ContactCards({
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-50px" }}
-        className="grid grid-cols-1 md:grid-cols-3 gap-6"
+        className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto"
       >
         {cardsData.map((card) => {
           const Icon = card.icon;
@@ -105,17 +94,14 @@ export default function ContactCards({
                 "transition-all ease-out"
               )}
             >
-              {/* Subtle gradient hover layer */}
               <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-neutral-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
               <div className="flex flex-col gap-4 relative z-10 h-full justify-between">
                 <div className="flex flex-col gap-4">
-                  {/* Matching Icon Badge */}
                   <div className="p-3 w-fit rounded-lg bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 group-hover:scale-105 transition-transform duration-300">
                     <Icon className="w-6 h-6 stroke-[1.75]" />
                   </div>
 
-                  {/* Text Content */}
                   <div>
                     <h3 className="text-lg font-semibold text-foreground mb-2">
                       {card.title}
