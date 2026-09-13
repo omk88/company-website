@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import {  Crosshair, Eye, Handshake, Lightbulb } from "lucide-react";
+import {  Crosshair, Eye, Handshake, Heart, Lightbulb } from "lucide-react";
 
 const values = [
   {
@@ -74,11 +74,18 @@ export default function ValuesSection() {
       <div className="absolute top-1/3 left-1/4 w-[400px] h-[250px] bg-amber-500/10 dark:bg-amber-500/10 blur-[100px] rounded-full pointer-events-none" />
 
       <div className="relative z-10 max-w-6xl mx-auto">
-        
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-foreground">
-            Our Core Values
-          </h2>
+
+        <div className="flex flex-col gap-2 items-center">
+          <div className="inline-flex w-fit items-center gap-1.5 px-3.5 py-1 rounded-full bg-white border border-gray-200/80 shadow-sm text-sm font-medium text-foreground">
+            <Heart className="w-4 h-4 text-foreground" />
+            <span>Values</span>
+          </div>
+          
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-foreground">
+              Our Core Values
+            </h2>
+          </div>
         </div>
 
         <motion.div

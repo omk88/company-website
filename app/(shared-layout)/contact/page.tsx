@@ -25,16 +25,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-
-const CONTACT_MODELS = ['/pipes.glb'];
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -85,27 +76,6 @@ export default function ContactPage() {
       toast.error("Something went wrong. Please try again.");
     } finally {
       setIsPending(false);
-    }
-  };
-
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!chatInput.trim() || isChatLoading) return;
-
-    const userMsg = chatInput.trim();
-    setChatInput("");
-
-    const updatedHistory: ChatMessage[] = [...chatHistory, { role: "user", content: userMsg }];
-    setChatHistory(updatedHistory);
-    setIsChatLoading(true);
-
-    try {
-      const aiReply = await fetchAIResponse({ history: updatedHistory });
-      setChatHistory([...updatedHistory, { role: "assistant", content: aiReply }]);
-    } catch (error) {
-      toast.error("The assistant is experiencing connectivity issues. Please try again.");
-    } finally {
-      setIsChatLoading(false);
     }
   };
 

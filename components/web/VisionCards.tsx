@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Wrench, ChevronsUp, Zap, Check, Sparkles, Code2, ShieldCheck } from "lucide-react";
 
-// Code snippets for Card 1
 const codeExamples = [
   {
     type: "REST & GraphQL",
@@ -17,19 +16,15 @@ const codeExamples = [
 ];
 
 export default function RedesignedVisionCards() {
-  // Card 1 state cycle
   const [codeIndex, setCodeIndex] = useState(0);
 
-  // Card 3 step state cycle (0: prompt typing, 1: rendering UI)
   const [aiStep, setAiStep] = useState(0);
 
   useEffect(() => {
-    // Card 1 loop (4s)
     const codeTimer = setInterval(() => {
       setCodeIndex((prev) => (prev + 1) % codeExamples.length);
     }, 4000);
 
-    // Card 3 loop (3.5s)
     const aiTimer = setInterval(() => {
       setAiStep((prev) => (prev === 0 ? 1 : 0));
     }, 3500);
@@ -43,7 +38,6 @@ export default function RedesignedVisionCards() {
   return (
     <div className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-4 font-sans">
       
-      {/* Card 1: Developer Suite */}
       <div className="w-full rounded-3xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-xl flex flex-col justify-between">
         <div>
           <div className="flex items-center gap-2 mb-4 text-neutral-800 dark:text-neutral-200 font-semibold text-sm">
@@ -96,7 +90,6 @@ export default function RedesignedVisionCards() {
         </div>
       </div>
 
-      {/* Card 2: Performance Agility */}
       <div className="w-full rounded-3xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-xl flex flex-col justify-between">
         <div>
           <div className="flex items-center gap-2 mb-4 text-neutral-800 dark:text-neutral-200 font-semibold text-sm">
@@ -107,7 +100,6 @@ export default function RedesignedVisionCards() {
           </div>
 
           <div className="relative h-56 rounded-2xl bg-neutral-50 dark:bg-neutral-900/50 p-4 flex flex-col justify-center space-y-5 border border-neutral-100 dark:border-neutral-800/50">
-            {/* Modern Fast Bar */}
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs font-semibold text-neutral-800 dark:text-neutral-200">
                 <span>Modern Stack</span>
@@ -129,7 +121,6 @@ export default function RedesignedVisionCards() {
               </div>
             </div>
 
-            {/* Legacy Slow Bar */}
             <div className="space-y-1.5 opacity-50">
               <div className="flex justify-between text-xs text-neutral-500">
                 <span>Traditional Setup</span>
@@ -161,7 +152,6 @@ export default function RedesignedVisionCards() {
         </div>
       </div>
 
-      {/* Card 3: Next-Gen Systems */}
       <div className="w-full rounded-3xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-xl flex flex-col justify-between">
         <div>
           <div className="flex items-center gap-2 mb-4 text-neutral-800 dark:text-neutral-200 font-semibold text-sm">
@@ -172,7 +162,6 @@ export default function RedesignedVisionCards() {
           </div>
 
           <div className="relative h-56 rounded-2xl bg-neutral-50 dark:bg-neutral-900/50 p-4 flex flex-col justify-between border border-neutral-100 dark:border-neutral-800/50">
-            {/* Input Prompt Box */}
             <div className="flex items-center gap-2 bg-white dark:bg-neutral-900 p-2.5 rounded-xl border border-neutral-200/80 dark:border-neutral-800 shadow-sm text-xs text-neutral-600 dark:text-neutral-300">
               <Sparkles className="w-3.5 h-3.5 text-purple-500 shrink-0" />
               <span className="font-mono text-[11px] truncate">
@@ -180,7 +169,6 @@ export default function RedesignedVisionCards() {
               </span>
             </div>
 
-            {/* Generated UI Elements Output */}
             <div className="space-y-2 my-auto">
               <AnimatePresence mode="wait">
                 {aiStep === 1 ? (

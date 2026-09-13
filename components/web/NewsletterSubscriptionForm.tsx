@@ -7,8 +7,15 @@ import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api"; 
 import { toast } from "sonner";
 import { ArrowRight, Loader2 } from "lucide-react"; 
+import { cn } from "@/lib/utils";
 
-export default function NewsletterSubscriptionForm() {
+interface NewsletterSubscriptionFormProps {
+  size?: "default" | "lg";
+}
+
+export default function NewsletterSubscriptionForm({ 
+  size = "default" 
+}: NewsletterSubscriptionFormProps) {
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -34,8 +41,16 @@ export default function NewsletterSubscriptionForm() {
     }
   };
 
+  const isLg = size === "lg";
+
   return (
-    <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-2 w-full sm:w-80">
+    <form 
+      onSubmit={handleSubscribe} 
+      className={cn(
+        "flex flex-col sm:flex-row gap-2.5 w-full",
+        isLg ? "sm:w-full max-w-md" : "sm:w-80"
+      )}
+    >
       <Input 
         type="email"
         required
@@ -43,20 +58,30 @@ export default function NewsletterSubscriptionForm() {
         placeholder="Enter your email" 
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        className="bg-white dark:bg-zinc-950 h-10 rounded-lg px-3 text-sm border-zinc-200 dark:border-zinc-800 focus-visible:ring-1 focus-visible:ring-zinc-400"
+        className={cn(
+          "bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 focus-visible:ring-1 focus-visible:ring-zinc-400 transition-all",
+          isLg 
+            ? "h-12 rounded-xl px-4 text-base placeholder:text-zinc-400" 
+            : "h-10 rounded-lg px-3 text-sm"
+        )}
       />
       
       <Button 
         type="submit" 
         disabled={isSubmitting}
-        className="cursor-pointer h-10 px-4 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 text-xs font-semibold rounded-lg shrink-0 gap-2"
+        className={cn(
+          "cursor-pointer bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 font-semibold shrink-0 gap-2 transition-all active:scale-95",
+          isLg 
+            ? "h-12 px-6 text-sm rounded-xl" 
+            : "h-10 px-4 text-xs rounded-lg"
+        )}
       >
         {isSubmitting ? (
-          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+          <Loader2 className={cn("animate-spin", isLg ? "w-4 h-4" : "w-3.5 h-3.5")} />
         ) : (
           <>
             <span>Subscribe</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <ArrowRight className={isLg ? "w-4 h-4" : "w-3.5 h-3.5"} />
           </>
         )}
       </Button> 
