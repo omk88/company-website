@@ -245,8 +245,11 @@ const schema = defineSchema({
     subtitle: v.string(),
     content: v.string(),
     tags: v.array(v.string()),
+    imageUrl: v.optional(v.string()),
+    storageId: v.optional(v.string()),
     updatedAt: v.number(),
-  }).index("by_user", ["userId"]),
+  })
+    .index("by_user", ["userId"]),
 
 });
 

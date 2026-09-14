@@ -216,15 +216,20 @@ export default function BlogPostForm() {
     const userData = useCurrentUser();
     const selectedBlog = useBlogStore((state) => state.selectedBlog);
     const setSelectedBlog = useBlogStore((state) => state.setSelectedBlog);
+    const activeDraft = useBlogStore((state) => state.activeDraft);
+    const clearStore = useBlogStore((state) => state.clearStore);
+
     const isEditing = Boolean(selectedBlog?._id);
 
     useEffect(() => {
         if (selectedBlog?.imageUrl) {
             setImagePreviewUrl(selectedBlog.imageUrl);
+        } else if (activeDraft?.imageUrl) {
+            setImagePreviewUrl(activeDraft.imageUrl);
         } else {
             setImagePreviewUrl(null);
         }
-    }, [selectedBlog]);
+    }, [selectedBlog, activeDraft]);
 
     const createBlog = useMutation(api.blogs.createPost);
     const updateBlog = useMutation(api.blogs.updatePost);
@@ -234,7 +239,6 @@ export default function BlogPostForm() {
         defaultValues: { title: "", subtitle: "", content: "", author: "", tags: [], coverImage: null }
     });
 
-    const activeDraft = useBlogStore((state) => state.activeDraft);
     useBlogDraft(watch, isEditing, userData?.userId, activeDraft?._id);
 
     const errorCount = Object.keys(errors).length;
@@ -250,10 +254,21 @@ export default function BlogPostForm() {
                 tags: selectedBlog.tags || [],
                 coverImage: selectedBlog.imageUrl || null,
             });
-        } else {
+        } else if (!activeDraft) {
             reset({ title: "", subtitle: "", content: "", author: "", tags: [], coverImage: null });
         }
     }, [selectedBlog, reset]);
+
+    useEffect(() => {
+        if (activeDraft) {
+            reset({
+                title: activeDraft.title || "",
+                subtitle: activeDraft.subtitle || "",
+                content: activeDraft.content || "",
+                tags: activeDraft.tags || [],
+            });
+        }
+    }, [activeDraft, reset]);
 
     const clearImage = () => {
         setSelectedImage(null);
@@ -269,20 +284,13 @@ export default function BlogPostForm() {
         return "text-emerald-500 dark:text-emerald-400";
     };
 
-    const { clearDraft } = useBlogDraft(
-        watch,
-        isEditing,
-        userData?.userId,
-        activeDraft?._id
-    );
-
     const onSubmit = async (data: BlogFormValues) => {
         if (!userData?.userId) {
             toast.error("User session not found. Please log in.");
             return;
         }
 
-        const hasExistingImage = Boolean(selectedBlog?.imageUrl);
+        const hasExistingImage = Boolean(selectedBlog?.imageUrl || activeDraft?.imageUrl);
         if (!selectedImage && !hasExistingImage) {
             toast.error("Please upload a cover image from your computer.");
             return;
@@ -293,7 +301,7 @@ export default function BlogPostForm() {
         const postType = userData.email?.endsWith("@taqtiq.tech") ? "team" : "community";
 
         try {
-            let storageId = selectedBlog?.storageId || "";
+            let storageId = selectedBlog?.storageId || activeDraft?.storageId || "";
             const formattedTitle = toTitleCase(data.title);
 
             if (selectedImage) {
@@ -335,9 +343,6 @@ export default function BlogPostForm() {
                     tags: data.tags,
                     storageId: storageId,
                 });
-                if (!isEditing) {
-                    clearDraft();
-                }
                 toast.success("Blog article updated successfully!");
             } else {
                 await createBlog({
@@ -352,9 +357,7 @@ export default function BlogPostForm() {
                     storageId: storageId,
                     postType: postType,
                 });
-                if (!isEditing) {
-                    clearDraft();
-                }
+
                 toast.success("Blog article published successfully!");
             }
 
@@ -371,11 +374,10 @@ export default function BlogPostForm() {
             }
 
             clearImage();
-
             const targetBlogId = selectedBlog?._id;
 
             reset();
-            setSelectedBlog(null);
+            clearStore();
 
             if (targetBlogId) {
                 router.push(`/insights/${targetBlogId}`);
@@ -391,17 +393,6 @@ export default function BlogPostForm() {
             setIsLoading(false);
         }
     };
-
-    useEffect(() => {
-        if (activeDraft) {
-            reset({
-            title: activeDraft.title || "",
-            subtitle: activeDraft.subtitle || "",
-            content: activeDraft.content || "",
-            tags: activeDraft.tags || [],
-            });
-        }
-    }, [activeDraft, reset]);
     
     return (
         <div className="w-full h-[calc(100vh-4rem)] overflow-hidden">

@@ -6,6 +6,8 @@ export interface Draft {
   subtitle?: string;
   content: string;
   tags?: string[];
+  imageUrl?: string;
+  storageId?: string;
 }
 
 export interface Blog {
