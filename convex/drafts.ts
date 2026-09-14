@@ -43,17 +43,10 @@ export const getDraft = query({
   },
 });
 
-export const deleteDraft = mutation({
-  args: { userId: v.string() },
+export const deleteDraftById = mutation({
+  args: { draftId: v.id("drafts") },
   handler: async (ctx, args) => {
-    const existing = await ctx.db
-      .query("drafts")
-      .withIndex("by_user", (q) => q.eq("userId", args.userId))
-      .first();
-
-    if (existing) {
-      await ctx.db.delete(existing._id);
-    }
+    await ctx.db.delete(args.draftId);
   },
 });
 
