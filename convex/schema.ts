@@ -239,6 +239,15 @@ const schema = defineSchema({
     .index("by_blog", ["blogId"])
     .index("by_user", ["userId"]),
 
+  drafts: defineTable({
+    userId: v.string(),
+    title: v.string(),
+    subtitle: v.string(),
+    content: v.string(),
+    tags: v.array(v.string()),
+    updatedAt: v.number(),
+  }).index("by_user", ["userId"]),
+
 });
 
 export default schema;

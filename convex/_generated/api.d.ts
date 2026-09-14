@@ -18,6 +18,7 @@ import type * as chat from "../chat.js";
 import type * as comments from "../comments.js";
 import type * as contact from "../contact.js";
 import type * as crons from "../crons.js";
+import type * as drafts from "../drafts.js";
 import type * as files from "../files.js";
 import type * as http from "../http.js";
 import type * as notifications from "../notifications.js";
@@ -44,6 +45,7 @@ declare const fullApi: ApiFromModules<{
   comments: typeof comments;
   contact: typeof contact;
   crons: typeof crons;
+  drafts: typeof drafts;
   files: typeof files;
   http: typeof http;
   notifications: typeof notifications;

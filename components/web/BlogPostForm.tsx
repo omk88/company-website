@@ -32,6 +32,7 @@ import ts from "highlight.js/lib/languages/typescript";
 import "highlight.js/styles/github-dark.css";
 import { useBlogStore } from "@/stores/useBlogStore";
 import { ScrollArea } from "../ui/scroll-area";
+import { useBlogDraft } from "@/hooks/useBlogDraft";
 
 const lowlight = createLowlight();
 lowlight.register("javascript", js);
@@ -215,6 +216,7 @@ export default function BlogPostForm() {
     const userData = useCurrentUser();
     const selectedBlog = useBlogStore((state) => state.selectedBlog);
     const setSelectedBlog = useBlogStore((state) => state.setSelectedBlog);
+    const isEditing = Boolean(selectedBlog?._id);
 
     useEffect(() => {
         if (selectedBlog?.imageUrl) {
@@ -228,7 +230,7 @@ export default function BlogPostForm() {
     const updateBlog = useMutation(api.blogs.updatePost);
     const generateUploadUrl = useMutation(api.blogs.generateUploadUrl);
     
-    const { control, handleSubmit, clearErrors, formState: { errors }, reset } = useForm<BlogFormValues>({
+    const { control, handleSubmit, watch, clearErrors, formState: { errors }, reset } = useForm<BlogFormValues>({
         defaultValues: { title: "", subtitle: "", content: "", author: "", tags: [], coverImage: null }
     });
 
@@ -263,6 +265,12 @@ export default function BlogPostForm() {
         if (length < 100) return "text-amber-500 dark:text-amber-400";
         return "text-emerald-500 dark:text-emerald-400";
     };
+
+    const { clearLocalDraft: clearDraft } = useBlogDraft(
+        watch,
+        isEditing,
+        userData?.userId
+    );
 
     const onSubmit = async (data: BlogFormValues) => {
         if (!userData?.userId) {
@@ -323,6 +331,9 @@ export default function BlogPostForm() {
                     tags: data.tags,
                     storageId: storageId,
                 });
+                if (!isEditing) {
+                    clearDraft();
+                }
                 toast.success("Blog article updated successfully!");
             } else {
                 await createBlog({
@@ -337,6 +348,9 @@ export default function BlogPostForm() {
                     storageId: storageId,
                     postType: postType,
                 });
+                if (!isEditing) {
+                    clearDraft();
+                }
                 toast.success("Blog article published successfully!");
             }
 
