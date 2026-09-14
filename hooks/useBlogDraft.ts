@@ -89,12 +89,16 @@ export function useBlogDraft<T extends Record<string, any>>(
 
     window.addEventListener("visibilitychange", handleVisibilityChange);
     window.addEventListener("pagehide", handleSaveDraft);
+    window.addEventListener("popstate", handleSaveDraft);
 
     return () => {
       window.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("pagehide", handleSaveDraft);
+      window.removeEventListener("popstate", handleSaveDraft);
+      
+      handleSaveDraft();
     };
-  }, [userId, isEditing]);
+  }, [userId, isEditing, saveConvexDraft, setActiveDraft]);
 
   const clearDraft = async () => {
     latestFormValues.current = null;
