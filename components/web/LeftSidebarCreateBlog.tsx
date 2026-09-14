@@ -54,6 +54,8 @@ export function LeftSidebarCreateBlog({ onSelectDraft }: LeftSidebarCreateBlogPr
     }
   };
 
+  const setActiveDraft = useBlogStore((state) => state.setActiveDraft);
+
   return (
     <aside className="w-[3.5rem] shrink-0 h-full relative z-40">
       <Sidebar bgClass="bg-white dark:bg-zinc-950" showBorder={true} className="!top-16 !z-40 !w-[3.5rem]">
@@ -105,7 +107,7 @@ export function LeftSidebarCreateBlog({ onSelectDraft }: LeftSidebarCreateBlogPr
                   <Button 
                     variant="ghost" 
                     size="icon" 
-                    className="h-6 w-6 text-zinc-500 hover:text-zinc-900" 
+                    className="cursor-pointer h-6 w-6 text-zinc-500 hover:text-zinc-900" 
                     onClick={() => setIsOpen(false)}
                   >
                     <ChevronLeft className="h-4 w-4" />
@@ -114,7 +116,7 @@ export function LeftSidebarCreateBlog({ onSelectDraft }: LeftSidebarCreateBlogPr
 
                 <div className="flex-1 overflow-y-auto space-y-2">
                   {drafts === undefined && (
-                    <p className="text-xs text-zinc-400 p-2">Loading drafts...</p>
+                    <p className="text-xs text-zinc-400 p-2">Loading drafts…</p>
                   )}
 
                   {drafts?.length === 0 && (
@@ -124,8 +126,11 @@ export function LeftSidebarCreateBlog({ onSelectDraft }: LeftSidebarCreateBlogPr
                   {drafts?.map((draft) => (
                     <div
                       key={draft._id}
-                      onClick={() => onSelectDraft?.(draft)}
-                      className="group flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-transparent hover:border-zinc-200 dark:hover:border-zinc-700 cursor-pointer transition-all"
+                      onClick={() => {
+                        setActiveDraft(draft);
+                        setIsOpen(false);
+                      }}
+                      className="group flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 border-transparent cursor-pointer transition-all"
                     >
                       <div className="flex items-center gap-2.5 overflow-hidden">
                         <FileText className="w-4 h-4 text-zinc-400 shrink-0" />
@@ -142,7 +147,7 @@ export function LeftSidebarCreateBlog({ onSelectDraft }: LeftSidebarCreateBlogPr
                         variant="ghost" 
                         size="icon" 
                         onClick={(e) => handleDelete(e, draft._id)}
-                        className="h-6 w-6 opacity-0 group-hover:opacity-100 text-zinc-400 hover:text-red-500 transition-opacity shrink-0"
+                        className="cursor-pointer ml-4 h-6 w-6 opacity-0 group-hover:opacity-100 text-zinc-400 hover:text-red-500 transition-opacity shrink-0"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </Button>

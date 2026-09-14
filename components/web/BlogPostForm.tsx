@@ -234,6 +234,9 @@ export default function BlogPostForm() {
         defaultValues: { title: "", subtitle: "", content: "", author: "", tags: [], coverImage: null }
     });
 
+    const activeDraft = useBlogStore((state) => state.activeDraft);
+    useBlogDraft(watch, isEditing, userData?.userId, activeDraft?._id);
+
     const errorCount = Object.keys(errors).length;
     const hasErrors = errorCount > 0;
 
@@ -266,10 +269,11 @@ export default function BlogPostForm() {
         return "text-emerald-500 dark:text-emerald-400";
     };
 
-    const { clearLocalDraft: clearDraft } = useBlogDraft(
+    const { clearDraft } = useBlogDraft(
         watch,
         isEditing,
-        userData?.userId
+        userData?.userId,
+        activeDraft?._id
     );
 
     const onSubmit = async (data: BlogFormValues) => {
@@ -387,6 +391,17 @@ export default function BlogPostForm() {
             setIsLoading(false);
         }
     };
+
+    useEffect(() => {
+        if (activeDraft) {
+            reset({
+            title: activeDraft.title || "",
+            subtitle: activeDraft.subtitle || "",
+            content: activeDraft.content || "",
+            tags: activeDraft.tags || [],
+            });
+        }
+    }, [activeDraft, reset]);
     
     return (
         <div className="w-full h-[calc(100vh-4rem)] overflow-hidden">

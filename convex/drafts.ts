@@ -3,6 +3,7 @@ import { v } from "convex/values";
 
 export const saveDraft = mutation({
   args: {
+    draftId: v.optional(v.id("drafts")),
     userId: v.string(),
     title: v.string(),
     subtitle: v.string(),
@@ -10,10 +11,7 @@ export const saveDraft = mutation({
     tags: v.array(v.string()),
   },
   handler: async (ctx, args) => {
-    const existing = await ctx.db
-      .query("drafts")
-      .withIndex("by_user", (q) => q.eq("userId", args.userId))
-      .first();
+    if (!args.title.trim() && !args.content.trim()) return;
 
     const payload = {
       userId: args.userId,
@@ -24,10 +22,11 @@ export const saveDraft = mutation({
       updatedAt: Date.now(),
     };
 
-    if (existing) {
-      await ctx.db.patch(existing._id, payload);
+    if (args.draftId) {
+      await ctx.db.patch(args.draftId, payload);
+      return args.draftId;
     } else {
-      await ctx.db.insert("drafts", payload);
+      return await ctx.db.insert("drafts", payload);
     }
   },
 });

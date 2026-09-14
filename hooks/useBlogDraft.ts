@@ -3,33 +3,28 @@ import { UseFormWatch } from "react-hook-form";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 
-const DRAFT_KEY = "blog_post_draft_data";
-
 export function useBlogDraft<T extends Record<string, any>>(
   watch: UseFormWatch<T>,
   isEditing: boolean,
-  userId?: string
+  userId?: string,
+  draftId?: string
 ) {
-  const createConvexDraft = useMutation(api.drafts.createDraft);
+  const saveConvexDraft = useMutation(api.drafts.saveDraft);
+  const deleteDraftById = useMutation(api.drafts.deleteDraftById);
   const latestFormValues = useRef<T | null>(null);
 
   useEffect(() => {
     if (isEditing) return;
-
     const subscription = watch((values) => {
       latestFormValues.current = values as T;
-
-      const { coverImage, ...serializable } = values;
-      localStorage.setItem(DRAFT_KEY, JSON.stringify(serializable));
     });
-
     return () => subscription.unsubscribe();
   }, [watch, isEditing]);
 
   useEffect(() => {
     if (isEditing || !userId) return;
 
-    const handleSaveNewDraft = () => {
+    const handleSaveDraft = () => {
       const data = latestFormValues.current;
       if (!data) return;
 
@@ -39,7 +34,8 @@ export function useBlogDraft<T extends Record<string, any>>(
       const tags = (data.tags as string[]) || [];
 
       if (title.trim() || content.trim()) {
-        createConvexDraft({
+        saveConvexDraft({
+          draftId: draftId as any,
           userId,
           title,
           subtitle,
@@ -51,23 +47,26 @@ export function useBlogDraft<T extends Record<string, any>>(
 
     const handleVisibilityChange = () => {
       if (document.visibilityState === "hidden") {
-        handleSaveNewDraft();
+        handleSaveDraft();
       }
     };
 
     window.addEventListener("visibilitychange", handleVisibilityChange);
-    window.addEventListener("beforeunload", handleSaveNewDraft);
+    window.addEventListener("beforeunload", handleSaveDraft);
 
     return () => {
       window.removeEventListener("visibilitychange", handleVisibilityChange);
-      window.removeEventListener("beforeunload", handleSaveNewDraft);
+      window.removeEventListener("beforeunload", handleSaveDraft);
     };
-  }, [userId, isEditing, createConvexDraft]);
+  }, [userId, isEditing, draftId, saveConvexDraft]);
 
-  const clearLocalDraft = () => {
-    localStorage.removeItem(DRAFT_KEY);
+  const clearDraft = async () => {
     latestFormValues.current = null;
+    localStorage.removeItem("blog_post_draft_data");
+    if (draftId) {
+      await deleteDraftById({ draftId: draftId as any });
+    }
   };
 
-  return { clearLocalDraft };
+  return { clearDraft };
 }
