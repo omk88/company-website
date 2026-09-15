@@ -14,11 +14,13 @@ export function useBlogDraft<T extends Record<string, any>>(
   const deleteDraftById = useMutation(api.drafts.deleteDraftById);
   const setActiveDraft = useBlogStore((state) => state.setActiveDraft);
   const activeDraft = useBlogStore((state) => state.activeDraft);
+  const clearStore = useBlogStore((state) => state.clearStore);
 
   const latestFormValues = useRef<T | null>(null);
   const currentDraftIdRef = useRef<string | undefined>(draftId);
   
   const isSavingRef = useRef<boolean>(false);
+  const isClearedRef = useRef<boolean>(false);
 
   useEffect(() => {
     currentDraftIdRef.current = draftId;
@@ -39,7 +41,7 @@ export function useBlogDraft<T extends Record<string, any>>(
       if (isSavingRef.current) return;
 
       const data = latestFormValues.current;
-      if (!data) return;
+      if (!data || isSavingRef.current) return;
 
       const title = (data.title as string) || "";
       const subtitle = (data.subtitle as string) || "";
@@ -101,12 +103,21 @@ export function useBlogDraft<T extends Record<string, any>>(
   }, [userId, isEditing, saveConvexDraft, setActiveDraft]);
 
   const clearDraft = async () => {
+    isClearedRef.current = true;
     latestFormValues.current = null;
-    localStorage.removeItem("blog_post_draft_data");
-    if (currentDraftIdRef.current) {
-      await deleteDraftById({ draftId: currentDraftIdRef.current as any });
-      currentDraftIdRef.current = undefined;
+    
+    const targetDraftId = currentDraftIdRef.current;
+    currentDraftIdRef.current = undefined;
+
+    if (targetDraftId) {
+      try {
+        await deleteDraftById({ draftId: targetDraftId as any });
+      } catch (err) {
+        console.error("Failed to delete draft:", err);
+      }
     }
+
+    clearStore();
   };
 
   return { clearDraft };

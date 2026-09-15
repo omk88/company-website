@@ -221,25 +221,20 @@ export default function BlogPostForm() {
 
     const isEditing = Boolean(selectedBlog?._id);
 
-    useEffect(() => {
-        if (selectedBlog?.imageUrl) {
-            setImagePreviewUrl(selectedBlog.imageUrl);
-        } else if (activeDraft?.imageUrl) {
-            setImagePreviewUrl(activeDraft.imageUrl);
-        } else {
-            setImagePreviewUrl(null);
-        }
-    }, [selectedBlog, activeDraft]);
-
     const createBlog = useMutation(api.blogs.createPost);
     const updateBlog = useMutation(api.blogs.updatePost);
     const generateUploadUrl = useMutation(api.blogs.generateUploadUrl);
-    
+
     const { control, handleSubmit, watch, clearErrors, formState: { errors }, reset } = useForm<BlogFormValues>({
         defaultValues: { title: "", subtitle: "", content: "", author: "", tags: [], coverImage: null }
     });
 
-    useBlogDraft(watch, isEditing, userData?.userId, activeDraft?._id);
+    const { clearDraft } = useBlogDraft(
+        watch,
+        isEditing,
+        userData?.userId,
+        activeDraft?._id
+    );
 
     const errorCount = Object.keys(errors).length;
     const hasErrors = errorCount > 0;
@@ -254,21 +249,17 @@ export default function BlogPostForm() {
                 tags: selectedBlog.tags || [],
                 coverImage: selectedBlog.imageUrl || null,
             });
-        } else if (!activeDraft) {
-            reset({ title: "", subtitle: "", content: "", author: "", tags: [], coverImage: null });
-        }
-    }, [selectedBlog, reset]);
-
-    useEffect(() => {
-        if (activeDraft) {
+        } else if (activeDraft) {
             reset({
                 title: activeDraft.title || "",
                 subtitle: activeDraft.subtitle || "",
                 content: activeDraft.content || "",
                 tags: activeDraft.tags || [],
             });
+        } else {
+            reset({ title: "", subtitle: "", content: "", author: "", tags: [], coverImage: null });
         }
-    }, [activeDraft, reset]);
+    }, [selectedBlog, activeDraft, reset]);
 
     const clearImage = () => {
         setSelectedImage(null);
@@ -359,6 +350,7 @@ export default function BlogPostForm() {
                 });
 
                 toast.success("Blog article published successfully!");
+                await clearDraft();
             }
 
             try {
