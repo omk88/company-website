@@ -249,6 +249,8 @@ export default function BlogPostForm() {
                 tags: selectedBlog.tags || [],
                 coverImage: selectedBlog.imageUrl || null,
             });
+            setImagePreviewUrl(selectedBlog.imageUrl || null);
+            setSelectedImage(null);
         } else if (activeDraft) {
             reset({
                 title: activeDraft.title || "",
@@ -256,8 +258,11 @@ export default function BlogPostForm() {
                 content: activeDraft.content || "",
                 tags: activeDraft.tags || [],
             });
+            setImagePreviewUrl(activeDraft.imageUrl || null);
+            setSelectedImage(null);
         } else {
             reset({ title: "", subtitle: "", content: "", author: "", tags: [], coverImage: null });
+            clearImage(); 
         }
     }, [selectedBlog, activeDraft, reset]);
 
