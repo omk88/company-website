@@ -19,7 +19,7 @@ export async function PageBlogPosts() {
   );
 
   return (
-    <div className="flex flex-col flex-1 h-full min-h-0 p-2 bg-muted/40">
+    <div className="flex flex-col flex-1 h-full min-h-0 p-2">
       <BlogFeedWrapper preloadedData={preloadedData} />
     </div>
   )

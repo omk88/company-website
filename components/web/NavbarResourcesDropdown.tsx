@@ -28,13 +28,13 @@ const mainPages = [
   },
   {
     title: "Careers",
-    description: "Interested in working for us? View our open positions.",
+    description: "Interested in working for us? View open positions.",
     href: "/careers",
     icon: Briefcase,
   },
   {
     title: "Help & Support",
-    description: "Get answers to common questions or reach our support team.",
+    description: "Get answers to common questions or reach support.",
     href: "/contact",
     icon: HelpCircle,
   },
@@ -81,10 +81,10 @@ export default function NavbarResourcesDropdown({
           </NavigationMenuTrigger>
 
           <NavigationMenuContent className="p-0 overflow-hidden shadow-xl rounded-xl">
-            <div className="w-[580px] grid grid-cols-12 bg-background">
+            <div className="w-[640px] grid grid-cols-12 bg-background">
               
-              <div className="col-span-7 p-3">
-                <div className="flex flex-col gap-0.5 relative">
+              <div className="col-span-8 p-3">
+                <div className="grid grid-cols-2 gap-2 relative">
                   {mainPages.map((item, index) => {
                     const Icon = item.icon;
                     return (
@@ -93,7 +93,7 @@ export default function NavbarResourcesDropdown({
                           href={item.href}
                           onMouseEnter={() => setHoveredCardIndex(index)}
                           onMouseLeave={() => setHoveredCardIndex(null)}
-                          className="relative group p-2.5 rounded-lg flex items-start gap-3 transition-colors"
+                          className="relative group p-2.5 rounded-lg flex items-start gap-3 transition-colors h-full"
                         >
                           <AnimatePresence>
                             {hoveredCardIndex === index && (
@@ -127,7 +127,7 @@ export default function NavbarResourcesDropdown({
                 </div>
               </div>
 
-              <div className="col-span-5 bg-neutral-50/80 dark:bg-neutral-900/50 p-3 border-l border-neutral-200/60 dark:border-neutral-800/60 flex flex-col justify-between">
+              <div className="col-span-4 bg-neutral-50/80 dark:bg-neutral-900/50 p-3 border-l border-neutral-200/60 dark:border-neutral-800/60 flex flex-col justify-between">
                 <div className="flex flex-col gap-0.5">
                   {legalPages.map((legal) => {
                     const Icon = legal.icon;

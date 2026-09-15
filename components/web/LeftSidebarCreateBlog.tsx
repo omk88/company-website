@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, FolderBookmark, Trash2, FileText, ChevronLeft } from "lucide-react";
+import { ArrowLeft, FolderBookmark, Trash2, FileText, ChevronLeft, FileImage } from "lucide-react";
 import { Sidebar, SidebarHeader, SidebarFooter, SidebarContent } from "../ui/sidebar";
 import { Button, buttonVariants } from "../ui/button";
 import { cn } from "@/lib/utils";
@@ -38,10 +38,7 @@ export function LeftSidebarCreateBlog({ onSelectDraft }: LeftSidebarCreateBlogPr
   const currentUser = useCurrentUser();
   const userId = currentUser?.userId;
 
-  const drafts = useQuery(
-    api.drafts.listUserDrafts,
-    userId ? { userId } : "skip"
-  );
+  const drafts = useQuery(api.drafts.listUserDrafts);
 
   const deleteDraftById = useMutation(api.drafts.deleteDraftById);
 
@@ -132,8 +129,19 @@ export function LeftSidebarCreateBlog({ onSelectDraft }: LeftSidebarCreateBlogPr
                       }}
                       className="group flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 border-transparent cursor-pointer transition-all"
                     >
-                      <div className="flex items-center gap-2.5 overflow-hidden">
-                        <FileText className="w-4 h-4 text-zinc-400 shrink-0" />
+                      <div className="flex items-center gap-4 overflow-hidden">
+                        <div className="h-8 w-8 border border-border rounded-full overflow-hidden shrink-0 flex items-center justify-center">
+                          {draft.imageUrl ? (
+                            <img
+                              src={draft.imageUrl}
+                              alt={draft.title || "Cover Image"}
+                              className="h-full w-full object-cover"
+                              decoding="async"
+                            />
+                          ) : (
+                            <FileImage className="h-4 w-4 text-muted-foreground stroke-[2]" />
+                          )}
+                        </div>
                         <div className="truncate">
                           <p className="text-xs font-medium text-zinc-800 dark:text-zinc-200 truncate">
                             {draft.title.trim() || "Untitled Post"}

@@ -82,12 +82,22 @@ export const createDraft = mutation({
 });
 
 export const listUserDrafts = query({
-  args: { userId: v.string() },
-  handler: async (ctx, args) => {
-    return await ctx.db
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return [];
+
+    const drafts = await ctx.db
       .query("drafts")
-      .withIndex("by_user", (q) => q.eq("userId", args.userId))
-      .order("desc")
+      .withIndex("by_user", (q) => q.eq("userId", identity.subject))
       .collect();
+
+    return Promise.all(
+      drafts.map(async (draft) => ({
+        ...draft,
+        imageUrl: draft.storageId 
+          ? await ctx.storage.getUrl(draft.storageId) 
+          : null,
+      }))
+    );
   },
 });
