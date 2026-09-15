@@ -134,7 +134,7 @@ export function FeaturedBlogs({ preloadedData }: { preloadedData: Preloaded<type
         </div>
       </Link>
 
-      <div className="flex items-center gap-3 text-[11px] text-zinc-500 font-sans pt-1">
+      <div className="flex font-semibold items-center gap-3 text-[11px] text-zinc-500 font-sans pt-1">
         <div className="flex items-center gap-1">
           <Eye className="w-3 h-3 stroke-[2] shrink-0" />
           <span>{compactFormatter.format(currentPost.totalViews)}</span>

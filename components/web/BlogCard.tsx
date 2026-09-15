@@ -128,7 +128,7 @@ export function BlogCard({
           )}
         </div>
 
-        <div className="flex items-center justify-between text-xs font-extralight tracking-tight select-none">
+        <div className="flex font-semibold items-center justify-between text-xs tracking-tight select-none">
           <div className="flex items-center gap-4 px-1">
             <div className="flex items-center gap-1">
               <Eye className="w-3.5 h-3.5" />
@@ -247,7 +247,7 @@ export function BlogCard({
           </p>
         </Link>
 
-        <div className="flex font-sans items-center justify-between text-sm tracking-tight select-none w-full mt-auto">
+        <div className="flex font-sans font-semibold items-center justify-between text-sm tracking-tight select-none w-full mt-auto">
           <div className="flex items-center">
             <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
               <Eye className="w-4 h-4 stroke-[2.3] shrink-0" />
