@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { useState, useRef, useEffect, useMemo, memo, useDeferredValue, Suspense } from "react";
 import { cn } from "@/lib/utils";
 import { api } from "@/convex/_generated/api";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { Badge } from "../ui/badge";
 import { Checkbox } from "../ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
@@ -226,17 +226,30 @@ export default function BlogPostForm() {
     const updateBlog = useMutation(api.blogs.updatePost);
     const generateUploadUrl = useMutation(api.blogs.generateUploadUrl);
 
-    const COMPRESSION_OPTIONS = {
-        maxSizeMB: 1.0,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-        fileType: "image/webp" as const,
-        initialQuality: 0.85,
-    };
-
     const { control, handleSubmit, watch, clearErrors, formState: { errors }, reset, setValue } = useForm<BlogFormValues>({
         defaultValues: { title: "", subtitle: "", content: "", author: "", tags: [], coverImage: null }
     });
+
+    const currentStorageId = 
+        watch("storageId") || 
+        selectedBlog?.storageId || 
+        activeDraft?.storageId || 
+        null;
+
+    const resolvedImageUrl = useQuery(
+        api.blogs.getStorageUrl,
+        currentStorageId ? { storageId: currentStorageId } : "skip"
+    );
+
+    useEffect(() => {
+        if (selectedImage) return;
+
+        if (resolvedImageUrl) {
+            setImagePreviewUrl(resolvedImageUrl);
+        } else if (!currentStorageId) {
+            setImagePreviewUrl(null);
+        }
+    }, [resolvedImageUrl, selectedImage, currentStorageId]);
 
     const { clearDraft } = useBlogDraft(
         watch,

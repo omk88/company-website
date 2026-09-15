@@ -1350,3 +1350,17 @@ async function claimMarkdownImages(ctx: any, content: string) {
     }
   }
 }
+
+export const getStorageUrl = query({
+  args: {
+    storageId: v.union(v.string(), v.null()),
+  },
+  handler: async (ctx, args) => {
+    if (!args.storageId) {
+      return null;
+    }
+
+    const url = await ctx.storage.getUrl(args.storageId);
+    return url;
+  },
+});
