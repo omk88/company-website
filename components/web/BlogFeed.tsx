@@ -2,7 +2,7 @@
 
 import { api } from "@/convex/_generated/api";
 import { usePaginatedQuery } from "convex/react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 import { BlogCard } from "./BlogCard";
 import { BlogCardSkeleton } from "./LoadingSkeletons/BlogCardSkeleton";
 import { EmptyState } from "./EmptyState";
@@ -16,6 +16,20 @@ interface BlogFeedProps {
   isActive: boolean;
   isInitialFeed?: boolean;
   preloadedData?: any; 
+}
+
+function subscribeToMobileBreakpoint(callback: () => void) {
+  const mediaQuery = window.matchMedia("(max-width: 767px)");
+  mediaQuery.addEventListener("change", callback);
+  return () => mediaQuery.removeEventListener("change", callback);
+}
+
+function getMobileSnapshot() {
+  return window.matchMedia("(max-width: 767px)").matches;
+}
+
+function getServerSnapshot() {
+  return false;
 }
 
 export function BlogFeed(props: BlogFeedProps) {
@@ -32,6 +46,13 @@ function StandardBlogFeed({
   preloadedData,
   isInitialFeed,
 }: BlogFeedProps) {
+
+  const isMobile = useSyncExternalStore(
+    subscribeToMobileBreakpoint,
+    getMobileSnapshot,
+    getServerSnapshot
+  );
+  
   const trimmedSearch = searchTerm.trim();
 
   const { results, status, loadMore } = usePaginatedQuery(
@@ -121,6 +142,7 @@ function StandardBlogFeed({
                   date={blog._creationTime}
                   readTime={blog.readTime}
                   tags={blog.tags}
+                  isMobile={isMobile}
                 />
               </li>
             ))}

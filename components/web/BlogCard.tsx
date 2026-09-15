@@ -9,6 +9,7 @@ import { FaFacebook, FaXTwitter } from "react-icons/fa6";
 import { toast } from "sonner";
 import { RxLinkedinLogo } from "react-icons/rx";
 import { ProfileHoverCard, formatSmartDate } from "./ProfileHoverCard";
+import { Separator } from "../ui/separator";
 
 interface BlogCardProps {
   id: string;
@@ -24,6 +25,7 @@ interface BlogCardProps {
   readTime: number;
   tags: Array<string>;
   variant?: "default" | "compact";
+  isMobile?: boolean;
 }
 
 export function BlogCard({
@@ -40,6 +42,7 @@ export function BlogCard({
   tags,
   username,
   variant = "default",
+  isMobile,
 }: BlogCardProps) {
   const isCompact = variant === "compact";
 
@@ -98,6 +101,139 @@ export function BlogCard({
       </DropdownMenuContent>
     </DropdownMenu>
   );
+
+  if (isMobile) {
+    return (
+      <div className="group flex flex-col md:flex-row h-auto md:h-[190px] rounded-none px-2">
+        <Link 
+          href={`/insights/${id}`}
+          className="rounded-2xl relative aspect-video md:aspect-auto w-full md:w-2/5 md:h-full overflow-hidden bg-muted border-b md:border-b-0 md:border-r border-border/50 shrink-0 block"
+        >
+          <div className="relative w-full aspect-[16/9] bg-zinc-100 dark:bg-zinc-800">
+            <Image
+              src={imageUrl}
+              alt={title}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            />
+          </div>
+        </Link>
+
+        <div className="flex flex-col flex-1 justify-start py-2 min-w-0">
+          <div className="mt-1.5 min-w-0">
+            <div className="font-roboto flex items-start justify-between text-xs uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
+              
+              <div className="@container flex-1 min-w-0 pr-2">
+                <div className="flex flex-wrap items-center gap-y-0.5">
+                  
+                  <ProfileHoverCard authorUsername={username} displayName={displayName || username}>
+                    <span className="cursor-pointer break-all">{displayName || username}</span>
+                  </ProfileHoverCard>
+
+                  <span className="shrink-0 px-1 text-zinc-400 @[150px]:inline hidden">
+                    &middot;
+                  </span>
+
+                  <span className="shrink-0">
+                    {formatSmartDate(date, false)}
+                  </span>
+
+                </div>
+              </div>
+
+              <div className="shrink-0 whitespace-nowrap pl-2">
+                <span>{readTime} min read</span>
+              </div>
+
+            </div>
+          </div>
+
+          <Link href={`/insights/${id}`} className="space-y-2 py-2 block hover:no-underline">
+            <h3 className="leading-tight text-base font-bold tracking-tight line-clamp-2 text-foreground transition-colors duration-100 group-hover:text-blue-600 break-words">
+              {title}
+            </h3>
+            <p className="leading-tight text-zinc-600 dark:text-zinc-400 line-clamp-3 leading-relaxed text-sm break-words">
+              {subtitle}
+            </p>
+          </Link>
+
+          <div className="flex font-sans font-semibold items-center justify-between text-xs tracking-tight select-none w-full mt-2">
+            <div className="flex items-center">
+              <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
+                <Eye className="w-3.5 h-3.5 stroke-[2.3] shrink-0" />
+                <span>{totalViews}</span>
+              </div>
+              <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
+                <ThumbsUp className="w-3.5 h-3.5 stroke-[2.3] shrink-0" />
+                <span>{likes}</span>
+              </div>
+              <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
+                <MessageSquare className="w-3.5 h-3.5 stroke-[2.3] shrink-0" />
+                <span>{commentCount}</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0 max-w-[55%] justify-end">
+              {tags && tags.length > 0 ? (
+                <>
+                  <div className="flex flex-row gap-1 items-center justify-end">
+                    {tags.slice(0, 2).map((tag) => (
+                      <Badge 
+                        key={tag} 
+                        variant="outline" 
+                        className="font-sans text-[10px] px-1.5 py-0.5 whitespace-nowrap border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                      >
+                        <span className="capitalize">{tag}</span>
+                      </Badge>
+                    ))}
+                  </div>
+                  
+                  {tags.length > 2 && (
+                    <HoverCard openDelay={100} closeDelay={100}>
+                      <HoverCardTrigger asChild>
+                        <Badge 
+                          variant="outline" 
+                          className="font-mono text-[10px] px-1.5 py-0.5 whitespace-nowrap border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 cursor-help hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors shrink-0"
+                        >
+                          +{tags.length - 2}
+                        </Badge>
+                      </HoverCardTrigger>
+                      
+                      <HoverCardContent side="top" align="end" className="w-auto max-w-[220px] p-2.5">
+                        <div className="space-y-1.5">
+                          <h4 className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">More Topics</h4>
+                          <div className="flex flex-wrap gap-1 max-h-[120px] overflow-y-auto">
+                            {tags.slice(2).map((tag) => (
+                              <Badge 
+                                key={tag} 
+                                variant="outline" 
+                                className="font-mono text-[10px] px-1.5 py-0.5 whitespace-nowrap border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300"
+                              >
+                                <span className="capitalize">{tag}</span>
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      </HoverCardContent>
+                    </HoverCard>
+                  )}
+                </>
+              ) : (
+                <Badge 
+                  variant="outline" 
+                  className="font-mono text-[10px] px-1.5 py-0.5 whitespace-nowrap border-zinc-200 dark:border-zinc-800 text-zinc-500"
+                >
+                  General
+                </Badge>
+              )}
+            </div>
+          </div>
+        </div>
+        <Separator className="my-4" />
+      </div>
+    );
+  }
 
   if (isCompact) {
     return (
