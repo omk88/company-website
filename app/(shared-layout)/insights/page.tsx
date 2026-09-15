@@ -27,7 +27,7 @@ export default function InsightsPage() {
 
         <section 
           id="blog-grid-section" 
-          className="w-full flex-1 flex flex-col h-full min-h-0 bg-white dark:bg-zinc-950 pt-[110px] md:pt-0"
+          className="w-full flex-1 flex flex-col h-full min-h-0 bg-white dark:bg-zinc-950 pt-16 md:pt-0"
         >
           <div className="flex flex-col flex-1 h-full min-h-0">
             <Suspense fallback={
