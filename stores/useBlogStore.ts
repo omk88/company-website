@@ -6,8 +6,8 @@ export interface Draft {
   subtitle?: string;
   content: string;
   tags?: string[];
-  imageUrl?: string;
   storageId?: string;
+  imageUrl?: string | null;
 }
 
 export interface Blog {
@@ -17,8 +17,8 @@ export interface Blog {
   content: string;
   author: string;
   tags?: string[];
-  imageUrl?: string;
   storageId?: string;
+  imageUrl?: string | null;
 }
 
 interface BlogStore {
@@ -34,8 +34,6 @@ export const useBlogStore = create<BlogStore>((set) => ({
   activeDraft: null,
   
   setSelectedBlog: (blog) => set({ selectedBlog: blog, activeDraft: null }),
-  
   setActiveDraft: (draft) => set({ activeDraft: draft, selectedBlog: null }),
-  
   clearStore: () => set({ selectedBlog: null, activeDraft: null }),
 }));

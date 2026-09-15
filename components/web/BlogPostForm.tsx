@@ -47,6 +47,7 @@ interface BlogFormValues {
     content: string;
     author: string;
     tags: string[];
+    storageId?: string;
     coverImage?: File | string | null;
 }
 
@@ -225,7 +226,15 @@ export default function BlogPostForm() {
     const updateBlog = useMutation(api.blogs.updatePost);
     const generateUploadUrl = useMutation(api.blogs.generateUploadUrl);
 
-    const { control, handleSubmit, watch, clearErrors, formState: { errors }, reset } = useForm<BlogFormValues>({
+    const COMPRESSION_OPTIONS = {
+        maxSizeMB: 1.0,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+        fileType: "image/webp" as const,
+        initialQuality: 0.85,
+    };
+
+    const { control, handleSubmit, watch, clearErrors, formState: { errors }, reset, setValue } = useForm<BlogFormValues>({
         defaultValues: { title: "", subtitle: "", content: "", author: "", tags: [], coverImage: null }
     });
 
@@ -247,7 +256,7 @@ export default function BlogPostForm() {
                 content: selectedBlog.content,
                 author: selectedBlog.author,
                 tags: selectedBlog.tags || [],
-                coverImage: selectedBlog.imageUrl || null,
+                coverImage: selectedBlog.storageId || null,
             });
             setImagePreviewUrl(selectedBlog.imageUrl || null);
             setSelectedImage(null);
@@ -257,6 +266,7 @@ export default function BlogPostForm() {
                 subtitle: activeDraft.subtitle || "",
                 content: activeDraft.content || "",
                 tags: activeDraft.tags || [],
+                coverImage: activeDraft.storageId || null
             });
             setImagePreviewUrl(activeDraft.imageUrl || null);
             setSelectedImage(null);
@@ -409,13 +419,15 @@ export default function BlogPostForm() {
                                     control={control}
                                     rules={{
                                         validate: (value) => {
-                                            if (value || selectedBlog?.imageUrl) return true;
+                                            const hasExisting = Boolean(selectedBlog?.storageId || activeDraft?.storageId || selectedBlog?.imageUrl || activeDraft?.imageUrl);
+                                            if (value || hasExisting) return true;
                                             return "A cover image is required";
                                         },
                                     }}
                                     render={({ field, fieldState }) => {
                                         const isInvalid = fieldState.invalid;
                                         const errorMessage = fieldState.error?.message;
+                                        const hasExistingImage = Boolean(selectedBlog?.storageId || activeDraft?.storageId || selectedBlog?.imageUrl || activeDraft?.imageUrl);
 
                                         return (
                                             <Field className="w-full">
@@ -426,12 +438,36 @@ export default function BlogPostForm() {
                                                     accept="image/*"
                                                     disabled={isLoading}
                                                     className="hidden"
-                                                    onChange={(e) => {
+                                                    onChange={async (e) => {
                                                         if (e.target.files && e.target.files[0]) {
                                                             const file = e.target.files[0];
                                                             setSelectedImage(file);
                                                             setImagePreviewUrl(URL.createObjectURL(file));
-                                                            field.onChange(file);
+
+                                                            try {
+                                                                const compressedFile = (await imageCompression(file, {
+                                                                    maxSizeMB: 1.0,
+                                                                    maxWidthOrHeight: 1920,
+                                                                    useWebWorker: true,
+                                                                    fileType: "image/webp" as const,
+                                                                    initialQuality: 0.85,
+                                                                })) as File;
+
+                                                                const uploadUrl = await generateUploadUrl();
+                                                                const res = await fetch(uploadUrl, {
+                                                                    method: "POST",
+                                                                    headers: { "Content-Type": compressedFile.type },
+                                                                    body: compressedFile,
+                                                                });
+
+                                                                if (!res.ok) throw new Error("Upload failed");
+                                                                const { storageId } = await res.json();
+
+                                                                setValue("storageId", storageId, { shouldValidate: true });
+                                                                field.onChange(storageId);
+                                                            } catch (err) {
+                                                                toast.error("Failed to upload image preview.");
+                                                            }
                                                         }
                                                     }}
                                                 />
@@ -454,7 +490,7 @@ export default function BlogPostForm() {
                                                             <span className="truncate">
                                                                 {selectedImage
                                                                     ? selectedImage.name
-                                                                    : selectedBlog?.imageUrl
+                                                                    : hasExistingImage
                                                                     ? "Change cover image..."
                                                                     : "Cover image..."}
                                                             </span>
@@ -467,6 +503,7 @@ export default function BlogPostForm() {
                                                                     e.preventDefault();
                                                                     e.stopPropagation();
                                                                     clearImage();
+                                                                    setValue("storageId", "", { shouldValidate: true });
                                                                     field.onChange(null);
                                                                 }}
                                                                 disabled={isLoading}

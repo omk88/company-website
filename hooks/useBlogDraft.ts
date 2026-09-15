@@ -47,7 +47,7 @@ export function useBlogDraft<T extends Record<string, any>>(
       const subtitle = (data.subtitle as string) || "";
       const content = (data.content as string) || "";
       const tags = (data.tags as string[]) || [];
-      const storageId = (data.storageId as string) || undefined;
+      const storageId = (data.storageId as string) || (data.coverImage as string) || activeDraft?.storageId || "";
 
       if (!title.trim() && !content.trim()) return;
 
@@ -60,6 +60,7 @@ export function useBlogDraft<T extends Record<string, any>>(
           title,
           subtitle,
           content,
+          storageId,
           tags,
         });
 

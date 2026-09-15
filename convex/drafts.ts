@@ -8,6 +8,7 @@ export const saveDraft = mutation({
     title: v.string(),
     subtitle: v.string(),
     content: v.string(),
+    storageId: v.string(),
     tags: v.array(v.string()),
   },
   handler: async (ctx, args) => {
@@ -19,6 +20,7 @@ export const saveDraft = mutation({
       subtitle: args.subtitle,
       content: args.content,
       tags: args.tags,
+      storageId: args.storageId,
       updatedAt: Date.now(),
     };
 
@@ -32,16 +34,22 @@ export const saveDraft = mutation({
 });
 
 export const getDraft = query({
-  args: { userId: v.string() },
+  args: { draftId: v.id("drafts") },
   handler: async (ctx, args) => {
-    if (!args.userId) return null;
-    return await ctx.db
-      .query("drafts")
-      .withIndex("by_user", (q) => q.eq("userId", args.userId))
-      .first();
+    const draft = await ctx.db.get(args.draftId);
+    if (!draft) return null;
+
+    let imageUrl: string | null = null;
+    if (draft.storageId) {
+      imageUrl = await ctx.storage.getUrl(draft.storageId);
+    }
+
+    return {
+      ...draft,
+      imageUrl,
+    };
   },
 });
-
 export const deleteDraftById = mutation({
   args: { draftId: v.id("drafts") },
   handler: async (ctx, args) => {
@@ -55,6 +63,7 @@ export const createDraft = mutation({
     title: v.string(),
     subtitle: v.string(),
     content: v.string(),
+    storageId: v.string(),
     tags: v.array(v.string()),
   },
   handler: async (ctx, args) => {
@@ -66,6 +75,7 @@ export const createDraft = mutation({
       subtitle: args.subtitle,
       content: args.content,
       tags: args.tags,
+      storageId: args.storageId,
       updatedAt: Date.now(),
     });
   },
