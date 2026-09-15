@@ -12,15 +12,19 @@ export const metadata: Metadata = {
 
 export default function InsightsPage() {
   return (
-    <SidebarProvider>
+    <SidebarProvider className="flex-col md:flex-row">
       <aside 
-        className="shrink-0"
+        className="hidden md:block shrink-0"
         style={{ "--sidebar-width": "12.8rem" } as React.CSSProperties}
       >
         <LeftSidebar />
       </aside>
 
       <div className="w-full min-w-0 flex flex-col flex-1 min-h-[calc(100vh-4rem)] pt-16">
+        <div className="block md:hidden">
+          <LeftSidebar />
+        </div>
+
         <section 
           id="blog-grid-section" 
           className="w-full flex-1 flex flex-col h-full min-h-0 bg-white dark:bg-zinc-950"
@@ -40,7 +44,7 @@ export default function InsightsPage() {
       </div>
 
       <aside 
-        className="shrink-0"
+        className="hidden md:block shrink-0"
         style={{ "--sidebar-width": "18rem" } as React.CSSProperties}
       >
         <RightSidebar />

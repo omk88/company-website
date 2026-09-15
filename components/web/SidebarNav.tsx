@@ -21,7 +21,11 @@ const NAV_ITEMS: NavItem[] = [
   { id: "community", label: "Community", icon: Globe },
 ];
 
-export function SidebarNav() {
+interface SidebarNavProps {
+  isHorizontal?: boolean;
+}
+
+export function SidebarNav({ isHorizontal = false }: SidebarNavProps) {
   const router = useRouter();
   const feedType = useSearchStore((state) => state.feedType);
   const setFeedType = useSearchStore((state) => state.setFeedType);
@@ -43,18 +47,30 @@ export function SidebarNav() {
   };
 
   return (
-    <SidebarMenu className="w-full flex flex-col gap-0.5">
+    <SidebarMenu 
+      className={`
+        flex w-full gap-1
+        ${isHorizontal 
+          ? "flex-row items-center overflow-x-auto no-scrollbar" 
+          : "flex-col gap-0.5"
+        }
+      `}
+    >
       {NAV_ITEMS.map((item) => {
         const Icon = item.icon;
         const isActive = feedType === item.id;
 
         return (
-          <SidebarMenuItem key={item.id} className="w-full">
+          <SidebarMenuItem 
+            key={item.id} 
+            className={isHorizontal ? "w-auto shrink-0" : "w-full"}
+          >
             <SidebarMenuButton
               isActive={isActive}
               onClick={() => handleNavClick(item)}
               className={`
-                group w-full !cursor-pointer justify-start px-2.5 py-1.5 rounded-lg text-[13px] transition-colors
+                group !cursor-pointer justify-start px-2.5 py-1.5 rounded-lg text-[13px] transition-colors
+                ${isHorizontal ? "whitespace-nowrap flex items-center gap-2" : "w-full"}
                 ${
                   isActive
                     ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-semibold"

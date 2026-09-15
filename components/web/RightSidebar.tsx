@@ -34,7 +34,7 @@ export function RightSidebar() {
       bgClass="bg-background/95" 
       showBorder={true}
       side="right" 
-      className="!top-16 !z-40 flex flex-col overflow-hidden"
+      className="hidden md:flex !top-16 !z-40 flex-col overflow-hidden"
       style={{ height: "calc(100vh - 4rem)" }}
     >
       <ScrollArea>
