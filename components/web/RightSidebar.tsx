@@ -13,6 +13,7 @@ import { preloadQuery } from "convex/nextjs";
 import { api } from "@/convex/_generated/api";
 import { FeaturedBlogsSkeleton } from "./LoadingSkeletons/FeaturedBlogsSkeleton";
 import { TrendingBlogsSkeleton } from "./LoadingSkeletons/TrendingBlogsSkeleton";
+import { ScrollArea } from "../ui/scroll-area";
 
 async function FeaturedSection() {
   await connection();
@@ -36,23 +37,25 @@ export function RightSidebar() {
       className="!top-16 !z-40 flex flex-col overflow-hidden"
       style={{ height: "calc(100vh - 4rem)" }}
     >
-      <SidebarContent className="scrollbar-none !p-3 space-y-4">
-        <SidebarGroup className="!p-0"> 
-          <SidebarGroupContent>
-            <Suspense fallback={<FeaturedBlogsSkeleton />}>
-              <FeaturedSection />
-            </Suspense>
-          </SidebarGroupContent>
-        </SidebarGroup>
+      <ScrollArea>
+        <SidebarContent className="scrollbar-none !p-3 space-y-4">
+            <SidebarGroup className="!p-0"> 
+              <SidebarGroupContent>
+                <Suspense fallback={<FeaturedBlogsSkeleton />}>
+                  <FeaturedSection />
+                </Suspense>
+              </SidebarGroupContent>
+            </SidebarGroup>
 
-        <SidebarGroup className="!p-0">
-          <SidebarGroupContent>
-            <Suspense fallback={<TrendingBlogsSkeleton count={3}/>}>
-              <TrendingSection />
-            </Suspense>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
+            <SidebarGroup className="!p-0">
+              <SidebarGroupContent>
+                <Suspense fallback={<TrendingBlogsSkeleton count={3}/>}>
+                  <TrendingSection />
+                </Suspense>
+              </SidebarGroupContent>
+            </SidebarGroup>
+        </SidebarContent>
+      </ScrollArea>
       
       <SidebarFooter className="hidden" />
     </Sidebar>

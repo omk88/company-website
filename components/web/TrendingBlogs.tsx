@@ -33,9 +33,10 @@ export function TrendingBlogs({ preloadedData }: { preloadedData: Preloaded<type
               href={`/insights/${blog._id}`} 
               className="group/trending block w-full p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 hover:bg-zinc-100/90 dark:hover:bg-zinc-800/60 transition-all duration-100"
             >
-              <div className="w-full flex flex-row items-center justify-between gap-3">
+              <div className="w-full flex flex-row items-center justify-between gap-3 min-w-0"> {/* <-- Added min-w-0 */}
                 <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
-                  <h3 className="text-[13px] font-medium leading-snug text-zinc-900 dark:text-zinc-100 group-hover/trending:text-blue-600 dark:group-hover/trending:text-blue-400 line-clamp-1 transition-colors">
+                  
+                  <h3 className="text-[13px] font-medium leading-snug text-zinc-900 dark:text-zinc-100 group-hover/trending:text-blue-600 dark:group-hover/trending:text-blue-400 line-clamp-1 break-all transition-colors">
                     {blog.title}
                   </h3>
                   

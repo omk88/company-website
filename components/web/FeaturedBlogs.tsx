@@ -97,11 +97,11 @@ export function FeaturedBlogs({ preloadedData }: { preloadedData: Preloaded<type
 
       <Link 
         href={`/insights/${currentPost._id}`}
-        className="group/card flex items-start justify-between gap-3 w-full text-inherit no-underline cursor-pointer my-1"
+        className="group/card flex items-start justify-between gap-3 w-full text-inherit no-underline cursor-pointer my-1 min-w-0" // <-- Added min-w-0
       >
-        <div className="flex flex-col justify-between flex-1 min-w-0">
+        <div className="flex flex-col justify-between flex-1 min-w-0"> {/* <-- min-w-0 is here */}
           <div>
-            <div className="font-roboto flex items-center gap-1.5 text-[11px] tracking-tight uppercase text-zinc-500 mb-1">
+            <div className="font-roboto flex items-center gap-1.5 text-[11px] tracking-tight uppercase text-zinc-500 mb-1 min-w-0">
               <ProfileHoverCard authorUsername={currentPost.username} displayName={currentPost.displayName}>
                 <span className="cursor-pointer shrink-0" title={rawName}>
                   {displayName}
@@ -111,7 +111,7 @@ export function FeaturedBlogs({ preloadedData }: { preloadedData: Preloaded<type
               <span className="shrink-0">{formattedDate}</span>
             </div>
 
-            <h3 className="text-[13px] font-medium leading-snug text-zinc-900 dark:text-zinc-100 group-hover/card:text-blue-600 dark:group-hover/card:text-blue-400 transition-colors line-clamp-2">
+            <h3 className="text-[13px] font-medium leading-snug text-zinc-900 dark:text-zinc-100 group-hover/card:text-blue-600 dark:group-hover/card:text-blue-400 transition-colors line-clamp-2 break-all">
               {currentPost.title}
             </h3>
           </div>
