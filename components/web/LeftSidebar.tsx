@@ -8,7 +8,7 @@ import { SidebarNav } from "./SidebarNav";
 export async function LeftSidebar() {
   return (
     <>
-      <nav className="flex md:hidden flex-col w-full border-b bg-background/95 backdrop-blur-md py-1.5 gap-1 fixed top-10 left-0 z-30">
+      <nav className="flex md:hidden flex-col w-full border-b bg-background/95 backdrop-blur-md py-1.5 gap-2 fixed top-10 left-0 z-30">
         <SidebarNav isHorizontal={true} />
         
         <div className="flex items-center gap-1.5 w-full overflow-x-auto no-scrollbar px-2 scroll-px-2 shrink-0">

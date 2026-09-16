@@ -51,7 +51,7 @@ export function SidebarNav({ isHorizontal = false }: SidebarNavProps) {
       className={`
         flex w-full gap-1
         ${isHorizontal 
-          ? "flex-row items-center overflow-x-auto no-scrollbar px-2 min-w-full" 
+          ? "flex-row items-center gap-2 overflow-x-auto no-scrollbar px-2 min-w-full" 
           : "flex-col gap-0.5"
         }
       `}
@@ -69,7 +69,7 @@ export function SidebarNav({ isHorizontal = false }: SidebarNavProps) {
               isActive={isActive}
               onClick={() => handleNavClick(item)}
               className={`
-                group !cursor-pointer justify-start px-2.5 py-1.5 rounded-lg text-[13px] transition-colors
+                group !cursor-pointer justify-start px-2.5 py-1.5 rounded-lg text-sm transition-colors
                 ${isHorizontal ? "whitespace-nowrap flex items-center gap-2" : "w-full"}
                 ${
                   isActive
