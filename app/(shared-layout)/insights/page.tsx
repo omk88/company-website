@@ -5,6 +5,7 @@ import { PageBlogPosts } from "@/components/web/PageBlogPosts";
 import { LeftSidebar } from "@/components/web/LeftSidebar";
 import { Suspense } from "react";
 import { BlogCardSkeleton } from "@/components/web/LoadingSkeletons/BlogCardSkeleton";
+import CreatePostButton from "@/components/web/CreatePostButton";
 
 export const metadata: Metadata = {
   title: "Insights",
@@ -20,7 +21,8 @@ export default function InsightsPage() {
         <LeftSidebar />
       </aside>
 
-      <div className="w-full min-w-0 flex flex-col flex-1 min-h-[calc(100vh-4rem)] pt-16">
+      {/* Added pb-16 to mobile to reserve space for the fixed bottom bar, resetting to md:pb-0 on desktop */}
+      <div className="w-full min-w-0 flex flex-col flex-1 min-h-[calc(100vh-4rem)] pt-16 pb-16 md:pb-0">
         <div className="block md:hidden">
           <LeftSidebar />
         </div>
@@ -49,6 +51,12 @@ export default function InsightsPage() {
       >
         <RightSidebar />
       </aside>
+
+      <div className="fixed bottom-0 left-0 right-0 z-50 flex md:hidden items-center justify-center h-12 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 px-4">
+        <div className="w-fit flex justify-center items-center">
+          <CreatePostButton />
+        </div>
+      </div>
     </SidebarProvider>
   );
 }
