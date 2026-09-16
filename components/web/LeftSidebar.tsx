@@ -8,11 +8,11 @@ import { SidebarNav } from "./SidebarNav";
 export async function LeftSidebar() {
   return (
     <>
-      <nav className="flex md:hidden flex-col w-full border-b bg-background/95 backdrop-blur-md p-1.5 gap-0.5 fixed top-10 left-0 z-30">
+      <nav className="flex md:hidden flex-col w-full border-b bg-background/95 backdrop-blur-md py-1.5 gap-1 fixed top-10 left-0 z-30">
         <SidebarNav isHorizontal={true} />
         
-        <div className="flex items-center gap-2 w-full pt-1">
-          <div className="flex-1">
+        <div className="flex items-center gap-1 w-full px-2">
+          <div className="flex-1 min-w-0">
             <SidebarSearch placeholder="insights" fullWidth={true} showDropdown={true} />
           </div>
           <SidebarSort fullWidth={false} />
@@ -25,17 +25,24 @@ export async function LeftSidebar() {
         bgClass="bg-background/95" 
         collapsible="icon"
       >
-        <SidebarContent className="!p-0 w-full">
-          <SidebarGroup className="pt-3 !px-2 w-full">
+        <SidebarContent className="!p-0 w-full overflow-x-hidden">
+          <SidebarGroup className="pt-3 !px-2 w-full flex flex-col">
             <SidebarNav isHorizontal={false} />
 
-            <div className="flex flex-col py-2 gap-2.5 items-start w-full">
+            <div className="flex flex-col py-2 gap-2.5 items-stretch w-full min-w-0">
               <div className="w-full px-1 py-1">
                 <Separator />
               </div>
-              <SidebarSearch placeholder="insights" fullWidth={true} showDropdown={true} />
-              <SidebarSort fullWidth={true} />
-              <SidebarTags fullWidth={true} />
+
+              <div className="w-full min-w-0">
+                <SidebarSearch placeholder="insights" fullWidth={true} showDropdown={true} />
+              </div>
+              <div className="w-full min-w-0">
+                <SidebarSort fullWidth={true} />
+              </div>
+              <div className="w-full min-w-0">
+                <SidebarTags fullWidth={true} />
+              </div>
             </div>
           </SidebarGroup>
         </SidebarContent>

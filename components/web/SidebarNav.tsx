@@ -51,7 +51,7 @@ export function SidebarNav({ isHorizontal = false }: SidebarNavProps) {
       className={`
         flex w-full gap-1
         ${isHorizontal 
-          ? "flex-row items-center overflow-x-auto no-scrollbar" 
+          ? "flex-row items-center overflow-x-auto no-scrollbar px-3 min-w-full" 
           : "flex-col gap-0.5"
         }
       `}
