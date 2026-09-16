@@ -43,7 +43,7 @@ export function SidebarSearch({
         border border-zinc-200 dark:border-zinc-800 rounded-md md:rounded-lg 
         px-2.5 md:px-3 h-7 md:h-9 
         focus-within:ring-1 focus-within:ring-zinc-400 transition-colors
-        md:w-full ${fullWidth ? "w-full flex-1 min-w-0" : "w-auto"}
+        w-full
       `}
     >
       <Search className="h-3.5 w-3.5 md:h-4 md:w-4 text-zinc-400 md:text-zinc-500 shrink-0 mr-2 translate-y-[0.5px]" />
@@ -54,7 +54,7 @@ export function SidebarSearch({
         placeholder={fullPlaceholder}
         value={localValue}
         onChange={(e) => setLocalValue(e.target.value)}
-        className="h-full border-0 bg-transparent px-0 text-xs md:text-sm text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 md:placeholder:text-zinc-500 focus-visible:ring-0 focus-visible:border-0 shadow-none w-full flex-1 min-w-0"
+        className="h-full border-0 bg-transparent px-0 text-xs md:text-sm text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 md:placeholder:text-zinc-500 focus-visible:ring-0 focus-visible:border-0 shadow-none w-full min-w-0 flex-1"
       />
 
       {localValue && (

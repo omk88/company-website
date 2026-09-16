@@ -11,12 +11,17 @@ export async function LeftSidebar() {
       <nav className="flex md:hidden flex-col w-full border-b bg-background/95 backdrop-blur-md py-1.5 gap-1 fixed top-10 left-0 z-30">
         <SidebarNav isHorizontal={true} />
         
-        <div className="flex items-center gap-1 w-full px-2">
-          <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-1.5 w-full overflow-x-auto no-scrollbar px-2 scroll-px-2 shrink-0">
+          <div className="w-[180px] shrink-0">
             <SidebarSearch placeholder="insights" fullWidth={true} showDropdown={true} />
           </div>
-          <SidebarSort fullWidth={false} />
-          <SidebarTags fullWidth={false} />
+
+          <div className="shrink-0">
+            <SidebarSort fullWidth={false} />
+          </div>
+          <div className="shrink-0">
+            <SidebarTags fullWidth={false} />
+          </div>
         </div>
       </nav>
 
