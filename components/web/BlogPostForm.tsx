@@ -864,29 +864,6 @@ export default function BlogPostForm() {
                                             </Button>
                                         </div>
                                     )}
-
-                                    {!isDesktop &&
-                                        <div className="fixed bottom-0 left-0 right-0 z-50 flex md:hidden items-center justify-center h-16 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 px-4">
-                                            <Button
-                                                size="lg"
-                                                type="submit"
-                                                disabled={isLoading}
-                                                className={cn(
-                                                    "inline-flex rounded-full text-sm bg-zinc-800 text-neutral-50 dark:bg-neutral-50 dark:text-neutral-900 dark:hover:bg-neutral-50/90 w-fit ml-auto",
-                                                    isLoading && "cursor-not-allowed opacity-70"
-                                                )}
-                                            >
-                                                {isLoading ? (
-                                                <>
-                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                    {selectedBlog ? "Updating" : "Publishing"}
-                                                </>
-                                                ) : (
-                                                selectedBlog ? "Update" : "Publish"
-                                                )}
-                                            </Button>
-                                        </div>
-                                    }
                                     
                                     <div className="hidden md:flex">
                                         <Button
