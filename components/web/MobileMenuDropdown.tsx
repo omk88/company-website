@@ -2,6 +2,7 @@ import { Briefcase, Cookie, FileText, HelpCircle, House, Info, Layers, Library, 
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Button } from "../ui/button";
 import Link from "next/link";
+import { useState } from "react";
 
 const mainPages = [
   {
@@ -43,8 +44,12 @@ const legalPages = [
 ];
 
 export function MobileMenuDropdown() {
+    const [open, setOpen] = useState(false);
+
+    const handleClose = () => setOpen(false);
+
     return (
-        <Popover>
+        <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
                 <Button
                     variant={"ghost"}
@@ -62,6 +67,7 @@ export function MobileMenuDropdown() {
                                 <li key={page.href}>
                                     <Link
                                         href={page.href}
+                                        onClick={handleClose}
                                         className="flex items-center gap-3 rounded-lg p-1 transition-colors hover:bg-accent hover:text-accent-foreground"
                                     >
                                         <div className="relative z-10 p-1.5 rounded-md bg-neutral-100 dark:bg-neutral-800 text-foreground group-hover:scale-105 transition-transform duration-200 shrink-0">
@@ -87,6 +93,7 @@ export function MobileMenuDropdown() {
                                 <li key={page.href}>
                                     <Link
                                         href={page.href}
+                                        onClick={handleClose}
                                         className="flex items-center"
                                     >
                                         <div className="relative z-10 p-2 text-foreground">
