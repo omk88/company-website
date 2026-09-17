@@ -1,18 +1,24 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
 import BlogPostForm from "@/components/web/BlogPostForm";
 import { LeftSidebarCreateBlog } from "@/components/web/LeftSidebarCreateBlog";
+import { MobileCreateBlogBar } from "@/components/web/MobileCreateBlogBar";
 
 export default function CreateBlog() {
   return (
-    <div>
-      <SidebarProvider>
-        <div className="hidden md:flex">
+    <SidebarProvider>
+      <div className="flex flex-col md:flex-row w-full min-h-screen bg-white dark:bg-zinc-900">
+        <div className="hidden md:block shrink-0">
           <LeftSidebarCreateBlog />
         </div>
-        <div className="w-full min-h-screen bg-white dark:bg-zinc-900 pt-10 md:pt-16">
+
+        <div className="block md:hidden w-full shrink-0 pt-10">
+          <MobileCreateBlogBar />
+        </div>
+
+        <div className="w-full flex-1 pt-10 md:pt-16">
           <BlogPostForm />
         </div>
-      </SidebarProvider>
-    </div>
+      </div>
+    </SidebarProvider>
   );
 }

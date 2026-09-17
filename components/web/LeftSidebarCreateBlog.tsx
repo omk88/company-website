@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, FolderBookmark, Trash2, FileText, ChevronLeft, FileImage } from "lucide-react";
+import { ArrowLeft, FolderBookmark, Trash2, ChevronLeft, FileImage } from "lucide-react";
 import { Sidebar, SidebarHeader, SidebarFooter, SidebarContent } from "../ui/sidebar";
 import { Button, buttonVariants } from "../ui/button";
 import { cn } from "@/lib/utils";
@@ -39,7 +39,6 @@ export function LeftSidebarCreateBlog({ onSelectDraft }: LeftSidebarCreateBlogPr
   const userId = currentUser?.userId;
 
   const drafts = useQuery(api.drafts.listUserDrafts);
-
   const deleteDraftById = useMutation(api.drafts.deleteDraftById);
 
   const handleDelete = async (e: React.MouseEvent, draftId: any) => {
@@ -54,15 +53,20 @@ export function LeftSidebarCreateBlog({ onSelectDraft }: LeftSidebarCreateBlogPr
   const setActiveDraft = useBlogStore((state) => state.setActiveDraft);
 
   return (
-    <aside className="w-[3.5rem] shrink-0 h-full relative z-40">
-      <Sidebar bgClass="bg-white dark:bg-zinc-950" showBorder={true} className="!top-16 !z-40 !w-[3.5rem]">
-        <div className="flex h-full w-full relative">
-          <div className="w-[3.5rem] shrink-0 flex flex-col items-center border-zinc-200 dark:border-zinc-800 h-full bg-white dark:bg-zinc-950 z-10">
-            <SidebarHeader className="flex items-center justify-center p-2">
+    <aside className="w-full md:w-[3.5rem] h-14 md:h-full shrink-0 relative z-40">
+      <Sidebar 
+        bgClass="bg-white dark:bg-zinc-950" 
+        showBorder={true} 
+        className="!top-0 md:!top-16 !z-40 !w-full md:!w-[3.5rem] !h-14 md:!h-full"
+      >
+        <div className="flex flex-col md:flex-row h-full w-full relative">
+          <div className="w-full md:w-[3.5rem] h-14 md:h-full shrink-0 flex flex-row md:flex-col items-center justify-between md:justify-start border-b md:border-b-0 md:border-r border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 z-10 px-3 md:px-0">
+            
+            <SidebarHeader className="flex items-center justify-center p-0 md:p-2">
               <Link
                 className={cn(
                   buttonVariants({ variant: "ghost", size: "icon" }),
-                  "h-11 w-11 rounded-full text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 dark:hover:text-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                  "h-10 w-10 md:h-11 md:w-11 rounded-full text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 dark:hover:text-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                 )}
                 href={backHref}
                 title={selectedBlog?._id ? "Back to blog post" : "Back to insights"}
@@ -71,12 +75,12 @@ export function LeftSidebarCreateBlog({ onSelectDraft }: LeftSidebarCreateBlogPr
               </Link>
             </SidebarHeader>
 
-            <SidebarContent className="items-center">
+            <SidebarContent className="items-center p-0 md:p-0">
               <button
                 onClick={() => setIsOpen((prev) => !prev)}
                 className={cn(
                   buttonVariants({ variant: "ghost", size: "icon" }),
-                  "cursor-pointer h-11 w-11 rounded-full transition-colors",
+                  "cursor-pointer h-10 w-10 md:h-11 md:w-11 rounded-full transition-colors",
                   isOpen 
                     ? "bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100" 
                     : "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 dark:hover:text-zinc-100 dark:hover:bg-zinc-800"
@@ -87,17 +91,21 @@ export function LeftSidebarCreateBlog({ onSelectDraft }: LeftSidebarCreateBlogPr
               </button>
             </SidebarContent>
 
-            <SidebarFooter />
+            <SidebarFooter className="hidden md:flex" />
           </div>
 
           <AnimatePresence>
             {isOpen && (
               <motion.div
-                initial={{ x: "-100%", opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: "-100%", opacity: 0 }}
+                initial={{ y: "-100%", x: 0, opacity: 0 }}
+                animate={{ y: 0, x: 0, opacity: 1 }}
+                exit={{ y: "-100%", x: 0, opacity: 0 }}
                 transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
-                className="absolute left-[3.5rem] top-0 bottom-0 w-[16rem] bg-white dark:bg-zinc-950 border-r border-zinc-200 dark:border-zinc-800 shadow-xl z-0 p-3 flex flex-col h-full"
+                className={cn(
+                  "absolute bg-white dark:bg-zinc-950 shadow-xl z-0 p-3 flex flex-col",
+                  "top-[3.5rem] left-0 right-0 max-h-[60vh] border-b border-zinc-200 dark:border-zinc-800",
+                  "md:top-0 md:bottom-0 md:left-[3.5rem] md:right-auto md:w-[16rem] md:h-full md:max-h-full md:border-r md:border-b-0"
+                )}
               >
                 <div className="flex items-center justify-between mb-4 pb-2 border-b border-zinc-200 dark:border-zinc-800">
                   <span className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">Saved Drafts</span>
@@ -107,11 +115,11 @@ export function LeftSidebarCreateBlog({ onSelectDraft }: LeftSidebarCreateBlogPr
                     className="cursor-pointer h-6 w-6 text-zinc-500 hover:text-zinc-900" 
                     onClick={() => setIsOpen(false)}
                   >
-                    <ChevronLeft className="h-4 w-4" />
+                    <ChevronLeft className="h-4 w-4 md:rotate-0 rotate-90" />
                   </Button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto space-y-2">
+                <div className="flex-1 overflow-y-auto space-y-2 max-h-[45vh] md:max-h-none">
                   {drafts === undefined && (
                     <p className="text-xs text-zinc-400 p-2">Loading drafts…</p>
                   )}
@@ -155,7 +163,7 @@ export function LeftSidebarCreateBlog({ onSelectDraft }: LeftSidebarCreateBlogPr
                         variant="ghost" 
                         size="icon" 
                         onClick={(e) => handleDelete(e, draft._id)}
-                        className="cursor-pointer ml-4 h-6 w-6 opacity-0 group-hover:opacity-100 text-zinc-400 hover:text-red-500 transition-opacity shrink-0"
+                        className="cursor-pointer ml-4 h-6 w-6 md:opacity-0 md:group-hover:opacity-100 opacity-100 text-zinc-400 hover:text-red-500 transition-opacity shrink-0"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </Button>

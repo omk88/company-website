@@ -491,7 +491,7 @@ export default function BlogPostForm() {
                                                     <label
                                                         htmlFor="cover-image-upload"
                                                         className={cn(
-                                                            "group flex items-center justify-between w-full h-8 pl-2.5 pr-8 rounded-md border border-input bg-background text-xs cursor-pointer hover:bg-accent/50 transition-all select-none relative",
+                                                            "group flex items-center justify-between w-full h-8 pl-2.5 pr-8 rounded-md border border-input bg-background text-sm md:text-xs cursor-pointer hover:bg-accent/50 transition-all select-none relative",
                                                             "has-[button:hover]:bg-background",
                                                             !isInvalid &&
                                                                 "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-transparent",
@@ -501,7 +501,7 @@ export default function BlogPostForm() {
                                                         )}
                                                     >
                                                         <span className="flex flex-row items-center gap-1.5 text-muted-foreground group-hover:text-foreground group-has-[button:hover]:text-muted-foreground transition-colors truncate max-w-[75%]">
-                                                            <Paperclip className="h-3.5 w-3.5 shrink-0 stroke-[1.5]" />
+                                                            <Paperclip className="size-4 md:size-3.5 shrink-0 stroke-[1.5]" />
                                                             <span className="truncate">
                                                                 {selectedImage
                                                                     ? selectedImage.name
@@ -576,7 +576,7 @@ export default function BlogPostForm() {
                                                         placeholder="Title"
                                                         type="text"
                                                         disabled={isLoading}
-                                                        className="w-full h-full bg-transparent pl-2.5 pr-14 text-xs placeholder:text-xs focus:outline-none"
+                                                        className="w-full h-full bg-transparent pl-2.5 pr-14 text-sm md:text-xs md:placeholder:text-xs focus:outline-none"
                                                         {...field}
                                                     />
 
@@ -644,7 +644,7 @@ export default function BlogPostForm() {
                                                         placeholder="Summary"
                                                         rows={2}
                                                         disabled={isLoading}
-                                                        className="w-full bg-transparent p-3 pr-14 text-xs placeholder:text-xs focus:outline-none resize-y min-h-[40px]"
+                                                        className="w-full bg-transparent p-3 pr-14 text-sm md:text-xs md:placeholder:text-xs focus:outline-none resize-y min-h-[40px]"
                                                         {...field}
                                                     />
 
@@ -717,7 +717,7 @@ export default function BlogPostForm() {
                                                     <PopoverTrigger asChild disabled={isLoading}>
                                                         <div
                                                             className={cn(
-                                                                "flex min-h-8 w-full flex-wrap gap-1 rounded-md border border-input bg-background px-2.5 py-1 text-xs cursor-pointer items-center justify-between relative transition-all",
+                                                                "flex min-h-8 w-full flex-wrap gap-1 rounded-md border border-input bg-background px-2.5 py-1 text-sm md:text-xs cursor-pointer items-center justify-between relative transition-all",
                                                                 !isInvalid &&
                                                                 "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-transparent",
                                                                 isInvalid &&
@@ -752,11 +752,11 @@ export default function BlogPostForm() {
                                                                         className="text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted cursor-pointer transition-colors"
                                                                         title="Clear tags"
                                                                     >
-                                                                        <X className="h-3 w-3 stroke-[2]" />
+                                                                        <X className="size-4 md:size-3 stroke-[2]" />
                                                                     </button>
                                                                 )}
 
-                                                                <ChevronDown className="text-muted-foreground h-3.5 w-3.5 stroke-[2]" />
+                                                                <ChevronDown className="text-muted-foreground size-4.5 md:size-3.5 stroke-[2]" />
 
                                                                 {errorMessage && (
                                                                     <TooltipProvider>
@@ -864,6 +864,29 @@ export default function BlogPostForm() {
                                             </Button>
                                         </div>
                                     )}
+
+                                    {!isDesktop &&
+                                        <div className="fixed bottom-0 left-0 right-0 z-50 flex flex-row w-full border-t border-border bg-white dark:bg-zinc-950 p-1 sm:px-6 md:static md:bg-transparent md:border-0 md:p-0">
+                                            <Button
+                                                size="lg"
+                                                type="submit"
+                                                disabled={isLoading}
+                                                className={cn(
+                                                    "inline-flex rounded-full text-sm bg-zinc-800 text-neutral-50 dark:bg-neutral-50 dark:text-neutral-900 dark:hover:bg-neutral-50/90 w-fit ml-auto",
+                                                    isLoading && "cursor-not-allowed opacity-70"
+                                                )}
+                                            >
+                                                {isLoading ? (
+                                                <>
+                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                    {selectedBlog ? "Updating" : "Publishing"}
+                                                </>
+                                                ) : (
+                                                selectedBlog ? "Update" : "Publish"
+                                                )}
+                                            </Button>
+                                        </div>
+                                    }
                                     
                                     <Button
                                         type="submit"

@@ -614,7 +614,7 @@ export function MarkdownTextEditor({
             onDrop={handleDrop}
             placeholder={placeholder}
             rows={8}
-            className="w-full bg-transparent p-3 pr-14 text-xs focus:outline-none disabled:opacity-50 resize-y min-h-[150px]"
+            className="w-full bg-transparent p-3 pr-14 text-sm md:text-xs focus:outline-none disabled:opacity-50 resize-y min-h-[150px]"
           />
 
           {content && (

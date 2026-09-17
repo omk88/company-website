@@ -21,7 +21,6 @@ export default function InsightsPage() {
         <LeftSidebar />
       </aside>
 
-      {/* Added pb-16 to mobile to reserve space for the fixed bottom bar, resetting to md:pb-0 on desktop */}
       <div className="w-full min-w-0 flex flex-col flex-1 min-h-[calc(100vh-4rem)] pt-16 pb-16 md:pb-0">
         <div className="block md:hidden">
           <LeftSidebar />
