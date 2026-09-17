@@ -69,7 +69,7 @@ export function SidebarNav({ isHorizontal = false }: SidebarNavProps) {
               isActive={isActive}
               onClick={() => handleNavClick(item)}
               className={`
-                group !cursor-pointer justify-start px-2.5 py-1.5 rounded-lg text-sm transition-colors
+                group !cursor-pointer justify-start px-2.5 py-1.5 rounded-lg text-lg md:text-sm transition-colors
                 ${isHorizontal ? "whitespace-nowrap flex items-center gap-2" : "w-full"}
                 ${
                   isActive

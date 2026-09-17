@@ -12,7 +12,7 @@ export async function LeftSidebar() {
         <SidebarNav isHorizontal={true} />
         
         <div className="flex items-center gap-1.5 w-full overflow-x-auto no-scrollbar px-2 scroll-px-2 shrink-0">
-          <div className="w-[180px] shrink-0">
+          <div className="w-[240px] shrink-0">
             <SidebarSearch placeholder="insights" fullWidth={true} showDropdown={true} />
           </div>
 

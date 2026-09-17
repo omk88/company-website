@@ -62,13 +62,13 @@ export function SidebarTags({ fullWidth, className }: SidebarTagsProps) {
           )}
         >
           <span className="flex items-center gap-1.5 md:gap-2 whitespace-nowrap">
-            <Tag className="h-4 w-4 md:h-4 md:w-4 shrink-0 text-zinc-500" />
-            <span>Tags</span>
+            <Tag className="h-5 w-5 md:h-4 md:w-4 shrink-0 text-zinc-500" />
+            <span className="text-base md:text-[13px]">Tags</span>
             {activeTags.length > 0 && !isAllSelected && (
               <span className="text-zinc-500 font-normal">({activeTags.length})</span>
             )}
           </span>
-          <ChevronDown className="h-3 w-3 md:h-4 md:w-4 shrink-0 text-zinc-500" />
+          <ChevronDown className="h-5 w-5 md:h-4 md:w-4 shrink-0 text-zinc-500" />
         </button>
       </PopoverTrigger>
 
