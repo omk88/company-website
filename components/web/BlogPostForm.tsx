@@ -866,7 +866,7 @@ export default function BlogPostForm() {
                                     )}
 
                                     {!isDesktop &&
-                                        <div className="fixed bottom-0 left-0 right-0 z-50 flex flex-row items-center w-full border-t border-border bg-white dark:bg-zinc-950 px-4 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] md:static md:bg-transparent md:border-0 md:p-0">
+                                        <div className="fixed bottom-0 left-0 right-0 z-50 flex md:hidden items-center justify-center h-16 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 px-4">
                                             <Button
                                                 size="lg"
                                                 type="submit"
