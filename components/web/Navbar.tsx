@@ -29,7 +29,7 @@ export function Navbar() {
   return (
     <header className="w-full fixed top-0 z-50 bg-background/95 backdrop-blur-sm border-b">
       <nav className="w-full px-4 md:px-12 h-10 md:h-16 flex items-center justify-between relative">
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-4 md:gap-8">
           <Link href="/">
             <h1 className="font-poppins text-2xl md:text-xl font-bold tracking-tight text-foreground">
               TaQtiQ

@@ -6,6 +6,7 @@ import { NavLink } from "./NavLink";
 import NavbarResourcesDropdown from "./NavbarResourcesDropdown";
 import { Button } from "../ui/button";
 import { Menu } from "lucide-react";
+import { MobileMenuDropdown } from "./MobileMenuDropdown";
 
 export function NavLinksGroup() {
   const [hoveredPath, setHoveredPath] = useState<string | null>(null);
@@ -50,9 +51,7 @@ export function NavLinksGroup() {
         </LayoutGroup>
       </div>
       <div className="flex md:hidden">
-        <Button>
-          <Menu />
-        </Button>
+        <MobileMenuDropdown />
       </div>
     </div>
   );
