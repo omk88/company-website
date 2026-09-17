@@ -42,8 +42,8 @@ export default function CreatePostButton() {
                 className="h-10 md:h-8 rounded-full border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs text-zinc-700 dark:text-zinc-200 shadow-none transition-all flex items-center gap-1.5 px-3 cursor-pointer"
                 onClick={handleCreatePostClick}
             >
-                <Plus className="w-4 h-4 md:w-3.5 md:h-3.5 shrink-0 stroke-[2.5]" />
-                <span className="text-sm md:text-xs">Create a Post</span>
+                <Plus className="w-6 h-6 md:w-3.5 md:h-3.5 shrink-0 stroke-[2.5]" />
+                <span className="text-base md:text-xs">Create a Post</span>
             </Button>
         </div>
     );

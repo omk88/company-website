@@ -122,7 +122,7 @@ export function BlogCard({
 
         <div className="flex flex-col flex-1 justify-start py-2 min-w-0">
           <div className="mt-1.5 min-w-0">
-            <div className="font-roboto flex items-start justify-between text-xs uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
+            <div className="font-roboto flex items-start justify-between text-sm uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
               
               <div className="@container flex-1 min-w-0 pr-2">
                 <div className="flex flex-wrap items-center gap-y-0.5">
@@ -150,26 +150,26 @@ export function BlogCard({
           </div>
 
           <Link href={`/insights/${id}`} className="space-y-2 py-2 block hover:no-underline">
-            <h3 className="leading-tight text-base font-bold tracking-tight line-clamp-2 text-foreground transition-colors duration-100 group-hover:text-blue-600 break-words">
+            <h3 className="leading-tight text-lg font-bold tracking-tight line-clamp-2 text-foreground transition-colors duration-100 group-hover:text-blue-600 break-words">
               {title}
             </h3>
-            <p className="leading-tight text-zinc-600 dark:text-zinc-400 line-clamp-3 leading-relaxed text-sm break-words">
+            <p className="leading-tight text-zinc-600 dark:text-zinc-400 line-clamp-3 leading-relaxed text-base break-words">
               {subtitle}
             </p>
           </Link>
 
-          <div className="flex font-sans font-semibold items-center justify-between text-xs tracking-tight select-none w-full mt-2">
+          <div className="flex font-sans font-semibold items-center justify-between text-sm tracking-tight select-none w-full mt-2">
             <div className="flex items-center">
               <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
-                <Eye className="w-3.5 h-3.5 stroke-[2.3] shrink-0" />
+                <Eye className="w-4 h-4 stroke-[2.3] shrink-0" />
                 <span>{totalViews}</span>
               </div>
               <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
-                <ThumbsUp className="w-3.5 h-3.5 stroke-[2.3] shrink-0" />
+                <ThumbsUp className="w-4 h-4 stroke-[2.3] shrink-0" />
                 <span>{likes}</span>
               </div>
               <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
-                <MessageSquare className="w-3.5 h-3.5 stroke-[2.3] shrink-0" />
+                <MessageSquare className="w-4 h-4 stroke-[2.3] shrink-0" />
                 <span>{commentCount}</span>
               </div>
             </div>
@@ -182,9 +182,11 @@ export function BlogCard({
                       <Badge 
                         key={tag} 
                         variant="outline" 
-                        className="font-sans text-[10px] px-1.5 py-0.5 whitespace-nowrap border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                        className="h-5 px-2 font-sans text-sm whitespace-nowrap border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                       >
-                        <span className="capitalize">{tag}</span>
+                        <span className="capitalize inline-flex items-center leading-none -translate-y-[0.5px]">
+                          {tag}
+                        </span>
                       </Badge>
                     ))}
                   </div>
@@ -194,7 +196,7 @@ export function BlogCard({
                       <HoverCardTrigger asChild>
                         <Badge 
                           variant="outline" 
-                          className="font-mono text-[10px] px-1.5 py-0.5 whitespace-nowrap border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 cursor-help hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors shrink-0"
+                          className="font-mono text-sm px-1.5 py-0.5 whitespace-nowrap border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 cursor-help hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors shrink-0"
                         >
                           +{tags.length - 2}
                         </Badge>
