@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { RxLinkedinLogo } from "react-icons/rx";
 import { ProfileHoverCard, formatSmartDate } from "./ProfileHoverCard";
 import { Separator } from "../ui/separator";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
 interface BlogCardProps {
   id: string;
@@ -126,10 +127,11 @@ export function BlogCard({
               
               <div className="@container flex-1 min-w-0 pr-2">
                 <div className="flex flex-wrap items-center gap-y-0.5">
-                  
-                  <ProfileHoverCard authorUsername={username} displayName={displayName || username}>
+                  <Link 
+                      href={`/${username}`}
+                  >
                     <span className="cursor-pointer break-all">{displayName || username}</span>
-                  </ProfileHoverCard>
+                  </Link>
 
                   <span className="shrink-0 px-1 text-zinc-400 @[150px]:inline hidden">
                     &middot;
@@ -192,39 +194,39 @@ export function BlogCard({
                   </div>
                   
                   {tags.length > 2 && (
-                    <HoverCard openDelay={100} closeDelay={100}>
-                      <HoverCardTrigger asChild>
+                    <Popover>
+                      <PopoverTrigger asChild>
                         <Badge 
                           variant="outline" 
-                          className="font-mono text-sm px-1.5 py-0.5 whitespace-nowrap border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 cursor-help hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors shrink-0"
+                          className="h-5 px-2 font-sans text-sm whitespace-nowrap border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                         >
                           +{tags.length - 2}
                         </Badge>
-                      </HoverCardTrigger>
+                      </PopoverTrigger>
                       
-                      <HoverCardContent side="top" align="end" className="w-auto max-w-[220px] p-2.5">
+                      <PopoverContent side="top" align="end" className="w-auto max-w-[220px] p-2.5">
                         <div className="space-y-1.5">
-                          <h4 className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">More Topics</h4>
+                          <h4 className="text-sm font-semibold text-zinc-500 uppercase tracking-wider">More Topics</h4>
                           <div className="flex flex-wrap gap-1 max-h-[120px] overflow-y-auto">
                             {tags.slice(2).map((tag) => (
                               <Badge 
                                 key={tag} 
                                 variant="outline" 
-                                className="font-mono text-[10px] px-1.5 py-0.5 whitespace-nowrap border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300"
+                                className="h-5 px-2 font-sans text-sm whitespace-nowrap border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                               >
                                 <span className="capitalize">{tag}</span>
                               </Badge>
                             ))}
                           </div>
                         </div>
-                      </HoverCardContent>
-                    </HoverCard>
+                      </PopoverContent>
+                    </Popover>
                   )}
                 </>
               ) : (
                 <Badge 
                   variant="outline" 
-                  className="font-mono text-[10px] px-1.5 py-0.5 whitespace-nowrap border-zinc-200 dark:border-zinc-800 text-zinc-500"
+                  className="h-5 px-2 font-sans text-sm whitespace-nowrap border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                 >
                   General
                 </Badge>
