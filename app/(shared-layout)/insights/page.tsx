@@ -52,7 +52,7 @@ export default function InsightsPage() {
         <RightSidebar />
       </aside>
 
-      <div className="fixed bottom-0 left-0 right-0 z-50 flex md:hidden items-center justify-center h-12 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 px-4">
+      <div className="fixed bottom-0 left-0 right-0 z-50 flex md:hidden items-center justify-center h-16 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 px-4">
         <div className="w-fit flex justify-center items-center">
           <CreatePostButton />
         </div>
