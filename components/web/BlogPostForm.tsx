@@ -866,7 +866,7 @@ export default function BlogPostForm() {
                                     )}
 
                                     {!isDesktop &&
-                                        <div className="fixed bottom-0 left-0 right-0 z-50 flex flex-row w-full border-t border-border bg-white dark:bg-zinc-950 p-1 sm:px-6 md:static md:bg-transparent md:border-0 md:p-0">
+                                        <div className="fixed bottom-0 left-0 right-0 z-50 flex flex-row items-center w-full border-t border-border bg-white dark:bg-zinc-950 px-4 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] md:static md:bg-transparent md:border-0 md:p-0">
                                             <Button
                                                 size="lg"
                                                 type="submit"
@@ -888,23 +888,25 @@ export default function BlogPostForm() {
                                         </div>
                                     }
                                     
-                                    <Button
-                                        type="submit"
-                                        disabled={isLoading}
-                                        className={cn(
-                                            "inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-neutral-900 text-neutral-50 hover:bg-neutral-900/90 dark:bg-neutral-50 dark:text-neutral-900 dark:hover:bg-neutral-50/90 p-2 w-full sm:w-auto cursor-pointer",
-                                            isLoading && "cursor-not-allowed opacity-70"
-                                        )}
-                                    >
-                                        {isLoading ? (
-                                            <>
-                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                {selectedBlog ? "Updating" : "Publishing"}
-                                            </>
-                                        ) : (
-                                            selectedBlog ? "Update Post" : "Publish Post"
-                                        )}
-                                    </Button>
+                                    <div className="hidden md:flex">
+                                        <Button
+                                            type="submit"
+                                            disabled={isLoading}
+                                            className={cn(
+                                                "inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-neutral-900 text-neutral-50 hover:bg-neutral-900/90 dark:bg-neutral-50 dark:text-neutral-900 dark:hover:bg-neutral-50/90 p-2 w-full sm:w-auto cursor-pointer",
+                                                isLoading && "cursor-not-allowed opacity-70"
+                                            )}
+                                        >
+                                            {isLoading ? (
+                                                <>
+                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                    {selectedBlog ? "Updating" : "Publishing"}
+                                                </>
+                                            ) : (
+                                                selectedBlog ? "Update Post" : "Publish Post"
+                                            )}
+                                        </Button>
+                                    </div>
                                 </div>
                             </FieldGroup>
                         </form>

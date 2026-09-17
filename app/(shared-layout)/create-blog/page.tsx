@@ -11,7 +11,7 @@ export default function CreateBlog() {
           <LeftSidebarCreateBlog />
         </div>
 
-        <div className="flex md:hidden w-full shrink-0">
+        <div className="block md:hidden w-full shrink-0 pt-10">
           <MobileCreateBlogBar />
         </div>
 
