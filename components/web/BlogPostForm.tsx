@@ -33,6 +33,7 @@ import "highlight.js/styles/github-dark.css";
 import { useBlogStore } from "@/stores/useBlogStore";
 import { ScrollArea } from "../ui/scroll-area";
 import { useBlogDraft } from "@/hooks/useBlogDraft";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 const lowlight = createLowlight();
 lowlight.register("javascript", js);
@@ -219,6 +220,8 @@ export default function BlogPostForm() {
     const setSelectedBlog = useBlogStore((state) => state.setSelectedBlog);
     const activeDraft = useBlogStore((state) => state.activeDraft);
     const clearStore = useBlogStore((state) => state.clearStore);
+
+    const isDesktop = useMediaQuery("(min-width: 768px)");
 
     const isEditing = Boolean(selectedBlog?._id);
 
@@ -415,16 +418,15 @@ export default function BlogPostForm() {
     };
     
     return (
-        <div className="w-full h-[calc(100vh-4rem)] overflow-hidden">
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] items-stretch h-full overflow-hidden">
-                <ScrollArea className="w-full my-4 sm:px-6 overflow-y-auto h-[calc(100%-2rem)] min-h-0">
+            <div className="w-full min-h-full md:h-[calc(100dvh-4rem)] md:overflow-hidden">
+                <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] items-stretch h-full">
+                    <ScrollArea className="w-full h-full sm:px-6">
                     <div
                         className={cn(
-                        "relative w-full rounded-md border p-2 my-auto transition-colors",
+                        "relative w-full rounded-md md:my-4 md:border p-2 my-auto transition-colors",
                         hasErrors ? "border-destructive" : "border-border"
                         )}
                     >
-
                         <form onSubmit={handleSubmit(onSubmit)}>
                             <FieldGroup className="gap-y-2">
                                 <Controller
@@ -890,11 +892,13 @@ export default function BlogPostForm() {
                     <Separator orientation="vertical" className="h-full w-[1px]" />
                 </div>
 
-                <ScrollArea className="w-full my-4 sm:px-6 overflow-y-auto h-[calc(100%-2rem)] min-h-0">
-                    <div className="w-full">
+                {isDesktop && (
+                    <ScrollArea className="w-full my-4 sm:px-6 overflow-y-auto h-[calc(100%-2rem)] min-h-0">
+                        <div className="w-full">
                         <LivePostPreview control={control} previewImage={imagePreviewUrl} />
-                    </div>
-                </ScrollArea>
+                        </div>
+                    </ScrollArea>
+                )}
             </div>
         </div>
     );
