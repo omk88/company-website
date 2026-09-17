@@ -25,8 +25,6 @@ function AuthSkeleton() {
 }
 
 export function Navbar() {
-  const anim =
-    "relative no-underline hover:no-underline after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100";
 
   return (
     <header className="w-full fixed top-0 z-50 bg-background/95 backdrop-blur-sm border-b">
