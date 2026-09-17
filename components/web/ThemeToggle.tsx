@@ -20,11 +20,11 @@ export function ThemeToggle() {
           <Button
             variant="ghost"
             size="icon"
-            className="w-9 h-9 relative flex items-center justify-center cursor-pointer"
+            className="size-9 md:size-9 relative flex items-center justify-center cursor-pointer"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
           >
-            <Moon className="h-4 w-4 text-foreground transition-all block dark:hidden" />
-            <Sun className="h-4 w-4 text-foreground transition-all hidden dark:block" />
+            <Moon className="size-5 md:size-4 stroke-[2.5] md:stroke-2 text-foreground transition-all block dark:hidden" />
+            <Sun className="size-5 md:size-4 stroke-[2.5] md:stroke-2 text-foreground transition-all hidden dark:block" />
           </Button>
         </TooltipTrigger>
         
