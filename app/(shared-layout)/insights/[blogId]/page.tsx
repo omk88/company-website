@@ -117,7 +117,7 @@ export default async function BlogPage({ params }: BlogPageProps) {
 
       <LeftSidebarControls blog={blog} interactionState={interactionState} />
 
-      <main className="flex-1 min-w-0 pt-10 md:pt-16">
+      <main className="flex-1 min-w-0 md:px-0 px-1 pt-8 md:pt-16">
         <div className="max-w-3xl mx-auto">
           <BlogContent blog={blog} preloadedComments={preloadedComments} />
         </div>

@@ -61,10 +61,10 @@ export function CommentSection(props: { preloadedComments: Preloaded<typeof api.
   }, [data]);
 
   return (
-    <div className="space-y-8 my-8">
-      <div className="flex items-center gap-2">
-        <MessageSquare className="w-5 h-5 text-zinc-700 dark:text-zinc-300" />
-        <h2 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+    <div className="space-y-4 md:space-y-8 my-4 md:my-8">
+      <div className="flex items-center gap-2 text-zinc-900 dark:text-zinc-100">
+        <MessageSquare className="size-6 md:size-5" />
+        <h2 className="text-2xl md:text-xl font-bold tracking-tight">
           Comments ({data.length})
         </h2>
       </div>
@@ -78,11 +78,11 @@ export function CommentSection(props: { preloadedComments: Preloaded<typeof api.
               <Textarea 
                 aria-invalid={fieldState.invalid} 
                 placeholder="What are your thoughts?" 
-                className="bg-zinc-50/50 dark:bg-zinc-900/30 border-zinc-200 dark:border-zinc-800 rounded-xl min-h-[100px] p-4 text-sm focus-visible:ring-1 focus-visible:ring-zinc-400 resize-y"
+                className="bg-zinc-50/50 dark:bg-zinc-900/30 border-zinc-200 dark:border-zinc-800 rounded-xl min-h-[100px] p-4 text-lg md:text-sm focus-visible:ring-1 focus-visible:ring-zinc-400 resize-y"
                 {...field}
               />
               {fieldState.invalid && (
-                <p className="text-xs text-red-500 mt-1">{fieldState.error?.message}</p>
+                <p className="text-sm md:text-xs text-red-500 mt-1">{fieldState.error?.message}</p>
               )}
             </div>
           )}
@@ -91,11 +91,11 @@ export function CommentSection(props: { preloadedComments: Preloaded<typeof api.
         <div className="flex justify-end">
           <Button 
             disabled={isCommentPending}
-            className="rounded-lg h-9 px-4 text-xs font-medium cursor-pointer"
+            className="rounded-lg h-10 md:h-9 px-6 md:px-4 text-lg md:text-xs font-medium cursor-pointer"
           >
             {isCommentPending ? (
               <>
-                <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
+                <Loader2 className="size-4.5 md:size-3.5 animate-spin mr-1.5" />
                 Posting...
               </>
             ) : (
@@ -123,7 +123,7 @@ export function CommentSection(props: { preloadedComments: Preloaded<typeof api.
                         </time>
                     </div>
 
-                    <p className="text-sm text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap leading-relaxed">
+                    <p className="text-lg md:text-sm text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap leading-relaxed">
                         {comment.body}
                     </p>
                 
