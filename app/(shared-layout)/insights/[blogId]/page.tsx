@@ -9,6 +9,7 @@ import { RightSidebarArticles } from "@/components/web/RightSidebarArticles";
 import { BlogContent } from "@/components/web/Blogs/BlogContent";
 import { preloadAuthQuery } from "@/lib/auth-server";
 import { BlogStoreHydrator } from "@/components/web/BlogStoreHydrator";
+import { MobileControls } from "./_components/MobileControls";
 
 interface BlogPageProps {
   params: Promise<{ blogId: Id<"blogs"> }>;
@@ -115,19 +116,25 @@ export default async function BlogPage({ params }: BlogPageProps) {
       />
       <BlogStoreHydrator blog={blog} />
 
-      <LeftSidebarControls blog={blog} interactionState={interactionState} />
+      <div className="hidden md:flex">
+        <LeftSidebarControls blog={blog} interactionState={interactionState} />
+      </div>
 
-      <main className="flex-1 min-w-0 md:px-0 px-1 pt-8 md:pt-16">
+      <main className="flex-1 min-w-0 md:px-0 px-1 pt-8 md:pt-14">
         <div className="max-w-3xl mx-auto">
           <BlogContent blog={blog} preloadedComments={preloadedComments} />
         </div>
       </main>
 
-      <RightSidebarArticles
-        username={blog.username}
-        displayName={blog.displayName}
-        blogs={authorPosts}
-      />
+      <div className="hidden md:flex">
+        <RightSidebarArticles
+          username={blog.username}
+          displayName={blog.displayName}
+          blogs={authorPosts}
+        />
+      </div>
+
+      <MobileControls blog={blog} interactionState={interactionState} />
     </SidebarProvider>
   );
 }

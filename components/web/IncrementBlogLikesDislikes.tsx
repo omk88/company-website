@@ -2,7 +2,7 @@
 
 import { api } from "@/convex/_generated/api";
 import { Doc } from "@/convex/_generated/dataModel";
-import { useConvex, useMutation, useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { Bookmark, Copy, Ellipsis, MessageSquare, SmilePlus, SquarePen, Star, ThumbsUp, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
@@ -47,7 +47,6 @@ interface IncrementBlogLikesProps {
 }
 
 export function IncrementBlogLikesDislikes({ blog, initialInteractionState }: IncrementBlogLikesProps) {
-  const convex = useConvex();
   const router = useRouter();
 
   const currentUser = useCurrentUser();
@@ -68,13 +67,6 @@ export function IncrementBlogLikesDislikes({ blog, initialInteractionState }: In
   const hasLiked = voteState.hasVoted;
   const likesCount = voteState.likes;
   const isFeatured = featuredState.isFeatured;
-
-  const prefetchBlog = () => {
-    convex.query(api.blogs.getBlogById, { blogId: blog._id }).catch((err) => {
-      console.error("Prefetch failed:", err);
-    });
-  };
-
 
   const toggleReactionMutation = useMutation(api.blogs.toggleBlogReaction).withOptimisticUpdate(
     (localStore, args) => {
