@@ -17,6 +17,7 @@ import { FaFacebook, FaXTwitter } from "react-icons/fa6";
 import { RxLinkedinLogo } from "react-icons/rx";
 import { DeleteBlogDialog } from "@/components/web/DeleteBlogDialog";
 import Link from "next/link";
+import { useState } from "react";
 
 interface MobileControlsProps {
   blog: Doc<"blogs">;
@@ -45,6 +46,8 @@ export function MobileControls({ blog, interactionState }: MobileControlsProps) 
   const hasLiked = voteState.hasVoted;
   const likesCount = voteState.likes;
   const isFeatured = featuredState.isFeatured;
+
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const toggleReactionMutation = useMutation(api.blogs.toggleBlogReaction).withOptimisticUpdate(
     (localStore, args) => {
@@ -402,41 +405,44 @@ export function MobileControls({ blog, interactionState }: MobileControlsProps) 
                         <DropdownMenuLabel className="text-lg font-semibold text-zinc-500">Manage</DropdownMenuLabel>
 
                         <DropdownMenuItem
-                            className="cursor-pointer text-xs flex items-center gap-2"
-                            onClick={() => {
-                                const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
-                                window.location.href
-                                )}`;
-                                window.open(shareUrl, "_blank", "noopener,noreferrer");
-                            }}
+                            className={`cursor-pointer text-xs flex items-center gap-2`}
+                            onClick={handleFeaturedClick}
                         >
-                            <Star className="size-4.5 shrink-0" />
-                            <span className="text-lg">Feature Blog</span>
+                            <Star
+                                className={`size-4.5 ${
+                                    isFeatured ? "text-amber-500 fill-amber-500" : ""
+                                }`}
+                            />
+                            <span className="text-lg">
+                                {isFeatured ? "Unfeature Blog" : "Feature Blog"}
+                            </span>
                         </DropdownMenuItem>
             
                         <DropdownMenuItem
-                            className="cursor-pointer text-lg flex items-center gap-2"
-                            onClick={() => {
-                                navigator.clipboard.writeText(window.location.href);
-                                toast.success("Link copied to clipboard!");
-                            }}
+                            onClick={() => setSelectedBlog(blog)}
                         >
-                            <SquarePen className="size-4.5 shrink-0" />
-                            <span className="text-lg">Edit Blog</span>
+                            <Link href={`/create-blog?id=${blog._id}`} className="text-lg flex items-center gap-2">
+                                <SquarePen className="size-4.5 shrink-0" />
+                                <span className="text-lg">Edit Blog</span>
+                            </Link>
                         </DropdownMenuItem>
             
-                        <DropdownMenuItem
-                            className="cursor-pointer text-lg flex items-center gap-2"
-                            onClick={() => {
-                                const shareUrl = `https://x.com/intent/tweet?url=${encodeURIComponent(
-                                window.location.href
-                                )}&text=${encodeURIComponent("Check out this article!")}`;
-                                window.open(shareUrl, "_blank", "noopener,noreferrer");
+                        <DropdownMenuItem 
+                            onSelect={(e) => {
+                                e.preventDefault();
+                                setShowDeleteDialog(true);
                             }}
                         >
-                            <Trash2 className="size-4.5 shrink-0" />
+                            <Trash2 className="size-4.5 shrink-0 mr-2" />
                             <span className="text-lg">Delete Blog</span>
                         </DropdownMenuItem>
+
+                        <DeleteBlogDialog
+                            open={showDeleteDialog}
+                            onOpenChange={setShowDeleteDialog}
+                            blogIds={[blog._id]}
+                            onSuccess={() => { router.push("/insights"); }}
+                        />
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
