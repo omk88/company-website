@@ -24,7 +24,7 @@ export function MobileCreateBlogBar() {
                 href={backHref}
                 title={selectedBlog?._id ? "Back to blog post" : "Back to insights"}
             >
-                <ArrowLeft className="w-4 h-4" />
+                <ArrowLeft className="size-6" />
             </Link>
         </div>
     )

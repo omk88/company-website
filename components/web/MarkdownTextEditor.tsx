@@ -651,7 +651,7 @@ export function MarkdownTextEditor({
           )}
         </div>
 
-        <div className="flex items-center justify-end px-2.5 py-1 bg-muted/20 border-t border-border/40 text-[10px]">
+        <div className="flex items-center justify-end px-2.5 py-1 bg-muted/20 border-t-2 md:border-t border-border/40 md:text-[10px]">
           <span className={cn("font-mono transition-colors", getCounterColor(content.length, minLength))}>
             {isMet ? (
               <span>✓ {content.length}</span>
