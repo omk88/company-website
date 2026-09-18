@@ -3,7 +3,7 @@
 import { api } from "@/convex/_generated/api";
 import { Doc } from "@/convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
-import { Bookmark, Copy, Ellipsis, MessageSquare, SmilePlus, SquarePen, Star, ThumbsUp, Trash2 } from "lucide-react";
+import { Bookmark, Copy, Ellipsis, MessageSquare, Share2, SmilePlus, SquarePen, Star, ThumbsUp, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "../ui/dropdown-menu";
@@ -349,7 +349,7 @@ export function IncrementBlogLikesDislikes({ blog, initialInteractionState }: In
             variant="ghost"
             className="flex items-center justify-center h-11 w-11 p-0 rounded-full text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
           >
-            <Ellipsis className="w-4 h-4" />
+            <Share2 className="w-4 h-4" />
           </Button>
         </DropdownMenuTrigger>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { IncrementBlogLikesDislikes, InteractionState } from "@/components/web/IncrementBlogLikesDislikes";
+import { InteractionState } from "@/components/web/IncrementBlogLikesDislikes";
 import { Doc } from "@/convex/_generated/dataModel";
 
 import { api } from "@/convex/_generated/api";
@@ -10,11 +10,13 @@ import { useRouter } from "next/navigation";
 import { useCurrentUser } from "@/app/ConvexClientProvider";
 import { useBlogStore } from "@/stores/useBlogStore";
 import { Button } from "@/components/ui/button";
-import { Bookmark, Copy, Ellipsis, MessageSquare, SmilePlus, ThumbsUp } from "lucide-react";
+import { Bookmark, Copy, Ellipsis, MessageSquare, Share2, SmilePlus, SquarePen, Star, ThumbsUp, Trash2 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { EMOJI_REACTIONS, ReactionType } from "@/app/constants/reactions";
 import { FaFacebook, FaXTwitter } from "react-icons/fa6";
 import { RxLinkedinLogo } from "react-icons/rx";
+import { DeleteBlogDialog } from "@/components/web/DeleteBlogDialog";
+import Link from "next/link";
 
 interface MobileControlsProps {
   blog: Doc<"blogs">;
@@ -327,12 +329,12 @@ export function MobileControls({ blog, interactionState }: MobileControlsProps) 
                             variant="ghost"
                             className="flex items-center justify-center h-14 w-14 p-0 rounded-full text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
                         >
-                            <Ellipsis className="size-6" />
+                            <Share2 className="size-6" />
                         </Button>
                     </DropdownMenuTrigger>
         
-                    <DropdownMenuContent side="right" className="w-44 rounded-xl">
-                        <DropdownMenuLabel className="text-xs font-semibold text-zinc-500">Share</DropdownMenuLabel>
+                    <DropdownMenuContent side="top" className="w-44 rounded-xl">
+                        <DropdownMenuLabel className="text-lg font-semibold text-zinc-500">Share</DropdownMenuLabel>
             
                         <DropdownMenuItem
                             className="cursor-pointer text-xs flex items-center gap-2"
@@ -341,12 +343,12 @@ export function MobileControls({ blog, interactionState }: MobileControlsProps) 
                                 toast.success("Link copied to clipboard!");
                             }}
                         >
-                            <Copy className="h-3.5 w-3.5 shrink-0" />
-                            <span>Copy link</span>
+                            <Copy className="size-4.5 shrink-0" />
+                            <span className="text-lg">Copy link</span>
                         </DropdownMenuItem>
             
                         <DropdownMenuItem
-                            className="cursor-pointer text-xs flex items-center gap-2"
+                            className="cursor-pointer text-lg flex items-center gap-2"
                             onClick={() => {
                                 const shareUrl = `https://x.com/intent/tweet?url=${encodeURIComponent(
                                 window.location.href
@@ -354,8 +356,8 @@ export function MobileControls({ blog, interactionState }: MobileControlsProps) 
                                 window.open(shareUrl, "_blank", "noopener,noreferrer");
                             }}
                         >
-                            <FaXTwitter className="h-3.5 w-3.5 shrink-0" />
-                            <span>X (Twitter)</span>
+                            <FaXTwitter className="size-4.5 shrink-0" />
+                            <span className="text-lg">X (Twitter)</span>
                         </DropdownMenuItem>
             
                         <DropdownMenuItem
@@ -367,8 +369,8 @@ export function MobileControls({ blog, interactionState }: MobileControlsProps) 
                                 window.open(shareUrl, "_blank", "noopener,noreferrer");
                             }}
                         >
-                            <RxLinkedinLogo className="h-3.5 w-3.5 shrink-0" />
-                            <span>LinkedIn</span>
+                            <RxLinkedinLogo className="size-4.5 shrink-0" />
+                            <span className="text-lg">LinkedIn</span>
                         </DropdownMenuItem>
             
                         <DropdownMenuItem
@@ -380,12 +382,63 @@ export function MobileControls({ blog, interactionState }: MobileControlsProps) 
                                 window.open(shareUrl, "_blank", "noopener,noreferrer");
                             }}
                         >
-                            <FaFacebook className="h-3.5 w-3.5 shrink-0" />
-                            <span>Facebook</span>
+                            <FaFacebook className="size-4.5 shrink-0" />
+                            <span className="text-lg">Facebook</span>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
 
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button
+                            variant="ghost"
+                            className="flex items-center justify-center h-14 w-14 p-0 rounded-full text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                        >
+                            <Ellipsis className="size-6" />
+                        </Button>
+                    </DropdownMenuTrigger>
+        
+                    <DropdownMenuContent side="top" className="w-44 rounded-xl">
+                        <DropdownMenuLabel className="text-lg font-semibold text-zinc-500">Manage</DropdownMenuLabel>
+
+                        <DropdownMenuItem
+                            className="cursor-pointer text-xs flex items-center gap-2"
+                            onClick={() => {
+                                const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
+                                window.location.href
+                                )}`;
+                                window.open(shareUrl, "_blank", "noopener,noreferrer");
+                            }}
+                        >
+                            <Star className="size-4.5 shrink-0" />
+                            <span className="text-lg">Feature Blog</span>
+                        </DropdownMenuItem>
+            
+                        <DropdownMenuItem
+                            className="cursor-pointer text-lg flex items-center gap-2"
+                            onClick={() => {
+                                navigator.clipboard.writeText(window.location.href);
+                                toast.success("Link copied to clipboard!");
+                            }}
+                        >
+                            <SquarePen className="size-4.5 shrink-0" />
+                            <span className="text-lg">Edit Blog</span>
+                        </DropdownMenuItem>
+            
+                        <DropdownMenuItem
+                            className="cursor-pointer text-lg flex items-center gap-2"
+                            onClick={() => {
+                                const shareUrl = `https://x.com/intent/tweet?url=${encodeURIComponent(
+                                window.location.href
+                                )}&text=${encodeURIComponent("Check out this article!")}`;
+                                window.open(shareUrl, "_blank", "noopener,noreferrer");
+                            }}
+                        >
+                            <Trash2 className="size-4.5 shrink-0" />
+                            <span className="text-lg">Delete Blog</span>
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
         </div>
       </div>
