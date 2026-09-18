@@ -423,11 +423,11 @@ export default function BlogPostForm() {
                     <ScrollArea className="w-full h-full sm:px-6">
                     <div
                         className={cn(
-                        "relative w-full rounded-md md:my-4 md:border p-2 my-auto transition-colors",
-                        hasErrors ? "border-destructive" : "border-border"
+                            "relative w-full rounded-md md:my-4 md:border p-2 my-auto transition-colors",
+                            hasErrors ? "border-destructive" : "border-border"
                         )}
                     >
-                        <form onSubmit={handleSubmit(onSubmit)}>
+                        <form id="blog-post-form" onSubmit={handleSubmit(onSubmit)}>
                             <FieldGroup className="gap-y-2">
                                 <Controller
                                     name="coverImage"
@@ -491,7 +491,7 @@ export default function BlogPostForm() {
                                                     <label
                                                         htmlFor="cover-image-upload"
                                                         className={cn(
-                                                            "group flex items-center justify-between w-full h-8 pl-2.5 pr-8 rounded-md border border-input bg-background text-sm md:text-xs cursor-pointer hover:bg-accent/50 transition-all select-none relative",
+                                                            "group flex items-center justify-between w-full h-8 pl-2.5 pr-8 rounded-md border-2 md:border md:p-2 p-5 border-input bg-background text-lg md:text-xs cursor-pointer hover:bg-accent/50 transition-all select-none relative",
                                                             "has-[button:hover]:bg-background",
                                                             !isInvalid &&
                                                                 "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-transparent",
@@ -501,7 +501,7 @@ export default function BlogPostForm() {
                                                         )}
                                                     >
                                                         <span className="flex flex-row items-center gap-1.5 text-muted-foreground group-hover:text-foreground group-has-[button:hover]:text-muted-foreground transition-colors truncate max-w-[75%]">
-                                                            <Paperclip className="size-4 md:size-3.5 shrink-0 stroke-[1.5]" />
+                                                            <Paperclip className="size-5 md:size-3.5 shrink-0 stroke-[1.5]" />
                                                             <span className="truncate">
                                                                 {selectedImage
                                                                     ? selectedImage.name
@@ -528,7 +528,7 @@ export default function BlogPostForm() {
                                                                 )}
                                                                 title="Remove image"
                                                             >
-                                                                <X className="h-3.5 w-3.5 stroke-[2]" />
+                                                                <X className="size-4.5 md:size-3.5 stroke-[2]" />
                                                             </button>
                                                         )}
                                                     </label>
@@ -565,7 +565,7 @@ export default function BlogPostForm() {
                                                 <div className="relative flex items-center w-full">
                                                     <div
                                                         className={cn(
-                                                            "relative flex items-center w-full h-8 rounded-md border border-input bg-background overflow-hidden transition-all",
+                                                            "relative flex items-center w-full h-12 md:h-8 rounded-md border-2 md:border border-input bg-background overflow-hidden transition-all",
                                                             "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-transparent",
                                                             fieldState.invalid && "border-destructive focus-within:ring-destructive",
                                                             isLoading && "opacity-50 pointer-events-none"
@@ -576,7 +576,7 @@ export default function BlogPostForm() {
                                                         placeholder="Title"
                                                         type="text"
                                                         disabled={isLoading}
-                                                        className="w-full h-full bg-transparent pl-2.5 pr-14 text-sm md:text-xs md:placeholder:text-xs focus:outline-none"
+                                                        className="w-full h-full bg-transparent pl-2.5 pr-14 text-lg md:text-xs md:placeholder:text-xs focus:outline-none"
                                                         {...field}
                                                     />
 
@@ -590,7 +590,7 @@ export default function BlogPostForm() {
                                                                 fieldState.invalid ? "right-7" : "right-2"
                                                             )}
                                                         >
-                                                            <X className="h-3.5 w-3.5 stroke-[2]" />
+                                                            <X className="size-4.5 md:size-3.5 stroke-[2]" />
                                                         </button>
                                                     )}
 
@@ -633,7 +633,7 @@ export default function BlogPostForm() {
                                             <Field>
                                                 <div
                                                     className={cn(
-                                                        "relative flex flex-col w-full rounded-md border border-input bg-background overflow-hidden transition-all",
+                                                        "relative flex flex-col w-full rounded-md border-2 md:border border-input bg-background overflow-hidden transition-all",
                                                         "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-transparent",
                                                         fieldState.invalid && "border-destructive focus-within:ring-destructive",
                                                         isLoading && "opacity-50 pointer-events-none"
@@ -644,21 +644,21 @@ export default function BlogPostForm() {
                                                         placeholder="Summary"
                                                         rows={2}
                                                         disabled={isLoading}
-                                                        className="w-full bg-transparent p-3 pr-14 text-sm md:text-xs md:placeholder:text-xs focus:outline-none resize-y min-h-[40px]"
+                                                        className="w-full bg-transparent p-3 pr-14 text-lg md:text-xs md:placeholder:text-xs focus:outline-none resize-y min-h-[40px]"
                                                         {...field}
                                                     />
 
                                                     {field.value && (
                                                         <button
-                                                        type="button"
-                                                        disabled={isLoading}
-                                                        onClick={() => field.onChange("")}
-                                                        className={cn(
-                                                            "absolute top-2.5 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted cursor-pointer transition-colors z-10",
-                                                            fieldState.invalid ? "right-12" : "right-7"
-                                                        )}
+                                                            type="button"
+                                                            disabled={isLoading}
+                                                            onClick={() => field.onChange("")}
+                                                            className={cn(
+                                                                "absolute top-2.5 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted cursor-pointer transition-colors z-10",
+                                                                fieldState.invalid ? "right-12" : "right-7"
+                                                            )}
                                                         >
-                                                            <X className="h-3.5 w-3.5 stroke-[2]" />
+                                                            <X className="size-4.5 md:size-3.5 stroke-[2]" />
                                                         </button>
                                                     )}
 
@@ -677,7 +677,7 @@ export default function BlogPostForm() {
                                                         </TooltipProvider>
                                                     )}
 
-                                                    <div className="flex items-center justify-end px-2.5 py-1 bg-muted/20 border-t border-border/40 text-[10px]">
+                                                    <div className="flex items-center justify-end px-2.5 py-1 bg-muted/20 border-t-2 md:border-t border-border/40 text-base md:text-[10px]">
                                                         <span className={cn("font-mono transition-colors", getCounterColor(currentLength))}>
                                                             {isMet ? (
                                                                 <span>✓ {currentLength}</span>
@@ -717,7 +717,7 @@ export default function BlogPostForm() {
                                                     <PopoverTrigger asChild disabled={isLoading}>
                                                         <div
                                                             className={cn(
-                                                                "flex min-h-8 w-full flex-wrap gap-1 rounded-md border border-input bg-background px-2.5 py-1 text-sm md:text-xs cursor-pointer items-center justify-between relative transition-all",
+                                                                "flex h-12 md:h-8 w-full flex-wrap gap-1 rounded-md border-2 md:border border-input bg-background px-2.5 py-1 text-sm md:text-xs cursor-pointer items-center justify-between relative transition-all",
                                                                 !isInvalid &&
                                                                 "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-transparent",
                                                                 isInvalid &&
@@ -725,14 +725,14 @@ export default function BlogPostForm() {
                                                                 )}
                                                             >
                                                             {value.length === 0 ? (
-                                                                <span className="text-muted-foreground">Tags...</span>
+                                                                <span className="text-muted-foreground text-lg md:text-xs">Tags...</span>
                                                             ) : (
                                                                 <div className="flex flex-wrap gap-1 pr-14">
                                                                     {value.map((tag) => (
                                                                         <Badge
                                                                             key={tag}
                                                                             variant="secondary"
-                                                                            className="text-[11px] px-1.5 py-0 h-5 font-normal capitalize"
+                                                                            className="text-base md:text-[11px] px-1.5 py-0 h-7 md:h-5 font-normal capitalize"
                                                                         >
                                                                             {tag}
                                                                         </Badge>
@@ -752,7 +752,7 @@ export default function BlogPostForm() {
                                                                         className="text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted cursor-pointer transition-colors"
                                                                         title="Clear tags"
                                                                     >
-                                                                        <X className="size-4 md:size-3 stroke-[2]" />
+                                                                        <X className="size-4.5 md:size-3 stroke-[2]" />
                                                                     </button>
                                                                 )}
 

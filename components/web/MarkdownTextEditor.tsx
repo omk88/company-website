@@ -463,7 +463,7 @@ export function MarkdownTextEditor({
   const isMet = content.length >= minLength;
 
   return (
-    <div className="w-full max-w-2xl">
+    <div className="w-full max-w-2xl mb-12 md:mb-0">
       <input
         type="file"
         ref={fileInputRef}
@@ -475,7 +475,7 @@ export function MarkdownTextEditor({
 
       <div
         className={cn(
-          "flex flex-col w-full rounded-md border border-input bg-background overflow-hidden transition-all",
+          "flex flex-col w-full rounded-md border-2 md:border border-input bg-background overflow-hidden transition-all",
           isFocused && !error && "ring-2 ring-ring ring-offset-2 border-transparent",
           isDragging && "border-primary bg-primary/5 ring-2 ring-primary",
           error && "border-destructive focus-within:ring-2 focus-within:ring-destructive focus-within:ring-offset-2 focus-within:border-transparent",
@@ -483,8 +483,8 @@ export function MarkdownTextEditor({
         )}
       >
         <TooltipProvider delayDuration={200}>
-          <div className="flex items-center justify-between p-1 border-b border-border/60">
-            <div className="flex items-center gap-0.5">
+          <div className="flex items-center justify-between p-1 border-b-2 md:border-b border-border/60">
+            <div className="flex items-center gap-1.5 md:gap-0.5">
               {toolbarActions.map((item, index) => {
                 const Icon = item.icon;
                 return (
@@ -498,7 +498,7 @@ export function MarkdownTextEditor({
                         className="h-8 w-8 cursor-pointer text-muted-foreground hover:text-foreground"
                         onClick={item.action}
                       >
-                        <Icon className="h-4 w-4" />
+                        <Icon className="size-5 md:size-4" />
                         <span className="sr-only">{item.label}</span>
                       </Button>
                     </TooltipTrigger>
@@ -614,7 +614,7 @@ export function MarkdownTextEditor({
             onDrop={handleDrop}
             placeholder={placeholder}
             rows={8}
-            className="w-full bg-transparent p-3 pr-14 text-sm md:text-xs focus:outline-none disabled:opacity-50 resize-y min-h-[150px]"
+            className="w-full bg-transparent p-3 pr-14 text-lg md:text-xs focus:outline-none disabled:opacity-50 resize-y min-h-[200px] md:min-h-[150px]"
           />
 
           {content && (
@@ -631,7 +631,7 @@ export function MarkdownTextEditor({
               )}
               title="Clear content"
             >
-              <X className="h-3.5 w-3.5 stroke-[2]" />
+              <X className="size-4.5 md:size-3.5 stroke-[2]" />
             </button>
           )}
 

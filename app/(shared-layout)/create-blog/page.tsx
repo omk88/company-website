@@ -1,10 +1,8 @@
-import { Button } from "@/components/ui/button";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import BlogPostForm from "@/components/web/BlogPostForm";
 import { LeftSidebarCreateBlog } from "@/components/web/LeftSidebarCreateBlog";
 import { MobileCreateBlogBar } from "@/components/web/MobileCreateBlogBar";
-import { cn } from "cn";
-import { Loader2 } from "lucide-react";
+import { MobilePublishBlogButton } from "@/components/web/MobilePublishBlogButton";
 
 export default function CreateBlog() {
   return (
@@ -22,18 +20,8 @@ export default function CreateBlog() {
           <BlogPostForm />
         </div>
 
-        <div className="md:hidden flex justify-end fixed bottom-4 right-4 z-50 border-t bg-white w-full">
-          <Button
-            form="blog-post-form"
-            type="submit"
-            size="lg"
-            className={cn(
-              "rounded-full text-sm bg-zinc-800 text-neutral-50 dark:bg-neutral-50 dark:text-neutral-900",
-            )}
-          >
-            Publish
-          </Button>
-        </div>
+        <MobilePublishBlogButton />
+
       </div>
     </SidebarProvider>
   );
