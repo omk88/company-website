@@ -36,14 +36,13 @@ interface BlogContentProps {
 }
 
 export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
-  const authorName = blog.displayName || blog.username;
   const avatarSrc = blog.profilePicUrl || blog.defaultProfilePicUrl || "/noImage.png";
 
   return (
     <article className="p-2">
       <ViewTracker blogId={blog._id} />
 
-      <div className="relative w-full h-[400px] mb-6 rounded-lg overflow-hidden">
+      <div className="relative w-full h-[300px] md:h-[400px] mb-2 md:mb-6 rounded-lg overflow-hidden">
         <Image
           src={blog.imageUrl}
           alt={blog.title}
@@ -59,35 +58,8 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
           {blog.title}
         </h1>
         
-        <div className="flex items-center justify-between text-sm text-zinc-600 dark:text-zinc-400 font-normal my-4">
-          <div className="flex items-center gap-2">
-            <div className="relative w-5 h-5 rounded-full overflow-hidden shrink-0">
-              <Image
-                src={avatarSrc}
-                alt={`${authorName}'s avatar`}
-                fill
-                sizes="20px"
-                className="object-cover"
-              />
-            </div>
 
-            <BlogName username={blog.username} displayName={blog.displayName} />
-
-            <span>&middot;</span>
-
-            <time dateTime={new Date(blog._creationTime).toISOString()}>
-              {new Date(blog._creationTime).toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-              })}
-            </time>
-          </div>
-
-          <span className="text-xs sm:text-sm text-zinc-500 font-medium">
-            {blog.readTime} min read
-          </span>
-        </div>
+        <BlogName avatarSrc={avatarSrc} username={blog.username} displayName={blog.displayName} date={blog._creationTime} readTime={blog.readTime} />
 
         <div className="mb-4">
           <BlogEmojiReactions initialBlog={blog} />
