@@ -244,10 +244,10 @@ export function BlogCard({
       <div className="group flex flex-col gap-2 p-2 bg-zinc-50/80 hover:bg-zinc-100/90 rounded-xl transition-colors duration-100 dark:bg-muted/30">
         <div className="flex items-center justify-between p-1 gap-2">
           <Link href={`/insights/${id}`} className="block hover:no-underline flex-1 min-w-0">
-            <h3 className="leading-tight text-sm font-bold tracking-tight line-clamp-1 text-foreground transition-colors group-hover:text-blue-600">
+            <h3 className="leading-tight text-lg md:text-sm font-bold tracking-tight line-clamp-1 text-foreground transition-colors group-hover:text-blue-600">
               {title}
             </h3>
-            <p className="leading-tight text-zinc-600 dark:text-zinc-400 line-clamp-2 text-xs mt-0.5">
+            <p className="leading-tight text-zinc-600 dark:text-zinc-400 line-clamp-2 text-base md:text-xs mt-0.5">
               {subtitle}
             </p>
           </Link>
@@ -268,21 +268,21 @@ export function BlogCard({
           )}
         </div>
 
-        <div className="flex font-semibold items-center justify-between text-xs tracking-tight select-none">
+        <div className="flex flex-col md:flex-row items-start font-semibold gap-2 justify-between text-lg md:text-xs tracking-tight select-none">
           <div className="flex items-center gap-4 px-1">
             <div className="flex items-center gap-1">
-              <Eye className="w-3.5 h-3.5" />
+              <Eye className="size-4.5 md:size-3.5" />
               <span>{totalViews}</span>
             </div>
             <div className="flex items-center gap-1">
-              <ThumbsUp className="w-3.5 h-3.5" />
+              <ThumbsUp className="size-4.5 md:size-3.5" />
               <span>{likes}</span>
             </div>
             <div className="flex items-center gap-1">
-              <MessageSquare className="w-3.5 h-3.5" />
+              <MessageSquare className="size-4.5 md:size-3.5" />
               <span>{commentCount}</span>
             </div>
-            <time className="text-xs text-zinc-400">
+            <time className="text-base md:text-xs text-zinc-400">
               {formatSmartDate(date, false)}
             </time>
           </div>
@@ -295,7 +295,7 @@ export function BlogCard({
                     <Badge 
                       key={tag} 
                       variant="outline" 
-                      className="font-sans text-[10px] px-1.5 py-0.5 whitespace-nowrap border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                      className="font-sans text-base md:text-[10px] px-2 py-1.5 md:px-1.5 md:py-0.5 whitespace-nowrap border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                     >
                       <span className="capitalize">{tag}</span>
                     </Badge>
@@ -307,7 +307,7 @@ export function BlogCard({
                     <HoverCardTrigger asChild>
                       <Badge 
                         variant="outline" 
-                        className="font-mono text-[10px] px-1.5 py-0.5 whitespace-nowrap border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 cursor-help hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors shrink-0"
+                        className="font-mono text-base md:text-[10px] px-2 py-1.5 md:px-1.5 md:py-0.5 whitespace-nowrap border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 cursor-help hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors shrink-0"
                       >
                         +{tags.length - 2}
                       </Badge>

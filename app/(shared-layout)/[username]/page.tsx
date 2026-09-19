@@ -7,6 +7,7 @@ import { LeftSidebarProfile } from "@/components/web/LeftSidebarProfile";
 import { ProfileContent } from "@/components/web/ProfileContent";
 import { RightSidebarProfile } from "@/components/web/RightSidebarProfile";
 import { MobileProfileSection } from "./_components/MobileProfileSection";
+import { MobileProfileSwitchBar } from "./_components/MobileProfileSwitchBar";
 
 interface ProfileRouteProps {
   params: Promise<{ username: string }>;
@@ -39,6 +40,14 @@ export default async function Profile({ params }: ProfileRouteProps) {
           preloadedCurrentUser={preloadedCurrentUser} 
         />
       </div>
+
+      <div className="w-full min-w-0 flex flex-col flex-1 border-b">
+        <MobileProfileSwitchBar
+          preloadedProfile={preloadedProfile} 
+          preloadedCurrentUser={preloadedCurrentUser} 
+        />
+      </div>
+      
       <SidebarProvider>
         <aside 
           className="shrink-0 hidden md:flex"
