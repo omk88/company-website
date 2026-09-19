@@ -59,7 +59,7 @@ export function ProfileContent({
   }, [setSelectedMetric]);
 
   return (
-    <div className="flex flex-col h-full flex-1">
+    <div className="flex flex-col w-full">
       <div className={selectedMetric === "insights" ? "flex flex-col flex-1 h-full" : "hidden"}>
         <ProfileBlogsWrapper profile={profileData} preloadedBlogs={preloadedBlogs} />
       </div>

@@ -41,44 +41,42 @@ export function MobileProfileSwitchBar({ preloadedProfile }: MobileProfileSwitch
 
     return (
         <div>
-            <SidebarProvider>
-                <nav className="flex md:hidden flex-col w-full py-1.5 gap-2 sticky z-30">
-                    <SidebarMenu 
-                        className={"flex w-full gap-1 flex-row items-center gap-2 overflow-x-auto no-scrollbar px-2 min-w-full"}
-                    >
-                        {NAV_ITEMS.map((item) => {
-                            const Icon = item.icon;
-                            const isActive = selectedMetric === item.id;
-                            const count = counts[item.id as ProfileMetricType];
+            <nav className="flex md:hidden flex-col w-full py-1.5 gap-2 sticky top-16 z-30 border-b">
+                <SidebarMenu 
+                    className={"flex w-full gap-1 flex-row items-center gap-2 overflow-x-auto no-scrollbar px-2 min-w-full"}
+                >
+                    {NAV_ITEMS.map((item) => {
+                        const Icon = item.icon;
+                        const isActive = selectedMetric === item.id;
+                        const count = counts[item.id as ProfileMetricType];
 
-                            return (
-                                <SidebarMenuItem key={item.id} className="w-full">
-                                    <SidebarMenuButton
-                                        isActive={isActive}
-                                        onClick={() => setSelectedMetric(item.id as ProfileMetricType)}
-                                        className={`
-                                            group w-full !cursor-pointer justify-start px-2.5 py-1.5 rounded-lg text-lg transition-colors
-                                            ${
-                                                isActive 
-                                                ? "bg-accent text-accent-foreground font-semibold" 
-                                                : "text-muted-foreground hover:text-foreground hover:bg-accent/50 dark:hover:bg-zinc-800/60 font-medium"
-                                            }
-                                        `}
-                                    >
-                                        <Icon className="!size-5 stroke-[2.5]" />
+                        return (
+                            <SidebarMenuItem key={item.id} className="w-full">
+                                <SidebarMenuButton
+                                    isActive={isActive}
+                                    onClick={() => setSelectedMetric(item.id as ProfileMetricType)}
+                                    className={`
+                                        group w-full !cursor-pointer justify-start px-2.5 py-1.5 rounded-lg text-lg transition-colors
+                                        ${
+                                            isActive 
+                                            ? "bg-accent text-accent-foreground font-semibold" 
+                                            : "text-muted-foreground hover:text-foreground hover:bg-accent/50 dark:hover:bg-zinc-800/60 font-medium"
+                                        }
+                                    `}
+                                >
+                                    <Icon className="!size-5 stroke-[2.5]" />
 
-                                        <span className="flex items-center gap-1">
-                                            <span>{count}</span>
-                                            <span>{item.label}</span>
-                                        </span>
-                                        
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            );
-                        })}
-                    </SidebarMenu>
-                </nav>
-            </SidebarProvider>
+                                    <span className="flex items-center gap-1">
+                                        <span>{count}</span>
+                                        <span>{item.label}</span>
+                                    </span>
+                                    
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        );
+                    })}
+                </SidebarMenu>
+            </nav>
         </div>
     )
 }

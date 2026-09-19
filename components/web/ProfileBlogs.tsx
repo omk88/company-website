@@ -64,7 +64,7 @@ export function ProfileBlogs({ profile, preloadedData }: ProfileBlogsProps) {
   }, [canLoadMore, loadMore]);
 
   return (
-    <div className="flex flex-col flex-1 h-full min-h-0 w-full p-2">
+    <div className="flex flex-col flex-1 w-full p-2">
       <div className="w-full mx-auto flex-1">
         {isFirstLoad && displayResults.length === 0 ? (
           <ul className="flex flex-col gap-2">

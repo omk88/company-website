@@ -41,13 +41,6 @@ export default async function Profile({ params }: ProfileRouteProps) {
         />
       </div>
 
-      <div className="w-full min-w-0 flex flex-col flex-1 border-b">
-        <MobileProfileSwitchBar
-          preloadedProfile={preloadedProfile} 
-          preloadedCurrentUser={preloadedCurrentUser} 
-        />
-      </div>
-      
       <SidebarProvider>
         <aside 
           className="shrink-0 hidden md:flex"
@@ -60,10 +53,13 @@ export default async function Profile({ params }: ProfileRouteProps) {
         </aside>
         
         <div className="flex-1 flex flex-row min-w-0 w-full min-h-screen md:pt-16 md:flex">
-          <section
-            id="profile-content-section" 
-            className="flex-1 min-w-0 flex flex-col h-full"
-          >
+          <section id="profile-content-section" className="flex-1 min-w-0 flex flex-col h-full">
+
+            <MobileProfileSwitchBar
+              preloadedProfile={preloadedProfile} 
+              preloadedCurrentUser={preloadedCurrentUser} 
+            />
+
             <ProfileContent 
               preloadedProfile={preloadedProfile} 
               preloadedCurrentUser={preloadedCurrentUser}
