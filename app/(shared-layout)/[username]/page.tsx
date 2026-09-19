@@ -34,7 +34,7 @@ export default async function Profile({ params }: ProfileRouteProps) {
 
   return (
     <div className="min-h-screen w-full md:h-screen md:overflow-hidden">
-      <div className="pt-10 w-full md:hidden shrink-0">
+      <div className="pt-12 w-full md:hidden shrink-0">
         <MobileProfileSection
           preloadedProfile={preloadedProfile} 
           preloadedCurrentUser={preloadedCurrentUser} 

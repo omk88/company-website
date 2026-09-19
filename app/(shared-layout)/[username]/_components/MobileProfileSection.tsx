@@ -91,7 +91,7 @@ export function MobileProfileSection({ preloadedProfile, preloadedCurrentUser }:
         </div>
       )}
       <div className="flex flex-row items-center gap-2 w-full">
-        <div className="relative h-20 w-20 shrink-0 rounded-full overflow-hidden border-2 border-muted bg-muted">
+        <div className="relative h-16 w-16 shrink-0 rounded-full overflow-hidden border-2 border-muted bg-muted">
           {displayAvatar ? (
             <Image
               src={displayAvatar}
@@ -109,18 +109,18 @@ export function MobileProfileSection({ preloadedProfile, preloadedCurrentUser }:
 
         <div className="flex flex-row justify-between w-full">
           <div className="flex flex-col w-full">
-            <h4 className="text-2xl font-semibold text-foreground tracking-tight">
+            <h4 className="text-xl font-semibold text-foreground tracking-tight">
               {displayName || profile.username}
             </h4>
 
             <div className="flex items-center gap-2 flex-wrap">
-              <p className="text-xl text-muted-foreground">{`@${profile.username}`}</p>
+              <p className="text-lg text-muted-foreground">{`@${profile.username}`}</p>
             </div>
           </div>
         </div>
       </div>
       <div className="flex flex-row items-center">
-        <div className="inline-flex w-fit items-center gap-1 text-lg font-sans font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-full border border-amber-200/60 dark:border-amber-800/50 cursor-help select-none">
+        <div className="inline-flex w-fit items-center gap-1 text-base font-sans font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-full border border-amber-200/60 dark:border-amber-800/50 cursor-help select-none">
           <Zap className="w-4 h-4 fill-amber-500 stroke-amber-500 dark:fill-amber-400 dark:stroke-amber-400 shrink-0" />
           <span>{profile.totalLikes ?? 0}</span>
         </div>
@@ -143,22 +143,22 @@ export function MobileProfileSection({ preloadedProfile, preloadedCurrentUser }:
         </div>
       )}
 
-      <div className="space-y-1 text-lg">
+      <div className="space-y-1 text-base">
         <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
-          <Cake className="w-5 h-5 stroke-[2.3] shrink-0" />
+          <Cake className="w-4 h-4 stroke-[2.3] shrink-0" />
           <p>{formattedDate}</p>
         </div>
 
         {profile.location && (
           <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
-            <MapPin className="w-5 h-5 stroke-[2.3] shrink-0" />
+            <MapPin className="w-4 h-4 stroke-[2.3] shrink-0" />
             <p>{profile.location}</p>
           </div>
         )}
 
         {primarySocial && (
           <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
-            <SocialPlatformIcon platform={primarySocial.platform} className="w-5 h-5 shrink-0 text-foreground" />
+            <SocialPlatformIcon platform={primarySocial.platform} className="w-4 h-4 shrink-0 text-foreground" />
             <Link 
               href={primarySocial.url} 
               target="_blank" 
@@ -175,7 +175,7 @@ export function MobileProfileSection({ preloadedProfile, preloadedCurrentUser }:
           <button
             type="button"
             onClick={() => setIsExpanded((prev) => !prev)}
-            className="text-lg font-medium text-left cursor-pointer hover:text-blue-600 transition-colors w-fit"
+            className="text-base font-medium text-left cursor-pointer hover:text-blue-600 transition-colors w-fit"
           >
             {isExpanded ? "Show less" : "Read more"}
           </button>
@@ -190,10 +190,10 @@ export function MobileProfileSection({ preloadedProfile, preloadedCurrentUser }:
               {hasExtraSocials && (
                 <div className="flex flex-col gap-1.5">
                   {additionalSocials.map((social, index) => (
-                    <div className="flex items-center gap-1.5 text-lg" key={index}>
+                    <div className="flex items-center gap-1.5 text-base" key={index}>
                       <SocialPlatformIcon 
                         platform={social.platform} 
-                        className="w-5 h-5 shrink-0 text-foreground" 
+                        className="w-4 h-4 shrink-0 text-foreground" 
                       />
                       <Link 
                         href={social.url} 
