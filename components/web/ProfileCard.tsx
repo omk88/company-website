@@ -36,7 +36,7 @@ export function ProfileCard({
         <div 
           className="flex flex-row items-center gap-2"
         >
-          <div className="h-12 w-12 border-2 border-muted rounded-full overflow-hidden bg-muted relative shrink-0">
+          <div className="size-12 border-2 border-muted rounded-full overflow-hidden bg-muted relative shrink-0">
             <img
               src={profilePicture || defaultProfilePicture || ""}
               alt={displayName || username}
@@ -45,13 +45,22 @@ export function ProfileCard({
             />
           </div>
 
-          <div className="flex flex-col min-w-0">
+          <div className="hidden md:flex flex-col min-w-0">
             <ProfileHoverCard authorUsername={username} displayName={displayName || username}>
               <span className="text-sm font-semibold truncate">
                 {displayName || username}
               </span>
             </ProfileHoverCard>
             <span className="text-xs font-extralight text-zinc-600 dark:text-zinc-400 truncate">
+              @{username}
+            </span>
+          </div>
+
+          <div className="md:hidden flex flex-col min-w-0">
+            <span className="text-lg font-semibold truncate">
+              {displayName || username}
+            </span>
+            <span className="text-base font-extralight text-zinc-600 dark:text-zinc-400 truncate">
               @{username}
             </span>
           </div>
@@ -76,7 +85,7 @@ export function ProfileCard({
             </div>
           )}
         </div>
-        <time className="text-xs text-zinc-400">
+        <time className="text-base md:text-xs text-zinc-400">
           {formatSmartDate(followedAt, false)}
         </time>
       </div>

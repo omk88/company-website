@@ -103,29 +103,41 @@ export function FollowButton({
 
   if (isSelf) return null;
 
-  const heightClass = isCompact || isXS ? "h-6" : "h-7";
-  const bellSize = isCompact || isXS ? 24 : 28;
-  const iconSizeClass = isCompact || isXS ? "h-3 w-3" : "h-3.5 w-3.5";
+  const heightClass = isCompact || isXS ? "h-8 sm:h-6" : "h-9 sm:h-7";
+  const bellSizeMobile = isCompact || isXS ? 32 : 36;
+  const bellSizeDesktop = isCompact || isXS ? 24 : 28;
+
+  const iconSizeClass = isCompact || isXS 
+    ? "h-4 w-4 sm:h-3 sm:w-3" 
+    : "h-4 w-4 sm:h-3.5 sm:w-3.5";
+
   const buttonSize = isXS ? "xs" : isCompact ? "xs" : "sm";
+
   const buttonPadding = isXS
-    ? "px-2.5 py-1"
+    ? "px-3 py-1.5 sm:px-2.5 sm:py-1"
     : isCompact
-      ? "px-3"
-      : "px-4 py-0";
+      ? "px-4 sm:px-3"
+      : "px-5 py-1 sm:px-4 sm:py-0";
 
   return (
     <LayoutGroup>
       <motion.div
         layout
         transition={springConfig}
-        className={`flex flex-row items-center gap-1.5 w-full ${heightClass}`}
+        className={`flex flex-row items-center gap-2 sm:gap-1.5 w-full ${heightClass}`}
       >
         <AnimatePresence mode="sync" initial={false}>
           {isFollowing && (
             <motion.div
               key="bell-container"
               initial={{ opacity: 0, width: 0, scale: 0.8 }}
-              animate={{ opacity: 1, width: bellSize, scale: 1 }}
+              animate={{
+                opacity: 1,
+                width: typeof window !== "undefined" && window.innerWidth < 640 
+                  ? bellSizeMobile 
+                  : bellSizeDesktop,
+                scale: 1,
+              }}
               exit={{ opacity: 0, width: 0, scale: 0.8 }}
               transition={springConfig}
               className="shrink-0 flex items-center h-full overflow-hidden"
@@ -163,7 +175,7 @@ export function FollowButton({
         <motion.div layout transition={springConfig} className="flex-1 h-full min-w-0">
           <Button
             variant={isFollowing ? "outline" : "default"}
-            className={`cursor-pointer text-xs w-full h-full box-border leading-none rounded-full font-medium transition-colors ${buttonPadding}`}
+            className={`cursor-pointer text-sm sm:text-xs w-full h-full box-border leading-none rounded-full font-medium transition-colors ${buttonPadding}`}
             size={buttonSize}
             disabled={isPending}
             onClick={handleFollowClick}

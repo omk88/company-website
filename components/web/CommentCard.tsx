@@ -46,16 +46,16 @@ export function CommentCard({ comment, index, variant }: CommentProps) {
         onClick={handleCompactClick}
         className="group flex flex-col p-3 gap-2 bg-zinc-50/80 hover:bg-zinc-100/90 rounded-xl transition-colors duration-100 dark:bg-muted/30 cursor-pointer"
       >
-        <div className="text-sm line-clamp-3">
+        <div className="text-lg md:text-sm line-clamp-3">
           {comment.body}
         </div>
-        <div className="flex items-center justify-between text-xs font-extralight tracking-tight select-none">
+        <div className="flex items-center justify-between text-xs tracking-tight select-none">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1">
-              <ThumbsUp className="w-3.5 h-3.5" />
-              <span>{comment.likes}</span>
+              <ThumbsUp className="size-4.5 md:size-3.5" />
+              <span className="md:text-xs text-base">{comment.likes}</span>
             </div>
-            <time className="text-xs text-zinc-400">
+            <time className="text-base md:text-xs text-zinc-400">
               {formatSmartDate(comment._creationTime, false)}
             </time>
           </div>
