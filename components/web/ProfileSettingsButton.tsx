@@ -26,7 +26,7 @@ export function ProfileSettingsButton({ userId }: ProfileSettingsButtonProps) {
     return (
         <ProfileSettingsDialog userId={userId}>
             <Button variant="ghost" size="icon" className="cursor-pointer">
-                <Settings className="h-4 w-4" />
+                <Settings className="size-5 md:size-4" />
             </Button>
         </ProfileSettingsDialog>
     );

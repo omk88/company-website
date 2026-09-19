@@ -6,6 +6,7 @@ import { fetchQuery } from "convex/nextjs";
 import { LeftSidebarProfile } from "@/components/web/LeftSidebarProfile";
 import { ProfileContent } from "@/components/web/ProfileContent";
 import { RightSidebarProfile } from "@/components/web/RightSidebarProfile";
+import { MobileProfileSection } from "./_components/MobileProfileSection";
 
 interface ProfileRouteProps {
   params: Promise<{ username: string }>;
@@ -31,36 +32,44 @@ export default async function Profile({ params }: ProfileRouteProps) {
     : null;
 
   return (
-    <SidebarProvider>
-      <aside 
-        className="shrink-0"
-        style={{ "--sidebar-width": "20rem" } as React.CSSProperties}
-      >
-        <LeftSidebarProfile 
+    <div>
+      <div className="pt-10 flex flex-col w-full min-h-screen md:hidden">
+        <MobileProfileSection
           preloadedProfile={preloadedProfile} 
           preloadedCurrentUser={preloadedCurrentUser} 
         />
-      </aside>
-      
-      <div className="flex-1 flex flex-row min-w-0 w-full min-h-screen pt-16">
-        <section
-          id="profile-content-section" 
-          className="flex-1 min-w-0 flex flex-col h-full"
+      </div>
+      <SidebarProvider>
+        <aside 
+          className="shrink-0 hidden md:flex"
+          style={{ "--sidebar-width": "20rem" } as React.CSSProperties}
         >
-          <ProfileContent 
-            preloadedProfile={preloadedProfile} 
-            preloadedCurrentUser={preloadedCurrentUser}
-            preloadedBlogs={preloadedBlogs}
-          />
-        </section>
-
-        <aside style={{ "--sidebar-width": "24rem" } as React.CSSProperties} className="w-[24rem] shrink-0">
-          <RightSidebarProfile 
+          <LeftSidebarProfile 
             preloadedProfile={preloadedProfile} 
             preloadedCurrentUser={preloadedCurrentUser} 
           />
         </aside>
-      </div>
-    </SidebarProvider>
+        
+        <div className="flex-1 flex flex-row min-w-0 w-full min-h-screen pt-16 hidden md:flex">
+          <section
+            id="profile-content-section" 
+            className="flex-1 min-w-0 flex flex-col h-full"
+          >
+            <ProfileContent 
+              preloadedProfile={preloadedProfile} 
+              preloadedCurrentUser={preloadedCurrentUser}
+              preloadedBlogs={preloadedBlogs}
+            />
+          </section>
+
+          <aside style={{ "--sidebar-width": "24rem" } as React.CSSProperties} className="w-[24rem] shrink-0 hidden md:flex">
+            <RightSidebarProfile 
+              preloadedProfile={preloadedProfile} 
+              preloadedCurrentUser={preloadedCurrentUser} 
+            />
+          </aside>
+        </div>
+      </SidebarProvider>
+    </div>
   );
 }

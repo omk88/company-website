@@ -123,7 +123,7 @@ export function EditProfileButton({ profile, avatarSrc, defaultAvatarSrc }: Edit
   return (
     <EditProfileDialog profile={profile} avatarSrc={avatarSrc} defaultAvatarSrc={defaultAvatarSrc}>
       <Button variant="ghost" size="icon" className="cursor-pointer">
-        <Pen className="h-4 w-4" />
+        <Pen className="size-5 md:size-4" />
       </Button>
     </EditProfileDialog>
   );
