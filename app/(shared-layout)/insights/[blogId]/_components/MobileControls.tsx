@@ -391,60 +391,69 @@ export function MobileControls({ blog, interactionState }: MobileControlsProps) 
                     </DropdownMenuContent>
                 </DropdownMenu>
 
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button
-                            variant="ghost"
-                            className="flex items-center justify-center h-14 w-14 p-0 rounded-full text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-                        >
-                            <Ellipsis className="size-6 " />
-                        </Button>
-                    </DropdownMenuTrigger>
-        
-                    <DropdownMenuContent side="top" className="w-44 rounded-xl">
-                        <DropdownMenuLabel className="text-lg font-semibold text-zinc-500">Manage</DropdownMenuLabel>
+                {(isCompanyUser || canEditOrDelete) && (
 
-                        <DropdownMenuItem
-                            className={`cursor-pointer text-xs flex items-center gap-2`}
-                            onClick={handleFeaturedClick}
-                        >
-                            <Star
-                                className={`size-4.5 ${
-                                    isFeatured ? "text-amber-500 fill-amber-500" : ""
-                                }`}
-                            />
-                            <span className="text-lg">
-                                {isFeatured ? "Unfeature Blog" : "Feature Blog"}
-                            </span>
-                        </DropdownMenuItem>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                variant="ghost"
+                                className="flex items-center justify-center h-14 w-14 p-0 rounded-full text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                            >
+                                <Ellipsis className="size-6 " />
+                            </Button>
+                        </DropdownMenuTrigger>
             
-                        <DropdownMenuItem
-                            onClick={() => setSelectedBlog(blog)}
-                        >
-                            <Link href={`/create-blog?id=${blog._id}`} className="text-lg flex items-center gap-2">
-                                <SquarePen className="size-4.5 shrink-0" />
-                                <span className="text-lg">Edit Blog</span>
-                            </Link>
-                        </DropdownMenuItem>
-            
-                        <DropdownMenuItem 
-                            onSelect={(e) => {
-                                e.preventDefault();
-                                setShowDeleteDialog(true);
-                            }}
-                        >
-                            <Trash2 className="size-4.5 shrink-0 mr-2" />
-                            <span className="text-lg">Delete Blog</span>
-                        </DropdownMenuItem>
+                        <DropdownMenuContent side="top" className="w-44 rounded-xl">
+                            <DropdownMenuLabel className="text-lg font-semibold text-zinc-500">Manage</DropdownMenuLabel>
+                            
+                            {isCompanyUser && (
+                                <DropdownMenuItem
+                                    className={`cursor-pointer text-xs flex items-center gap-2`}
+                                    onClick={handleFeaturedClick}
+                                >
+                                    <Star
+                                        className={`size-4.5 ${
+                                            isFeatured ? "text-amber-500 fill-amber-500" : ""
+                                        }`}
+                                    />
+                                    <span className="text-lg">
+                                        {isFeatured ? "Unfeature Blog" : "Feature Blog"}
+                                    </span>
+                                </DropdownMenuItem>
+                            )}
+                
+                            {canEditOrDelete && (
+                                <>
+                                    <DropdownMenuItem
+                                        onClick={() => setSelectedBlog(blog)}
+                                    >
+                                        <Link href={`/create-blog?id=${blog._id}`} className="text-lg flex items-center gap-2">
+                                            <SquarePen className="size-4.5 shrink-0" />
+                                            <span className="text-lg">Edit Blog</span>
+                                        </Link>
+                                    </DropdownMenuItem>
+                    
+                                    <DropdownMenuItem 
+                                        onSelect={(e) => {
+                                            e.preventDefault();
+                                            setShowDeleteDialog(true);
+                                        }}
+                                    >
+                                        <Trash2 className="size-4.5 shrink-0 mr-2" />
+                                        <span className="text-lg">Delete Blog</span>
+                                    </DropdownMenuItem>
 
-                        <DeleteBlogDialog
-                            open={showDeleteDialog}
-                            onOpenChange={setShowDeleteDialog}
-                            blogIds={[blog._id]}
-                            onSuccess={() => { router.push("/insights"); }}
-                        />
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                                    <DeleteBlogDialog
+                                        open={showDeleteDialog}
+                                        onOpenChange={setShowDeleteDialog}
+                                        blogIds={[blog._id]}
+                                        onSuccess={() => { router.push("/insights"); }}
+                                    />
+                                </>
+                            )}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                )}
             </div>
         </div>
       </div>
