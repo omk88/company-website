@@ -33,7 +33,7 @@ export default async function Profile({ params }: ProfileRouteProps) {
 
   return (
     <div>
-      <div className="pt-10 flex flex-col w-full min-h-screen md:hidden">
+      <div className="pt-10 flex flex-col w-full md:hidden">
         <MobileProfileSection
           preloadedProfile={preloadedProfile} 
           preloadedCurrentUser={preloadedCurrentUser} 
@@ -50,7 +50,7 @@ export default async function Profile({ params }: ProfileRouteProps) {
           />
         </aside>
         
-        <div className="flex-1 flex flex-row min-w-0 w-full min-h-screen pt-16 hidden md:flex">
+        <div className="flex-1 flex flex-row min-w-0 w-full min-h-screen md:pt-16 md:flex">
           <section
             id="profile-content-section" 
             className="flex-1 min-w-0 flex flex-col h-full"

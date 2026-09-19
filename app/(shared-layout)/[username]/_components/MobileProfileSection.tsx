@@ -79,7 +79,7 @@ export function MobileProfileSection({ preloadedProfile, preloadedCurrentUser }:
     const formattedDate = dateFormatter.format(profile._creationTime);
 
     return (
-        <div className="flex flex-col gap-4 p-2 h-fit border-b bg-zinc-50/80 dark:bg-zinc-900/50 fixed w-full">
+        <div className="flex flex-col gap-4 p-2 h-fit border-b bg-zinc-50/80 dark:bg-zinc-900/50 sticky top-0 w-full">
             {isOwnProfile && (
                 <div className="flex flex-row gap-2 absolute -top-1 -right-1 p-4 flex items-center z-10">
                     <ProfileSettingsButton userId={profile.userId} />
