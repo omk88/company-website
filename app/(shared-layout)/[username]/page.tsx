@@ -33,15 +33,15 @@ export default async function Profile({ params }: ProfileRouteProps) {
     : null;
 
   return (
-    <div>
-      <div className="pt-10 flex flex-col w-full md:hidden">
+    <div className="min-h-screen w-full md:h-screen md:overflow-hidden">
+      <div className="pt-10 w-full md:hidden shrink-0">
         <MobileProfileSection
           preloadedProfile={preloadedProfile} 
           preloadedCurrentUser={preloadedCurrentUser} 
         />
       </div>
 
-      <SidebarProvider>
+      <SidebarProvider className="w-full md:flex-1 md:min-h-0">
         <aside 
           className="shrink-0 hidden md:flex"
           style={{ "--sidebar-width": "20rem" } as React.CSSProperties}
@@ -52,13 +52,14 @@ export default async function Profile({ params }: ProfileRouteProps) {
           />
         </aside>
         
-        <div className="flex-1 flex flex-row min-w-0 w-full min-h-screen md:pt-16 md:flex">
-          <section id="profile-content-section" className="flex-1 min-w-0 flex flex-col h-full">
-
-            <MobileProfileSwitchBar
-              preloadedProfile={preloadedProfile} 
-              preloadedCurrentUser={preloadedCurrentUser} 
-            />
+        <div className="w-full md:flex-1 md:flex md:flex-row md:min-w-0 md:h-full md:min-h-0 md:pt-16">
+          <section id="profile-content-section" className="w-full md:flex-1 md:min-w-0 md:flex md:flex-col md:h-full md:min-h-0">
+            <div className="sticky top-[48px] z-20 bg-background shrink-0 md:static">
+              <MobileProfileSwitchBar
+                preloadedProfile={preloadedProfile} 
+                preloadedCurrentUser={preloadedCurrentUser} 
+              />
+            </div>
 
             <ProfileContent 
               preloadedProfile={preloadedProfile} 

@@ -59,24 +59,24 @@ export function ProfileContent({
   }, [setSelectedMetric]);
 
   return (
-    <div className="flex flex-col w-full">
-      <div className={selectedMetric === "insights" ? "flex flex-col flex-1 h-full" : "hidden"}>
+    <div className="flex flex-col w-full flex-1 md:min-h-0">
+      <div className={selectedMetric === "insights" ? "flex flex-col flex-1 h-full md:min-h-0" : "hidden"}>
         <ProfileBlogsWrapper profile={profileData} preloadedBlogs={preloadedBlogs} />
       </div>
 
-      <div className={selectedMetric === "comments" ? "flex flex-col flex-1 h-full" : "hidden"}>
+      <div className={selectedMetric === "comments" ? "flex flex-col flex-1 h-full md:min-h-0 md:overflow-y-auto" : "hidden"}>
         <ProfileComments profile={profileData} />
       </div>
 
-      <div className={selectedMetric === "bookmarks" ? "flex flex-col flex-1 h-full" : "hidden"}>
+      <div className={selectedMetric === "bookmarks" ? "flex flex-col flex-1 h-full md:min-h-0 md:overflow-y-auto" : "hidden"}>
         <ProfileBookmarks profile={profileData} />
       </div>
 
-      <div className={selectedMetric === "followers" ? "flex flex-col flex-1 h-full" : "hidden"}>
+      <div className={selectedMetric === "followers" ? "flex flex-col flex-1 h-full md:min-h-0 md:overflow-y-auto" : "hidden"}>
         <ProfileFollowers profile={profileData} currentUser={currentUser} />
       </div>
 
-      <div className={selectedMetric === "following" ? "flex flex-col flex-1 h-full" : "hidden"}>
+      <div className={selectedMetric === "following" ? "flex flex-col flex-1 h-full md:min-h-0 md:overflow-y-auto" : "hidden"}>
         <ProfileFollowing profile={profileData} currentUser={currentUser} />
       </div>
     </div>
