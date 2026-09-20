@@ -85,20 +85,20 @@ export function AudioPlayer({ audioUrl, title }: AudioPlayerProps) {
           onClick={togglePlay}
           size="icon"
           variant="default"
-          className="h-9 w-9 shrink-0 rounded-full bg-zinc-900 text-zinc-50 hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+          className="cursor-pointer h-9 w-9 shrink-0 rounded-full bg-zinc-900 text-zinc-50 hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
           aria-label={isPlaying ? "Pause" : "Play"}
         >
           {isPlaying ? (
-            <Pause className="h-4 w-4" />
+            <Pause className="cursor-pointer h-4 w-4" />
           ) : (
-            <Play className="h-4 w-4 ml-0.5 fill-current" />
+            <Play className="cursor-pointer h-4 w-4 ml-0.5 fill-current" />
           )}
         </Button>
 
         <div className="flex flex-1 flex-col justify-center gap-1.5">
           <div className="flex items-center justify-between text-xs font-medium tracking-tight text-zinc-500 dark:text-zinc-400">
             <span className="truncate max-w-[200px] sm:max-w-none">
-              {title ? `Listen to article` : "Audio Narration"}
+              Listen to article
             </span>
             <span className="font-mono text-[11px] tabular-nums">
               {formatTime(currentTime)} / {formatTime(duration)}
@@ -119,17 +119,17 @@ export function AudioPlayer({ audioUrl, title }: AudioPlayerProps) {
             onClick={restartAudio}
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-50"
+            className="cursor-pointer h-8 w-8 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-50"
             title="Restart"
           >
-            <RotateCcw className="h-3.5 w-3.5" />
+            <RotateCcw className="cursor-pointer h-3.5 w-3.5" />
           </Button>
 
           <Button
             onClick={toggleMute}
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-50"
+            className="cursor-pointer h-8 w-8 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-50"
             title={isMuted ? "Unmute" : "Mute"}
           >
             {isMuted ? (

@@ -6,14 +6,33 @@ import { internal } from "./_generated/api";
 import { PollyClient, SynthesizeSpeechCommand } from "@aws-sdk/client-polly";
 
 export const generateAudio = internalAction({
-  args: { blogId: v.id("blogs"), content: v.string() },
+  args: { 
+    blogId: v.id("blogs"), 
+    content: v.string(),
+    title: v.string(),
+    author: v.string(),
+    subtitle: v.string(),
+  },
   handler: async (ctx, args) => {
     try {
-      const plainText = args.content
+      const cleanedBody = args.content
         .replace(/<[^>]*>/g, "")
         .replace(/[#*`~_\[\]()]/g, "")
         .replace(/\n+/g, " ")
         .trim();
+
+      let intro = `${args.title.trim()} by ${args.author.trim()}.`;
+
+      if (args.subtitle && args.subtitle.trim()) {
+        const cleanedSubtitle = args.subtitle
+          .replace(/<[^>]*>/g, "")
+          .replace(/[#*`~_\[\]()]/g, "")
+          .trim();
+        
+        intro += ` ${cleanedSubtitle}.`;
+      }
+
+      const plainText = `${intro} ${cleanedBody}`;
 
       const accessKeyId = (process.env.AWS_ACCESS_KEY_ID || "").trim();
       const secretAccessKey = (process.env.AWS_SECRET_ACCESS_KEY || "").trim();
