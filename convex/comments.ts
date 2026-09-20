@@ -6,7 +6,9 @@ import { calculateScores, calculateCommentScores } from "./scoreAlgorithm";
 import { Id } from "./_generated/dataModel";
 
 export const getCommentsByBlog = query({
-  args: { blogId: v.id("blogs") },
+  args: {
+    blogId: v.id("blogs"),
+  },
   handler: async (ctx, args) => {
     const comments = await ctx.db
       .query("comments")
@@ -27,19 +29,33 @@ export const getCommentsByBlog = query({
 
     const profileMap = new Map(authorIds.map((id, index) => [id, profiles[index]]));
 
-    return await Promise.all(
-      comments.map(async (comment) => {
-        const profile = profileMap.get(comment.authorId);
-        const authorProfilePicUrl = profile?.profilePic
-          ? (await ctx.storage.getUrl(profile.profilePic)) ?? undefined
-          : undefined;
+    const profileUrls = await Promise.all(
+      profiles.map(async (profile) => {
+        if (!profile) return { custom: undefined, default: undefined };
+
+        const [custom, defaultPic] = await Promise.all([
+          profile.profilePic ? ctx.storage.getUrl(profile.profilePic) : null,
+          profile.defaultProfilePic ? ctx.storage.getUrl(profile.defaultProfilePic) : null,
+        ]);
 
         return {
-          ...comment,
-          authorProfilePicUrl,
+          custom: custom ?? undefined,
+          default: defaultPic ?? undefined,
         };
       })
     );
+
+    const urlMap = new Map(authorIds.map((id, index) => [id, profileUrls[index]]));
+
+    return comments.map((comment) => {
+      const urls = urlMap.get(comment.authorId);
+
+      return {
+        ...comment,
+        authorProfilePicUrl: urls?.custom,
+        defaultAuthorProfilePicUrl: urls?.default,
+      };
+    });
   },
 });
 
