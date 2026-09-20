@@ -1,8 +1,9 @@
 import { Id } from "./_generated/dataModel";
-import { mutation, query } from "./_generated/server";
+import { internalAction, internalMutation, mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { paginationOptsValidator } from "convex/server";
 import { calculateScores } from "./scoreAlgorithm";
+import { internal } from "./_generated/api";
 
 const WORDS_PER_MINUTE = 225;
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
@@ -49,6 +50,8 @@ export const createPost = mutation({
       tags: args.tags,
       storageId: args.storageId,
       imageUrl: generatedImageUrl || "",
+      audioStorageId: undefined,
+      audioUrl: undefined,
       totalViews: 0,
       likes: 0,
       commentCount: 0,
@@ -90,7 +93,26 @@ export const createPost = mutation({
       profilePromise,
     ]);
 
+    await ctx.scheduler.runAfter(0, internal.tts.generateAudio, {
+      blogId,
+      content: args.content,
+    });
+
     return blogId;
+  },
+});
+
+export const updateBlogAudio = internalMutation({
+  args: {
+    blogId: v.id("blogs"),
+    audioStorageId: v.string(),
+    audioUrl: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.blogId, {
+      audioStorageId: args.audioStorageId,
+      audioUrl: args.audioUrl,
+    });
   },
 });
 

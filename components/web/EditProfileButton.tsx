@@ -343,7 +343,7 @@ function EditProfileDialog({ profile, avatarSrc, defaultAvatarSrc, children }: E
 
       <DialogContent className="sm:max-w-[425px] max-h-[85vh] flex flex-col p-0 overflow-hidden">
         <DialogHeader className="p-6 pb-4">
-          <DialogTitle>Edit Profile</DialogTitle>
+          <DialogTitle className="text-sm">Edit Profile</DialogTitle>
         </DialogHeader>
 
         <FormProvider {...form}>

@@ -27,6 +27,7 @@ import type * as profiles from "../profiles.js";
 import type * as scoreAlgorithm from "../scoreAlgorithm.js";
 import type * as settings from "../settings.js";
 import type * as subscribers from "../subscribers.js";
+import type * as tts from "../tts.js";
 
 import type {
   ApiFromModules,
@@ -54,6 +55,7 @@ declare const fullApi: ApiFromModules<{
   scoreAlgorithm: typeof scoreAlgorithm;
   settings: typeof settings;
   subscribers: typeof subscribers;
+  tts: typeof tts;
 }>;
 
 /**

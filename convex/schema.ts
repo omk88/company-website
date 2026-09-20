@@ -9,6 +9,8 @@ const schema = defineSchema({
     title: v.string(),
     subtitle: v.string(),
     imageUrl: v.string(),
+    audioStorageId: v.optional(v.string()),
+    audioUrl: v.optional(v.string()),
     content: v.string(),
     displayName: v.optional(v.string()),
     username: v.string(),
