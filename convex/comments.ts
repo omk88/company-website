@@ -6,9 +6,7 @@ import { calculateScores, calculateCommentScores } from "./scoreAlgorithm";
 import { Id } from "./_generated/dataModel";
 
 export const getCommentsByBlog = query({
-  args: {
-    blogId: v.id("blogs")
-  },
+  args: { blogId: v.id("blogs") },
   handler: async (ctx, args) => {
     const comments = await ctx.db
       .query("comments")
@@ -16,29 +14,33 @@ export const getCommentsByBlog = query({
       .order("desc")
       .collect();
 
+    const authorIds = Array.from(new Set(comments.map((c) => c.authorId)));
+
+    const profiles = await Promise.all(
+      authorIds.map((userId) =>
+        ctx.db
+          .query("profiles")
+          .withIndex("by_userId", (q) => q.eq("userId", userId))
+          .unique()
+      )
+    );
+
+    const profileMap = new Map(authorIds.map((id, index) => [id, profiles[index]]));
+
     return await Promise.all(
       comments.map(async (comment) => {
-        const profile = await ctx.db
-          .query("profiles")
-          .withIndex("by_userId", (q) => q.eq("userId", comment.authorId))
-          .unique();
-
-        const authorProfilePicUrl = profile?.profilePic 
+        const profile = profileMap.get(comment.authorId);
+        const authorProfilePicUrl = profile?.profilePic
           ? (await ctx.storage.getUrl(profile.profilePic)) ?? undefined
-          : undefined;
-
-        const defaultAuthorProfilePicUrl = profile?.defaultProfilePic 
-          ? (await ctx.storage.getUrl(profile.defaultProfilePic)) ?? undefined
           : undefined;
 
         return {
           ...comment,
           authorProfilePicUrl,
-          defaultAuthorProfilePicUrl,
         };
       })
     );
-  }
+  },
 });
 
 export const getPaginatedCommentsByAuthor = query({

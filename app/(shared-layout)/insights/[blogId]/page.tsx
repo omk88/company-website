@@ -10,6 +10,7 @@ import { BlogContent } from "@/components/web/Blogs/BlogContent";
 import { preloadAuthQuery } from "@/lib/auth-server";
 import { BlogStoreHydrator } from "@/components/web/BlogStoreHydrator";
 import { MobileControls } from "./_components/MobileControls";
+import ScrollToTop from "@/hooks/resetScroll";
 
 interface BlogPageProps {
   params: Promise<{ blogId: Id<"blogs"> }>;
@@ -109,32 +110,35 @@ export default async function BlogPage({ params }: BlogPageProps) {
   };
 
   return (
-    <SidebarProvider className="bg-white dark:bg-zinc-950 w-full min-h-screen relative flex">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <BlogStoreHydrator blog={blog} />
-
-      <div className="hidden md:flex">
-        <LeftSidebarControls blog={blog} interactionState={interactionState} />
-      </div>
-
-      <main className="flex-1 min-w-0 md:px-0 px-1 pt-13.5 md:pt-16 pb-16">
-        <div className="max-w-3xl mx-auto">
-          <BlogContent blog={blog} preloadedComments={preloadedComments} />
-        </div>
-      </main>
-
-      <div className="hidden md:flex">
-        <RightSidebarArticles
-          username={blog.username}
-          displayName={blog.displayName}
-          blogs={authorPosts}
+    <div>
+      <ScrollToTop />
+      <SidebarProvider className="bg-white dark:bg-zinc-950 w-full min-h-screen relative flex">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-      </div>
+        <BlogStoreHydrator blog={blog} />
 
-      <MobileControls blog={blog} interactionState={interactionState} />
-    </SidebarProvider>
+        <div className="hidden md:flex">
+          <LeftSidebarControls blog={blog} interactionState={interactionState} />
+        </div>
+
+        <main className="flex-1 min-w-0 md:px-0 px-1 pt-13.5 md:pt-16 pb-16">
+          <div className="max-w-3xl mx-auto">
+            <BlogContent blog={blog} preloadedComments={preloadedComments} />
+          </div>
+        </main>
+
+        <div className="hidden md:flex">
+          <RightSidebarArticles
+            username={blog.username}
+            displayName={blog.displayName}
+            blogs={authorPosts}
+          />
+        </div>
+
+        <MobileControls blog={blog} interactionState={interactionState} />
+      </SidebarProvider>
+    </div>
   );
 }

@@ -254,7 +254,7 @@ export function BlogCard({
 
           {imageUrl && (
             <Link 
-              href={`/insights/${id}`} 
+              href={`/insights/${id}`}
               className="relative w-14 h-14 shrink-0 overflow-hidden rounded-xl block"
             >
               <Image

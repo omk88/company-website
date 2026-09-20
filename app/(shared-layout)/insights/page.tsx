@@ -6,6 +6,8 @@ import { LeftSidebar } from "@/components/web/LeftSidebar";
 import { Suspense } from "react";
 import { BlogCardSkeleton } from "@/components/web/LoadingSkeletons/BlogCardSkeleton";
 import CreatePostButton from "@/components/web/CreatePostButton";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Insights",

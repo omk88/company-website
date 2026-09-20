@@ -199,7 +199,6 @@ canvas::after {
 }
 
 html {
-  scroll-behavior: smooth;
   scrollbar-gutter: stable;
 }
 
