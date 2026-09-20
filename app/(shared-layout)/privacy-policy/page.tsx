@@ -349,7 +349,7 @@ export default function PrivacyPolicy() {
 
   return (
     <>
-      <div className="min-h-screen bg-background text-foreground py-20 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-background text-foreground pt-14 pb-20 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto">
           <header className="border-b border-border pb-8 mb-12">
             <h1 className="text-4xl font-bold tracking-tight mb-3 sm:text-5xl">
