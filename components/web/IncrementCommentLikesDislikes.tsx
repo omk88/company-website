@@ -62,14 +62,14 @@ export function IncrementCommentLikesDislikes({ comment }: IncrementCommentLikes
     <Button
       variant="ghost"
       onClick={handleLikeClick}
-      className="flex flex-row items-center justify-center gap-1 h-11 w-11 p-0 rounded-full text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+      className="flex flex-row items-center justify-center gap-1 size-12 md:size-11 p-0 rounded-full text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
     >
       <ThumbsUp
-        className={`w-4 h-4 shrink-0 transition-none ${
+        className={`size-5 md:size-4 shrink-0 transition-none ${
           hasLiked ? "text-emerald-500 fill-emerald-500" : ""
         }`}
       />
-      <span className={`text-xs font-medium leading-none ${hasLiked ? "text-emerald-500 font-bold" : ""}`}>
+      <span className={`text-lg md:text-xs font-medium leading-none ${hasLiked ? "text-emerald-500 font-bold" : ""}`}>
         {likesCount}
       </span>
     </Button>

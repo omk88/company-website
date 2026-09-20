@@ -108,17 +108,17 @@ export function CommentSection(props: { preloadedComments: Preloaded<typeof api.
       <div className="divide-y divide-zinc-100 dark:divide-zinc-800/60 pt-4">
         {data.map((comment) => (
             <div key={comment._id} id={`comment-${comment._id}`} className="flex items-start gap-3 py-4 border-b border-zinc-100 dark:border-zinc-800/60 last:border-0">
-                <Avatar className="w-8 h-8 shrink-0 mt-0.5">
+                <Avatar className="size-10 md:size-8 shrink-0 mt-0.5">
                     <AvatarImage src={comment.authorProfilePicUrl || comment.defaultAuthorProfilePicUrl || undefined} />
                 </Avatar>
             
                 <div className="flex-1 space-y-1">
                     <div className="flex items-center gap-2">
-                        <span className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">
+                        <span className="font-semibold text-lg md:text-sm text-zinc-900 dark:text-zinc-100">
                             {comment.displayName || comment.username}
                         </span>
-                        <span className="text-xs text-zinc-400">&middot;</span>
-                        <time className="text-xs text-zinc-400">
+                        <span className="text-base md:text-xs text-zinc-400">&middot;</span>
+                        <time className="text-base md:text-xs text-zinc-400">
                             {formatSmartDate(comment._creationTime, false)}
                         </time>
                     </div>
