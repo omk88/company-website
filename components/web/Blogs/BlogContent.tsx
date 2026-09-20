@@ -17,6 +17,7 @@ import { createLowlight } from "lowlight";
 import js from "highlight.js/lib/languages/javascript";
 import ts from "highlight.js/lib/languages/typescript";
 import "highlight.js/styles/github-dark.css";
+import { AudioPlayer } from "@/app/(shared-layout)/insights/[blogId]/_components/AudioPlayer";
 
 const lowlight = createLowlight();
 lowlight.register("javascript", js);
@@ -65,9 +66,11 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
           <BlogEmojiReactions initialBlog={blog} />
         </div>
 
-        <p className="text-lg text-neutral-600 dark:text-neutral-400 font-medium">
+        <p className="mb-4 text-lg text-neutral-600 dark:text-neutral-400 font-medium">
           {blog.subtitle}
         </p>
+
+        <AudioPlayer audioUrl={blog.audioUrl} title={blog.title} />
       </header>
 
       <Separator className="my-8" />
