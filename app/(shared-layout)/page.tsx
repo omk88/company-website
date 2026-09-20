@@ -6,7 +6,7 @@ import { AiOutlineInstagram } from 'react-icons/ai';
 import { RxLinkedinLogo } from 'react-icons/rx';
 import Footer from '@/components/web/Footer';
 import { cn } from '@/lib/utils';
-import TrustedToolsSection from '@/components/web/TrustedToolsSection';
+import TrustedToolsSection from '@/app/(shared-layout)/_components/TrustedToolsSection';
 import VisionCards from '@/components/web/VisionCards';
 import InteractiveCodeBox from '@/components/web/InteractiveCodeBox';
 import { GlobalReachMap } from '@/components/web/GlobalReachMap';
@@ -25,12 +25,12 @@ export default function Home() {
 
       <div className="max-w-6xl mx-auto w-full border-x border-neutral-200 dark:border-neutral-800 flex-1">
         
-        <section className="w-full flex items-center justify-center pb-14 min-h-[calc(100vh-4rem)]">
-          <div className="w-full px-4 sm:px-8 mt-4">
+        <section className="w-full flex items-center justify-center pb-6 md:min-h-[calc(100vh-4rem)]">
+          <div className="w-full px-4 sm:px-8 md:mt-4">
             
             <div className="w-full bg-white/90 dark:bg-neutral-900/80 backdrop-blur-lg rounded-lg border border-neutral-200/70 dark:border-neutral-800/80 shadow-md overflow-hidden isolate">
               
-              <div className="p-8 sm:p-12 lg:p-14 my-4 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+              <div className="p-8 sm:p-12 lg:p-14 md:my-4 grid grid-cols-1 lg:grid-cols-12 md:gap-8 lg:gap-10 items-center">
                 
                 <div className="lg:col-span-5 flex flex-col items-start text-left gap-7 isolate">
                   
@@ -76,7 +76,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="lg:col-span-7 w-full flex justify-center lg:justify-end min-w-0">
+                <div className="hidden md:flex lg:col-span-7 w-full justify-center lg:justify-end min-w-0">
                   <InteractiveCodeBox />
                 </div>
 
