@@ -87,7 +87,29 @@ const MemoizedMarkdown = memo(function MemoizedMarkdown({ content }: { content: 
     <div className="prose prose-neutral dark:prose-invert max-w-none text-base leading-relaxed text-neutral-800 dark:text-neutral-200 break-words">
       <ReactMarkdown
         rehypePlugins={[[rehypeHighlight, { lowlight }]]}
-        components={{ pre: CodeBlock }}
+        components={{
+          pre: CodeBlock,
+          code({ className, children, node, ...props }: any) {
+            const isInline = !node?.parent || node?.parent?.tagName !== "pre";
+
+            if (isInline) {
+              return (
+                <code
+                  className="px-1.5 py-0.5 rounded-md bg-neutral-900 border border-neutral-800 text-neutral-200 font-mono text-sm font-normal before:content-none after:content-none"
+                  {...props}
+                >
+                  {children}
+                </code>
+              );
+            }
+
+            return (
+              <code className={className} {...props}>
+                {children}
+              </code>
+            );
+          },
+        }}
       >
         {content}
       </ReactMarkdown>

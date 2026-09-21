@@ -160,7 +160,7 @@ export function CodeBlock({
   };
 
   return (
-    <div className="relative my-6 rounded-2xl bg-black border border-neutral-800 overflow-hidden shadow-md">
+    <div className="relative my-6 rounded-xl bg-black border border-neutral-800 overflow-hidden shadow-md">
       <div className="flex items-center justify-between px-4 py-2.5 bg-neutral-900/80 border-b border-neutral-800 text-xs">
         <div className="flex items-center gap-2 font-mono text-neutral-400">
           <FileCode className="w-4 h-4 text-neutral-500" />
@@ -175,8 +175,8 @@ export function CodeBlock({
                 onClick={() => setLanguage("ts")}
                 className={`px-2 py-0.5 rounded-md text-[11px] font-semibold transition-colors ${
                   language === "ts"
-                    ? "bg-neutral-800 text-blue-400 shadow-sm"
-                    : "text-neutral-500 hover:text-neutral-300"
+                    ? "bg-neutral-800 text-blue-400 shadow-sm cursor-default"
+                    : "text-neutral-500 hover:text-neutral-300 cursor-pointer"
                 }`}
               >
                 TS
@@ -186,8 +186,8 @@ export function CodeBlock({
                 onClick={() => setLanguage("js")}
                 className={`px-2 py-0.5 rounded-md text-[11px] font-semibold transition-colors ${
                   language === "js"
-                    ? "bg-neutral-800 text-yellow-400 shadow-sm"
-                    : "text-neutral-500 hover:text-neutral-300"
+                    ? "bg-neutral-800 text-yellow-400 shadow-sm cursor-default"
+                    : "text-neutral-500 hover:text-neutral-300 cursor-pointer"
                 }`}
               >
                 JS
@@ -199,7 +199,7 @@ export function CodeBlock({
             onClick={handleCopy}
             size="sm"
             variant="ghost"
-            className="h-7 w-7 p-0 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded-md transition-all"
+            className="cursor-pointer h-7 w-7 p-0 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded-md transition-all"
           >
             {copied ? (
               <Check className="w-3.5 h-3.5 text-green-400" />
