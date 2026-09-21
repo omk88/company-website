@@ -97,14 +97,13 @@ export function LeftSidebarCreateBlog({ onSelectDraft }: LeftSidebarCreateBlogPr
           <AnimatePresence>
             {isOpen && (
               <motion.div
-                initial={{ y: "-100%", x: 0, opacity: 0 }}
-                animate={{ y: 0, x: 0, opacity: 1 }}
-                exit={{ y: "-100%", x: 0, opacity: 0 }}
+                initial={{ x: "-100%", opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: "-100%", opacity: 0 }}
                 transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
                 className={cn(
                   "absolute bg-white dark:bg-zinc-950 shadow-xl z-0 p-3 flex flex-col",
-                  "top-[3.5rem] left-0 right-0 max-h-[60vh] border-b border-zinc-200 dark:border-zinc-800",
-                  "md:top-0 md:bottom-0 md:left-[3.5rem] md:right-auto md:w-[16rem] md:h-full md:max-h-full md:border-r md:border-b-0"
+                  "top-0 bottom-0 left-[3.5rem] w-[16rem] h-full border-r border-zinc-200 dark:border-zinc-800"
                 )}
               >
                 <div className="flex items-center justify-between mb-4 pb-2 border-b border-zinc-200 dark:border-zinc-800">
