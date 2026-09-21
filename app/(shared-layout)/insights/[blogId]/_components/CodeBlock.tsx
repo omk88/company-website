@@ -1,9 +1,13 @@
 "use client";
 
 import React, { useState, useRef, Children, isValidElement } from "react";
-import { Check, Copy, FileCode } from "lucide-react";
-import { Button } from "../ui/button";
+import Image from "next/image";
+import { Check, Copy } from "lucide-react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+
+import jsIcon from "./jsvector.svg";
+import tsIcon from "./tsvector.svg";
 
 interface CodeElementProps {
   className?: string;
@@ -36,7 +40,7 @@ export function CodeBlock({
       const match = /^\/\/\s*title:\s*(.+)$/m.exec(text);
       if (match && !topLevelTitle) {
         topLevelTitle = match[1].trim();
-        return; 
+        return;
       }
     }
     nodesWithoutTopTitle.push(node);
@@ -53,7 +57,7 @@ export function CodeBlock({
     ? metaTitleMatch[1] || metaTitleMatch[2] || metaTitleMatch[3]
     : null;
 
-  const baseTitle = topLevelTitle || metaTitle || "index.ts";
+  const baseTitle = topLevelTitle || metaTitle || "";
 
   const tsNodes: React.ReactNode[] = [];
   const jsNodes: React.ReactNode[] = [];
@@ -161,13 +165,19 @@ export function CodeBlock({
 
   return (
     <div className="relative my-6 rounded-xl bg-black border border-neutral-800 overflow-hidden shadow-md">
-      <div className="flex items-center justify-between px-4 py-2.5 bg-neutral-900/80 border-b border-neutral-800 text-xs">
-        <div className="flex items-center gap-2 font-mono text-neutral-400">
-          <FileCode className="w-4 h-4 text-neutral-500" />
-          <span>{filename}</span>
+      <div className="flex items-center justify-between px-4 py-2 bg-neutral-900/80 border-b border-neutral-800 text-xs h-10">
+        <div className="flex items-center gap-2 font-mono text-neutral-400 min-w-0">
+          <Image
+            src={language === "ts" ? tsIcon : jsIcon}
+            alt={language === "ts" ? "TypeScript logo" : "JavaScript logo"}
+            width={16}
+            height={16}
+            className="w-4 h-4 rounded-[2px] shrink-0 object-contain"
+          />
+          <span className="truncate leading-tight text-neutral-300">{filename}</span>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 shrink-0">
           {hasDualVersion && (
             <div className="flex items-center bg-neutral-950 p-0.5 rounded-lg border border-neutral-800">
               <button
@@ -199,7 +209,7 @@ export function CodeBlock({
             onClick={handleCopy}
             size="sm"
             variant="ghost"
-            className="cursor-pointer h-7 w-7 p-0 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded-md transition-all"
+            className="cursor-pointer h-7 w-7 p-0 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded-md transition-all flex items-center justify-center"
           >
             {copied ? (
               <Check className="w-3.5 h-3.5 text-green-400" />

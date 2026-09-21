@@ -24,7 +24,7 @@ import { useCurrentUser } from "@/app/ConvexClientProvider";
 import { TAGS } from "@/app/constants/tags";
 import z from "zod";
 
-import { CodeBlock } from "./CodeBlock";
+import { CodeBlock } from "../../app/(shared-layout)/insights/[blogId]/_components/CodeBlock";
 import rehypeHighlight from "rehype-highlight";
 import { createLowlight } from "lowlight";
 import js from "highlight.js/lib/languages/javascript";

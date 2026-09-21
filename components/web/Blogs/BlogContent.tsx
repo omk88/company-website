@@ -16,7 +16,7 @@ import { Doc } from "@/convex/_generated/dataModel";
 import { Preloaded } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { BlogName } from "./BlogName";
-import { CodeBlock } from "../CodeBlock";
+import { CodeBlock } from "../../../app/(shared-layout)/insights/[blogId]/_components/CodeBlock";
 import { AudioPlayer } from "@/app/(shared-layout)/insights/[blogId]/_components/AudioPlayer";
 
 const lowlight = createLowlight();
