@@ -1,5 +1,11 @@
 import Image from "next/image";
 import ReactMarkdown from "react-markdown";
+import rehypeHighlight from "rehype-highlight";
+import { createLowlight } from "lowlight";
+import js from "highlight.js/lib/languages/javascript";
+import ts from "highlight.js/lib/languages/typescript";
+import "highlight.js/styles/github-dark.css";
+import { visit } from "unist-util-visit";
 
 import { Separator } from "@/components/ui/separator";
 import { BlogCTA } from "@/components/web/BlogCTA";
@@ -10,13 +16,7 @@ import { Doc } from "@/convex/_generated/dataModel";
 import { Preloaded } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { BlogName } from "./BlogName";
-
 import { CodeBlock } from "../CodeBlock";
-import rehypeHighlight from "rehype-highlight";
-import { createLowlight } from "lowlight";
-import js from "highlight.js/lib/languages/javascript";
-import ts from "highlight.js/lib/languages/typescript";
-import "highlight.js/styles/github-dark.css";
 import { AudioPlayer } from "@/app/(shared-layout)/insights/[blogId]/_components/AudioPlayer";
 
 const lowlight = createLowlight();
@@ -24,6 +24,18 @@ lowlight.register("javascript", js);
 lowlight.register("js", js);
 lowlight.register("typescript", ts);
 lowlight.register("ts", ts);
+
+function remarkMetaAsData() {
+  return (tree: any) => {
+    visit(tree, "code", (node: any) => {
+      if (node.meta) {
+        node.data = node.data || {};
+        node.data.hProperties = node.data.hProperties || {};
+        node.data.hProperties["data-meta"] = node.meta;
+      }
+    });
+  };
+}
 
 interface ExtendedBlog extends Doc<"blogs"> {
   imageUrl: string;
@@ -58,9 +70,14 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
         <h1 className="text-4xl font-bold tracking-tight text-neutral-950 dark:text-neutral-50">
           {blog.title}
         </h1>
-        
 
-        <BlogName avatarSrc={avatarSrc} username={blog.username} displayName={blog.displayName} date={blog._creationTime} readTime={blog.readTime} />
+        <BlogName
+          avatarSrc={avatarSrc}
+          username={blog.username}
+          displayName={blog.displayName}
+          date={blog._creationTime}
+          readTime={blog.readTime}
+        />
 
         <div className="mb-4">
           <BlogEmojiReactions initialBlog={blog} />
@@ -77,8 +94,18 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
 
       <section className="prose prose-neutral dark:prose-invert max-w-none text-lg leading-relaxed">
         <ReactMarkdown
+          remarkPlugins={[remarkMetaAsData]}
           rehypePlugins={[[rehypeHighlight, { lowlight }]]}
-          components={{ pre: CodeBlock }}
+          components={{
+            pre: CodeBlock,
+            code({ className, children, ...props }: any) {
+              return (
+                <code className={className} {...props}>
+                  {children}
+                </code>
+              );
+            },
+          }}
         >
           {blog.content}
         </ReactMarkdown>

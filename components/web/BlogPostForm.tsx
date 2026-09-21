@@ -34,6 +34,7 @@ import { useBlogStore } from "@/stores/useBlogStore";
 import { ScrollArea } from "../ui/scroll-area";
 import { useBlogDraft } from "@/hooks/useBlogDraft";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { visit } from "unist-util-visit";
 
 const lowlight = createLowlight();
 lowlight.register("javascript", js);
@@ -84,12 +85,12 @@ function toTitleCase(str: string): string {
 const MemoizedMarkdown = memo(function MemoizedMarkdown({ content }: { content: string }) {
   return (
     <div className="prose prose-neutral dark:prose-invert max-w-none text-base leading-relaxed text-neutral-800 dark:text-neutral-200 break-words">
-        <ReactMarkdown
-            rehypePlugins={[[rehypeHighlight, { lowlight }]]}
-            components={{ pre: CodeBlock }}
-        >
-            {content}
-        </ReactMarkdown>
+      <ReactMarkdown
+        rehypePlugins={[[rehypeHighlight, { lowlight }]]}
+        components={{ pre: CodeBlock }}
+      >
+        {content}
+      </ReactMarkdown>
     </div>
   );
 });
