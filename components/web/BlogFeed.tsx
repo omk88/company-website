@@ -151,14 +151,6 @@ function StandardBlogFeed({
           </ul>
 
           <div ref={loadMoreRef} className="w-full" />
-
-          <div>
-            <Link 
-              href={`/scrolltest`}
-            >
-              <Button>Hello</Button>
-            </Link>
-          </div>
         </>
       )}
     </div>
