@@ -202,8 +202,16 @@ export function CodeBlock({
     <div className="relative my-6 rounded-lg bg-black border border-neutral-800 overflow-hidden shadow-md w-full max-w-full">
       <div className="flex items-center justify-between px-4 h-10 bg-neutral-900/80 border-b border-neutral-800 text-xs">
         <div className="flex items-center gap-2 font-mono text-neutral-400 min-w-0">
-          {(hasKnownLanguage || hasDualVersion || filename) && renderIcon()}
-          {filename && <span className="truncate leading-tight text-neutral-300">{filename}</span>}
+          {(hasKnownLanguage || hasDualVersion || filename) && (
+            <div className="flex items-center justify-center shrink-0">
+              {renderIcon()}
+            </div>
+          )}
+          {filename && (
+            <span className="truncate text-neutral-300 leading-none flex items-center">
+              {filename}
+            </span>
+          )}
         </div>
 
         <div className="flex items-center gap-3 shrink-0">

@@ -33,17 +33,17 @@ export default async function Profile({ params }: ProfileRouteProps) {
     : null;
 
   return (
-    <div className="min-h-screen w-full md:h-screen md:overflow-hidden">
-      <div className="pt-12 w-full md:hidden shrink-0">
+    <div className="min-h-screen w-full">
+      <div className="pt-12 w-full md:hidden">
         <MobileProfileSection
           preloadedProfile={preloadedProfile} 
           preloadedCurrentUser={preloadedCurrentUser} 
         />
       </div>
 
-      <SidebarProvider className="w-full md:flex-1 md:min-h-0">
+      <SidebarProvider className="w-full min-h-screen">
         <aside 
-          className="shrink-0 hidden md:flex"
+          className="hidden md:block shrink-0 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto"
           style={{ "--sidebar-width": "20rem" } as React.CSSProperties}
         >
           <LeftSidebarProfile 
@@ -52,9 +52,9 @@ export default async function Profile({ params }: ProfileRouteProps) {
           />
         </aside>
         
-        <div className="w-full md:flex-1 md:flex md:flex-row md:min-w-0 md:h-full md:min-h-0 md:pt-16">
-          <section id="profile-content-section" className="w-full md:flex-1 md:min-w-0 md:flex md:flex-col md:h-full md:min-h-0">
-            <div className="sticky top-[48px] z-20 bg-background shrink-0 md:static">
+        <div className="w-full md:flex-1 md:flex md:flex-row md:min-w-0 md:pt-16">
+          <section id="profile-content-section" className="w-full md:flex-1 md:min-w-0">
+            <div className="sticky top-12 z-20 bg-background md:static">
               <MobileProfileSwitchBar
                 preloadedProfile={preloadedProfile} 
                 preloadedCurrentUser={preloadedCurrentUser} 
@@ -68,7 +68,10 @@ export default async function Profile({ params }: ProfileRouteProps) {
             />
           </section>
 
-          <aside style={{ "--sidebar-width": "24rem" } as React.CSSProperties} className="w-[24rem] shrink-0 hidden md:flex">
+          <aside 
+            style={{ "--sidebar-width": "24rem" } as React.CSSProperties} 
+            className="hidden md:block w-[24rem] shrink-0 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto"
+          >
             <RightSidebarProfile 
               preloadedProfile={preloadedProfile} 
               preloadedCurrentUser={preloadedCurrentUser} 

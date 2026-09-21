@@ -64,8 +64,8 @@ export function ProfileBlogs({ profile, preloadedData }: ProfileBlogsProps) {
   }, [canLoadMore, loadMore]);
 
   return (
-    <div className="flex flex-col flex-1 w-full p-2 md:min-h-0 md:overflow-y-auto">
-      <div className="w-full mx-auto flex-1">
+    <div className="w-full p-2">
+      <div className="w-full mx-auto">
         {isFirstLoad && displayResults.length === 0 ? (
           <ul className="flex flex-col gap-2">
             {[1, 2, 3].map((i) => (
@@ -75,7 +75,7 @@ export function ProfileBlogs({ profile, preloadedData }: ProfileBlogsProps) {
             ))}
           </ul>
         ) : displayResults.length === 0 ? (
-          <div className="flex flex-col flex-1 h-full min-h-0">
+          <div className="w-full py-8">
             <EmptyState size="sm" description="This user hasn't posted any insights yet." />
           </div>
         ) : (
