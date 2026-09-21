@@ -1,13 +1,17 @@
 "use client";
 
-import React, { useState, useRef, Children, isValidElement } from "react";
+import React, { useState, Children, isValidElement } from "react";
 import Image from "next/image";
-import { Check, Copy } from "lucide-react";
-import { toast } from "sonner";
+import { Check, Copy, FileCode } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { toast } from "sonner";
+import { common, createLowlight } from "lowlight";
 
 import jsIcon from "./jsvector.svg";
 import tsIcon from "./tsvector.svg";
+
+const lowlight = createLowlight(common);
 
 interface CodeElementProps {
   className?: string;
@@ -16,34 +20,94 @@ interface CodeElementProps {
   node?: { meta?: string };
 }
 
+function extractText(node: React.ReactNode): string {
+  if (node === null || node === undefined || typeof node === "boolean") return "";
+  if (typeof node === "string" || typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(extractText).join("");
+  if (isValidElement(node)) return extractText((node.props as any)?.children);
+  return "";
+}
+
+function renderLowlightTree(nodes: any[], keyPrefix = "ll"): React.ReactNode {
+  return nodes.map((node, index) => {
+    const key = `${keyPrefix}-${index}`;
+    if (node.type === "text") return node.value;
+    if (node.type === "element") {
+      const tagName = node.tagName || "span";
+      const props: any = { key };
+      if (node.properties?.className) {
+        props.className = Array.isArray(node.properties.className)
+          ? node.properties.className.join(" ")
+          : node.properties.className;
+      }
+      return React.createElement(
+        tagName,
+        props,
+        renderLowlightTree(node.children || [], key)
+      );
+    }
+    return null;
+  });
+}
+
 export function CodeBlock({
   children,
   ...props
 }: React.HTMLAttributes<HTMLPreElement> & { node?: any; "data-meta"?: string }) {
   const [copied, setCopied] = useState(false);
   const [language, setLanguage] = useState<"ts" | "js">("ts");
-  const preRef = useRef<HTMLPreElement>(null);
 
   const codeChild = Children.toArray(children).find(
     (child): child is React.ReactElement<CodeElementProps> =>
       isValidElement(child) && child.type === "code"
   );
 
-  const rawNodes = Children.toArray(codeChild?.props?.children || children);
+  const className = codeChild?.props?.className || props.className || "";
+  const langMatch = /language-([^\s]+)/.exec(className);
+  const detectedLang = langMatch ? langMatch[1].toLowerCase() : "";
 
-  let topLevelTitle: string | null = null;
-  const nodesWithoutTopTitle: React.ReactNode[] = [];
+  const isTs = detectedLang === "ts" || detectedLang === "typescript" || detectedLang === "tsx";
+  const isJs = detectedLang === "js" || detectedLang === "javascript" || detectedLang === "jsx";
+  const hasKnownLanguage = isTs || isJs;
 
-  rawNodes.forEach((node) => {
-    const text = typeof node === "string" ? node : (node as any)?.props?.children;
-    if (typeof text === "string" && /^\/\/\s*title:\s*(.+)$/m.test(text)) {
-      const match = /^\/\/\s*title:\s*(.+)$/m.exec(text);
-      if (match && !topLevelTitle) {
-        topLevelTitle = match[1].trim();
-        return;
-      }
+  const rawText = extractText(codeChild?.props?.children || children);
+  const lines = rawText.split("\n");
+
+  let topTitle: string | null = null;
+  let tsTitle: string | undefined = undefined;
+  let jsTitle: string | undefined = undefined;
+
+  const tsLines: string[] = [];
+  const jsLines: string[] = [];
+  let currentTarget: "ts" | "js" = "ts";
+  let hasDualVersion = false;
+
+  lines.forEach((line) => {
+    const trimmed = line.trim();
+
+    if (trimmed === "--- JS ---") {
+      currentTarget = "js";
+      hasDualVersion = true;
+      return;
     }
-    nodesWithoutTopTitle.push(node);
+    if (trimmed === "--- TS ---") {
+      currentTarget = "ts";
+      hasDualVersion = true;
+      return;
+    }
+
+    const titleMatch = /^\/\/\s*title:\s*(.+)$/i.exec(trimmed);
+    if (titleMatch) {
+      const extractedTitle = titleMatch[1].trim();
+      if (!topTitle) topTitle = extractedTitle;
+
+      if (currentTarget === "ts" && !tsTitle) tsTitle = extractedTitle;
+      if (currentTarget === "js" && !jsTitle) jsTitle = extractedTitle;
+      return;
+    }
+
+    if (currentTarget === "ts") tsLines.push(line);
+    else jsLines.push(line);
   });
 
   const meta =
@@ -57,124 +121,89 @@ export function CodeBlock({
     ? metaTitleMatch[1] || metaTitleMatch[2] || metaTitleMatch[3]
     : null;
 
-  const baseTitle = topLevelTitle || metaTitle || "";
-
-  const tsNodes: React.ReactNode[] = [];
-  const jsNodes: React.ReactNode[] = [];
-  let tsTitle: string | undefined = undefined;
-  let jsTitle: string | undefined = undefined;
-  let currentTarget: "ts" | "js" = "ts";
-  let hasDualVersion = false;
-
-  nodesWithoutTopTitle.forEach((node) => {
-    const text = typeof node === "string" ? node : (node as any)?.props?.children;
-
-    if (typeof text === "string" && text.includes("--- JS ---")) {
-      currentTarget = "js";
-      hasDualVersion = true;
-      return;
-    }
-    if (typeof text === "string" && text.includes("--- TS ---")) {
-      currentTarget = "ts";
-      hasDualVersion = true;
-      return;
-    }
-
-    if (typeof text === "string" && /^\/\/\s*title:\s*(.+)$/m.test(text)) {
-      const match = /^\/\/\s*title:\s*(.+)$/m.exec(text);
-      if (match) {
-        const val = match[1].trim();
-        if (currentTarget === "ts") tsTitle = val;
-        else jsTitle = val;
-      }
-      return;
-    }
-
-    if (currentTarget === "ts") tsNodes.push(node);
-    else jsNodes.push(node);
-  });
+  const baseTitle = topTitle || metaTitle || "";
 
   const resolveFilename = (
     lang: "ts" | "js",
     fallback: string,
-    tsT?: string,
-    jsT?: string
+    tTitle?: string,
+    jTitle?: string
   ): string => {
     if (lang === "js") {
-      if (jsT) return jsT;
-      if (tsT) return tsT.replace(/\.ts(x)?$/, ".js$1");
+      if (jTitle) return jTitle;
+      if (tTitle) return tTitle.replace(/\.ts(x)?$/, ".js$1");
       return fallback.replace(/\.ts(x)?$/, ".js$1");
     }
-    return tsT || fallback;
+    return tTitle || fallback;
   };
 
-  const filename = resolveFilename(language, baseTitle, tsTitle, jsTitle);
+  const activeLanguage = hasDualVersion ? language : isJs ? "js" : "ts";
+  const filename = resolveFilename(activeLanguage, baseTitle, tsTitle, jsTitle);
 
-  const trimNodeList = (nodes: React.ReactNode[]) => {
-    const result = [...nodes];
-
-    while (result.length > 0) {
-      const first = result[0];
-      if (typeof first === "string") {
-        const trimmed = first.replace(/^[\r\n]+/, "");
-        if (trimmed) {
-          result[0] = trimmed;
-          break;
-        }
-        result.shift();
-      } else {
-        break;
-      }
-    }
-
-    while (result.length > 0) {
-      const lastIdx = result.length - 1;
-      const last = result[lastIdx];
-
-      if (typeof last === "string") {
-        const trimmed = last.replace(/[\r\n]+\s*$/, "");
-        if (trimmed) {
-          result[lastIdx] = trimmed;
-          break;
-        }
-        result.pop();
-      } else {
-        break;
-      }
-    }
-
-    return result;
-  };
-
-  const activeNodes = hasDualVersion
+  const activeCodeLines = hasDualVersion
     ? language === "ts"
-      ? trimNodeList(tsNodes)
-      : trimNodeList(jsNodes)
-    : trimNodeList(nodesWithoutTopTitle);
+      ? tsLines
+      : jsLines
+    : tsLines;
+
+  const cleanCode = activeCodeLines.join("\n").replace(/^[\r\n]+|[\r\n]+\s*$/g, "");
 
   const handleCopy = () => {
-    const codeText = preRef.current?.innerText || "";
-    if (!codeText) return;
-
-    navigator.clipboard.writeText(codeText);
+    if (!cleanCode) return;
+    navigator.clipboard.writeText(cleanCode);
     setCopied(true);
     toast.success("Copied to clipboard!");
-
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const renderIcon = () => {
+    if (activeLanguage === "js") {
+      return (
+        <Image
+          src={jsIcon}
+          alt="JavaScript"
+          width={16}
+          height={16}
+          className="w-4 h-4 rounded-[2px] shrink-0 object-contain"
+        />
+      );
+    }
+    if (activeLanguage === "ts") {
+      return (
+        <Image
+          src={tsIcon}
+          alt="TypeScript"
+          width={16}
+          height={16}
+          className="w-4 h-4 rounded-[2px] shrink-0 object-contain"
+        />
+      );
+    }
+    return <FileCode className="w-4 h-4 text-neutral-500 shrink-0" />;
+  };
+
+  const getHighlightedContent = () => {
+    if (!cleanCode) return null;
+
+    const targetLang = activeLanguage === "ts" ? "typescript" : "javascript";
+    const highlightLang = lowlight.registered(detectedLang)
+      ? detectedLang
+      : targetLang;
+
+    try {
+      const tree = lowlight.highlight(highlightLang, cleanCode);
+      return renderLowlightTree(tree.children);
+    } catch {
+      return cleanCode;
+    }
+  };
+
   return (
-    <div className="relative my-6 rounded-xl bg-black border border-neutral-800 overflow-hidden shadow-md">
-      <div className="flex items-center justify-between px-4 py-2 bg-neutral-900/80 border-b border-neutral-800 text-xs h-10">
+    <div className="relative my-6 rounded-lg bg-black border border-neutral-800 overflow-hidden shadow-md w-full max-w-full">
+      <div className="flex items-center justify-between px-4 h-10 bg-neutral-900/80 border-b border-neutral-800 text-xs">
         <div className="flex items-center gap-2 font-mono text-neutral-400 min-w-0">
-          <Image
-            src={language === "ts" ? tsIcon : jsIcon}
-            alt={language === "ts" ? "TypeScript logo" : "JavaScript logo"}
-            width={16}
-            height={16}
-            className="w-4 h-4 rounded-[2px] shrink-0 object-contain"
-          />
-          <span className="truncate leading-tight text-neutral-300">{filename}</span>
+          {(hasKnownLanguage || hasDualVersion || filename) && renderIcon()}
+          {filename && <span className="truncate leading-tight text-neutral-300">{filename}</span>}
         </div>
 
         <div className="flex items-center gap-3 shrink-0">
@@ -220,15 +249,26 @@ export function CodeBlock({
         </div>
       </div>
 
-      <pre
-        ref={preRef}
-        {...props}
-        className="!bg-black !m-0 !rounded-none p-4 overflow-x-auto text-sm leading-relaxed font-mono"
-      >
-        <code className={`${codeChild?.props?.className || ""} !bg-transparent !p-0 !border-none`}>
-          {activeNodes}
-        </code>
-      </pre>
+      <div className="table table-fixed w-full">
+        <div className="table-cell w-full">
+          <ScrollArea 
+            className="w-full max-h-[500px] rounded-xl"
+            scrollbarInset={4}
+            rightOffset={2}
+            thumbClassName="bg-neutral-800 hover:bg-neutral-700"
+          >
+            <pre
+              {...props}
+              className="hljs !bg-black !m-0 !rounded-none p-4 text-sm leading-relaxed font-mono w-max min-w-full"
+            >
+              <code className={`${className} !bg-transparent !p-0 !border-none [&_*]:!bg-transparent`}>
+                {getHighlightedContent()}
+              </code>
+            </pre>
+            <ScrollBar orientation="horizontal" inset={8} thumbClassName="bg-neutral-800 hover:bg-neutral-700" />
+          </ScrollArea>
+        </div>
+      </div>
     </div>
   );
 }

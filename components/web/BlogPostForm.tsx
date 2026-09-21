@@ -84,7 +84,7 @@ function toTitleCase(str: string): string {
 
 const MemoizedMarkdown = memo(function MemoizedMarkdown({ content }: { content: string }) {
   return (
-    <div className="prose prose-neutral dark:prose-invert max-w-none text-base leading-relaxed text-neutral-800 dark:text-neutral-200 break-words">
+    <div className="prose prose-neutral dark:prose-invert max-w-none text-base leading-relaxed text-neutral-800 dark:text-neutral-200 break-words w-full min-w-0">
       <ReactMarkdown
         rehypePlugins={[[rehypeHighlight, { lowlight }]]}
         components={{
@@ -168,8 +168,9 @@ export const LivePostPreview = memo(function LivePostPreview({
   }, [deferredContent]);
 
   return (
-    <div>
-      <div className="w-full">
+    <div className="w-full min-w-0">
+      <div className="w-full min-w-0">
+        {/* Cover Image */}
         <div className="relative w-full h-[240px] mb-2 overflow-hidden rounded-lg flex items-center justify-center border bg-zinc-50 dark:bg-zinc-900">
           {previewImage ? (
             <img
@@ -184,6 +185,7 @@ export const LivePostPreview = memo(function LivePostPreview({
           )}
         </div>
 
+        {/* Metadata Header */}
         <div className="flex items-center justify-between text-sm text-zinc-600 dark:text-zinc-400 font-normal my-4">
           <div className="flex items-center gap-2">
             {profilePic ? (
@@ -212,6 +214,7 @@ export const LivePostPreview = memo(function LivePostPreview({
           </span>
         </div>
 
+        {/* Title and Subtitle */}
         <div className="flex flex-col gap-4">
           <h1 className="text-2xl font-bold tracking-tight text-neutral-950 dark:text-neutral-50 line-clamp-3">
             {formattedTitle}
@@ -225,7 +228,10 @@ export const LivePostPreview = memo(function LivePostPreview({
 
         {deferredContent.trim() && <Separator className="my-4" />}
 
-        <MemoizedMarkdown content={deferredContent} />
+        {/* Live Preview Container with width constraints */}
+        <div className="w-full min-w-0 overflow-hidden flex-1">
+          <MemoizedMarkdown content={deferredContent} />
+        </div>
       </div>
     </div>
   );
@@ -918,9 +924,9 @@ export default function BlogPostForm() {
                 </div>
 
                 {isDesktop && (
-                    <ScrollArea className="w-full my-4 sm:px-6 overflow-y-auto h-[calc(100%-2rem)] min-h-0">
-                        <div className="w-full">
-                        <LivePostPreview control={control} previewImage={imagePreviewUrl} />
+                    <ScrollArea className="w-full my-4 sm:px-6 overflow-y-auto h-[calc(100%-2rem)] min-h-0 min-w-0 max-w-full">
+                        <div className="w-full min-w-0 overflow-hidden">
+                            <LivePostPreview control={control} previewImage={imagePreviewUrl} />
                         </div>
                     </ScrollArea>
                 )}
