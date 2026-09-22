@@ -129,9 +129,11 @@ const ScrollBar = React.forwardRef<
         {...props}
       >
         <ScrollAreaPrimitive.ScrollAreaThumb
-          style={{ backgroundColor: thumbColor }}
+          style={{
+            ...(thumbColor ? { backgroundColor: thumbColor } : {}),
+          }}
           className={cn(
-            "relative flex-1 rounded-full bg-neutral-700 hover:bg-neutral-600 transition-colors",
+            "relative flex-1 rounded-full bg-border transition-colors",
             thumbClassName
           )}
         />
