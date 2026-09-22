@@ -6,8 +6,6 @@ import { LeftSidebar } from "@/components/web/LeftSidebar";
 import { Suspense } from "react";
 import { BlogCardSkeleton } from "@/components/web/LoadingSkeletons/BlogCardSkeleton";
 import CreatePostButton from "@/components/web/CreatePostButton";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Insights",
@@ -30,7 +28,7 @@ export default function InsightsPage() {
 
         <section 
           id="blog-grid-section" 
-          className="w-full flex-1 flex flex-col h-full min-h-0 bg-white dark:bg-zinc-950 pt-16 md:pt-0"
+          className="w-full flex-1 flex flex-col h-full min-h-0 bg-white dark:bg-zinc-950 pt-24 md:pt-0"
         >
           <div className="flex flex-col flex-1 h-full min-h-0">
             <Suspense fallback={
