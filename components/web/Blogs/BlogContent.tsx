@@ -18,6 +18,9 @@ import { api } from "@/convex/_generated/api";
 import { BlogName } from "./BlogName";
 import { CodeBlock } from "../../../app/(shared-layout)/insights/[blogId]/_components/CodeBlock";
 import { AudioPlayer } from "@/app/(shared-layout)/insights/[blogId]/_components/AudioPlayer";
+import { extractHeadings } from "@/app/(shared-layout)/insights/[blogId]/_utils/extractHeadings";
+import { TableOfContents } from "@/app/(shared-layout)/insights/[blogId]/_components/TableOfContents";
+import rehypeSlug from "rehype-slug";
 
 const lowlight = createLowlight();
 lowlight.register("javascript", js);
@@ -50,6 +53,8 @@ interface BlogContentProps {
 
 export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
   const avatarSrc = blog.profilePicUrl || blog.defaultProfilePicUrl || "/noImage.png";
+
+  const headings = extractHeadings(blog.content);
 
   return (
     <article className="p-2">
@@ -90,11 +95,16 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
         <AudioPlayer audioUrl={blog.audioUrl} title={blog.title} />
       </header>
 
-      <Separator className="my-8" />
+      <Separator className="mt-8" />
+
+      <TableOfContents headings={headings} />
 
       <section className="prose prose-neutral dark:prose-invert max-w-none text-lg leading-relaxed">
         <ReactMarkdown
-          rehypePlugins={[[rehypeHighlight, { lowlight }]]}
+          rehypePlugins={[
+            rehypeSlug,
+            [rehypeHighlight, { lowlight }],
+          ]}
           components={{
             pre: CodeBlock,
             code({ node, className, children, ...props }: any) {
