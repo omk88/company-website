@@ -4,7 +4,6 @@ import React, { useState, Children, isValidElement } from "react";
 import Image from "next/image";
 import { Check, Copy, FileCode } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 import { common, createLowlight } from "lowlight";
 
@@ -199,8 +198,8 @@ export function CodeBlock({
   };
 
   return (
-    <div className="relative my-6 rounded-lg bg-black border border-neutral-800 overflow-hidden shadow-md w-full max-w-full">
-      <div className="flex items-center justify-between px-4 h-10 bg-neutral-900/80 border-b border-neutral-800 text-xs">
+    <div className="not-prose flex flex-col h-[400px] w-full my-6 rounded-lg bg-black border border-neutral-800 shadow-md overflow-hidden min-w-0">
+      <div className="flex items-center justify-between px-4 h-10 shrink-0 bg-neutral-900/80 border-b border-neutral-800 text-xs select-none">
         <div className="flex items-center gap-2 font-mono text-neutral-400 min-w-0">
           {(hasKnownLanguage || hasDualVersion || filename) && (
             <div className="flex items-center justify-center shrink-0">
@@ -257,19 +256,15 @@ export function CodeBlock({
         </div>
       </div>
 
-      <div className="relative w-full overflow-hidden">
-        <ScrollArea className="w-full h-full max-h-[500px]">
-          <pre
-            {...props}
-            className="hljs !bg-black !m-0 !rounded-none p-4 text-sm leading-relaxed font-mono w-max min-w-full block"
-          >
-            <code className={`${className} !bg-transparent !p-0 !border-none [&_*]:!bg-transparent`}>
-              {getHighlightedContent()}
-            </code>
-          </pre>
-          <ScrollBar orientation="vertical" className="bg-neutral-900/50" />
-          <ScrollBar orientation="horizontal" className="bg-neutral-900/50" />
-        </ScrollArea>
+      <div className="flex-1 w-full overflow-auto scrollbar-thin scrollbar-thumb-neutral-800">
+        <pre
+          {...props}
+          className="hljs !bg-black !m-0 p-4 text-sm leading-relaxed font-mono min-w-full w-max block whitespace-pre"
+        >
+          <code className={`${className} !bg-transparent !p-0 !border-none [&_*]:!bg-transparent block`}>
+            {getHighlightedContent()}
+          </code>
+        </pre>
       </div>
     </div>
   );

@@ -99,7 +99,7 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
 
       <TableOfContents headings={headings} />
 
-      <section className="prose prose-neutral dark:prose-invert max-w-none text-lg leading-relaxed">
+      <section className="prose prose-neutral dark:prose-invert max-w-none text-lg leading-relaxed w-full min-w-0 [&_p]:break-words">
         <ReactMarkdown
           rehypePlugins={[
             rehypeSlug,
