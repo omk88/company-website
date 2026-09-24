@@ -101,10 +101,7 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
 
       <section className="prose prose-neutral dark:prose-invert max-w-none text-lg leading-relaxed w-full min-w-0 [&_p]:break-words">
         <ReactMarkdown
-          rehypePlugins={[
-            rehypeSlug,
-            [rehypeHighlight, { lowlight }],
-          ]}
+          rehypePlugins={[rehypeSlug]}
           components={{
             pre: CodeBlock,
             code({ node, className, children, ...props }: any) {
