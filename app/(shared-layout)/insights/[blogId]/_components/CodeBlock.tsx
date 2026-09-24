@@ -198,7 +198,7 @@ export function CodeBlock({
   };
 
   return (
-    <div className="not-prose flex flex-col h-[400px] w-full my-6 rounded-lg bg-black border border-neutral-800 shadow-md overflow-hidden min-w-0">
+    <div className="not-prose flex flex-col h-[200px] w-full my-6 rounded-lg bg-black border border-neutral-800 shadow-md overflow-hidden min-w-0">
       <div className="flex items-center justify-between px-4 h-10 shrink-0 bg-neutral-900/80 border-b border-neutral-800 text-xs select-none">
         <div className="flex items-center gap-2 font-mono text-neutral-400 min-w-0">
           {(hasKnownLanguage || hasDualVersion || filename) && (
