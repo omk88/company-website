@@ -257,25 +257,19 @@ export function CodeBlock({
         </div>
       </div>
 
-      <div className="table table-fixed w-full">
-        <div className="table-cell w-full">
-          <ScrollArea 
-            className="w-full max-h-[500px] rounded-xl"
-            scrollbarInset={4}
-            rightOffset={2}
-            thumbClassName="bg-neutral-800 hover:bg-neutral-700"
+      <div className="relative w-full overflow-hidden">
+        <ScrollArea className="w-full h-full max-h-[500px]">
+          <pre
+            {...props}
+            className="hljs !bg-black !m-0 !rounded-none p-4 text-sm leading-relaxed font-mono w-max min-w-full block"
           >
-            <pre
-              {...props}
-              className="hljs !bg-black !m-0 !rounded-none p-4 text-sm leading-relaxed font-mono w-max min-w-full"
-            >
-              <code className={`${className} !bg-transparent !p-0 !border-none [&_*]:!bg-transparent`}>
-                {getHighlightedContent()}
-              </code>
-            </pre>
-            <ScrollBar orientation="horizontal" inset={8} thumbClassName="bg-neutral-800 hover:bg-neutral-700" />
-          </ScrollArea>
-        </div>
+            <code className={`${className} !bg-transparent !p-0 !border-none [&_*]:!bg-transparent`}>
+              {getHighlightedContent()}
+            </code>
+          </pre>
+          <ScrollBar orientation="vertical" className="bg-neutral-900/50" />
+          <ScrollBar orientation="horizontal" className="bg-neutral-900/50" />
+        </ScrollArea>
       </div>
     </div>
   );
