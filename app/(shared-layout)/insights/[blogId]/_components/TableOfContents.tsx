@@ -3,6 +3,7 @@
 import * as React from "react";
 import { ChevronDown } from "lucide-react";
 import { Heading } from "../_utils/extractHeadings";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface TOCProps {
   headings: Heading[];
@@ -51,8 +52,8 @@ export function TableOfContents({ headings }: TOCProps) {
 
   return (
     <div
-        ref={dropdownRef}
-        className="sticky top-13.5 md:top-16 z-40 w-full mb-8 border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950"
+      ref={dropdownRef}
+      className="sticky top-13.5 md:top-16 z-40 w-full mb-8 border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950"
     >
       <div className="relative max-w-none px-2">
         <button
@@ -78,35 +79,37 @@ export function TableOfContents({ headings }: TOCProps) {
         </button>
 
         {isOpen && (
-          <div className="absolute top-full left-0 right-0 z-50 max-h-64 overflow-y-auto border-t bg-white p-3">
-            <div className="space-y-1">
-              {headings.map((heading) => {
-                const isActive = heading.id === activeId;
-                const indentClass =
-                  heading.level === 1
-                    ? "pl-0"
-                    : heading.level === 2
-                    ? "pl-3"
-                    : heading.level === 3
-                    ? "pl-6"
-                    : "pl-9";
+          <div className="absolute top-full left-0 right-0 z-50 border-t bg-white dark:bg-neutral-950 shadow-md">
+            <ScrollArea className="h-64 p-3">
+              <div className="space-y-1">
+                {headings.map((heading) => {
+                  const isActive = heading.id === activeId;
+                  const indentClass =
+                    heading.level === 1
+                      ? "pl-0"
+                      : heading.level === 2
+                      ? "pl-3"
+                      : heading.level === 3
+                      ? "pl-6"
+                      : "pl-9";
 
-                return (
-                  <a
-                    key={heading.id}
-                    href={`#${heading.id}`}
-                    onClick={() => setIsOpen(false)}
-                    className={`block text-sm py-1 transition-colors rounded-sm ${indentClass} ${
-                      isActive
-                        ? "text-blue-600 dark:text-blue-400 font-medium"
-                        : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
-                    }`}
-                  >
-                    {heading.text}
-                  </a>
-                );
-              })}
-            </div>
+                  return (
+                    <a
+                      key={heading.id}
+                      href={`#${heading.id}`}
+                      onClick={() => setIsOpen(false)}
+                      className={`block text-sm py-1 transition-colors rounded-sm ${indentClass} ${
+                        isActive
+                          ? "text-blue-600 dark:text-blue-400 font-medium"
+                          : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+                      }`}
+                    >
+                      {heading.text}
+                    </a>
+                  );
+                })}
+              </div>
+            </ScrollArea>
           </div>
         )}
       </div>
