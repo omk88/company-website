@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
-import { ArrowUpIcon, PlusIcon } from "lucide-react";
+import React, { useState, useRef, useLayoutEffect, useEffect } from "react";
+import Link from "next/link";
+import { ArrowUpIcon, PlusIcon, Loader2 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -12,6 +13,7 @@ export default function MessagingContent() {
   const { activeConversationId, activeUserProfile } = useMessageStore();
   const [inputText, setInputText] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const isInitialLoadRef = useRef(true);
 
   const messages = useQuery(
     api.messaging.getMessagesByConversation,
@@ -22,12 +24,21 @@ export default function MessagingContent() {
 
   const sendMessageMutation = useMutation(api.messaging.sendMessage);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
   useEffect(() => {
-    scrollToBottom();
+    isInitialLoadRef.current = true;
+  }, [activeConversationId]);
+
+  useLayoutEffect(() => {
+    if (!messages || messages.length === 0) return;
+
+    if (isInitialLoadRef.current) {
+      messagesEndRef.current?.scrollIntoView({
+        behavior: "instant" as ScrollBehavior,
+      });
+      isInitialLoadRef.current = false;
+    } else {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
   }, [messages]);
 
   const handleSendMessage = async (e?: React.FormEvent) => {
@@ -56,88 +67,102 @@ export default function MessagingContent() {
 
   if (!activeConversationId) {
     return (
-      <div className="flex flex-col items-center justify-center w-full h-full text-slate-400">
+      <div className="flex flex-col items-center justify-center w-full h-full text-slate-400 bg-white dark:bg-slate-900">
         <p className="text-sm">Select a conversation to start messaging</p>
       </div>
     );
   }
 
+  const isLoading = messages === undefined;
+  const username = activeUserProfile?.username || "";
+  const displayName = activeUserProfile?.displayName || username || "User";
+
   return (
     <div className="flex flex-col w-full h-full overflow-hidden bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 font-sans">
-      <header className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 px-6 py-2 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shrink-0">
-        <div className="flex items-center gap-3">
+      <header className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 px-4 py-2 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shrink-0">
+        <Link
+          href={`/${username}`}
+          className="group flex items-center gap-3 p-1.5 px-3 -ml-1.5 rounded-xl hover:bg-accent hover:text-accent-foreground transition-colors duration-100 cursor-pointer min-w-0"
+        >
           <div className="h-10 w-10 border border-border rounded-full overflow-hidden bg-muted shrink-0">
             {activeUserProfile?.avatarUrl ? (
               <img
                 src={activeUserProfile.avatarUrl}
-                alt="profile"
+                alt={username || "Profile"}
                 className="h-full w-full object-cover"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center font-bold text-xs">
-                {activeUserProfile?.displayName?.[0]?.toUpperCase() ?? "?"}
+              <div className="w-full h-full flex items-center justify-center font-bold text-xs text-slate-600 dark:text-slate-300">
+                {(displayName[0] ?? "?").toUpperCase()}
               </div>
             )}
           </div>
-          <div>
-            <h1 className="text-sm font-semibold tracking-tight text-slate-900 dark:text-slate-100">
-              {activeUserProfile?.displayName ?? "User"}
+
+          <div className="flex flex-col min-w-0">
+            <h1 className="text-sm font-semibold tracking-tight text-slate-900 dark:text-slate-100 truncate leading-tight group-hover:text-accent-foreground">
+              {displayName}
             </h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-              @{activeUserProfile?.username ?? "username"}
+            <p className="text-xs text-zinc-600 dark:text-zinc-400 group-hover:text-accent-foreground/80 truncate mt-0.5">
+              @{username}
             </p>
           </div>
-        </div>
+        </Link>
       </header>
 
-      <div className="flex-1 min-h-0 relative">
-        <ScrollArea className="h-full w-full">
-          <div className="p-4 md:p-6 space-y-4">
-            {messages?.map((msg) => {
-              const isUser = msg.senderId !== activeUserProfile?.userId;
+      <div className="flex-1 min-h-0 relative bg-white dark:bg-slate-900">
+        {isLoading ? (
+          <div className="w-full h-full flex items-center justify-center text-slate-400 dark:text-slate-500">
+            <Loader2 className="h-5 w-5 animate-spin" />
+          </div>
+        ) : (
+          <ScrollArea className="h-full w-full">
+            <div className="p-4 md:p-6 space-y-4">
+              {messages.map((msg) => {
+                const isUser = msg.senderId !== activeUserProfile?.userId;
 
-              return (
-                <div
-                  key={msg._id}
-                  className={`w-full flex ${
-                    isUser ? "justify-end" : "justify-start"
-                  } animate-in fade-in slide-in-from-bottom-2 duration-300`}
-                >
+                return (
                   <div
-                    className={`flex gap-2.5 max-w-[85%] ${
-                      isUser ? "flex-row-reverse" : "flex-row"
+                    key={msg._id}
+                    className={`w-full flex ${
+                      isUser ? "justify-end" : "justify-start"
                     }`}
                   >
                     <div
-                      className={`flex flex-col gap-1 max-w-[80%] ${
-                        isUser ? "items-end" : "items-start"
+                      className={`flex gap-2.5 max-w-[85%] ${
+                        isUser ? "flex-row-reverse" : "flex-row"
                       }`}
                     >
-                      <div className="text-sm leading-relaxed">
-                        <div
-                          className={`px-4 py-2.5 rounded-2xl shadow-sm transition-all duration-200 ${
-                            isUser
-                              ? "bg-blue-600 text-white rounded-br-none"
-                              : "bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-bl-none"
-                          }`}
-                        >
-                          <div className="break-words">{msg.content}</div>
+                      <div
+                        className={`flex flex-col gap-1 max-w-[80%] ${
+                          isUser ? "items-end" : "items-start"
+                        }`}
+                      >
+                        <div className="text-sm leading-relaxed">
+                          <div
+                            className={`px-4 py-2.5 rounded-2xl shadow-sm transition-all duration-200 ${
+                              isUser
+                                ? "bg-blue-600 text-white rounded-br-none"
+                                : "bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-bl-none"
+                            }`}
+                          >
+                            <div className="break-words">{msg.content}</div>
+                          </div>
                         </div>
+                        <span className="text-[10px] text-slate-400 px-1 mt-0.5">
+                          {new Date(msg._creationTime).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </span>
                       </div>
-                      <span className="text-[10px] text-slate-400 px-1 mt-0.5">
-                        {new Date(msg._creationTime).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </span>
                     </div>
                   </div>
-                </div>
-              );
-            })}
-            <div ref={messagesEndRef} />
-          </div>
-        </ScrollArea>
+                );
+              })}
+              <div ref={messagesEndRef} />
+            </div>
+          </ScrollArea>
+        )}
       </div>
 
       <footer className="p-4 md:p-6 bg-slate-50/50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 shrink-0">
