@@ -29,6 +29,7 @@ import { cn } from "@/lib/utils";
 import { ProfileSettingsButton } from "./ProfileSettingsButton";
 import { Badge } from "../ui/badge";
 import { ScrollArea } from "../ui/scroll-area";
+import MessageButton from "./MessageButton";
 
 interface RightSidebarProfileProps {
   preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
@@ -157,13 +158,17 @@ export function RightSidebarProfile({ preloadedProfile, preloadedCurrentUser }: 
                         <span>{profile.totalLikes ?? 0}</span>
                       </div>
                       {!isSelf && (
-                        <div className="ml-auto">
+                        <div className="ml-auto flex flex-row gap-2">
                           <FollowButton
                             userId={profile.userId}
                             displayName={displayName}
                             username={profile.username}
                             initialIsFollowing={isFollowing}
                             initialIsBell={isBell}
+                          />
+
+                          <MessageButton
+                            recipientId={profile.userId}
                           />
                         </div>
                       )}
