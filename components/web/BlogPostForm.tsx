@@ -34,7 +34,6 @@ import { useBlogStore } from "@/stores/useBlogStore";
 import { ScrollArea } from "../ui/scroll-area";
 import { useBlogDraft } from "@/hooks/useBlogDraft";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { visit } from "unist-util-visit";
 
 const lowlight = createLowlight();
 lowlight.register("javascript", js);
