@@ -252,6 +252,26 @@ const schema = defineSchema({
   })
     .index("by_user", ["userId"]),
 
+
+  conversations: defineTable({
+    participantIds: v.array(v.string()), 
+    lastMessageId: v.optional(v.id("messages")),
+    lastMessageContent: v.optional(v.string()),
+    lastMessageSenderId: v.optional(v.string()),
+    updatedAt: v.number(),
+  })
+    .index("by_updatedAt", ["updatedAt"]),
+
+  messages: defineTable({
+    conversationId: v.id("conversations"),
+    senderId: v.string(),
+    content: v.string(),
+    mediaUrl: v.optional(v.string()),
+    mediaType: v.optional(v.union(v.literal("image"), v.literal("file"))),
+    readBy: v.array(v.string()), 
+  })
+    .index("by_conversation", ["conversationId"]),
+
 });
 
 export default schema;
