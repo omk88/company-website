@@ -2,6 +2,56 @@ import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { paginationOptsValidator } from "convex/server";
 
+export const getMessagesByConversation = query({
+  args: {
+    conversationId: v.optional(v.id("conversations")),
+  },
+  handler: async (ctx, args) => {
+    if (!args.conversationId) return [];
+
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return [];
+
+    return await ctx.db
+      .query("messages")
+      .withIndex("by_conversation", (q) =>
+        q.eq("conversationId", args.conversationId!)
+      )
+      .order("asc")
+      .collect();
+  },
+});
+
+export const sendMessage = mutation({
+  args: {
+    conversationId: v.id("conversations"),
+    content: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
+
+    const currentUserId = identity.subject;
+    const now = Date.now();
+
+    const messageId = await ctx.db.insert("messages", {
+      conversationId: args.conversationId,
+      senderId: currentUserId,
+      content: args.content,
+      readBy: [currentUserId],
+    });
+
+    await ctx.db.patch(args.conversationId, {
+      lastMessageId: messageId,
+      lastMessageContent: args.content,
+      lastMessageSenderId: currentUserId,
+      updatedAt: now,
+    });
+
+    return messageId;
+  },
+});
+
 export const listConversations = query({
   args: {
     paginationOpts: paginationOptsValidator,
