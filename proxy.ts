@@ -10,7 +10,11 @@ export async function proxy(request: NextRequest) {
 
     const sessionTokenValue = prodCookie?.value || devCookie?.value || "";
 
-    if (pathname.startsWith("/company") && sessionTokenValue.trim() === "") {
+    const isProtectedRoute = 
+      pathname.startsWith("/company") || 
+      pathname.startsWith("/create-blog");
+
+    if (isProtectedRoute && sessionTokenValue.trim() === "") {
         url.pathname = "/sign-in";
         return NextResponse.redirect(url);
     }
@@ -19,5 +23,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ["/company/:path*", "/insights"],
+    matcher: ["/company/:path*", "/insights", "/create-blog/:path*"],
 };
