@@ -252,7 +252,6 @@ const schema = defineSchema({
   })
     .index("by_user", ["userId"]),
 
-
   conversations: defineTable({
     participantIds: v.array(v.string()), 
     lastMessageId: v.optional(v.id("messages")),
@@ -263,14 +262,22 @@ const schema = defineSchema({
     .index("by_updatedAt", ["updatedAt"])
     .index("by_participant", ["participantIds"]),
 
+  conversationMembers: defineTable({
+    conversationId: v.id("conversations"),
+    userId: v.string(),
+  })
+    .index("by_user", ["userId"]),
+
   messages: defineTable({
     conversationId: v.id("conversations"),
     senderId: v.string(),
+    recipientId: v.string(),
     content: v.string(),
     mediaUrl: v.optional(v.string()),
     mediaType: v.optional(v.union(v.literal("image"), v.literal("file"))),
     readBy: v.array(v.string()), 
   })
+    .index("by_recipient", ["recipientId"])
     .index("by_conversation", ["conversationId"]),
 
 });

@@ -34,9 +34,18 @@ export const sendMessage = mutation({
     const currentUserId = identity.subject;
     const now = Date.now();
 
+    const conversation = await ctx.db.get(args.conversationId);
+    if (!conversation) throw new Error("Conversation not found");
+
+    const recipientId = conversation.participantIds.find(
+      (id) => id !== currentUserId
+    );
+    if (!recipientId) throw new Error("Invalid conversation participants");
+
     const messageId = await ctx.db.insert("messages", {
       conversationId: args.conversationId,
       senderId: currentUserId,
+      recipientId: recipientId,
       content: args.content,
       readBy: [currentUserId],
     });
@@ -132,15 +141,13 @@ export const getOrCreateAndStartConversation = mutation({
       throw new Error("Cannot start a conversation with yourself.");
     }
 
-    const existingConversation = await ctx.db
-      .query("conversations")
-      .filter((q) =>
-        q.or(
-          q.eq(q.field("participantIds"), [currentUserId, args.participantId]),
-          q.eq(q.field("participantIds"), [args.participantId, currentUserId])
-        )
-      )
-      .first();
+    const allConversations = await ctx.db.query("conversations").collect();
+
+    const existingConversation = allConversations.find(
+      (conv) =>
+        conv.participantIds.includes(currentUserId) &&
+        conv.participantIds.includes(args.participantId)
+    );
 
     let conversationId = existingConversation?._id;
     const now = Date.now();
@@ -157,6 +164,7 @@ export const getOrCreateAndStartConversation = mutation({
     const messageId = await ctx.db.insert("messages", {
       conversationId,
       senderId: currentUserId,
+      recipientId: args.participantId,
       content: args.initialMessage,
       readBy: [currentUserId],
     });

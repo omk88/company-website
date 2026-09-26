@@ -37,26 +37,11 @@ export const getNotifications = query({
       .withIndex("by_authorId", (q) => q.eq("authorId", args.userId))
       .collect();
 
-    const userConversations = await ctx.db
-      .query("conversations")
-      .collect();
-
-    const activeConversations = userConversations.filter((c) =>
-      c.participantIds.includes(args.userId)
-    );
-
-    const messagePromises = activeConversations.map(async (conv) => {
-      const messages = await ctx.db
-        .query("messages")
-        .withIndex("by_conversation", (q) => q.eq("conversationId", conv._id))
-        .order("desc")
-        .take(10);
-
-      return messages.filter((m) => m.senderId !== args.userId);
-    });
-
-    const nestedMessages = await Promise.all(messagePromises);
-    const messageItems = nestedMessages.flat();
+    const incomingMessages = await ctx.db
+      .query("messages")
+      .withIndex("by_recipient", (q) => q.eq("recipientId", args.userId))
+      .order("desc")
+      .take(20);
 
     let blogItems: Array<any> = [];
     if (follows.length > 0) {
@@ -350,13 +335,11 @@ export const getNotifications = query({
       ),
 
       Promise.all(
-        messageItems.map(async (message) => {
+        incomingMessages.map(async (message) => {
           const senderProfile = await ctx.db
             .query("profiles")
             .withIndex("by_userId", (q) => q.eq("userId", message.senderId))
             .unique();
-
-          const isUnreadByMessage = !message.readBy.includes(args.userId);
 
           return {
             _id: message._id,
@@ -375,7 +358,7 @@ export const getNotifications = query({
             defaultProfilePic: senderProfile?.defaultProfilePic
               ? await ctx.storage.getUrl(senderProfile.defaultProfilePic)
               : null,
-            isUnread: isUnreadByMessage || message._creationTime > lastRead,
+            isUnread: message._creationTime > lastRead,
           };
         })
       ),
@@ -393,11 +376,15 @@ export const getNotifications = query({
 
     const pageSize = args.paginationOpts.numItems;
     const selectedPage = allNotifications.slice(0, pageSize);
+    const isDone = allNotifications.length <= pageSize;
+
+    const lastItem = selectedPage[selectedPage.length - 1];
+    const continueCursor = isDone || !lastItem ? "" : String(lastItem.createdAt);
 
     return {
       page: selectedPage,
-      isDone: allNotifications.length <= pageSize,
-      continueCursor: "",
+      isDone,
+      continueCursor,
     };
   },
 });
