@@ -19,6 +19,7 @@ import {
   Heart,
   Smile,
   ThumbsUp,
+  MessageCircle,
 } from "lucide-react";
 import {
   Tooltip,
@@ -41,6 +42,7 @@ import ReactionsNotificationCard from "./ReactionsNotificationCard";
 import BlogLikesNotificationCard from "./BlogLikesNotificationCard";
 import CommentLikesNotificationCard from "./CommentLikesNotificationCard";
 import { AnimatePresence, motion } from "framer-motion";
+import MessageNotificationCard from "./MessageNotificationCard";
 
 interface NavbarAuthClientProps {
   initialIsAuth: boolean;
@@ -140,13 +142,27 @@ type ReactionNotification = {
   isUnread?: boolean;
 };
 
+type MessageNotification = {
+  _id: string;
+  notificationType: "message";
+  content: string;
+  createdAt: number;
+  author: string;
+  authorUsername: string;
+  authorDisplayName?: string;
+  profilePic?: string | null;
+  defaultProfilePic?: string | null;
+  isUnread?: boolean;
+};
+
 type NotificationItem = 
   | BlogNotification 
   | CommentNotification 
   | FollowNotification 
   | CommentLikesNotification
   | ReactionNotification
-  | BlogLikesNotification;
+  | BlogLikesNotification
+  | MessageNotification;
 
 interface AuthorGroup {
   groupKey: string;
@@ -154,7 +170,7 @@ interface AuthorGroup {
   authorName: string;
   authorAvatar: string;
   isUnreadGroup: boolean;
-  type: "blog" | "comment" | "follow" | "reaction" | "blogLike" | "commentLike";
+  type: "blog" | "comment" | "follow" | "reaction" | "blogLike" | "commentLike" | "message";
   items: NotificationItem[];
 }
 
@@ -460,9 +476,13 @@ export function NavbarAuthClient({
                                                 ? totalCount === 1
                                                   ? "like"
                                                   : "likes"
-                                                : totalCount === 1
+                                                : group.type === "commentLike"
+                                                ? totalCount === 1
                                                   ? "like"
-                                                  : "likes" 
+                                                  : "likes"
+                                                : totalCount === 1
+                                                  ? "message" 
+                                                  : "messages"
                                               }
                                             </span>
                                           );
@@ -478,8 +498,10 @@ export function NavbarAuthClient({
                                           <Library className="h-3.5 w-3.5 text-muted-foreground" />
                                         ) : group.type === "blogLike" ? (
                                           <ThumbsUp className="h-3.5 w-3.5 text-muted-foreground" />
-                                        ) : (
+                                        ) : group.type === "commentLike" ? (
                                           <ThumbsUp className="h-3.5 w-3.5 text-muted-foreground" />
+                                        ) : (
+                                          <MessageCircle className="h-3.5 w-3.5 text-muted-foreground" />
                                         )}
                                       </div>
                                     </div>
@@ -546,6 +568,15 @@ export function NavbarAuthClient({
                                             _id={item._id}
                                             title={item.title}
                                             imageUrl={item.imageUrl ?? undefined}
+                                            createdAt={item.createdAt}
+                                            isUnread={item.isUnread}
+                                            onNotificationClick={() => setOpenNotifications(false)}
+                                          />
+                                        ) : item.notificationType === "message" ? (
+                                          <MessageNotificationCard
+                                            key={item._id}
+                                            _id={item._id}
+                                            content={item.content}
                                             createdAt={item.createdAt}
                                             isUnread={item.isUnread}
                                             onNotificationClick={() => setOpenNotifications(false)}

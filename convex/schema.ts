@@ -260,7 +260,8 @@ const schema = defineSchema({
     lastMessageSenderId: v.optional(v.string()),
     updatedAt: v.number(),
   })
-    .index("by_updatedAt", ["updatedAt"]),
+    .index("by_updatedAt", ["updatedAt"])
+    .index("by_participant", ["participantIds"]),
 
   messages: defineTable({
     conversationId: v.id("conversations"),

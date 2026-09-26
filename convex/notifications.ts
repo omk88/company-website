@@ -37,6 +37,27 @@ export const getNotifications = query({
       .withIndex("by_authorId", (q) => q.eq("authorId", args.userId))
       .collect();
 
+    const userConversations = await ctx.db
+      .query("conversations")
+      .collect();
+
+    const activeConversations = userConversations.filter((c) =>
+      c.participantIds.includes(args.userId)
+    );
+
+    const messagePromises = activeConversations.map(async (conv) => {
+      const messages = await ctx.db
+        .query("messages")
+        .withIndex("by_conversation", (q) => q.eq("conversationId", conv._id))
+        .order("desc")
+        .take(10);
+
+      return messages.filter((m) => m.senderId !== args.userId);
+    });
+
+    const nestedMessages = await Promise.all(messagePromises);
+    const messageItems = nestedMessages.flat();
+
     let blogItems: Array<any> = [];
     if (follows.length > 0) {
       const postPromises = follows.map((follow) =>
@@ -135,6 +156,7 @@ export const getNotifications = query({
       enrichedVotes,
       enrichedCommentVotes,
       enrichedReactions,
+      enrichedMessages,
     ] = await Promise.all([
       Promise.all(
         blogItems.map(async (blog) => {
@@ -326,6 +348,37 @@ export const getNotifications = query({
           };
         })
       ),
+
+      Promise.all(
+        messageItems.map(async (message) => {
+          const senderProfile = await ctx.db
+            .query("profiles")
+            .withIndex("by_userId", (q) => q.eq("userId", message.senderId))
+            .unique();
+
+          const isUnreadByMessage = !message.readBy.includes(args.userId);
+
+          return {
+            _id: message._id,
+            notificationType: "message" as const,
+            conversationId: message.conversationId,
+            content: message.content,
+            mediaType: message.mediaType,
+            createdAt: message._creationTime,
+            author: message.senderId,
+            authorUsername: senderProfile?.username ?? "",
+            authorDisplayName:
+              senderProfile?.displayName || senderProfile?.username || "",
+            profilePic: senderProfile?.profilePic
+              ? await ctx.storage.getUrl(senderProfile.profilePic)
+              : null,
+            defaultProfilePic: senderProfile?.defaultProfilePic
+              ? await ctx.storage.getUrl(senderProfile.defaultProfilePic)
+              : null,
+            isUnread: isUnreadByMessage || message._creationTime > lastRead,
+          };
+        })
+      ),
     ]);
 
     const allNotifications = [
@@ -335,6 +388,7 @@ export const getNotifications = query({
       ...enrichedVotes,
       ...enrichedCommentVotes,
       ...enrichedReactions,
+      ...enrichedMessages,
     ].sort((a, b) => b.createdAt - a.createdAt);
 
     const pageSize = args.paginationOpts.numItems;
