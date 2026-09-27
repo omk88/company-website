@@ -4,10 +4,81 @@ import React, { useState, useRef, useLayoutEffect, useEffect } from "react";
 import Link from "next/link";
 import { ArrowUpIcon, PlusIcon, Loader2 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useMessageStore } from "@/stores/useMessageStore";
+
+function MessagingContentSkeleton() {
+  return (
+    <div className="flex flex-col w-full h-full overflow-hidden bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 font-sans">
+      <header className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 px-4 py-2 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shrink-0">
+        <div className="flex items-center gap-3 p-1.5 px-3 -ml-1.5 min-w-0">
+          <Skeleton className="h-10 w-10 rounded-full shrink-0" />
+          <div className="flex flex-col gap-1.5 min-w-0">
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-3 w-20" />
+          </div>
+        </div>
+      </header>
+
+      <div className="flex-1 min-h-0 relative bg-white dark:bg-slate-900">
+        <ScrollArea className="h-full w-full">
+          <div className="p-4 md:p-6 space-y-4">
+            <div className="w-full flex justify-start">
+              <div className="flex gap-2.5 max-w-[85%] flex-row">
+                <div className="flex flex-col gap-1 items-start">
+                  <Skeleton className="h-12 w-48 rounded-2xl rounded-bl-none" />
+                  <Skeleton className="h-2.5 w-12 mt-0.5" />
+                </div>
+              </div>
+            </div>
+
+            <div className="w-full flex justify-end">
+              <div className="flex gap-2.5 max-w-[85%] flex-row-reverse">
+                <div className="flex flex-col gap-1 items-end">
+                  <Skeleton className="h-16 w-64 rounded-2xl rounded-br-none" />
+                  <Skeleton className="h-2.5 w-12 mt-0.5" />
+                </div>
+              </div>
+            </div>
+
+            <div className="w-full flex justify-start">
+              <div className="flex gap-2.5 max-w-[85%] flex-row">
+                <div className="flex flex-col gap-1 items-start">
+                  <Skeleton className="h-10 w-36 rounded-2xl rounded-bl-none" />
+                  <Skeleton className="h-2.5 w-12 mt-0.5" />
+                </div>
+              </div>
+            </div>
+
+            <div className="w-full flex justify-end">
+              <div className="flex gap-2.5 max-w-[85%] flex-row-reverse">
+                <div className="flex flex-col gap-1 items-end">
+                  <Skeleton className="h-10 w-52 rounded-2xl rounded-br-none" />
+                  <Skeleton className="h-2.5 w-12 mt-0.5" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </ScrollArea>
+      </div>
+
+      <footer className="p-4 md:p-6 bg-slate-50/50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 shrink-0">
+        <div className="w-full">
+          <div className="flex flex-col border border-slate-200 dark:border-slate-700 rounded-2xl bg-white dark:bg-slate-800 p-3 gap-3">
+            <Skeleton className="h-10 w-full bg-slate-100 dark:bg-slate-800" />
+            <div className="flex justify-between items-center w-full pt-1">
+              <Skeleton className="h-8 w-8 rounded-xl" />
+              <Skeleton className="h-9 w-9 rounded-xl" />
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
 
 export default function MessagingContent() {
   const { activeConversationId, activeUserProfile } = useMessageStore();
@@ -66,11 +137,7 @@ export default function MessagingContent() {
   };
 
   if (!activeConversationId) {
-    return (
-      <div className="flex flex-col items-center justify-center w-full h-full text-slate-400 bg-white dark:bg-slate-900">
-        <p className="text-sm">Select a conversation to start messaging</p>
-      </div>
-    );
+    return <MessagingContentSkeleton />;
   }
 
   const isLoading = messages === undefined;
