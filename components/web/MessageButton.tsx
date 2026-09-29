@@ -12,24 +12,19 @@ interface MessageButtonProps {
 
 export default function MessageButton({ recipientId }: MessageButtonProps) {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
   
   const startConversation = useMutation(api.messaging.getOrCreateAndStartConversation);
 
   const handleMessageClick = async () => {
-    if (isLoading) return;
-    setIsLoading(true);
 
     try {
       const conversationId = await startConversation({
-        participantId: recipientId,
-        initialMessage: "Hey there!",
+        participantId: recipientId
       });
 
-      router.push(`/messaging/`);
+      router.push(`/inbox/`);
     } catch (error) {
       console.error("Failed to start conversation:", error);
-      setIsLoading(false);
     }
   };
 
@@ -37,11 +32,10 @@ export default function MessageButton({ recipientId }: MessageButtonProps) {
     <div>
       <Button
         onClick={handleMessageClick}
-        disabled={isLoading}
         variant="default"
         className="cursor-pointer text-sm sm:text-xs w-full h-full box-border leading-none rounded-full font-medium transition-colors disabled:opacity-50"
       >
-        {isLoading ? "Starting Chat..." : "Message"}
+        Message
       </Button>
     </div>
   );

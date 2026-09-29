@@ -87,9 +87,7 @@ export default function LeftSidebarMessaging() {
               <ConversationSkeleton key={i} />
             ))
           ) : results.length === 0 ? (
-            <div className="p-8 text-center text-sm text-slate-500 dark:text-slate-400">
-              No conversations yet.
-            </div>
+            null
           ) : (
             <>
               {results.map((chat) => {
@@ -159,9 +157,7 @@ export default function LeftSidebarMessaging() {
                           {chat.lastMessageContent}
                         </p>
                       ) : (
-                        <p className="text-xs text-slate-400 italic mt-0.5">
-                          No messages yet
-                        </p>
+                        null
                       )}
                     </div>
                   </button>

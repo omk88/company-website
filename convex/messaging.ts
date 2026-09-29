@@ -127,7 +127,6 @@ export const listConversations = query({
 export const getOrCreateAndStartConversation = mutation({
   args: {
     participantId: v.string(),
-    initialMessage: v.string(),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -149,31 +148,13 @@ export const getOrCreateAndStartConversation = mutation({
         conv.participantIds.includes(args.participantId)
     );
 
-    let conversationId = existingConversation?._id;
-    const now = Date.now();
-
-    if (!conversationId) {
-      conversationId = await ctx.db.insert("conversations", {
-        participantIds: [currentUserId, args.participantId],
-        lastMessageContent: args.initialMessage,
-        lastMessageSenderId: currentUserId,
-        updatedAt: now,
-      });
+    if (existingConversation) {
+      return existingConversation._id;
     }
 
-    const messageId = await ctx.db.insert("messages", {
-      conversationId,
-      senderId: currentUserId,
-      recipientId: args.participantId,
-      content: args.initialMessage,
-      readBy: [currentUserId],
-    });
-
-    await ctx.db.patch(conversationId, {
-      lastMessageId: messageId,
-      lastMessageContent: args.initialMessage,
-      lastMessageSenderId: currentUserId,
-      updatedAt: now,
+    const conversationId = await ctx.db.insert("conversations", {
+      participantIds: [currentUserId, args.participantId],
+      updatedAt: Date.now(),
     });
 
     return conversationId;
