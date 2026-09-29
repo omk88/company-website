@@ -9,6 +9,7 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useMessageStore } from "@/stores/useMessageStore";
+import { Button } from "@/components/ui/button";
 
 function MessagingContentSkeleton() {
   return (
@@ -208,7 +209,7 @@ export default function MessagingContent() {
                           <div
                             className={`px-4 py-2.5 rounded-2xl shadow-sm transition-all duration-200 ${
                               isUser
-                                ? "bg-blue-600 text-white rounded-br-none"
+                                ? "bg-black dark:bg-slate-900 text-white rounded-br-none"
                                 : "bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-bl-none"
                             }`}
                           >
@@ -232,16 +233,16 @@ export default function MessagingContent() {
         )}
       </div>
 
-      <footer className="p-4 md:p-6 bg-slate-50/50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 shrink-0">
+      <footer className="p-4 bg-slate-50/50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 shrink-0">
         <div className="w-full relative">
           <form onSubmit={handleSendMessage} className="w-full">
-            <div className="flex flex-col border border-slate-200 dark:border-slate-700 rounded-2xl bg-white dark:bg-slate-800 shadow-sm focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition-all">
+            <div className="flex flex-col border border-slate-200 rounded-2xl bg-white transition-all">
               <div className="min-h-[56px] w-full px-4 pt-3 pb-1">
                 <textarea
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Type a message... (Press Enter to send)"
+                  placeholder="Type a message..."
                   className="w-full resize-none bg-transparent text-sm outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-800 dark:text-slate-100"
                   rows={2}
                 />
@@ -250,19 +251,19 @@ export default function MessagingContent() {
               <div className="flex justify-between items-center w-full px-3 pb-2 pt-1 border-t border-slate-100 dark:border-slate-700/50">
                 <button
                   type="button"
-                  className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors"
+                  className="cursor-pointer p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors"
                 >
                   <PlusIcon className="h-4 w-4" />
                 </button>
 
-                <button
+                <Button
                   type="submit"
+                  variant={"default"}
                   disabled={!inputText.trim()}
-                  className="p-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-40 text-white transition-all shadow-sm flex items-center justify-center"
+                  className="h-9 w-9 cursor-pointer rounded-full p-0 disabled:opacity-40 text-white transition-all flex items-center justify-center shrink-0"
                 >
                   <ArrowUpIcon className="h-4 w-4" />
-                  <span className="sr-only">Send message</span>
-                </button>
+                </Button>
               </div>
             </div>
           </form>
