@@ -482,6 +482,14 @@ export const updatePost = mutation({
       imageUrl: finalImageUrl,
     });
 
+    await ctx.scheduler.runAfter(0, internal.tts.generateAudio, {
+      blogId,
+      content: args.content,
+      title: args.title,
+      author: args.displayName || args.username,
+      subtitle: args.subtitle
+    });
+
     return blogId;
   },
 });
