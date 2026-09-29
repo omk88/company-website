@@ -1,6 +1,15 @@
-import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup } from "@/components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
+import { NavItem } from "@/components/web/SidebarNav";
+import { Trash2 } from "lucide-react";
+
+const NAV_ITEMS: NavItem[] = [
+  { id: "delete", label: "Delete Conversation", icon: Trash2 },
+];
 
 export default function LeftSidebarMessaging() {
+
+    const handleNavClick = (item: NavItem) => {};
+
     return (
       <Sidebar
         side="right"
@@ -10,6 +19,31 @@ export default function LeftSidebarMessaging() {
       >
         <SidebarContent className="!p-0 w-full overflow-x-hidden">
           <SidebarGroup className="pt-3 !px-2 w-full flex flex-col">
+
+            <SidebarMenu 
+              className={"flex w-full gap-1flex-col gap-0.5"}
+            >
+              {NAV_ITEMS.map((item) => {
+                const Icon = item.icon;
+
+                return (
+                  <SidebarMenuItem 
+                    key={item.id} 
+                    className={"w-full"}
+                  >
+                    <SidebarMenuButton
+                      onClick={() => handleNavClick(item)}
+                      className={`
+                        group !cursor-pointer justify-start px-2.5 py-1.5 rounded-lg text-lg md:text-sm transition-colors
+                      `}
+                    >
+                      <Icon className="h-4 w-4 shrink-0 stroke-[2.5] transition-colors" />
+                      <span>{item.label}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
 
           </SidebarGroup>
         </SidebarContent>
