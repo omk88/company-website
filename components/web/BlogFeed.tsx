@@ -6,8 +6,6 @@ import { useEffect, useRef, useSyncExternalStore } from "react";
 import { BlogCard } from "./BlogCard";
 import { BlogCardSkeleton } from "./LoadingSkeletons/BlogCardSkeleton";
 import { EmptyState } from "./EmptyState";
-import Link from "next/link";
-import { Button } from "../ui/button";
 
 interface BlogFeedProps {
   postType?: "community" | "team";

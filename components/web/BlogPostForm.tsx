@@ -41,7 +41,6 @@ lowlight.register("js", js);
 lowlight.register("typescript", ts);
 lowlight.register("ts", ts);
 
-
 interface BlogFormValues {
     title: string;
     subtitle: string;

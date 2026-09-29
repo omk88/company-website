@@ -6,7 +6,7 @@ import { internal } from "./_generated/api";
 import { PollyClient, SynthesizeSpeechCommand } from "@aws-sdk/client-polly";
 
 function chunkText(text: string, maxChunkLength = 1800): string[] {
-  const sentences = text.match(/[^.!?\n]+[.!?\n]+(\s+|$)\vert{}[^.!?\n]+$/g) || [text];
+  const sentences = text.match(/[^.!?\n]+[.!?\n]+(\s+|$)/g) || [text];
   const chunks: string[] = [];
   let currentChunk = "";
 
@@ -55,12 +55,14 @@ export const generateAudio = internalAction({
   handler: async (ctx, args) => {
     try {
       const cleanedBody = args.content
+        .replace(/```[\s\S]*?```/g, " See code block for more information. ")
+        .replace(/!\[.*?\]\(.*?\)/g, " See image for more information. ")
         .replace(/<[^>]*>/g, "")
         .replace(/[#*`~_\[\]()]/g, "")
-        .replace(/\n+/g, " ")
+        .replace(/\s+/g, " ")
         .trim();
 
-      let intro = `${args.title.trim()} by${args.author.trim()}.`;
+      let intro = `${args.title.trim()} by ${args.author.trim()}.`;
 
       if (args.subtitle && args.subtitle.trim()) {
         const cleanedSubtitle = args.subtitle
@@ -71,7 +73,7 @@ export const generateAudio = internalAction({
         intro += ` ${cleanedSubtitle}.`;
       }
 
-      const plainText = `${intro} ${cleanedBody}`;
+      const plainText = `${intro}${cleanedBody}`;
 
       const accessKeyId = (process.env.AWS_ACCESS_KEY_ID || "").trim();
       const secretAccessKey = (process.env.AWS_SECRET_ACCESS_KEY || "").trim();
@@ -93,7 +95,7 @@ export const generateAudio = internalAction({
       const audioBuffers: Buffer[] = [];
 
       for (const [index, chunk] of textChunks.entries()) {
-        console.log(`Processing chunk ${index + 1}/${textChunks.length} - Character Count: ${chunk.length}`);
+        console.log(`Processing chunk ${index + 1}/${textChunks.length} \vert{} Character Count:${chunk.length}`);
 
         const command = new SynthesizeSpeechCommand({
           OutputFormat: "mp3",
