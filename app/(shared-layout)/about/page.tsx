@@ -1,4 +1,4 @@
-import PersonCard from "@/components/PersonCard";
+import PersonCard from "@/components/web/PersonCard";
 import Footer from "@/components/web/Footer";
 import HeroTitle from "@/components/web/HeroTitle";
 import OurValues from "@/components/web/OurValues";

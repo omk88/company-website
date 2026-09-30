@@ -160,3 +160,40 @@ export const getOrCreateAndStartConversation = mutation({
     return conversationId;
   },
 });
+
+export const deleteConversation = mutation({
+  args: {
+    conversationId: v.id("conversations")
+  },
+  handler: async(ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Unauthorized: You must be logged in.");
+    }
+
+    const existingConversation = await ctx.db.get(args.conversationId);
+    if (!existingConversation) {
+      throw new Error("Conversation not found.")
+    }
+
+    const messages = await ctx.db
+      .query("messages")
+      .withIndex("by_conversation", (q) => q.eq("conversationId", args.conversationId))
+      .collect();
+
+    for (const message of messages) {
+      await ctx.db.delete(message._id)
+    }
+
+    const members = await ctx.db
+      .query("conversationMembers")
+      .withIndex("by_conversation", (q) => q.eq("conversationId", args.conversationId))
+      .collect();
+
+    for (const member of members) {
+      await ctx.db.delete(member._id);
+    }
+
+    await ctx.db.delete(args.conversationId);
+  }
+})

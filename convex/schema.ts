@@ -266,7 +266,8 @@ const schema = defineSchema({
     conversationId: v.id("conversations"),
     userId: v.string(),
   })
-    .index("by_user", ["userId"]),
+    .index("by_user", ["userId"])
+    .index("by_conversation", ["conversationId"]),
 
   messages: defineTable({
     conversationId: v.id("conversations"),
