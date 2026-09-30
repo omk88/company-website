@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, UIEvent } from "react";
-import { usePaginatedQuery } from "convex/react";
+import { useMutation, usePaginatedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Search, X, Loader2 } from "lucide-react";
 
@@ -21,6 +21,19 @@ export function SearchFollowers({ userId, onSelectUser }: FollowersPopoverProps)
   const searchTerm = useSearchStore((state) => state.searchTerm);
   const setSearchTerm = useSearchStore((state) => state.setSearchTerm);
   const [localValue, setLocalValue] = useState(searchTerm);
+
+  const startConversation = useMutation(api.messaging.getOrCreateAndStartConversation);
+  
+  const handleFollowerClick = async (recipientId: string) => {
+    try {
+        const conversationId = await startConversation({
+            participantId: recipientId
+        });
+
+    } catch (error) {
+        console.error("Failed to start conversation:", error);
+    }
+  };
 
   useEffect(() => {
     setLocalValue(searchTerm);
@@ -112,6 +125,7 @@ export function SearchFollowers({ userId, onSelectUser }: FollowersPopoverProps)
                   key={follower._id}
                   onClick={() => {
                     if (onSelectUser) onSelectUser(follower);
+                    handleFollowerClick(follower.userId);
                     setOpen(false);
                   }}
                   className="flex items-center gap-3 p-2 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800/60 cursor-pointer transition-colors"
