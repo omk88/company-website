@@ -14,6 +14,7 @@ interface MessageStore {
     conversationId: string | null,
     userProfile?: OtherUserProfile | null
   ) => void;
+  clearStore: () => void;
 }
 
 export const useMessageStore = create<MessageStore>((set) => ({
@@ -24,4 +25,5 @@ export const useMessageStore = create<MessageStore>((set) => ({
       activeConversationId: conversationId,
       activeUserProfile: userProfile,
     }),
+  clearStore: () => set({ activeConversationId: null, activeUserProfile: null }),
 }));

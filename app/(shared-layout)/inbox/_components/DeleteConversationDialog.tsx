@@ -6,6 +6,7 @@ import { api } from "@/convex/_generated/api";
 import { useMutation } from "convex/react";
 import { Id } from "@/convex/_generated/dataModel";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useMessageStore } from "@/stores/useMessageStore";
 
 
 interface DeleteConversationDialogProps {
@@ -23,6 +24,8 @@ export function DeleteConversationDialog({
     onOpenChange: setControlledOpen, 
     onSuccess 
 }: DeleteConversationDialogProps) {
+
+    const clearStore = useMessageStore((state) => state.clearStore);
 
     const [isDeleting, setIsDeleting] = useState(false);
     const [internalOpen, setInternalOpen] = useState(false);
@@ -45,6 +48,7 @@ export function DeleteConversationDialog({
         try {
             await deleteConversationMutation({ conversationId });
             toast.error("Conversation deleted successfully.");
+            clearStore();
             handleOpenChange(false);
             onSuccess?.();
         } catch (error) {
