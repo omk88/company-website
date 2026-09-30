@@ -170,7 +170,8 @@ export const getProfileByUsername = query({
 
 export const getProfileFollowers = query({
   args: {
-    userId: v.string(), 
+    userId: v.string(),
+    search: v.optional(v.string()), 
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
@@ -187,6 +188,14 @@ export const getProfileFollowers = query({
           .unique();
 
         if (!followerProfile) return null;
+
+        if (args.search && args.search.trim() !== "") {
+          const term = args.search.toLowerCase();
+          const matchesUsername = followerProfile.username?.toLowerCase().includes(term);
+          const matchesDisplayName = followerProfile.displayName?.toLowerCase().includes(term);
+
+          if (!matchesUsername && !matchesDisplayName) return null;
+        }
 
         const picUrl = followerProfile.profilePic
           ? await ctx.storage.getUrl(followerProfile.profilePic)
@@ -208,7 +217,9 @@ export const getProfileFollowers = query({
 
     return {
       ...page,
-      page: followers.filter(Boolean),
+      page: followers.filter(
+        (follower): follower is NonNullable<typeof follower> => follower !== null
+      ),
     };
   },
 });

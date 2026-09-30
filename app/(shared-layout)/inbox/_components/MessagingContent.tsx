@@ -144,12 +144,10 @@ export default function MessagingContent() {
     }
   };
 
-  // 1. If no conversation is active/selected, show empty state (e.g. after deletion)
   if (!activeConversationId) {
     return <EmptyMessagingState />;
   }
 
-  // 2. If a conversation IS selected, but messages query hasn't resolved yet, show loading skeleton
   if (messages === undefined) {
     return <MessagingContentSkeleton />;
   }

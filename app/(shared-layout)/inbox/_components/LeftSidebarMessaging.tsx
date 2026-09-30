@@ -8,6 +8,7 @@ import { MessageSquare, Loader2 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SearchFollowers } from "./SearchFollowers";
+import { useCurrentUser } from "@/app/ConvexClientProvider";
 
 function ConversationSkeleton() {
   return (
@@ -26,6 +27,7 @@ function ConversationSkeleton() {
 
 export default function LeftSidebarMessaging() {
   const { activeConversationId, setActiveConversation } = useMessageStore();
+  const userData = useCurrentUser();
 
   const { results, status, loadMore } = usePaginatedQuery(
     api.messaging.listConversations,
@@ -44,13 +46,6 @@ export default function LeftSidebarMessaging() {
   const isInitialLoading = !hasLoadedDataRef.current;
   const isLoadingMore = status === "LoadingMore";
   const isDone = status === "Exhausted";
-
-  useEffect(() => {
-    if (!activeConversationId && results.length > 0) {
-      const firstChat = results[0];
-      setActiveConversation(firstChat._id, firstChat.otherUserProfile);
-    }
-  }, [activeConversationId, results, setActiveConversation]);
 
   useEffect(() => {
     if (isDone || isLoadingMore || isInitialLoading) return;
@@ -76,9 +71,9 @@ export default function LeftSidebarMessaging() {
     <aside className="pt-20 p-4 w-80 h-full border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col shrink-0">
       <div className="flex flex-col gap-2">
         <div className="h-9">
-          <SearchFollowers />
+          <SearchFollowers userId={userData?.userId} />
         </div>
-        <div className="border-b p-2 border-slate-200 dark:border-slate-800 flex items-center gap-1.5">
+        <div className="border-b p-2 mb-2 border-slate-200 dark:border-slate-800 flex items-center gap-1.5">
           <MessageSquare className="h-4 w-4" />
           <h2 className="font-semibold text-slate-900 dark:text-slate-100 text-sm">
             Messages
@@ -87,7 +82,7 @@ export default function LeftSidebarMessaging() {
       </div>
 
       <ScrollArea className="flex-1">
-        <div className="p-2 space-y-1">
+        <div className="space-y-1">
           {isInitialLoading ? (
             Array.from({ length: 6 }).map((_, i) => (
               <ConversationSkeleton key={i} />
