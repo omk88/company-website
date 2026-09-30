@@ -2,12 +2,10 @@
 
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 import { NavItem } from "@/components/web/SidebarNav";
-import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useMessageStore } from "@/stores/useMessageStore";
-import { useMutation } from "convex/react";
 import { Trash2 } from "lucide-react";
-import { toast } from "sonner";
+import { DeleteConversationDialog } from "./DeleteConversationDialog";
 
 const NAV_ITEMS: NavItem[] = [
   { id: "delete", label: "Delete Conversation", icon: Trash2 },
@@ -16,18 +14,6 @@ const NAV_ITEMS: NavItem[] = [
 export default function RightSidebarMessaging() {
 
     const conversationId = useMessageStore((state) => state.activeConversationId) as Id<"conversations">;
-    const deleteConversationMutation = useMutation(api.messaging.deleteConversation);
-
-    const handleNavClick = async (item: NavItem) => {
-      if (!conversationId) return;
-
-      try {
-        await deleteConversationMutation({ conversationId })
-        toast.error("Conversation deleted successfully.");
-      } catch {
-        toast.error("Error deleting conversation.");
-      }
-    };
 
     return (
       <Sidebar
@@ -50,15 +36,20 @@ export default function RightSidebarMessaging() {
                     key={item.id} 
                     className={"w-full"}
                   >
-                    <SidebarMenuButton
-                      onClick={() => handleNavClick(item)}
-                      className={`
-                        group !cursor-pointer justify-start px-2.5 py-1.5 rounded-lg text-lg md:text-sm transition-colors
-                      `}
-                    >
-                      <Icon className="h-4 w-4 shrink-0 stroke-[2.5] transition-colors" />
-                      <span>{item.label}</span>
-                    </SidebarMenuButton>
+                    <DeleteConversationDialog
+                      conversationId={conversationId}
+                      onSuccess={() => {}}
+                      trigger={
+                        <SidebarMenuButton
+                          className={`
+                            group !cursor-pointer justify-start px-2.5 py-1.5 rounded-lg text-lg md:text-sm transition-colors
+                          `}
+                        >
+                          <Icon className="h-4 w-4 shrink-0 stroke-[2.5] transition-colors" />
+                          <span>{item.label}</span>
+                        </SidebarMenuButton>
+                      }
+                    />
                   </SidebarMenuItem>
                 );
               })}
