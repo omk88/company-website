@@ -1,14 +1,33 @@
+"use client";
+
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 import { NavItem } from "@/components/web/SidebarNav";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+import { useMessageStore } from "@/stores/useMessageStore";
+import { useMutation } from "convex/react";
 import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 const NAV_ITEMS: NavItem[] = [
   { id: "delete", label: "Delete Conversation", icon: Trash2 },
 ];
 
-export default function LeftSidebarMessaging() {
+export default function RightSidebarMessaging() {
 
-    const handleNavClick = (item: NavItem) => {};
+    const conversationId = useMessageStore((state) => state.activeConversationId) as Id<"conversations">;
+    const deleteConversationMutation = useMutation(api.messaging.deleteConversation);
+
+    const handleNavClick = async (item: NavItem) => {
+      if (!conversationId) return;
+
+      try {
+        await deleteConversationMutation({ conversationId })
+        toast.error("Conversation deleted successfully.");
+      } catch {
+        toast.error("Error deleting conversation.");
+      }
+    };
 
     return (
       <Sidebar
@@ -21,7 +40,7 @@ export default function LeftSidebarMessaging() {
           <SidebarGroup className="pt-3 !px-2 w-full flex flex-col">
 
             <SidebarMenu 
-              className={"flex w-full gap-1flex-col gap-0.5"}
+              className={"flex w-full gap-1 flex-col gap-0.5"}
             >
               {NAV_ITEMS.map((item) => {
                 const Icon = item.icon;
