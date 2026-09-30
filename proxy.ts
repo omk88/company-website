@@ -13,7 +13,7 @@ export async function proxy(request: NextRequest) {
     const isProtectedRoute = 
       pathname.startsWith("/company") || 
       pathname.startsWith("/create-blog") ||
-      pathname.startsWith("/messaging");
+      pathname.startsWith("/inbox");
 
     if (isProtectedRoute && sessionTokenValue.trim() === "") {
         url.pathname = "/sign-in";
@@ -28,6 +28,6 @@ export const config = {
       "/company/:path*", 
       "/insights", 
       "/create-blog/:path*", 
-      "/messaging/:path*"
+      "/inbox/:path*"
     ],
 };
