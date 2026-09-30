@@ -7,6 +7,7 @@ import { useMessageStore } from "@/stores/useMessageStore";
 import { MessageSquare, Loader2 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SearchFollowers } from "./SearchFollowers";
 
 function ConversationSkeleton() {
   return (
@@ -72,12 +73,17 @@ export default function LeftSidebarMessaging() {
   }, [isDone, isLoadingMore, isInitialLoading, status, loadMore]);
 
   return (
-    <aside className="w-80 h-full border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col shrink-0">
-      <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center gap-2">
-        <MessageSquare className="h-5 w-5 text-blue-600 dark:text-blue-500" />
-        <h2 className="font-semibold text-slate-900 dark:text-slate-100 text-lg">
-          Messages
-        </h2>
+    <aside className="pt-20 p-4 w-80 h-full border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col shrink-0">
+      <div className="flex flex-col gap-2">
+        <div className="h-9">
+          <SearchFollowers />
+        </div>
+        <div className="border-b p-2 border-slate-200 dark:border-slate-800 flex items-center gap-1.5">
+          <MessageSquare className="h-4 w-4" />
+          <h2 className="font-semibold text-slate-900 dark:text-slate-100 text-sm">
+            Messages
+          </h2>
+        </div>
       </div>
 
       <ScrollArea className="flex-1">
