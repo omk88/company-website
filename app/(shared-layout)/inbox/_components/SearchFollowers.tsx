@@ -10,6 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useSearchStore } from "@/stores/useSearchStore";
+import { useMessageStore } from "@/stores/useMessageStore";
 
 interface FollowersPopoverProps {
   userId: string | undefined;
@@ -21,15 +22,30 @@ export function SearchFollowers({ userId, onSelectUser }: FollowersPopoverProps)
   const searchTerm = useSearchStore((state) => state.searchTerm);
   const setSearchTerm = useSearchStore((state) => state.setSearchTerm);
   const [localValue, setLocalValue] = useState(searchTerm);
+  const { activeConversationId, setActiveConversation } = useMessageStore();
 
   const startConversation = useMutation(api.messaging.getOrCreateAndStartConversation);
   
-  const handleFollowerClick = async (recipientId: string) => {
+  const handleFollowerClick = async (follower: {
+    userId: string;
+    username: string;
+    displayName?: string;
+    profilePicUrl?: string | null;
+    defaultProfilePic?: string | null;
+  }) => {
     try {
-        const conversationId = await startConversation({
-            participantId: recipientId
+            const conversationId = await startConversation({
+            participantId: follower.userId,
         });
 
+        if (conversationId) {
+            setActiveConversation(conversationId, {
+                userId: follower.userId,
+                username: follower.username,
+                displayName: follower.displayName || follower.username,
+                avatarUrl: follower.profilePicUrl || follower.defaultProfilePic || null,
+            });
+        }
     } catch (error) {
         console.error("Failed to start conversation:", error);
     }
@@ -125,7 +141,7 @@ export function SearchFollowers({ userId, onSelectUser }: FollowersPopoverProps)
                   key={follower._id}
                   onClick={() => {
                     if (onSelectUser) onSelectUser(follower);
-                    handleFollowerClick(follower.userId);
+                    handleFollowerClick(follower);
                     setOpen(false);
                   }}
                   className="flex items-center gap-3 p-2 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800/60 cursor-pointer transition-colors"
