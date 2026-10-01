@@ -10,9 +10,11 @@ export default function MainLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <>
+    <div className="min-h-screen flex flex-col relative w-full overflow-x-clip">
       <Navbar />
-      {children}
-    </>
+      <main>
+        {children}
+      </main>
+    </div>
   );
 }

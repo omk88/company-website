@@ -17,15 +17,27 @@ export function TableOfContents({ headings }: TOCProps) {
   React.useEffect(() => {
     if (headings.length === 0) return;
 
+    const visibleHeadings = new Map<string, IntersectionObserverEntry>();
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            setActiveId(entry.target.id);
+            visibleHeadings.set(entry.target.id, entry);
+          } else {
+            visibleHeadings.delete(entry.target.id);
           }
         });
+
+        const sorted = Array.from(visibleHeadings.values()).sort(
+          (a, b) => a.target.getBoundingClientRect().top - b.target.getBoundingClientRect().top
+        );
+
+        if (sorted.length > 0) {
+          setActiveId(sorted[0].target.id);
+        }
       },
-      { rootMargin: "0px 0px -70% 0px" }
+      { rootMargin: "-10% 0px -65% 0px", threshold: 0 }
     );
 
     headings.forEach((heading) => {
@@ -50,26 +62,35 @@ export function TableOfContents({ headings }: TOCProps) {
 
   const activeHeading = headings.find((h) => h.id === activeId);
 
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    e.preventDefault();
+    setIsOpen(false);
+    setActiveId(id);
+
+    const targetElement = document.getElementById(id);
+    if (targetElement) {
+      targetElement.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
   return (
     <div
       ref={dropdownRef}
-      className="sticky top-13.5 md:top-16 z-40 w-full mb-8 border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950"
+      className="sticky top-12 md:top-16 z-40 w-full h-12 mb-8 border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 transform-gpu touch-pan-y"
     >
-      <div className="relative max-w-none px-2">
+      <div className="relative max-w-none px-2 h-full">
         <button
           onClick={() => setIsOpen((prev) => !prev)}
-          className="cursor-pointer flex items-center justify-between w-full py-3 text-sm text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white transition-colors"
+          className="cursor-pointer flex items-center justify-between w-full h-full text-sm text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white transition-colors"
           aria-expanded={isOpen}
         >
-          <div className="flex items-center gap-2 overflow-hidden truncate pr-4">
+          <div className="flex items-center gap-2 overflow-hidden truncate pr-4 min-w-0 h-full leading-none">
             <span className="font-medium text-neutral-500 dark:text-neutral-400 shrink-0">
-              On this page
+              On this page:
             </span>
-            {activeHeading && (
-              <span className="font-semibold text-neutral-900 dark:text-white truncate">
-                {activeHeading.text}
-              </span>
-            )}
+            <span className="font-semibold text-neutral-900 dark:text-white truncate">
+              {activeHeading ? activeHeading.text : "Overview"}
+            </span>
           </div>
           <ChevronDown
             className={`h-4 w-4 shrink-0 transition-transform duration-200 ${
@@ -79,7 +100,7 @@ export function TableOfContents({ headings }: TOCProps) {
         </button>
 
         {isOpen && (
-          <div className="absolute top-full left-0 right-0 z-50 border-t bg-white dark:bg-neutral-950 shadow-md">
+          <div className="absolute top-full left-0 right-0 z-50 border-t border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 shadow-lg">
             <ScrollArea className="h-64 p-3">
               <div className="space-y-1">
                 {headings.map((heading) => {
@@ -97,10 +118,10 @@ export function TableOfContents({ headings }: TOCProps) {
                     <a
                       key={heading.id}
                       href={`#${heading.id}`}
-                      onClick={() => setIsOpen(false)}
-                      className={`block text-sm py-1 transition-colors rounded-sm ${indentClass} ${
+                      onClick={(e) => handleLinkClick(e, heading.id)}
+                      className={`block text-sm py-1.5 transition-colors rounded-sm ${indentClass} ${
                         isActive
-                          ? "text-blue-600 dark:text-blue-400 font-medium"
+                          ? "text-blue-600 dark:text-blue-400 font-medium bg-neutral-100 dark:bg-neutral-900/50"
                           : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
                       }`}
                     >
