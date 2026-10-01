@@ -86,7 +86,7 @@ export const sendMessage = mutation({
 
     await ctx.db.patch(args.conversationId, {
       lastMessageId: messageId,
-      lastMessageContent: args.mediaUrl ? "📷 Image" : args.content,
+      lastMessageContent: args.mediaUrl ? "%%%image%%%" : args.content,
       lastMessageSenderId: currentUserId,
       updatedAt: now,
     });

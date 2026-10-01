@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { usePaginatedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useMessageStore } from "@/stores/useMessageStore";
-import { MessageSquare, Loader2 } from "lucide-react";
+import { MessageSquare, Loader2, Camera, Image } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SearchFollowers } from "./SearchFollowers";
@@ -152,10 +152,15 @@ export default function LeftSidebarMessaging() {
                     </div>
 
                     {chat.lastMessageContent && (
-                      <div className="pl-[52px] w-full">
-                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                          {chat.lastMessageContent}
-                        </p>
+                      <div className="pl-[52px] w-full text-xs text-slate-500 dark:text-slate-400 truncate">
+                        {chat.lastMessageContent === "%%%image%%%" ? (
+                          <div className="flex flex-row items-center gap-0.5">
+                            <Image className="h-4 w-4" />
+                            <p>Image</p>
+                          </div>
+                        ) : (
+                          <p>{chat.lastMessageContent}</p>
+                        )}
                       </div>
                     )}
                   </button>
