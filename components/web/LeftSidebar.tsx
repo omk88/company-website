@@ -1,11 +1,15 @@
 import { Separator } from "../ui/separator";
-import { Sidebar, SidebarContent, SidebarGroup, SidebarFooter } from "../ui/sidebar";
+import { Sidebar, SidebarContent, SidebarGroup, SidebarFooter, SidebarMenuButton } from "../ui/sidebar";
 import { SidebarSearch } from "./SidebarSearch";
 import { SidebarSort } from "./SidebarSort";
 import { SidebarTags } from "./SidebarTags";
 import { SidebarNav } from "./SidebarNav";
+import { Gavel } from "lucide-react";
 
 export async function LeftSidebar() {
+
+  const buttonStyleClass = "group !cursor-pointer justify-start px-2.5 py-1.5 rounded-lg text-lg md:text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/60 transition-colors w-full";
+
   return (
     <>
       <nav className="flex md:hidden flex-col w-full border-b bg-background/95 backdrop-blur-md py-4.5 gap-2 fixed top-10 left-0 z-30">
@@ -50,6 +54,12 @@ export async function LeftSidebar() {
               </div>
             </div>
           </SidebarGroup>
+          <div className="px-2">
+            <SidebarMenuButton className={buttonStyleClass}>
+              <Gavel className="h-4 w-4 shrink-0 stroke-[2.5] transition-colors" />
+              <span>Platform Rules</span>
+            </SidebarMenuButton>
+          </div>
         </SidebarContent>
         <SidebarFooter className="hidden" />
       </Sidebar>
