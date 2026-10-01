@@ -118,7 +118,7 @@ export default function SignInForm() {
                                 name="rememberMe"
                                 control={control}
                                 render={({ field }) => (
-                                    <Field orientation="horizontal" className="space-x-2">
+                                    <Field orientation="horizontal">
                                         <Checkbox
                                             id="remember-me-checkbox"
                                             checked={field.value}
