@@ -15,7 +15,9 @@ import {
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 
-import { Library, MessageSquareText, Bookmark, UsersRound, UserRoundCheck } from "lucide-react";
+import { Library, MessageSquareText, Bookmark, UsersRound, UserRoundCheck, Inbox } from "lucide-react";
+import { useCurrentUser } from "@/app/ConvexClientProvider";
+import Link from "next/link";
 
 interface LeftSidebarProfileProps {
   preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
@@ -50,6 +52,11 @@ export function LeftSidebarProfile({ preloadedProfile }: LeftSidebarProfileProps
   const selectedMetric = useProfileStore((state) => state.selectedMetric);
   const setSelectedMetric = useProfileStore((state) => state.setSelectedMetric);
 
+  const currentUser = useCurrentUser();
+  const isOwnProfile = Boolean(currentUser?.userId && profileData.profile?.userId && currentUser.userId === profileData.profile.userId);
+
+  const buttonStyleClass = "group !cursor-pointer justify-start px-2.5 py-1.5 rounded-lg text-lg md:text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/60 transition-colors w-full";
+
   return (
     <Sidebar 
       className="flex flex-col !top-16 !z-40 border-r"
@@ -60,6 +67,25 @@ export function LeftSidebarProfile({ preloadedProfile }: LeftSidebarProfileProps
         <SidebarGroup className="pt-3 !px-2 w-full">
           
           <SidebarMenu className="w-full flex flex-col gap-0.5">
+            {isOwnProfile && 
+              <div className="flex flex-col gap-2 mb-2">
+                <SidebarMenuItem className="w-full">
+                  <SidebarMenuButton
+                    asChild
+                    className={buttonStyleClass}
+                  >
+                    <Link href="/inbox">
+                      <Inbox className="h-4 w-4 shrink-0 stroke-[2.5] transition-colors" />
+                      
+                      <span className="flex items-center gap-1">
+                        Inbox
+                      </span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <Separator />
+              </div>
+            }
             {NAV_ITEMS.map((item) => {
               const Icon = item.icon;
               const isActive = selectedMetric === item.id;
