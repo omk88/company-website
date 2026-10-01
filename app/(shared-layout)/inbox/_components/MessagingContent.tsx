@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useLayoutEffect, useEffect } from "react";
 import Link from "next/link";
-import { ArrowUpIcon, PlusIcon, Loader2, MessageSquare } from "lucide-react";
+import { ArrowUpIcon, PlusIcon, Loader2, MessageSquare, X } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery, useMutation } from "convex/react";
@@ -11,86 +11,30 @@ import { Id } from "@/convex/_generated/dataModel";
 import { useMessageStore } from "@/stores/useMessageStore";
 import { Button } from "@/components/ui/button";
 
-function MessagingContentSkeleton() {
+function MessageImage({ storageId }: { storageId: Id<"_storage"> }) {
+  const imageUrl = useQuery(api.messaging.getMediaUrl, { storageId });
+
+  if (!imageUrl) {
+    return <Skeleton className="h-48 w-64 rounded-xl" />;
+  }
+
   return (
-    <div className="flex flex-col w-full h-full overflow-hidden bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 font-sans">
-      <header className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 px-4 py-2 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shrink-0">
-        <div className="flex items-center gap-3 p-1.5 px-3 -ml-1.5 min-w-0">
-          <Skeleton className="h-10 w-10 rounded-full shrink-0" />
-          <div className="flex flex-col gap-1.5 min-w-0">
-            <Skeleton className="h-4 w-32" />
-            <Skeleton className="h-3 w-20" />
-          </div>
-        </div>
-      </header>
-
-      <div className="flex-1 min-h-0 relative bg-white dark:bg-slate-900">
-        <ScrollArea className="h-full w-full">
-          <div className="p-4 md:p-6 space-y-4">
-            <div className="w-full flex justify-start">
-              <div className="flex gap-2.5 max-w-[85%] flex-row">
-                <div className="flex flex-col gap-1 items-start">
-                  <Skeleton className="h-12 w-48 rounded-2xl rounded-bl-none" />
-                  <Skeleton className="h-2.5 w-12 mt-0.5" />
-                </div>
-              </div>
-            </div>
-
-            <div className="w-full flex justify-end">
-              <div className="flex gap-2.5 max-w-[85%] flex-row-reverse">
-                <div className="flex flex-col gap-1 items-end">
-                  <Skeleton className="h-16 w-64 rounded-2xl rounded-br-none" />
-                  <Skeleton className="h-2.5 w-12 mt-0.5" />
-                </div>
-              </div>
-            </div>
-
-            <div className="w-full flex justify-start">
-              <div className="flex gap-2.5 max-w-[85%] flex-row">
-                <div className="flex flex-col gap-1 items-start">
-                  <Skeleton className="h-10 w-36 rounded-2xl rounded-bl-none" />
-                  <Skeleton className="h-2.5 w-12 mt-0.5" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </ScrollArea>
-      </div>
-
-      <footer className="p-4 md:p-6 bg-slate-50/50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 shrink-0">
-        <div className="w-full">
-          <div className="flex flex-col border border-slate-200 dark:border-slate-700 rounded-2xl bg-white dark:bg-slate-800 p-3 gap-3">
-            <Skeleton className="h-10 w-full bg-slate-100 dark:bg-slate-800" />
-            <div className="flex justify-between items-center w-full pt-1">
-              <Skeleton className="h-8 w-8 rounded-xl" />
-              <Skeleton className="h-9 w-9 rounded-xl" />
-            </div>
-          </div>
-        </div>
-      </footer>
-    </div>
-  );
-}
-
-function EmptyMessagingState() {
-  return (
-    <div className="flex flex-col items-center justify-center w-full h-full bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 p-6 text-center">
-      <div className="h-16 w-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-4 text-slate-400 dark:text-slate-500">
-        <MessageSquare className="h-8 w-8" />
-      </div>
-      <h3 className="text-base font-semibold text-slate-800 dark:text-slate-200">
-        No conversation selected
-      </h3>
-      <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-xs">
-        Choose a conversation from your list or start a new one to begin messaging.
-      </p>
-    </div>
+    <img
+      src={imageUrl}
+      alt="Attachment"
+      className="max-h-60 max-w-full rounded-xl object-cover my-1"
+    />
   );
 }
 
 export default function MessagingContent() {
   const { activeConversationId, activeUserProfile } = useMessageStore();
   const [inputText, setInputText] = useState("");
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const isInitialLoadRef = useRef(true);
 
@@ -101,6 +45,7 @@ export default function MessagingContent() {
       : "skip"
   );
 
+  const generateUploadUrl = useMutation(api.messaging.generateUploadUrl);
   const sendMessageMutation = useMutation(api.messaging.sendMessage);
 
   useEffect(() => {
@@ -120,20 +65,56 @@ export default function MessagingContent() {
     }
   }, [messages]);
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type.startsWith("image/")) {
+      setSelectedImage(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const clearSelectedImage = () => {
+    setSelectedImage(null);
+    if (imagePreview) URL.revokeObjectURL(imagePreview);
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
   const handleSendMessage = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!inputText.trim() || !activeConversationId) return;
+    if ((!inputText.trim() && !selectedImage) || !activeConversationId || isUploading) return;
 
     const content = inputText.trim();
-    setInputText("");
+    setIsUploading(true);
 
     try {
+      let storageId: Id<"_storage"> | undefined = undefined;
+
+      if (selectedImage) {
+        const uploadUrl = await generateUploadUrl();
+        const response = await fetch(uploadUrl, {
+          method: "POST",
+          headers: { "Content-Type": selectedImage.type },
+          body: selectedImage,
+        });
+
+        const { storageId: uploadedId } = await response.json();
+        storageId = uploadedId;
+      }
+
       await sendMessageMutation({
         conversationId: activeConversationId as Id<"conversations">,
         content,
+        mediaUrl: storageId,
+        mediaType: storageId ? "image" : undefined,
       });
+
+      setInputText("");
+      clearSelectedImage();
     } catch (error) {
       console.error("Failed to send message:", error);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -144,13 +125,8 @@ export default function MessagingContent() {
     }
   };
 
-  if (!activeConversationId) {
-    return <EmptyMessagingState />;
-  }
-
-  if (messages === undefined) {
-    return <MessagingContentSkeleton />;
-  }
+  if (!activeConversationId) return null;
+  if (messages === undefined) return null;
 
   const username = activeUserProfile?.username || "";
   const displayName = activeUserProfile?.displayName || username || "User";
@@ -218,7 +194,14 @@ export default function MessagingContent() {
                               : "bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-bl-none"
                           }`}
                         >
-                          <div className="break-words">{msg.content}</div>
+                          {msg.mediaUrl && (
+                            <MessageImage
+                              storageId={msg.mediaUrl as Id<"_storage">}
+                            />
+                          )}
+                          {msg.content && (
+                            <div className="break-words">{msg.content}</div>
+                          )}
                         </div>
                       </div>
                       <span className="text-[10px] text-slate-400 px-1 mt-0.5">
@@ -239,8 +222,36 @@ export default function MessagingContent() {
 
       <footer className="p-4 bg-slate-50/50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 shrink-0">
         <div className="w-full relative">
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileSelect}
+            accept="image/*"
+            className="hidden"
+          />
+
           <form onSubmit={handleSendMessage} className="w-full">
-            <div className="flex flex-col border border-slate-200 rounded-2xl bg-white transition-all">
+            <div className="flex flex-col border border-slate-200 dark:border-slate-700 rounded-2xl bg-white dark:bg-slate-800 transition-all">
+              
+              {imagePreview && (
+                <div className="p-3 pb-0 relative inline-block max-w-fit">
+                  <div className="relative rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700">
+                    <img
+                      src={imagePreview}
+                      alt="Selected Attachment"
+                      className="h-20 w-20 object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={clearSelectedImage}
+                      className="absolute top-1 right-1 p-1 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <div className="min-h-[56px] w-full px-4 pt-3 pb-1">
                 <textarea
                   value={inputText}
@@ -255,6 +266,7 @@ export default function MessagingContent() {
               <div className="flex justify-between items-center w-full px-3 pb-2 pt-1 border-t border-slate-100 dark:border-slate-700/50">
                 <button
                   type="button"
+                  onClick={() => fileInputRef.current?.click()}
                   className="cursor-pointer p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors"
                 >
                   <PlusIcon className="h-4 w-4" />
@@ -263,10 +275,14 @@ export default function MessagingContent() {
                 <Button
                   type="submit"
                   variant={"default"}
-                  disabled={!inputText.trim()}
+                  disabled={(!inputText.trim() && !selectedImage) || isUploading}
                   className="h-9 w-9 cursor-pointer rounded-full p-0 disabled:opacity-40 text-white transition-all flex items-center justify-center shrink-0"
                 >
-                  <ArrowUpIcon className="h-4 w-4" />
+                  {isUploading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <ArrowUpIcon className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
             </div>

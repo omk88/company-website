@@ -39,10 +39,25 @@ export const getMessagesByConversation = query({
   },
 });
 
+export const generateUploadUrl = mutation(async (ctx) => {
+  const identity = await ctx.auth.getUserIdentity();
+  if (!identity) throw new Error("Unauthorized");
+  return await ctx.storage.generateUploadUrl();
+});
+
+export const getMediaUrl = query({
+  args: { storageId: v.id("_storage") },
+  handler: async (ctx, args) => {
+    return await ctx.storage.getUrl(args.storageId);
+  },
+});
+
 export const sendMessage = mutation({
   args: {
     conversationId: v.id("conversations"),
     content: v.string(),
+    mediaUrl: v.optional(v.id("_storage")),
+    mediaType: v.optional(v.union(v.literal("image"), v.literal("file"))),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -64,12 +79,14 @@ export const sendMessage = mutation({
       senderId: currentUserId,
       recipientId: recipientId,
       content: args.content,
+      mediaUrl: args.mediaUrl,
+      mediaType: args.mediaType,
       readBy: [currentUserId],
     });
 
     await ctx.db.patch(args.conversationId, {
       lastMessageId: messageId,
-      lastMessageContent: args.content,
+      lastMessageContent: args.mediaUrl ? "📷 Image" : args.content,
       lastMessageSenderId: currentUserId,
       updatedAt: now,
     });

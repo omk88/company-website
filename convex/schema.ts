@@ -278,12 +278,13 @@ conversations: defineTable({
     senderId: v.string(),
     recipientId: v.string(),
     content: v.string(),
-    mediaUrl: v.optional(v.string()),
+    mediaUrl: v.optional(v.union(v.string(), v.id("_storage"))),
     mediaType: v.optional(v.union(v.literal("image"), v.literal("file"))),
     readBy: v.array(v.string()), 
   })
     .index("by_recipient", ["recipientId"])
     .index("by_conversation", ["conversationId"]),
+
 });
 
 export default schema;
