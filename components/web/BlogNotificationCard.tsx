@@ -30,11 +30,9 @@ export default function BlogNotificationCard({
     const currentPathWithoutHash = window.location.pathname;
 
     if (currentPathWithoutHash === targetPath) {
-      // Clear any active comment hash from the URL and scroll back to top
       window.history.replaceState(null, "", currentPathWithoutHash);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
-      // Clean push to the blog post route without carrying over lingering hashes
       router.push(targetPath);
     }
   };

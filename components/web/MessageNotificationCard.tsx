@@ -23,6 +23,7 @@ export default function MessageNotificationCard({
   isUnread = true,
   onNotificationClick,
 }: MessageNotificationCardProps) {
+
   const router = useRouter();
 
   const handleClick = (e: React.MouseEvent) => {
@@ -54,20 +55,24 @@ export default function MessageNotificationCard({
       )}
       <div className="flex-1 min-w-0 flex flex-row items-center justify-between gap-3 pr-4">
         <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
-          {mediaUrl &&
-            <div className="relative w-11 h-11 shrink-0 overflow-hidden rounded-lg bg-zinc-100 dark:bg-zinc-800">
-              <Image
-                src={mediaUrl}
-                alt={"Attached image"}
-                fill
-                sizes="44px"
-                className="object-cover"
-              />
-            </div>
-          }
-          <h3 className="text-sm font-medium leading-snug text-zinc-800 dark:text-zinc-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 line-clamp-1 transition-colors">
-            {content}
-          </h3>
+          <div className="flex flex-row gap-2">
+            {mediaUrl &&
+              <div className="shrink-0">
+                <div className="relative w-10 h-10 overflow-hidden rounded-lg bg-zinc-100 dark:bg-zinc-800">
+                  <Image
+                    src={mediaUrl}
+                    alt={"Attached image"}
+                    fill
+                    sizes="40px"
+                    className="object-cover"
+                  />
+                </div>
+              </div>
+            }
+            <h3 className="text-sm font-medium leading-snug text-zinc-800 dark:text-zinc-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 line-clamp-1 transition-colors">
+              {content}
+            </h3>
+          </div>
 
           <time className="text-xs text-zinc-400">
             {formatSmartDate(createdAt, false)}

@@ -188,7 +188,7 @@ function MessageItem({ msg, currentUserId }: MessageItemProps) {
                     <img
                       src={imageUrl}
                       alt="Full resolution attachment"
-                      className="max-h-[85vh] max-w-full w-auto h-auto object-contain rounded-2xl shadow-2xl"
+                      className="max-h-[85vh] max-w-full w-auto h-auto object-contain rounded-2xl"
                     />
                   ) : (
                     <Skeleton className="h-96 w-96 rounded-2xl" />
@@ -205,7 +205,7 @@ function MessageItem({ msg, currentUserId }: MessageItemProps) {
                       className="opacity-0 group-hover:opacity-100 transition-opacity duration-100 hover:text-slate-700 dark:hover:text-slate-200 p-2 rounded cursor-pointer"
                       title="Download image"
                     >
-                      <Download className="h-5 w-5" />
+                      <Download className="h-4 w-4" />
                     </button>
                   )}
                 </div>

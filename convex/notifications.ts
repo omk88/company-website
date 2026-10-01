@@ -1,6 +1,7 @@
 import { paginationOptsValidator } from "convex/server";
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { Id } from "./_generated/dataModel";
 
 export const getNotifications = query({
   args: {
@@ -341,12 +342,20 @@ export const getNotifications = query({
             .withIndex("by_userId", (q) => q.eq("userId", message.senderId))
             .unique();
 
+          let resolvedMediaUrl: string | null = null;
+          if (message.mediaUrl) {
+            resolvedMediaUrl = message.mediaUrl.startsWith("http")
+              ? message.mediaUrl
+              : await ctx.storage.getUrl(message.mediaUrl as Id<"_storage">);
+          }
+
           return {
             _id: message._id,
             notificationType: "message" as const,
             conversationId: message.conversationId,
             content: message.content,
-            mediaType: message.mediaType,
+            mediaUrl: resolvedMediaUrl, 
+            mediaType: message.mediaType ?? null,
             createdAt: message._creationTime,
             author: message.senderId,
             authorUsername: senderProfile?.username ?? "",
