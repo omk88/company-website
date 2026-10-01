@@ -252,7 +252,7 @@ const schema = defineSchema({
   })
     .index("by_user", ["userId"]),
 
-  conversations: defineTable({
+conversations: defineTable({
     participantIds: v.array(v.string()), 
     lastMessageId: v.optional(v.id("messages")),
     lastMessageContent: v.optional(v.string()),
@@ -265,9 +265,13 @@ const schema = defineSchema({
   conversationMembers: defineTable({
     conversationId: v.id("conversations"),
     userId: v.string(),
+    isDeleted: v.boolean(),
+    clearedAt: v.optional(v.number()), 
   })
     .index("by_user", ["userId"])
-    .index("by_conversation", ["conversationId"]),
+    .index("by_user_active", ["userId", "isDeleted"])
+    .index("by_conversation", ["conversationId"])
+    .index("by_conversation_user", ["conversationId", "userId"]),
 
   messages: defineTable({
     conversationId: v.id("conversations"),
@@ -280,7 +284,6 @@ const schema = defineSchema({
   })
     .index("by_recipient", ["recipientId"])
     .index("by_conversation", ["conversationId"]),
-
 });
 
 export default schema;

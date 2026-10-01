@@ -12,13 +12,30 @@ export const getMessagesByConversation = query({
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return [];
 
-    return await ctx.db
+    const currentUserId = identity.subject;
+
+    const member = await ctx.db
+      .query("conversationMembers")
+      .withIndex("by_conversation_user", (q) =>
+        q.eq("conversationId", args.conversationId!).eq("userId", currentUserId)
+      )
+      .unique();
+
+    const messages = await ctx.db
       .query("messages")
       .withIndex("by_conversation", (q) =>
         q.eq("conversationId", args.conversationId!)
       )
       .order("asc")
       .collect();
+
+    if (member?.clearedAt) {
+      return messages.filter(
+        (msg) => msg._creationTime > member.clearedAt!
+      );
+    }
+
+    return messages;
   },
 });
 
@@ -57,6 +74,19 @@ export const sendMessage = mutation({
       updatedAt: now,
     });
 
+    const members = await ctx.db
+      .query("conversationMembers")
+      .withIndex("by_conversation", (q) =>
+        q.eq("conversationId", args.conversationId)
+      )
+      .collect();
+
+    for (const member of members) {
+      if (member.isDeleted) {
+        await ctx.db.patch(member._id, { isDeleted: false });
+      }
+    }
+
     return messageId;
   },
 });
@@ -73,6 +103,17 @@ export const listConversations = query({
 
     const currentUserId = identity.subject;
 
+    const activeMemberships = await ctx.db
+      .query("conversationMembers")
+      .withIndex("by_user_active", (q) =>
+        q.eq("userId", currentUserId).eq("isDeleted", false)
+      )
+      .collect();
+
+    const activeConversationIds = new Set(
+      activeMemberships.map((m) => m.conversationId)
+    );
+
     const result = await ctx.db
       .query("conversations")
       .withIndex("by_updatedAt")
@@ -80,7 +121,7 @@ export const listConversations = query({
       .paginate(args.paginationOpts);
 
     const userConversations = result.page.filter((conv) =>
-      conv.participantIds.includes(currentUserId)
+      activeConversationIds.has(conv._id)
     );
 
     const conversationsWithProfiles = await Promise.all(
@@ -141,7 +182,6 @@ export const getOrCreateAndStartConversation = mutation({
     }
 
     const allConversations = await ctx.db.query("conversations").collect();
-
     const existingConversation = allConversations.find(
       (conv) =>
         conv.participantIds.includes(currentUserId) &&
@@ -149,6 +189,23 @@ export const getOrCreateAndStartConversation = mutation({
     );
 
     if (existingConversation) {
+      const userMember = await ctx.db
+        .query("conversationMembers")
+        .withIndex("by_conversation_user", (q) =>
+          q.eq("conversationId", existingConversation._id).eq("userId", currentUserId)
+        )
+        .unique();
+
+      if (userMember && userMember.isDeleted) {
+        await ctx.db.patch(userMember._id, { isDeleted: false });
+      } else if (!userMember) {
+        await ctx.db.insert("conversationMembers", {
+          conversationId: existingConversation._id,
+          userId: currentUserId,
+          isDeleted: false,
+        });
+      }
+
       return existingConversation._id;
     }
 
@@ -157,43 +214,82 @@ export const getOrCreateAndStartConversation = mutation({
       updatedAt: Date.now(),
     });
 
+    await ctx.db.insert("conversationMembers", {
+      conversationId,
+      userId: currentUserId,
+      isDeleted: false,
+    });
+
+    await ctx.db.insert("conversationMembers", {
+      conversationId,
+      userId: args.participantId,
+      isDeleted: false,
+    });
+
     return conversationId;
   },
 });
 
 export const deleteConversation = mutation({
   args: {
-    conversationId: v.id("conversations")
+    conversationId: v.id("conversations"),
   },
-  handler: async(ctx, args) => {
+  handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new Error("Unauthorized: You must be logged in.");
     }
 
+    const currentUserId = identity.subject;
+    const now = Date.now();
+
     const existingConversation = await ctx.db.get(args.conversationId);
     if (!existingConversation) {
-      throw new Error("Conversation not found.")
+      throw new Error("Conversation not found.");
     }
 
-    const messages = await ctx.db
-      .query("messages")
-      .withIndex("by_conversation", (q) => q.eq("conversationId", args.conversationId))
-      .collect();
-
-    for (const message of messages) {
-      await ctx.db.delete(message._id)
-    }
-
-    const members = await ctx.db
+    const currentMember = await ctx.db
       .query("conversationMembers")
-      .withIndex("by_conversation", (q) => q.eq("conversationId", args.conversationId))
-      .collect();
+      .withIndex("by_conversation_user", (q) =>
+        q.eq("conversationId", args.conversationId).eq("userId", currentUserId)
+      )
+      .unique();
 
-    for (const member of members) {
-      await ctx.db.delete(member._id);
+    if (currentMember) {
+      await ctx.db.patch(currentMember._id, {
+        isDeleted: true,
+        clearedAt: now,
+      });
     }
 
-    await ctx.db.delete(args.conversationId);
-  }
-})
+    const allMembers = await ctx.db
+      .query("conversationMembers")
+      .withIndex("by_conversation", (q) =>
+        q.eq("conversationId", args.conversationId)
+      )
+      .collect();
+
+    const allDeleted = allMembers.every((m) =>
+      m.userId === currentUserId ? true : m.isDeleted
+    );
+
+    if (allDeleted) {
+      const messages = await ctx.db
+        .query("messages")
+        .withIndex("by_conversation", (q) =>
+          q.eq("conversationId", args.conversationId)
+        )
+        .collect();
+
+      for (const message of messages) {
+        await ctx.db.delete(message._id);
+      }
+
+      for (const member of allMembers) {
+        await ctx.db.delete(member._id);
+      }
+
+      await ctx.db.delete(args.conversationId);
+    }
+  },
+});
