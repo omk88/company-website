@@ -2,9 +2,12 @@
 
 import { useRouter } from "next/navigation";
 import { formatSmartDate } from "./ProfileHoverCard";
+import Image from "next/image";
 
 export interface MessageNotificationCardProps {
   _id: string;
+  mediaUrl?: string | null;
+  mediaType?: "image" | "file" | null;
   content: string;
   createdAt: number;
   isUnread?: boolean;
@@ -13,6 +16,8 @@ export interface MessageNotificationCardProps {
 
 export default function MessageNotificationCard({
   _id,
+  mediaUrl,
+  mediaType,
   content,
   createdAt,
   isUnread = true,
@@ -49,6 +54,17 @@ export default function MessageNotificationCard({
       )}
       <div className="flex-1 min-w-0 flex flex-row items-center justify-between gap-3 pr-4">
         <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
+          {mediaUrl &&
+            <div className="relative w-11 h-11 shrink-0 overflow-hidden rounded-lg bg-zinc-100 dark:bg-zinc-800">
+              <Image
+                src={mediaUrl}
+                alt={"Attached image"}
+                fill
+                sizes="44px"
+                className="object-cover"
+              />
+            </div>
+          }
           <h3 className="text-sm font-medium leading-snug text-zinc-800 dark:text-zinc-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 line-clamp-1 transition-colors">
             {content}
           </h3>

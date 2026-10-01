@@ -148,6 +148,8 @@ type MessageNotification = {
   content: string;
   createdAt: number;
   author: string;
+  mediaUrl?: string | null;
+  mediaType?: "image" | "file" | null;
   authorUsername: string;
   authorDisplayName?: string;
   profilePic?: string | null;
@@ -576,6 +578,8 @@ export function NavbarAuthClient({
                                           <MessageNotificationCard
                                             key={item._id}
                                             _id={item._id}
+                                            mediaUrl={item.mediaUrl}
+                                            mediaType={item.mediaType}
                                             content={item.content}
                                             createdAt={item.createdAt}
                                             isUnread={item.isUnread}
