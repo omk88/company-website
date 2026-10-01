@@ -29,20 +29,7 @@ export default function MessageNotificationCard({
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     onNotificationClick?.();
-
-    const targetPath = `/insights`;
-    const commentHash = `#comment-${_id}`;
-    const currentPathWithoutHash = window.location.pathname;
-
-    if (currentPathWithoutHash === targetPath) {
-      window.history.replaceState(null, "", `${currentPathWithoutHash}${commentHash}`);
-      const el = document.getElementById(`comment-${_id}`);
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth" });
-      }
-    } else {
-      router.push(`${targetPath}${commentHash}`);
-    }
+    router.push(`/inbox`);
   };
 
   return (
