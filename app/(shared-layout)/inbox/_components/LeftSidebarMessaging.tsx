@@ -95,72 +95,69 @@ export default function LeftSidebarMessaging() {
                 const isActive = chat._id === activeConversationId;
                 const profile = chat.otherUserProfile;
 
-                const primaryName =
-                  profile?.displayName ||
-                  (profile?.username ? `@${profile.username}` : "Unknown User");
+                const primaryName = profile?.displayName || profile?.username;
 
-                const secondaryHandle =
-                  profile?.displayName && profile?.username
-                    ? `@${profile.username}`
-                    : null;
+                const secondaryHandle = `@${profile?.username}`;
 
                 return (
                   <button
                     key={chat._id}
                     onClick={() => setActiveConversation(chat._id, profile)}
-                    className={`cursor-pointer w-full flex items-center gap-3 p-3 rounded-xl text-left transition-colors ${
+                    className={`cursor-pointer w-full flex flex-col gap-1 p-3 rounded-xl text-left transition-colors ${
                       isActive
                         ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100"
                         : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/60"
                     }`}
                   >
-                    <div className="relative w-10 h-10 rounded-full overflow-hidden bg-slate-200 dark:bg-slate-700 shrink-0 border border-slate-200 dark:border-slate-700">
-                      {profile?.avatarUrl ? (
-                        <img
-                          src={profile.avatarUrl}
-                          alt={primaryName}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center font-bold text-xs text-slate-600 dark:text-slate-300">
-                          {(
-                            profile?.displayName?.[0] ??
-                            profile?.username?.[0] ??
-                            "?"
-                          ).toUpperCase()}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex flex-col min-w-0 flex-1">
-                      <div className="flex justify-between items-baseline w-full">
-                        <span className="text-sm font-semibold truncate">
-                          {primaryName}
-                        </span>
-                        {chat.updatedAt && (
-                          <span className="text-[10px] text-slate-400 shrink-0 ml-2">
-                            {new Date(chat.updatedAt).toLocaleTimeString([], {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
-                          </span>
+                    <div className="flex items-center gap-3 w-full">
+                      <div className="relative w-10 h-10 rounded-full overflow-hidden bg-slate-200 dark:bg-slate-700 shrink-0 border border-slate-200 dark:border-slate-700">
+                        {profile?.avatarUrl ? (
+                          <img
+                            src={profile.avatarUrl}
+                            alt={primaryName}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center font-bold text-xs text-slate-600 dark:text-slate-300">
+                            {(
+                              profile?.displayName?.[0] ??
+                              profile?.username?.[0] ??
+                              "?"
+                            ).toUpperCase()}
+                          </div>
                         )}
                       </div>
 
-                      {secondaryHandle && (
-                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                          {secondaryHandle}
-                        </p>
-                      )}
+                      <div className="flex flex-col min-w-0 flex-1">
+                        <div className="flex justify-between items-baseline w-full">
+                          <span className="text-sm font-semibold truncate">
+                            {primaryName}
+                          </span>
+                          {chat.updatedAt && (
+                            <span className="text-[10px] text-slate-400 shrink-0 ml-2">
+                              {new Date(chat.updatedAt).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                            </span>
+                          )}
+                        </div>
 
-                      {chat.lastMessageContent ? (
-                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                        {secondaryHandle && (
+                          <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                            {secondaryHandle}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {chat.lastMessageContent && (
+                      <div className="pl-[52px] w-full">
+                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
                           {chat.lastMessageContent}
                         </p>
-                      ) : (
-                        null
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </button>
                 );
               })}
