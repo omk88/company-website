@@ -25,6 +25,8 @@ export default function RightSidebarMessaging() {
     return true;
   });
 
+  const buttonStyleClass = "group !cursor-pointer justify-start px-2.5 py-1.5 rounded-lg text-lg md:text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/60 transition-colors w-full";
+
   return (
     <Sidebar
       side="right"
@@ -34,7 +36,7 @@ export default function RightSidebarMessaging() {
     >
       <SidebarContent className="!p-0 w-full overflow-x-hidden">
         <SidebarGroup className="pt-3 !px-2 w-full flex flex-col">
-          <SidebarMenu className="flex w-full gap-1 flex-col gap-0.5">
+          <SidebarMenu className="flex w-full gap-0.5 flex-col">
             {visibleNavItems.map((item) => {
               const Icon = item.icon;
 
@@ -45,9 +47,7 @@ export default function RightSidebarMessaging() {
                       conversationId={conversationId}
                       onSuccess={() => {}}
                       trigger={
-                        <SidebarMenuButton
-                          className="group !cursor-pointer justify-start px-2.5 py-1.5 rounded-lg text-lg md:text-sm transition-colors"
-                        >
+                        <SidebarMenuButton className={buttonStyleClass}>
                           <Icon className="h-4 w-4 shrink-0 stroke-[2.5] transition-colors" />
                           <span>{item.label}</span>
                         </SidebarMenuButton>
@@ -59,9 +59,7 @@ export default function RightSidebarMessaging() {
 
               return (
                 <SidebarMenuItem key={item.id} className="w-full">
-                  <SidebarMenuButton
-                    className="group !cursor-pointer justify-start px-2.5 py-1.5 rounded-lg text-lg md:text-sm transition-colors"
-                  >
+                  <SidebarMenuButton className={buttonStyleClass}>
                     <Icon className="h-4 w-4 shrink-0 stroke-[2.5] transition-colors" />
                     <span>{item.label}</span>
                   </SidebarMenuButton>
