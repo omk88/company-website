@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "next-themes";
 import { ConvexClientProvider } from "./ConvexClientProvider";
+import { BanProvider } from "@/components/web/BanProvider";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -53,7 +54,9 @@ export default function RootLayout({
         >
           <main>
             <ConvexClientProvider>
-              {children}
+              <BanProvider>
+                {children}
+              </BanProvider>
             </ConvexClientProvider>
           </main>
           <Toaster />

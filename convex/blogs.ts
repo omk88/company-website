@@ -215,8 +215,8 @@ export const toggleFeatured = mutation({
     blogId: v.id("blogs")
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return null;
+    const { identity, profile } = await requireActiveUser(ctx);
+
     const userId = identity.subject as Id<"profiles">;
 
     const blog = await ctx.db.get(args.blogId);
@@ -250,8 +250,8 @@ export const toggleBlogVote = mutation({
     blogId: v.id("blogs"),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return null;
+    const { identity, profile } = await requireActiveUser(ctx);
+
     const userId = identity.subject as Id<"profiles">;
 
     const blog = await ctx.db.get(args.blogId);
@@ -413,6 +413,8 @@ export const updatePost = mutation({
     storageId: v.string(), 
   },
   handler: async (ctx, args) => {
+
+    const { identity, profile } = await requireActiveUser(ctx);
 
     await claimMarkdownImages(ctx, args.content);
 
@@ -1195,8 +1197,8 @@ export const toggleBlogReaction = mutation({
     ),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return null;
+    const { identity, profile } = await requireActiveUser(ctx);
+
     const userId = identity.subject as Id<"profiles">;
 
     const blog = await ctx.db.get(args.blogId);
@@ -1294,8 +1296,7 @@ export const getBookmarkedState = query({
 export const toggleBookmark = mutation({
   args: { blogId: v.id("blogs") },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthenticated");
+    const { identity, profile } = await requireActiveUser(ctx);
 
     const userId = identity.subject; 
 

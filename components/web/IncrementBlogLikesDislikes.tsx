@@ -16,6 +16,8 @@ import { DeleteBlogDialog } from "./DeleteBlogDialog";
 import { EMOJI_REACTIONS, ReactionType } from "@/app/constants/reactions";
 import { useCurrentUser } from "@/app/ConvexClientProvider";
 import { useBlogStore } from "@/stores/useBlogStore";
+import { useState } from "react";
+import { useGuardedMutation } from "@/hooks/useGuardedMutation";
 
 export interface InteractionState {
   voteState: {
@@ -41,6 +43,13 @@ export interface InteractionState {
   };
 }
 
+interface BanDetails {
+  banReason: string;
+  banViolations: string[];
+  bannedAt: number | null;
+  bannedUntil: number | null;
+}
+
 interface IncrementBlogLikesProps {
   blog: Doc<"blogs">;
   initialInteractionState: InteractionState;
@@ -50,6 +59,9 @@ export function IncrementBlogLikesDislikes({ blog, initialInteractionState }: In
   const router = useRouter();
 
   const currentUser = useCurrentUser();
+
+  const [isBannedDialogOpen, setIsBannedDialogOpen] = useState(false);
+  const [banDetails, setBanDetails] = useState<BanDetails | null>(null);
 
   const liveState = useQuery(api.blogs.getBlogInteractionState, { blogId: blog._id });
 
@@ -68,7 +80,8 @@ export function IncrementBlogLikesDislikes({ blog, initialInteractionState }: In
   const likesCount = voteState.likes;
   const isFeatured = featuredState.isFeatured;
 
-  const toggleReactionMutation = useMutation(api.blogs.toggleBlogReaction).withOptimisticUpdate(
+  const toggleReactionMutation = useGuardedMutation(
+    api.blogs.toggleBlogReaction,
     (localStore, args) => {
       const { blogId, reactionType } = args;
       const previous = localStore.getQuery(api.blogs.getBlogInteractionState, { blogId });
@@ -109,7 +122,8 @@ export function IncrementBlogLikesDislikes({ blog, initialInteractionState }: In
     }
   );
 
-  const toggleBlogVoteMutation = useMutation(api.blogs.toggleBlogVote).withOptimisticUpdate(
+  const toggleBlogVoteMutation = useGuardedMutation(
+    api.blogs.toggleBlogVote,
     (localStore, args) => {
       const { blogId } = args;
       const previous = localStore.getQuery(api.blogs.getBlogInteractionState, { blogId });
@@ -135,7 +149,8 @@ export function IncrementBlogLikesDislikes({ blog, initialInteractionState }: In
     }
   );
 
-  const toggleBookmark = useMutation(api.blogs.toggleBookmark).withOptimisticUpdate(
+  const toggleBookmark = useGuardedMutation(
+    api.blogs.toggleBookmark,
     (localStore, args) => {
       const { blogId } = args;
       const previous = localStore.getQuery(api.blogs.getBlogInteractionState, { blogId });
@@ -152,7 +167,8 @@ export function IncrementBlogLikesDislikes({ blog, initialInteractionState }: In
     }
   );
 
-  const toggleFeaturedMutation = useMutation(api.blogs.toggleFeatured).withOptimisticUpdate(
+  const toggleFeaturedMutation = useGuardedMutation(
+    api.blogs.toggleFeatured,
     (localStore, args) => {
       const { blogId } = args;
       const previous = localStore.getQuery(api.blogs.getBlogInteractionState, { blogId });

@@ -35,7 +35,7 @@ import { ScrollArea } from "../ui/scroll-area";
 import { useBlogDraft } from "@/hooks/useBlogDraft";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { ConvexError } from "convex/values";
-import { BannedDialog } from "../BannedDialog";
+import { useGuardedMutation } from "@/hooks/useGuardedMutation";
 
 const lowlight = createLowlight();
 lowlight.register("javascript", js);
@@ -247,9 +247,6 @@ export default function BlogPostForm() {
     const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const [isBannedDialogOpen, setIsBannedDialogOpen] = useState(false);
-    const [banDetails, setBanDetails] = useState<BanDetails | null>(null);
-
     const userData = useCurrentUser();
     const selectedBlog = useBlogStore((state) => state.selectedBlog);
     const setSelectedBlog = useBlogStore((state) => state.setSelectedBlog);
@@ -260,8 +257,8 @@ export default function BlogPostForm() {
 
     const isEditing = Boolean(selectedBlog?._id);
 
-    const createBlog = useMutation(api.blogs.createPost);
-    const updateBlog = useMutation(api.blogs.updatePost);
+    const createBlog = useGuardedMutation(api.blogs.createPost);
+    const updateBlog = useGuardedMutation(api.blogs.updatePost);
     const generateUploadUrl = useMutation(api.blogs.generateUploadUrl);
 
     const { control, handleSubmit, watch, clearErrors, formState: { errors }, reset, setValue } = useForm<BlogFormValues>({
@@ -362,34 +359,35 @@ export default function BlogPostForm() {
             const formattedTitle = toTitleCase(data.title);
 
             if (selectedImage) {
-                const options = {
-                    maxSizeMB: 1.0,
-                    maxWidthOrHeight: 1920,
-                    useWebWorker: true,
-                    fileType: "image/webp" as const,
-                    initialQuality: 0.85,
-                };
+            const options = {
+                maxSizeMB: 1.0,
+                maxWidthOrHeight: 1920,
+                useWebWorker: true,
+                fileType: "image/webp" as const,
+                initialQuality: 0.85,
+            };
 
-                const compressedFile = (await imageCompression(selectedImage, options)) as File;
-                const uploadUrl = await generateUploadUrl();
+            const compressedFile = (await imageCompression(selectedImage, options)) as File;
+            const uploadUrl = await generateUploadUrl();
 
-                const result = await fetch(uploadUrl, {
-                    method: "POST",
-                    headers: { "Content-Type": compressedFile.type },
-                    body: compressedFile,
-                });
+            const result = await fetch(uploadUrl, {
+                method: "POST",
+                headers: { "Content-Type": compressedFile.type },
+                body: compressedFile,
+            });
 
-                if (!result.ok) throw new Error("Failed to upload image bundle.");
+            if (!result.ok) throw new Error("Failed to upload image bundle.");
 
-                const resJson = await result.json();
-                const responseSchema = z.object({ storageId: z.string() });
-                const parsedResponse = responseSchema.parse(resJson);
+            const resJson = await result.json();
+            const responseSchema = z.object({ storageId: z.string() });
+            const parsedResponse = responseSchema.parse(resJson);
 
-                storageId = parsedResponse.storageId;
+            storageId = parsedResponse.storageId;
             }
 
+            let result;
             if (selectedBlog?._id) {
-                await updateBlog({
+                result = await updateBlog({
                     blogId: selectedBlog._id as Id<"blogs">,
                     title: formattedTitle,
                     subtitle: data.subtitle,
@@ -400,9 +398,8 @@ export default function BlogPostForm() {
                     tags: data.tags,
                     storageId: storageId,
                 });
-                toast.success("Blog article updated successfully!");
             } else {
-                await createBlog({
+                result = await createBlog({
                     title: formattedTitle,
                     subtitle: data.subtitle,
                     content: data.content,
@@ -414,7 +411,17 @@ export default function BlogPostForm() {
                     storageId: storageId,
                     postType: postType,
                 });
-                toast.success("Blog article published successfully!");
+            }
+
+            if (result === undefined) return;
+
+            toast.success(
+            selectedBlog?._id
+                ? "Blog article updated successfully!"
+                : "Blog article published successfully!"
+            );
+
+            if (!selectedBlog?._id) {
                 await clearDraft();
             }
 
@@ -423,7 +430,7 @@ export default function BlogPostForm() {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        tags: ["featured-blogs", "main-blogs", "morefrom-blogs", "trending-blogs"],
+                    tags: ["featured-blogs", "main-blogs", "morefrom-blogs", "trending-blogs"],
                     }),
                 });
             } catch (err) {
@@ -436,25 +443,10 @@ export default function BlogPostForm() {
             reset();
             clearStore();
 
-            if (targetBlogId) {
-                router.push(`/insights/${targetBlogId}`);
-            } else {
-                router.push("/insights");
-            }
+            router.push(targetBlogId ? `/insights/${targetBlogId}` : "/insights");
             router.refresh();
 
         } catch (error) {
-            if (error instanceof ConvexError && error.data?.code === "USER_BANNED") {
-                setBanDetails({
-                    banReason: error.data.banReason,
-                    banViolations: error.data.banViolations,
-                    bannedAt: error.data.bannedAt,
-                    bannedUntil: error.data.bannedUntil,
-                });
-                setIsBannedDialogOpen(true);
-                return;
-            }
-
             console.error(error);
             toast.error(error instanceof Error ? error.message : "Process interrupted.");
         } finally {
@@ -947,11 +939,6 @@ export default function BlogPostForm() {
                     </ScrollArea>
                 )}
             </div>
-            <BannedDialog
-                open={isBannedDialogOpen}
-                onOpenChange={setIsBannedDialogOpen}
-                banDetails={banDetails}
-            />
         </div>
     );
 }
