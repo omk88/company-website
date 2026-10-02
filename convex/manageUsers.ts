@@ -5,8 +5,6 @@ export const getProxyUserStatus = query({
   args: {},
   handler: async (ctx, args) => {
 
-    console.log("CALLLLLLEDDDD!!!!");
-
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return null;
 
@@ -20,8 +18,6 @@ export const getProxyUserStatus = query({
     const isCurrentlyBanned =
       profile.isBanned &&
       (profile.bannedUntil === null || profile.bannedUntil === undefined || profile.bannedUntil > Date.now());
-
-    console.log("BANNNN", isCurrentlyBanned);
 
     return {
       isBanned: isCurrentlyBanned,
