@@ -175,6 +175,8 @@ const schema = defineSchema({
 
     lastCheckedNotificationsAt: v.optional(v.number()),
     lastReadNotificationsAt: v.optional(v.number()),
+
+    isModerator: v.optional(v.boolean()),
   })
     .index("by_userId", ["userId"])
     .index("by_username", ["username"]),

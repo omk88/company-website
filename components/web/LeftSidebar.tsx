@@ -5,6 +5,7 @@ import { SidebarSort } from "./SidebarSort";
 import { SidebarTags } from "./SidebarTags";
 import { SidebarNav } from "./SidebarNav";
 import { Gavel } from "lucide-react";
+import Link from "next/link";
 
 export async function LeftSidebar() {
 
@@ -55,9 +56,12 @@ export async function LeftSidebar() {
             </div>
           </SidebarGroup>
           <div className="px-2">
-            <SidebarMenuButton className={buttonStyleClass}>
-              <Gavel className="h-4 w-4 shrink-0 stroke-[2.5] transition-colors" />
-              <span>Platform Rules</span>
+            
+            <SidebarMenuButton asChild className={buttonStyleClass}>
+              <Link href="/rules">
+                <Gavel className="h-4 w-4 shrink-0 stroke-[2.5] transition-colors" />
+                <span>Platform Rules</span>
+              </Link>
             </SidebarMenuButton>
           </div>
         </SidebarContent>

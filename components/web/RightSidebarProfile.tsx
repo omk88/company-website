@@ -12,6 +12,7 @@ import {
   Wrench,
   Globe,
   Link as LinkIcon,
+  Crown,
 } from "lucide-react";
 import { 
   FaInstagram, 
@@ -148,37 +149,50 @@ export function RightSidebarProfile({ preloadedProfile, preloadedCurrentUser }: 
             </div>
 
             <div className="p-2 pt-4 gap-4 flex flex-col text-sm font-sans tracking-tight w-full">
-              
-              <TooltipProvider delayDuration={200}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="flex flex-row items-center">
-                      <div className="inline-flex w-fit items-center gap-1 text-xs font-sans font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-full border border-amber-200/60 dark:border-amber-800/50 cursor-help select-none">
-                        <Zap className="w-3 h-3 fill-amber-500 stroke-amber-500 dark:fill-amber-400 dark:stroke-amber-400 shrink-0" />
-                        <span>{profile.totalLikes ?? 0}</span>
-                      </div>
-                      {!isSelf && (
-                        <div className="ml-auto flex flex-row gap-2">
-                          <FollowButton
-                            userId={profile.userId}
-                            displayName={displayName}
-                            username={profile.username}
-                            initialIsFollowing={isFollowing}
-                            initialIsBell={isBell}
-                          />
-
-                          <MessageButton
-                            recipientId={profile.userId}
-                          />
+              <div className="flex flex-row items-center gap-2">
+                <TooltipProvider delayDuration={200}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                        <div className="inline-flex w-fit items-center gap-1 text-xs font-sans font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-full border border-amber-200/60 dark:border-amber-800/50 cursor-help select-none">
+                          <Zap className="w-3 h-3 fill-amber-500 stroke-amber-500 dark:fill-amber-400 dark:stroke-amber-400 shrink-0" />
+                          <span>{profile.totalLikes ?? 0}</span>
                         </div>
-                      )}
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom" align="start">
-                    <p className="text-xs font-medium">{profile.totalLikes} Total Likes</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" align="start">
+                      <p className="text-xs font-medium">{profile.totalLikes} Total Likes</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                {profile.isModerator &&
+                  <TooltipProvider delayDuration={200}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="inline-flex w-fit items-center gap-1 text-xs font-sans font-semibold px-2 py-0.5 rounded-full cursor-help select-none">
+                          <Crown className="w-4 h-4 fill-yellow-300 stroke-yellow-300 shrink-0" />
+                        </div>
+                      </TooltipTrigger>
+                    <TooltipContent side="bottom" align="center">
+                      <p className="text-xs font-medium">This User is a Moderator</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                }
+                {!isSelf && (
+                  <div className="ml-auto flex flex-row gap-2">
+                    <FollowButton
+                      userId={profile.userId}
+                      displayName={displayName}
+                      username={profile.username}
+                      initialIsFollowing={isFollowing}
+                      initialIsBell={isBell}
+                    />
+
+                    <MessageButton
+                      recipientId={profile.userId}
+                    />
+                  </div>
+                )}
+              </div>
               
               {profile.bio && (
                 <div>
