@@ -199,6 +199,7 @@ export function BanUserButton() {
               <div className="space-y-1">
                 <Label htmlFor="reason">Reason for Ban</Label>
                 <Textarea
+                  className="h-24"
                   id="reason"
                   placeholder="Enter the violation details..."
                   {...banForm.register("reason")}

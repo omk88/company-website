@@ -177,6 +177,12 @@ const schema = defineSchema({
     lastReadNotificationsAt: v.optional(v.number()),
 
     isModerator: v.optional(v.boolean()),
+
+    isBanned: v.boolean(),
+    banReason: v.optional(v.string()),
+    banViolations: v.optional(v.array(v.string())),
+    bannedAt: v.optional(v.number()),
+    bannedUntil: v.optional(v.union(v.number(), v.null())),
   })
     .index("by_userId", ["userId"])
     .index("by_username", ["username"]),
