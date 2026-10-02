@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { api } from "@/convex/_generated/api";
-import { useMutation } from "convex/react";
 import { toast } from "sonner";
 import { Bell, BellPlus, Loader2 } from "lucide-react";
 import { AnimatePresence, motion, LayoutGroup, Transition } from "framer-motion";
@@ -64,6 +63,9 @@ export function FollowButton({
     try {
       const result = await followMutation({ targetUserId: userId });
 
+      // Stop immediately if user is banned (useGuardedMutation returns undefined)
+      if (result === undefined) return;
+
       if (result?.isFollowing) {
         setIsFollowing(true);
         toast.success(`Following ${displayName || username}`);
@@ -87,6 +89,8 @@ export function FollowButton({
 
     try {
       const result = await bellMutation({ targetUserId: userId });
+
+      if (result === undefined) return;
 
       if (result?.isBell) {
         setIsBell(true);

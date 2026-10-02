@@ -36,10 +36,13 @@ export function CommentSection(props: { preloadedComments: Preloaded<typeof api.
   function onSubmit(formData: z.infer<typeof commentSchema>) {
     startCommentTransition(async () => {
       try {
-        await createComment(formData);
+        const result = await createComment(formData);
+        
+        if (result === undefined) return;
+
         form.reset();
         toast.success("Comment posted");
-      } catch {
+      } catch (error) {
         toast.error("Failed to post comment");
       }
     });
