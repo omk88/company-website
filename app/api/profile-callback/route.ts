@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { connection } from "next/server";
 import { api } from "@/convex/_generated/api";
 import { fetchAuthMutation, fetchAuthQuery } from "@/lib/auth-server";
 import { authClient } from "@/lib/auth-client";
@@ -7,9 +8,9 @@ import { Id } from "@/convex/_generated/dataModel";
 const GRADIENT_PALETTES = [
   { color1: "#FF512F", color2: "#DD2476" },
   { color1: "#1FA2FF", color2: "#A6FFCB" },
-  { color1: "#00c6ff", color2: "#0072ff" }, 
-  { color1: "#f9d423", color2: "#ff4e50" }, 
-  { color1: "#11998e", color2: "#119499" }, 
+  { color1: "#00c6ff", color2: "#0072ff" },
+  { color1: "#f9d423", color2: "#ff4e50" },
+  { color1: "#11998e", color2: "#119499" },
 ];
 
 function generateRandomGradientSVG() {
@@ -28,6 +29,8 @@ function generateRandomGradientSVG() {
 }
 
 export async function GET(request: Request) {
+  await connection();
+
   try {
     const session = await authClient.getSession({
       fetchOptions: { headers: request.headers },
@@ -43,12 +46,12 @@ export async function GET(request: Request) {
     const email = userData.email;
     const displayName = userData.displayName;
 
-    let profilePicField: Id<"_storage">; 
-    let publicProfilePicUrl = ""; 
+    let profilePicField: Id<"_storage">;
+    let publicProfilePicUrl = "";
 
     try {
       const svgString = generateRandomGradientSVG();
-      
+
       const uploadUrl = await fetchAuthMutation(api.profiles.generateUploadUrl);
       const uploadResponse = await fetch(uploadUrl, {
         method: "POST",
@@ -61,13 +64,13 @@ export async function GET(request: Request) {
       }
 
       const { storageId } = await uploadResponse.json();
-      
-      profilePicField = storageId as Id<"_storage">; 
+
+      profilePicField = storageId as Id<"_storage">;
 
       const urlResult = await fetchAuthQuery(api.profiles.getImageUrl, {
         storageId: profilePicField,
       });
-      
+
       if (urlResult) {
         publicProfilePicUrl = urlResult;
       }
@@ -79,8 +82,8 @@ export async function GET(request: Request) {
     await fetchAuthMutation(api.profiles.initialiseProfile, {
       userId: id,
       email: email,
-      displayName: displayName, 
-      defaultProfilePic: profilePicField, 
+      displayName: displayName,
+      defaultProfilePic: profilePicField,
     });
 
     if (publicProfilePicUrl) {
