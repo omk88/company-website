@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { paginationOptsValidator } from "convex/server";
+import { requireActiveUser } from "./banned";
 
 export const getMessagesByConversation = query({
   args: {
@@ -60,8 +61,7 @@ export const sendMessage = mutation({
     mediaType: v.optional(v.union(v.literal("image"), v.literal("file"))),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthorized");
+    const { identity, profile } = await requireActiveUser(ctx);
 
     const currentUserId = identity.subject;
     const now = Date.now();

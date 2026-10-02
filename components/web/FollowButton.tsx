@@ -7,6 +7,7 @@ import { useMutation } from "convex/react";
 import { toast } from "sonner";
 import { Bell, BellPlus, Loader2 } from "lucide-react";
 import { AnimatePresence, motion, LayoutGroup, Transition } from "framer-motion";
+import { useGuardedMutation } from "@/hooks/useGuardedMutation";
 
 interface FollowButtonProps {
   userId: string;
@@ -51,8 +52,8 @@ export function FollowButton({
   const isCompact = variant === "compact";
   const isXS = variant === "xs";
 
-  const followMutation = useMutation(api.profiles.toggleFollow);
-  const bellMutation = useMutation(api.profiles.toggleBell);
+  const followMutation = useGuardedMutation(api.profiles.toggleFollow);
+  const bellMutation = useGuardedMutation(api.profiles.toggleBell);
 
   const handleFollowClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();

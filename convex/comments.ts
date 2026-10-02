@@ -4,6 +4,7 @@ import { authComponent } from "./auth";
 import { paginationOptsValidator } from "convex/server";
 import { calculateScores, calculateCommentScores } from "./scoreAlgorithm";
 import { Id } from "./_generated/dataModel";
+import { requireActiveUser } from "./banned";
 
 export const getCommentsByBlog = query({
   args: {
@@ -104,18 +105,10 @@ export const createComment = mutation({
     blogId: v.id("blogs"),
   },
   handler: async (ctx, args) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-    if (!user) {
-      throw new ConvexError("Not authenticated");
-    }
+    const { identity, profile } = await requireActiveUser(ctx);
 
     const blog = await ctx.db.get(args.blogId);
     if (!blog) { return null; }
-
-    const profile = await ctx.db
-      .query("profiles")
-      .withIndex("by_userId", (q) => q.eq("userId", user._id))
-      .unique();
 
     if (!profile) {
       throw new ConvexError("User profile not found");
@@ -132,8 +125,8 @@ export const createComment = mutation({
       ctx.db.insert("comments", {
         blogId: args.blogId,
         body: args.body,
-        authorId: user._id,
-        displayName: user.displayUsername ?? undefined,
+        authorId: profile.userId,
+        displayName: profile.displayName ?? undefined,
         username: profile.username,
         blogTitle: blog.title,
         likes: 0,

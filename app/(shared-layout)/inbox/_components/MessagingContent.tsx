@@ -18,6 +18,7 @@ import { Id } from "@/convex/_generated/dataModel";
 import { useMessageStore } from "@/stores/useMessageStore";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useGuardedMutation } from "@/hooks/useGuardedMutation";
 
 function MessagingContentSkeleton() {
   return (
@@ -264,7 +265,7 @@ export default function MessagingContent() {
   );
 
   const generateUploadUrl = useMutation(api.messaging.generateUploadUrl);
-  const sendMessageMutation = useMutation(api.messaging.sendMessage);
+  const sendMessageMutation = useGuardedMutation(api.messaging.sendMessage);
 
   useEffect(() => {
     isInitialLoadRef.current = true;

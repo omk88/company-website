@@ -16,13 +16,14 @@ import { useEffect, useTransition } from "react";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import { IncrementCommentLikesDislikes } from "./IncrementCommentLikesDislikes"; 
 import { formatSmartDate } from "./ProfileHoverCard";
+import { useGuardedMutation } from "@/hooks/useGuardedMutation";
 
 export function CommentSection(props: { preloadedComments: Preloaded<typeof api.comments.getCommentsByBlog> }) {
   const params = useParams<{ blogId: Id<"blogs"> }>();
   const data = usePreloadedQuery(props.preloadedComments);
   
   const [isCommentPending, startCommentTransition] = useTransition();
-  const createComment = useMutation(api.comments.createComment);
+  const createComment = useGuardedMutation(api.comments.createComment);
 
   const form = useForm({ 
     resolver: zodResolver(commentSchema),
