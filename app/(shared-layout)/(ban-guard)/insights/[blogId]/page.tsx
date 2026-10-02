@@ -107,7 +107,7 @@ export default async function BlogPage({ params }: BlogPageProps) {
       "@type": "WebPage",
       "@id": `${baseUrl}/blog/${blog._id}`,
     },
-  };
+  }; 
 
   return (
     <div>
