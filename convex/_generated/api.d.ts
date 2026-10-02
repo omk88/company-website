@@ -21,6 +21,7 @@ import type * as crons from "../crons.js";
 import type * as drafts from "../drafts.js";
 import type * as files from "../files.js";
 import type * as http from "../http.js";
+import type * as manageUsers from "../manageUsers.js";
 import type * as messaging from "../messaging.js";
 import type * as notifications from "../notifications.js";
 import type * as postImageCleanup from "../postImageCleanup.js";
@@ -50,6 +51,7 @@ declare const fullApi: ApiFromModules<{
   drafts: typeof drafts;
   files: typeof files;
   http: typeof http;
+  manageUsers: typeof manageUsers;
   messaging: typeof messaging;
   notifications: typeof notifications;
   postImageCleanup: typeof postImageCleanup;

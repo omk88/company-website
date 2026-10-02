@@ -3,7 +3,10 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
 import { Gavel, ChevronRight } from "lucide-react";
+import { useMutation } from "convex/react";
+
 import { PLATFORM_RULES } from "@/constants/rules";
+import { api } from "@/convex/_generated/api";
 
 import { Button } from "../ui/button";
 import {
@@ -27,52 +30,68 @@ import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { Checkbox } from "../ui/checkbox";
 import { ScrollArea } from "../ui/scroll-area";
-
-const manageSchema = z.object({
-  emailNotifications: z.boolean(),
-});
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 const banUserSchema = z.object({
   violations: z.array(z.string()).min(1, "Select at least one violation rule"),
   reason: z.string().min(5, "Reason must be at least 5 characters"),
+  duration: z.string().min(1, "Please select a ban duration"),
 });
 
-type ManageFormValues = z.infer<typeof manageSchema>;
 type BanUserFormValues = z.infer<typeof banUserSchema>;
-
 type DialogStep = "manage" | "ban";
 
-export function BanUserButton() {
+interface BanUserButtonProps {
+  userId: string;
+}
+
+export function BanUserButton({ userId }: BanUserButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState<DialogStep>("manage");
 
-  const manageForm = useForm<ManageFormValues>({
-    resolver: zodResolver(manageSchema),
-    defaultValues: { emailNotifications: true },
-  });
+  const banUser = useMutation(api.manageUsers.banUser);
 
   const banForm = useForm<BanUserFormValues>({
     resolver: zodResolver(banUserSchema),
-    defaultValues: { reason: "" },
+    defaultValues: {
+      violations: [],
+      reason: "",
+      duration: "7",
+    },
   });
 
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);
     if (!open) {
       setTimeout(() => setStep("manage"), 200);
-      manageForm.reset();
       banForm.reset();
     }
   };
 
   const onBanSubmit = async (data: BanUserFormValues) => {
-    console.log("User banned:", data);
-    setIsOpen(false);
-  };
+    try {
+      const durationMs =
+        data.duration === "permanent"
+          ? null
+          : Number(data.duration) * 24 * 60 * 60 * 1000;
 
-  const onManageSubmit = async (data: ManageFormValues) => {
-    console.log("Settings saved:", data);
-    setIsOpen(false);
+      await banUser({
+        userId,
+        reason: data.reason,
+        violations: data.violations,
+        durationMs,
+      });
+
+      handleOpenChange(false);
+    } catch (error) {
+      console.error("Failed to ban user:", error);
+    }
   };
 
   return (
@@ -87,7 +106,7 @@ export function BanUserButton() {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[425px] h-[420px] flex flex-col justify-between overflow-hidden">
+      <DialogContent className="sm:max-w-[425px] h-[480px] flex flex-col justify-between overflow-hidden">
         <DialogHeader className="space-y-2">
           <DialogTitle>
             {step === "manage" ? "Manage User" : "Ban User"}
@@ -143,7 +162,7 @@ export function BanUserButton() {
                 name="violations"
                 control={banForm.control}
                 render={({ field }) => (
-                  <ScrollArea className="h-[180px] rounded-md border p-1">
+                  <ScrollArea className="h-[150px] rounded-md border p-1">
                     <div className="space-y-2 pr-3">
                       {PLATFORM_RULES.map((rule) => {
                         const isChecked = field.value?.includes(rule.id);
@@ -196,10 +215,45 @@ export function BanUserButton() {
                   {banForm.formState.errors.violations.message}
                 </p>
               )}
+
+              <div className="space-y-1">
+                <Label htmlFor="duration">Ban Duration</Label>
+                <Controller
+                  name="duration"
+                  control={banForm.control}
+                  render={({ field }) => (
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <SelectTrigger id="duration" className="w-full cursor-pointer">
+                        <SelectValue placeholder="Select duration" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">1 Day</SelectItem>
+                        <SelectItem value="3">3 Days</SelectItem>
+                        <SelectItem value="7">7 Days</SelectItem>
+                        <SelectItem
+                          value="permanent"
+                          className="text-destructive font-medium"
+                        >
+                          Permanent
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {banForm.formState.errors.duration && (
+                  <p className="text-xs text-destructive">
+                    {banForm.formState.errors.duration.message}
+                  </p>
+                )}
+              </div>
+
               <div className="space-y-1">
                 <Label htmlFor="reason">Reason for Ban</Label>
                 <Textarea
-                  className="h-24"
+                  className="h-20"
                   id="reason"
                   placeholder="Enter the violation details..."
                   {...banForm.register("reason")}
@@ -216,19 +270,11 @@ export function BanUserButton() {
 
         <DialogFooter className="border-t bg-background pt-3 gap-2 sm:gap-2">
           {step === "manage" ? (
-            <>
-              <DialogClose asChild>
-                <Button variant="outline" type="button">
-                  Cancel
-                </Button>
-              </DialogClose>
-              <Button
-                type="button"
-                onClick={manageForm.handleSubmit(onManageSubmit)}
-              >
-                Save Settings
+            <DialogClose asChild>
+              <Button variant="outline" type="button">
+                Cancel
               </Button>
-            </>
+            </DialogClose>
           ) : (
             <>
               <Button

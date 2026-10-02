@@ -197,7 +197,7 @@ export function RightSidebarProfile({ preloadedProfile, preloadedCurrentUser }: 
                     />
 
                     {currentUser.profile?.isModerator && 
-                      <BanUserButton />
+                      <BanUserButton userId={profile.userId} />
                     }
                   </div>
                 )}
