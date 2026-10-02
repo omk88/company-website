@@ -31,6 +31,7 @@ import { ProfileSettingsButton } from "./ProfileSettingsButton";
 import { Badge } from "../ui/badge";
 import { ScrollArea } from "../ui/scroll-area";
 import MessageButton from "./MessageButton";
+import { BanUserButton } from "./BanUserButton";
 
 interface RightSidebarProfileProps {
   preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
@@ -81,6 +82,10 @@ export function RightSidebarProfile({ preloadedProfile, preloadedCurrentUser }: 
   
   if (!profile) {
     return <div className="p-4 text-gray-500">Profile not found</div>;
+  }
+
+  if (!currentUser) {
+    return <div className="p-4 text-gray-500">Not logged in</div>;
   }
 
   const { displayName } = profile;
@@ -190,6 +195,10 @@ export function RightSidebarProfile({ preloadedProfile, preloadedCurrentUser }: 
                     <MessageButton
                       recipientId={profile.userId}
                     />
+
+                    {currentUser.profile?.isModerator && 
+                      <BanUserButton />
+                    }
                   </div>
                 )}
               </div>

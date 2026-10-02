@@ -103,7 +103,7 @@ function StandardBlogFeed({
           loadMore(6);
         }
       },
-      { rootMargin: "200px" }
+      { rootMargin: "600px" }
     );
 
     if (loadMoreRef.current) observer.observe(loadMoreRef.current);

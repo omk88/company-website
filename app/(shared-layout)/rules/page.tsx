@@ -1,57 +1,8 @@
 import Footer from "@/components/web/Footer";
-
-interface RulesSections {
-  id: string;
-  title: string;
-  content: React.ReactNode;
-}
+import { PLATFORM_RULES } from "@/constants/rules";
 
 export default function PlatformRules() {
-
   const lastUpdated = "2026-10-02";
-
-  const sections: RulesSections[] = [
-  {
-    id: "rule1",
-    title: "Keep content on topic.",
-    content: (
-        <div>
-            <span>This is a tech blog, try to keep all content about technology and coding/programming. Content that is off topic will be removed.</span>
-        </div>
-    )},
-    {
-    id: "rule2",
-    title: "No explicit content.",
-    content: (
-        <div>
-            <span>Any explicit/adult/pornographic content will be removed and you will be banned.</span>
-        </div>
-    )},
-    {
-    id: "rule3",
-    title: "No plagiarism.",
-    content: (
-        <div>
-            <span>Plagarised content will be removed. Cross posting content is fine but stealing somebody elses content will get you banned.</span>
-        </div>
-    )},
-    {
-    id: "rule4",
-    title: "Do not post low value content.",
-    content: (
-        <div>
-            <span>Content that is low effort and low value will be removed. This includes content that is entirely or almost entirely AI generated.</span>
-        </div>
-    )},
-    {
-    id: "rule5",
-    title: "Don't post peoples private information without permission.",
-    content: (
-        <div>
-            <span>Any post containing personal information without permission from that individual (such as their physical address) will be removed immediately and you will be banned.</span>
-        </div>
-    )},
-  ]
 
   return (
     <>
@@ -67,13 +18,17 @@ export default function PlatformRules() {
           </header>
 
           <div className="space-y-7">
-            {sections.map((section) => (
-              <section key={section.id} id={section.id} className="scroll-mt-20 border-t border-border/40 pt-8 first:border-t-0 first:pt-0">
+            {PLATFORM_RULES.map((rule) => (
+              <section
+                key={rule.id}
+                id={rule.id}
+                className="scroll-mt-20 border-t border-border/40 pt-8 first:border-t-0 first:pt-0"
+              >
                 <h2 className="text-xl font-semibold tracking-tight text-foreground mb-4">
-                  {section.title}
+                  {rule.title}
                 </h2>
                 <div className="text-base leading-relaxed text-muted-foreground space-y-4">
-                  {section.content}
+                  <p>{rule.description}</p>
                 </div>
               </section>
             ))}
