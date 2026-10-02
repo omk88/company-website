@@ -50,6 +50,7 @@ export const initialiseProfile = mutation({
       totalLikes: 0,
       followerCount: 0,
       followingCount: 0,
+      isBanned: false,
     });
 
     await ctx.db.insert("profileSettings", {
@@ -281,6 +282,7 @@ export const createProfile = mutation({
     totalLikes: v.number(),
     followerCount: v.number(),
     followingCount: v.number(),
+    isBanned: v.boolean(),
   },
   handler: async (ctx, args) => {
     const existingUser = await ctx.db
