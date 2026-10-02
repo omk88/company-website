@@ -84,10 +84,6 @@ export function RightSidebarProfile({ preloadedProfile, preloadedCurrentUser }: 
     return <div className="p-4 text-gray-500">Profile not found</div>;
   }
 
-  if (!currentUser) {
-    return <div className="p-4 text-gray-500">Not logged in</div>;
-  }
-
   const { displayName } = profile;
   const isOwnProfile = Boolean(currentUser?.userId && profile?.userId && currentUser.userId === profile.userId);
 
@@ -196,7 +192,7 @@ export function RightSidebarProfile({ preloadedProfile, preloadedCurrentUser }: 
                       recipientId={profile.userId}
                     />
 
-                    {currentUser.profile?.isModerator && 
+                    {currentUser?.profile?.isModerator && 
                       <BanUserButton userId={profile.userId} />
                     }
                   </div>
