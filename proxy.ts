@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { api } from "@/convex/_generated/api";
-import { fetchAuthQuery } from "@/lib/auth-server"; 
 
 export async function proxy(request: NextRequest) {
     const url = request.nextUrl.clone();
@@ -9,23 +7,15 @@ export async function proxy(request: NextRequest) {
 
     const prodCookie = request.cookies.get("__Secure-better-auth.session_token");
     const devCookie = request.cookies.get("better-auth.session_token");
-    const sessionTokenValue = prodCookie?.value || devCookie?.value || "";
-
-    const userStatus = await fetchAuthQuery(api.manageUsers.getProxyUserStatus, {});
+    const hasSession = Boolean(prodCookie?.value || devCookie?.value);
 
     const isAuthProtectedRoute = 
       pathname.startsWith("/company") || 
       pathname.startsWith("/create-blog") ||
-      pathname.startsWith("/inbox");
+      pathname.startsWith("/inbox") ||
+      pathname.startsWith("/insights");
 
-    const isBanProtectedRoute = pathname.startsWith("/insights");
-
-    if (isBanProtectedRoute && userStatus?.isBanned) {
-        url.pathname = "/banned";
-        return NextResponse.redirect(url);
-    }
-
-    if (isAuthProtectedRoute && sessionTokenValue.trim() === "") {
+    if (isAuthProtectedRoute && !hasSession) {
         url.pathname = "/sign-in";
         return NextResponse.redirect(url);
     }
@@ -36,7 +26,7 @@ export async function proxy(request: NextRequest) {
 export const config = {
     matcher: [
       "/company/:path*", 
-      "/insights", 
+      "/insights/:path*", 
       "/create-blog/:path*", 
       "/inbox/:path*"
     ],
