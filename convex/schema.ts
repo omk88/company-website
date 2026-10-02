@@ -178,7 +178,7 @@ const schema = defineSchema({
 
     isModerator: v.optional(v.boolean()),
 
-    isBanned: v.boolean(),
+    isBanned: v.optional(v.boolean()),
     banReason: v.optional(v.string()),
     banViolations: v.optional(v.array(v.string())),
     bannedAt: v.optional(v.number()),
