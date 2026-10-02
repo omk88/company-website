@@ -34,6 +34,8 @@ import { useBlogStore } from "@/stores/useBlogStore";
 import { ScrollArea } from "../ui/scroll-area";
 import { useBlogDraft } from "@/hooks/useBlogDraft";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { ConvexError } from "convex/values";
+import { BannedDialog } from "../BannedDialog";
 
 const lowlight = createLowlight();
 lowlight.register("javascript", js);
@@ -231,12 +233,22 @@ export const LivePostPreview = memo(function LivePostPreview({
   );
 });
 
+interface BanDetails {
+  banReason: string;
+  banViolations: string[];
+  bannedAt: number | null;
+  bannedUntil: number | null;
+}
+
 export default function BlogPostForm() {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const [isBannedDialogOpen, setIsBannedDialogOpen] = useState(false);
+    const [banDetails, setBanDetails] = useState<BanDetails | null>(null);
 
     const userData = useCurrentUser();
     const selectedBlog = useBlogStore((state) => state.selectedBlog);
@@ -402,7 +414,6 @@ export default function BlogPostForm() {
                     storageId: storageId,
                     postType: postType,
                 });
-
                 toast.success("Blog article published successfully!");
                 await clearDraft();
             }
@@ -433,6 +444,17 @@ export default function BlogPostForm() {
             router.refresh();
 
         } catch (error) {
+            if (error instanceof ConvexError && error.data?.code === "USER_BANNED") {
+                setBanDetails({
+                    banReason: error.data.banReason,
+                    banViolations: error.data.banViolations,
+                    bannedAt: error.data.bannedAt,
+                    bannedUntil: error.data.bannedUntil,
+                });
+                setIsBannedDialogOpen(true);
+                return;
+            }
+
             console.error(error);
             toast.error(error instanceof Error ? error.message : "Process interrupted.");
         } finally {
@@ -925,6 +947,11 @@ export default function BlogPostForm() {
                     </ScrollArea>
                 )}
             </div>
+            <BannedDialog
+                open={isBannedDialogOpen}
+                onOpenChange={setIsBannedDialogOpen}
+                banDetails={banDetails}
+            />
         </div>
     );
 }

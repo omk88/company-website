@@ -11,6 +11,7 @@
 import type * as auth from "../auth.js";
 import type * as avatarCleanup from "../avatarCleanup.js";
 import type * as avatars from "../avatars.js";
+import type * as banned from "../banned.js";
 import type * as blogs from "../blogs.js";
 import type * as calculateIsPopular from "../calculateIsPopular.js";
 import type * as calculateIsTrending from "../calculateIsTrending.js";
@@ -41,6 +42,7 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   avatarCleanup: typeof avatarCleanup;
   avatars: typeof avatars;
+  banned: typeof banned;
   blogs: typeof blogs;
   calculateIsPopular: typeof calculateIsPopular;
   calculateIsTrending: typeof calculateIsTrending;

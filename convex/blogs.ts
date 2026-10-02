@@ -4,6 +4,7 @@ import { v } from "convex/values";
 import { paginationOptsValidator } from "convex/server";
 import { calculateScores } from "./scoreAlgorithm";
 import { internal } from "./_generated/api";
+import { requireActiveUser } from "./banned";
 
 const WORDS_PER_MINUTE = 225;
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
@@ -29,13 +30,13 @@ export const createPost = mutation({
     postType: v.union(v.literal("community"), v.literal("team")),
   },
   handler: async (ctx, args) => {
+    const { identity, profile } = await requireActiveUser(ctx);
 
     await claimMarkdownImages(ctx, args.content);
-
     const generatedImageUrl = await ctx.storage.getUrl(args.storageId);
 
     const words = args.content.trim().split(/\s+/);
-    const wordCount = words.filter(word => word.length > 0).length;
+    const wordCount = words.filter((word) => word.length > 0).length;
     const readTimeMinutes = Math.max(1, Math.ceil(wordCount / WORDS_PER_MINUTE));
     const now = Date.now();
 
@@ -83,22 +84,14 @@ export const createPost = mutation({
       })
     );
 
-    const profilePromise = ctx.db
-      .query("profiles")
-      .withIndex("by_userId", (q) => q.eq("userId", args.author))
-      .unique();
-
-    const [_, profile] = await Promise.all([
-      Promise.all(tagPromises),
-      profilePromise,
-    ]);
+    await Promise.all(tagPromises);
 
     await ctx.scheduler.runAfter(0, internal.tts.generateAudio, {
       blogId,
       content: args.content,
       title: args.title,
       author: args.displayName || args.username,
-      subtitle: args.subtitle
+      subtitle: args.subtitle,
     });
 
     return blogId;
