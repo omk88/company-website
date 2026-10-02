@@ -1,6 +1,6 @@
 import { cache } from "react";
 import { Metadata } from "next";
-import { fetchQuery } from "convex/nextjs";
+import { fetchQuery, preloadQuery } from "convex/nextjs";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { SidebarProvider } from "@/components/ui/sidebar";
@@ -77,7 +77,7 @@ export default async function BlogPage({ params }: BlogPageProps) {
 
   const [blogData, preloadedComments] = await Promise.all([
     getBlogData(blogId),
-    preloadAuthQuery(api.comments.getCommentsByBlog, { blogId }),
+    preloadQuery(api.comments.getCommentsByBlog, { blogId }),
   ]);
 
   if (!blogData?.blog) {
