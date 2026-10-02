@@ -3,8 +3,7 @@ import { v } from "convex/values";
 
 export const getProxyUserStatus = query({
   args: {},
-  handler: async (ctx, args) => {
-
+  handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return null;
 
@@ -17,10 +16,14 @@ export const getProxyUserStatus = query({
 
     const isCurrentlyBanned =
       profile.isBanned &&
-      (profile.bannedUntil === null || profile.bannedUntil === undefined || profile.bannedUntil > Date.now());
+      (profile.bannedUntil === null || 
+       profile.bannedUntil === undefined || 
+       profile.bannedUntil > Date.now());
 
     return {
       isBanned: isCurrentlyBanned,
+      banReason: profile.banReason,
+      bannedUntil: profile.bannedUntil ?? null,
     };
   },
 });
