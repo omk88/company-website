@@ -12,9 +12,8 @@ export async function proxy(request: NextRequest) {
     const isAuthProtectedRoute = 
       pathname.startsWith("/company") || 
       pathname.startsWith("/create-blog") ||
-      pathname.startsWith("/inbox") ||
-      pathname.startsWith("/insights");
-
+      pathname.startsWith("/inbox");
+      
     if (isAuthProtectedRoute && !hasSession) {
         url.pathname = "/sign-in";
         return NextResponse.redirect(url);
@@ -25,8 +24,6 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
     matcher: [
-      "/company/:path*", 
-      "/insights/:path*", 
       "/create-blog/:path*", 
       "/inbox/:path*"
     ],
