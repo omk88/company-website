@@ -13,7 +13,7 @@ export async function proxy(request: NextRequest) {
       pathname.startsWith("/company") || 
       pathname.startsWith("/create-blog") ||
       pathname.startsWith("/inbox");
-      
+
     if (isAuthProtectedRoute && !hasSession) {
         url.pathname = "/sign-in";
         return NextResponse.redirect(url);
