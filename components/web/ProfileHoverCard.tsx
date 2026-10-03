@@ -1,6 +1,6 @@
 "use client";
 
-import { MapPin, Cake, ThumbsUp, MessageSquareText, Library, User, ArrowUpRight, Zap, MessageSquare, UsersRound } from "lucide-react";
+import { MapPin, Cake, ThumbsUp, MessageSquareText, Library, User, ArrowUpRight, Zap, MessageSquare, UsersRound, Crown } from "lucide-react";
 import { HoverCard, HoverCardTrigger, HoverCardContent } from "../ui/hover-card";
 import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
@@ -105,24 +105,40 @@ export function ProfileHoverCard({ displayName, authorUsername, children, align 
                         </Link>
 
                         <div className="gap-4 p-2 flex flex-col text-[14px] font-sans tracking-tight select-none w-full">
-                            <TooltipProvider delayDuration={200}>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <div className="flex flex-row items-center">
-                                            <div className="inline-flex w-fit items-center gap-1 text-xs font-sans font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/60 cursor-help select-none">
-                                                <Zap className="w-3 h-3 fill-amber-500 stroke-amber-500 shrink-0" />
-                                                <span>{profileData?.profile?.totalLikes}</span>
+                            <div className="flex flex-row gap-2">
+                                <TooltipProvider delayDuration={200}>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <div className="flex flex-row items-center">
+                                                <div className="inline-flex w-fit items-center gap-1 text-xs font-sans font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/60 cursor-help select-none">
+                                                    <Zap className="w-3 h-3 fill-amber-500 stroke-amber-500 shrink-0" />
+                                                    <span>{profileData?.profile?.totalLikes}</span>
+                                                </div>
+                                                <div className="ml-auto">
+                                                    <FollowButton userId={profileData?.profile?.userId || ""} username={profileData?.profile?.username || ""} displayName={profileData?.profile?.displayName || ""} initialIsFollowing={profileData?.viewerStatus.isFollowing} initialIsBell={profileData?.viewerStatus.isBell} isSelf={profileData?.viewerStatus.isSelf} />
+                                                </div>
                                             </div>
-                                            <div className="ml-auto">
-                                                <FollowButton userId={profileData?.profile?.userId || ""} username={profileData?.profile?.username || ""} displayName={profileData?.profile?.displayName || ""} initialIsFollowing={profileData?.viewerStatus.isFollowing} initialIsBell={profileData?.viewerStatus.isBell} isSelf={profileData?.viewerStatus.isSelf} />
-                                            </div>
-                                        </div>
-                                    </TooltipTrigger>
-                                    <TooltipContent side="bottom" align="start">
-                                        <p className="text-xs font-medium">{profileData?.profile?.totalLikes} Total Likes</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="bottom" align="start">
+                                            <p className="text-xs font-medium">{profileData?.profile?.totalLikes} Total Likes</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                                {profileData?.profile?.isModerator &&
+                                    <TooltipProvider delayDuration={200}>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <div className="inline-flex w-fit items-center gap-1 text-xs font-sans font-semibold px-2 py-0.5 rounded-full cursor-help select-none">
+                                                    <Crown className="w-4 h-4 fill-yellow-300 stroke-yellow-300 shrink-0" />
+                                                </div>
+                                            </TooltipTrigger>
+                                            <TooltipContent side="bottom" align="center">
+                                                <p className="text-xs font-medium">This User is a Moderator</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                }
+                            </div>
 
                             <div className="flex flex-row">
                                 <div className="flex items-start gap-1.5 min-w-[3rem] justify-start">
