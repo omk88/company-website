@@ -8,6 +8,7 @@ import { Doc } from "@/convex/_generated/dataModel";
 import { FunctionReturnType } from "convex/server";
 import { CompactCommentCardSkeleton } from "./LoadingSkeletons/CompactCommentCardSkeleton";
 import { EmptyState } from "./EmptyState";
+import { MessageSquareText } from "lucide-react";
 
 type ProfileData = FunctionReturnType<typeof api.profiles.getProfileByUsername>;
 
@@ -77,7 +78,7 @@ export function ProfileComments({ profile, preloadedData }: ProfileCommentsProps
           </ul>
         ) : displayResults.length === 0 ? (
           <div className="flex flex-col flex-1 h-full min-h-0">
-            <EmptyState size="sm" title="No comments found" description="This user hasn't posted any comments yet." />
+            <EmptyState icon={MessageSquareText} size="sm" title="No comments found" description="This user hasn't posted any comments yet." />
           </div>
         ) : (
           <>

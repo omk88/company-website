@@ -7,6 +7,7 @@ import { BlogCard } from "./BlogCard";
 import { EmptyState } from "./EmptyState";
 import { CompactBlogCardSkeleton } from "./LoadingSkeletons/CompactBlogCardSkeleton";
 import { FunctionReturnType } from "convex/server";
+import { Bookmark } from "lucide-react";
 
 type ProfileData = FunctionReturnType<typeof api.profiles.getProfileByUsername>;
 
@@ -77,6 +78,7 @@ export function ProfileBookmarks({ profile, preloadedData }: ProfileBookmarksPro
         ) : displayResults.length === 0 ? (
           <div className="flex flex-col flex-1 h-full min-h-0">
             <EmptyState
+              icon={Bookmark}
               size="sm"
               title="No bookmarked posts found"
               description="This user hasn't added any bookmarks yet."

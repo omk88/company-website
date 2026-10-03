@@ -7,6 +7,7 @@ import { ProfileCard } from "./ProfileCard";
 import { FunctionReturnType } from "convex/server";
 import { EmptyState } from "./EmptyState";
 import { ProfileCardSkeleton } from "./ProfileFollows";
+import { UsersRound } from "lucide-react";
 
 type ProfileData = FunctionReturnType<typeof api.profiles.getProfileByUsername>;
 type CurrentUserData = FunctionReturnType<typeof api.auth.getCurrentUser>;
@@ -75,7 +76,7 @@ export function ProfileFollowers({ profile, currentUser, preloadedData }: Profil
   if (displayResults.length === 0) {
     return (
       <div className="flex flex-col flex-1 h-full min-h-0">
-        <EmptyState size="sm" title="No users found" description="This user doesn't have any followers yet." />
+        <EmptyState icon={UsersRound} size="sm" title="No users found" description="This user doesn't have any followers yet." />
       </div>
     );
   }

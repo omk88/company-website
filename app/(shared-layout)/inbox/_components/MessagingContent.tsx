@@ -9,6 +9,7 @@ import {
   MessageSquare,
   X,
   Download,
+  MessageCircle,
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -19,6 +20,7 @@ import { useMessageStore } from "@/stores/useMessageStore";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useGuardedMutation } from "@/hooks/useGuardedMutation";
+import { EmptyState } from "@/components/web/EmptyState";
 
 function MessagingContentSkeleton() {
   return (
@@ -77,22 +79,6 @@ function MessagingContentSkeleton() {
           </div>
         </div>
       </footer>
-    </div>
-  );
-}
-
-function EmptyMessagingState() {
-  return (
-    <div className="flex flex-col items-center justify-center w-full h-full bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 p-6 text-center">
-      <div className="h-16 w-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-4 text-slate-400 dark:text-slate-500">
-        <MessageSquare className="h-8 w-8" />
-      </div>
-      <h3 className="text-base font-semibold text-slate-800 dark:text-slate-200">
-        No conversation selected
-      </h3>
-      <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-xs">
-        Choose a conversation from your list or start a new one to begin messaging.
-      </p>
     </div>
   );
 }
@@ -350,7 +336,7 @@ export default function MessagingContent() {
   };
 
   if (!activeConversationId) {
-    return <EmptyMessagingState />;
+    return <EmptyState icon={MessageCircle} title="No conversation selected" description="Choose a conversation from your list or start a new one to begin messaging." />;
   }
 
   if (messages === undefined) {

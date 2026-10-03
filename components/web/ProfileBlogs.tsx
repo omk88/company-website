@@ -7,6 +7,7 @@ import { BlogCard } from "./BlogCard";
 import { EmptyState } from "./EmptyState";
 import { CompactBlogCardSkeleton } from "./LoadingSkeletons/CompactBlogCardSkeleton";
 import { FunctionReturnType } from "convex/server";
+import { Library } from "lucide-react";
 
 type ProfileData = FunctionReturnType<typeof api.profiles.getProfileByUsername>;
 
@@ -76,7 +77,7 @@ export function ProfileBlogs({ profile, preloadedData }: ProfileBlogsProps) {
           </ul>
         ) : displayResults.length === 0 ? (
           <div className="w-full py-8">
-            <EmptyState size="sm" description="This user hasn't posted any insights yet." />
+            <EmptyState icon={Library} size="sm" description="This user hasn't posted any insights yet." />
           </div>
         ) : (
           <>

@@ -1,22 +1,26 @@
-import { FileSearch, Inbox } from "lucide-react";
+import { FileSearch, Inbox, LucideIcon } from "lucide-react";
 
 interface EmptyStateProps {
   title?: string;
   description?: string;
+  icon?: LucideIcon;
   size?: "lg" | "sm";
 }
 
 export function EmptyState({
   title = "No insights found",
   description = "We couldn't find any articles matching your search or filters. Try adjusting your search term or clearing filters.",
+  icon: IconComponent,
   size = "lg",
 }: EmptyStateProps) {
+
+  const Icon = IconComponent ?? (size === "lg" ? FileSearch : Inbox);
 
   if (size === "lg") {
     return (
       <div className="flex flex-1 h-full w-full flex-col items-center justify-center rounded-none p-8 text-center">      
         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted border border-border">
-          <FileSearch className="h-6 w-6 text-muted-foreground stroke-[1.8]" />
+          <Icon className="h-6 w-6 text-muted-foreground stroke-[1.8]" />
         </div>
 
         <div className="mt-4 max-w-sm space-y-1.5">
@@ -34,7 +38,7 @@ export function EmptyState({
   return (
     <div className="flex flex-1 h-full w-full flex-col items-center justify-center rounded-none p-8 text-center">      
       <div className="flex size-12 md:size-10 items-center justify-center rounded-full bg-muted border border-border">
-        <Inbox className="size-6 md:size-5 text-muted-foreground stroke-[1.8]" />
+        <Icon className="size-6 md:size-5 text-muted-foreground stroke-[1.8]" />
       </div>
 
       <div className="mt-2 max-w-sm md:space-y-1">
