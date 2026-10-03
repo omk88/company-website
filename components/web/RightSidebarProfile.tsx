@@ -169,7 +169,7 @@ export function RightSidebarProfile({ preloadedProfile, preloadedCurrentUser }: 
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <div className="inline-flex w-fit items-center gap-1 text-xs font-sans font-semibold px-2 py-0.5 rounded-full cursor-help select-none">
-                          <Crown className="w-4 h-4 fill-yellow-300 stroke-yellow-300 shrink-0" />
+                          <Crown className="w-4 h-4 fill-yellow-300 stroke-yellow-500 shrink-0" />
                         </div>
                       </TooltipTrigger>
                     <TooltipContent side="bottom" align="center">
