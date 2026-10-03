@@ -35,13 +35,13 @@ export function formatSmartDate(date: Date | number, profileDate: boolean): stri
         const rtf = new Intl.RelativeTimeFormat("en-US", { numeric: "auto" });
 
         if (diffInMinutes < 1) {
-        return "just now";
+            return "just now";
         }
         if (diffInMinutes < 60) {
-        return rtf.format(-diffInMinutes, "minute");
+            return rtf.format(-diffInMinutes, "minute");
         }
         if (diffInHours < 24) {
-        return rtf.format(-diffInHours, "hour");
+            return rtf.format(-diffInHours, "hour");
         }
         return rtf.format(-diffInDays, "day");
     }

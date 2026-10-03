@@ -282,7 +282,7 @@ export function BlogCard({
               <MessageSquare className="size-4.5 md:size-3.5" />
               <span>{commentCount}</span>
             </div>
-            <time className="text-base md:text-xs text-zinc-400">
+            <time className="capitalize text-base md:text-xs text-zinc-400">
               {formatSmartDate(date, false)}
             </time>
           </div>
