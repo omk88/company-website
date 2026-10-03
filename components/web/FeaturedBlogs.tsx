@@ -6,7 +6,7 @@ import { ArrowLeft, ArrowRight, Eye, MessageSquare, Sparkles, ThumbsUp } from "l
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { api } from "@/convex/_generated/api";
-import { Preloaded, usePreloadedQuery, useQuery } from "convex/react";
+import { Preloaded, usePreloadedQuery } from "convex/react";
 import { ProfileHoverCard } from "./ProfileHoverCard";
 
 function formatRelativeDate(dateString: string | number | Date): string {
@@ -76,7 +76,7 @@ export function FeaturedBlogs({ preloadedData }: { preloadedData: Preloaded<type
   const displayName = truncateName(rawName, 12);
 
   return (
-    <div className="flex flex-col justify-between w-full bg-zinc-50/80 dark:bg-zinc-900/50 rounded-xl p-3.5 transition-all">
+    <div className="flex flex-col justify-between w-full bg-zinc-50/80 dark:bg-zinc-900/50 hover:bg-zinc-100/90 rounded-xl p-3.5 transition-all">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-800 dark:text-zinc-200">
           <Sparkles className="w-3.5 h-3.5 shrink-0" />
