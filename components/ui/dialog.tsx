@@ -5,7 +5,7 @@ import { Dialog as DialogPrimitive } from "radix-ui"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { XIcon } from "lucide-react"
+import { DownloadIcon, XIcon } from "lucide-react"
 
 function Dialog({
   ...props
@@ -47,14 +47,84 @@ function DialogOverlay({
   )
 }
 
+interface DialogContentProps
+  extends React.ComponentProps<typeof DialogPrimitive.Content> {
+  showCloseButton?: boolean
+  variant?: "default" | "lightbox"
+  title?: string
+  onDownload?: () => void
+}
+
 function DialogContent({
   className,
   children,
   showCloseButton = true,
+  variant = "default",
+  title,
+  onDownload,
   ...props
-}: React.ComponentProps<typeof DialogPrimitive.Content> & {
-  showCloseButton?: boolean
-}) {
+}: DialogContentProps) {
+  if (variant === "lightbox") {
+    return (
+      <DialogPortal>
+        <DialogOverlay />
+        <DialogPrimitive.Content
+          data-slot="dialog-content"
+          className={cn(
+            "fixed inset-0 z-50 flex items-center justify-center p-4 outline-none border-none bg-transparent shadow-none",
+            className
+          )}
+          {...props}
+        >
+          <DialogPrimitive.Close className="absolute inset-0 z-0 h-full w-full cursor-default border-none bg-transparent outline-none" />
+
+          <div 
+            className="absolute top-0 inset-x-0 flex items-center justify-between p-4 bg-gradient-to-b from-black/40 to-transparent z-20"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="text-sm font-medium truncate max-w-[50%] text-neutral-200">
+              {title && <DialogPrimitive.Title className="text-sm font-medium">{title}</DialogPrimitive.Title>}
+            </div>
+
+            <div className="flex items-center gap-2">
+              {onDownload && (
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={onDownload}
+                  className="text-neutral-200 hover:bg-white/20 hover:text-white cursor-pointer"
+                >
+                  <DownloadIcon className="h-4 w-4" />
+                  <span className="sr-only">Download</span>
+                </Button>
+              )}
+
+              {showCloseButton && (
+                <DialogPrimitive.Close asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    className="text-neutral-200 hover:bg-white/20 hover:text-white cursor-pointer"
+                  >
+                    <XIcon className="h-4 w-4" />
+                    <span className="sr-only">Close</span>
+                  </Button>
+                </DialogPrimitive.Close>
+              )}
+            </div>
+          </div>
+
+          <div 
+            className="relative z-10 max-w-full max-h-full flex items-center justify-center data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 duration-100"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {children}
+          </div>
+        </DialogPrimitive.Content>
+      </DialogPortal>
+    )
+  }
+
   return (
     <DialogPortal>
       <DialogOverlay />
@@ -74,8 +144,7 @@ function DialogContent({
               className="absolute top-2 right-2 cursor-pointer"
               size="icon-sm"
             >
-              <XIcon
-              />
+              <XIcon />
               <span className="sr-only">Close</span>
             </Button>
           </DialogPrimitive.Close>

@@ -1,6 +1,5 @@
 import Image from "next/image";
 import ReactMarkdown from "react-markdown";
-import rehypeHighlight from "rehype-highlight";
 import { createLowlight } from "lowlight";
 import js from "highlight.js/lib/languages/javascript";
 import ts from "highlight.js/lib/languages/typescript";
@@ -21,6 +20,7 @@ import { AudioPlayer } from "@/app/(shared-layout)/insights/[blogId]/_components
 import { extractHeadings } from "@/app/(shared-layout)/insights/[blogId]/_utils/extractHeadings";
 import { TableOfContents } from "@/app/(shared-layout)/insights/[blogId]/_components/TableOfContents";
 import rehypeSlug from "rehype-slug";
+import { ImageDialog } from "../ImageDialog";
 
 const lowlight = createLowlight();
 lowlight.register("javascript", js);
@@ -106,7 +106,8 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
           components={{
             pre: CodeBlock,
             code({ node, className, children, ...props }: any) {
-              const isInline = !node?.parent || node?.parent?.tagName !== "pre";
+              const isInline =
+                !node?.parent || node?.parent?.tagName !== "pre";
 
               if (isInline) {
                 return (
@@ -123,6 +124,17 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
                 <code className={className} {...props}>
                   {children}
                 </code>
+              );
+            },
+            img({ src, alt, ...props }) {
+              if (!src || typeof src !== "string") return null;
+
+              return (
+                <ImageDialog
+                  src={src}
+                  alt={alt}
+                  {...props}
+                />
               );
             },
           }}
