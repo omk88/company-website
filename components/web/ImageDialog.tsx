@@ -66,7 +66,7 @@ export function ImageDialog({
           <img
             src={imageUrl}
             alt={alt || displayTitle || ""}
-            className="max-h-[85vh] max-w-[90vw] w-auto h-auto object-contain rounded-none select-none shadow-2xl"
+            className="max-h-[75vh] max-w-[90vw] w-auto h-auto object-contain rounded-none select-none shadow-2xl"
           />
         </DialogContent>
       </Dialog>
