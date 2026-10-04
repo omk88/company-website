@@ -62,11 +62,12 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
 
       <div className="relative w-full h-[300px] md:h-[400px] mb-2 md:mb-6 rounded-lg overflow-hidden">
         <Image
+          quality={90}
           src={blog.imageUrl}
           alt={blog.title}
           fill
           priority
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 70vw, 800px"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1920px"
           className="object-cover"
         />
       </div>
