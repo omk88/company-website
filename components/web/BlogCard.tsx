@@ -378,8 +378,8 @@ export function BlogCard({
           </div>
         </div>
 
-        <Link href={`/insights/${id}`} className="space-y-2 py-2 block hover:no-underline">
-          <h3 className="leading-tight py-0.5 text-xl font-bold tracking-tight line-clamp-2 text-foreground transition-colors duration-100 group-hover:text-blue-600 break-words">
+        <Link href={`/insights/${id}`} className="space-y-2 py-1 block hover:no-underline">
+          <h3 className="leading-tight text-xl font-bold tracking-tight line-clamp-2 text-foreground transition-colors duration-100 group-hover:text-blue-600 break-words">
             {title}
           </h3>
           <p className="leading-snug text-zinc-600 dark:text-zinc-400 line-clamp-3 text-sm break-words">
