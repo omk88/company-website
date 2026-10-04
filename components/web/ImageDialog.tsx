@@ -32,14 +32,25 @@ export function ImageDialog({
 
   if (!imageUrl) return null;
 
-  const handleDownload = () => {
+const handleDownload = async () => {
+  try {
+    const response = await fetch(imageUrl);
+    const blob = await response.blob();
+    const blobUrl = URL.createObjectURL(blob);
+
     const link = document.createElement("a");
-    link.href = imageUrl;
-    link.download = alt || title || "downloaded-image";
+    link.href = blobUrl;
+    link.download = alt || title || "downloaded-image.png";
     document.body.appendChild(link);
     link.click();
+    
     document.body.removeChild(link);
-  };
+    URL.revokeObjectURL(blobUrl);
+  } catch (error) {
+    console.error("Failed to download image:", error);
+    window.open(imageUrl, "_blank");
+  }
+};
 
   const displayTitle = title || alt;
 
