@@ -105,39 +105,48 @@ export function ProfileHoverCard({ displayName, authorUsername, children, align 
                         </Link>
 
                         <div className="gap-4 p-2 flex flex-col text-[14px] font-sans tracking-tight select-none w-full">
-                            <div className="flex flex-row gap-2">
-                                <TooltipProvider delayDuration={200}>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <div className="flex flex-row items-center">
+                            <div className="flex flex-row items-center justify-between gap-2">
+                                <div className="flex flex-row items-center gap-2">
+                                    <TooltipProvider delayDuration={200}>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
                                                 <div className="inline-flex w-fit items-center gap-1 text-xs font-sans font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/60 cursor-help select-none">
                                                     <Zap className="w-3 h-3 fill-amber-500 stroke-amber-500 shrink-0" />
                                                     <span>{profileData?.profile?.totalLikes}</span>
                                                 </div>
-                                                <div className="ml-auto">
-                                                    <FollowButton userId={profileData?.profile?.userId || ""} username={profileData?.profile?.username || ""} displayName={profileData?.profile?.displayName || ""} initialIsFollowing={profileData?.viewerStatus.isFollowing} initialIsBell={profileData?.viewerStatus.isBell} isSelf={profileData?.viewerStatus.isSelf} />
-                                                </div>
-                                            </div>
-                                        </TooltipTrigger>
-                                        <TooltipContent side="bottom" align="start">
-                                            <p className="text-xs font-medium">{profileData?.profile?.totalLikes} Total Likes</p>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </TooltipProvider>
-                                {profileData?.profile?.isModerator &&
-                                    <TooltipProvider delayDuration={200}>
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <div className="inline-flex w-fit items-center gap-1 text-xs font-sans font-semibold px-2 py-0.5 rounded-full cursor-help select-none">
-                                                    <Crown className="w-4 h-4 fill-yellow-300 stroke-yellow-500 shrink-0" />
-                                                </div>
                                             </TooltipTrigger>
-                                            <TooltipContent side="bottom" align="center">
-                                                <p className="text-xs font-medium">This User is a Moderator</p>
+                                            <TooltipContent side="bottom" align="start">
+                                                <p className="text-xs font-medium">{profileData?.profile?.totalLikes} Total Likes</p>
                                             </TooltipContent>
                                         </Tooltip>
                                     </TooltipProvider>
-                                }
+
+                                    {profileData?.profile?.isModerator && (
+                                        <TooltipProvider delayDuration={200}>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <div className="inline-flex w-fit items-center gap-1 text-xs font-sans font-semibold px-2 py-0.5 rounded-full cursor-help select-none">
+                                                        <Crown className="w-4 h-4 fill-yellow-300 stroke-yellow-500 shrink-0" />
+                                                    </div>
+                                                </TooltipTrigger>
+                                                <TooltipContent side="bottom" align="center">
+                                                    <p className="text-xs font-medium">This User is a Moderator</p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
+                                    )}
+                                </div>
+
+                                <div>
+                                    <FollowButton 
+                                        userId={profileData?.profile?.userId || ""} 
+                                        username={profileData?.profile?.username || ""} 
+                                        displayName={profileData?.profile?.displayName || ""} 
+                                        initialIsFollowing={profileData?.viewerStatus.isFollowing} 
+                                        initialIsBell={profileData?.viewerStatus.isBell} 
+                                        isSelf={profileData?.viewerStatus.isSelf} 
+                                    />
+                                </div>
                             </div>
 
                             <div className="flex flex-row">
