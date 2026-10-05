@@ -91,6 +91,7 @@ export function ProfileBookmarks({ profile, preloadedData }: ProfileBookmarksPro
                 <li key={blog._id}>
                   <BlogCard
                     id={blog._id}
+                    blogTitleId={blog.blogTitleId}
                     imageUrl={blog.imageUrl}
                     displayName={blog.displayName}
                     username={blog.username}
