@@ -1451,3 +1451,29 @@ function slugify(text: string): string {
     .replace(/^-+/, "")
     .replace(/-+$/, "");
 }
+
+export const getSitemapBlogs = query({
+  args: {},
+  handler: async (ctx) => {
+    const blogs = await ctx.db
+      .query("blogs")
+      .withIndex("by_createdAt")
+      .order("desc")
+      .collect();
+
+    return blogs.map((blog) => ({
+      slug: blog.blogTitleId ?? blog._id,
+      updatedAt: blog.createdAt,
+    }));
+  },
+});
+
+export const getSitemapUsernames = query({
+  args: {},
+  handler: async (ctx) => {
+    const blogs = await ctx.db.query("blogs").collect();
+    const usernames = Array.from(new Set(blogs.map((b) => b.username)));
+
+    return usernames;
+  },
+});
