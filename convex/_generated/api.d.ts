@@ -24,6 +24,7 @@ import type * as files from "../files.js";
 import type * as http from "../http.js";
 import type * as manageUsers from "../manageUsers.js";
 import type * as messaging from "../messaging.js";
+import type * as migrations from "../migrations.js";
 import type * as notifications from "../notifications.js";
 import type * as postImageCleanup from "../postImageCleanup.js";
 import type * as profiles from "../profiles.js";
@@ -55,6 +56,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   manageUsers: typeof manageUsers;
   messaging: typeof messaging;
+  migrations: typeof migrations;
   notifications: typeof notifications;
   postImageCleanup: typeof postImageCleanup;
   profiles: typeof profiles;

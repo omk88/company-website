@@ -40,7 +40,21 @@ export const createPost = mutation({
     const readTimeMinutes = Math.max(1, Math.ceil(wordCount / WORDS_PER_MINUTE));
     const now = Date.now();
 
+    const baseSlug = slugify(args.title);
+    let blogTitleId = baseSlug;
+
+    const existing = await ctx.db
+      .query("blogs")
+      .withIndex("by_blogTitleId", (q) => q.eq("blogTitleId", blogTitleId))
+      .first();
+
+    if (existing) {
+      const uniqueSuffix = Math.random().toString(36).substring(2, 7);
+      blogTitleId = `${baseSlug}-${uniqueSuffix}`;
+    }
+
     const blogId = await ctx.db.insert("blogs", {
+      blogTitleId,
       title: args.title,
       subtitle: args.subtitle,
       content: args.content,
@@ -413,7 +427,6 @@ export const updatePost = mutation({
     storageId: v.string(), 
   },
   handler: async (ctx, args) => {
-
     const { identity, profile } = await requireActiveUser(ctx);
 
     await claimMarkdownImages(ctx, args.content);
@@ -434,6 +447,27 @@ export const updatePost = mutation({
         } catch (e) {
           console.warn("Could not remove old asset:", e);
         }
+      }
+    }
+
+    const words = fieldsToUpdate.content.trim().split(/\s+/);
+    const wordCount = words.filter((word) => word.length > 0).length;
+    const readTimeMinutes = Math.max(1, Math.ceil(wordCount / WORDS_PER_MINUTE));
+
+    let blogTitleId = currentPost.blogTitleId;
+
+    if (fieldsToUpdate.title !== currentPost.title) {
+      const baseSlug = slugify(fieldsToUpdate.title);
+      blogTitleId = baseSlug;
+
+      const existing = await ctx.db
+        .query("blogs")
+        .withIndex("by_blogTitleId", (q) => q.eq("blogTitleId", blogTitleId))
+        .first();
+
+      if (existing && existing._id !== blogId) {
+        const uniqueSuffix = Math.random().toString(36).substring(2, 7);
+        blogTitleId = `${baseSlug}-${uniqueSuffix}`;
       }
     }
 
@@ -469,12 +503,14 @@ export const updatePost = mutation({
         ),
       ];
 
-      await Promise.all(tagOperations)
+      await Promise.all(tagOperations);
     }
 
     await ctx.db.patch(blogId, {
       ...fieldsToUpdate,
+      blogTitleId,
       imageUrl: finalImageUrl,
+      readTime: readTimeMinutes,
     });
 
     await ctx.scheduler.runAfter(0, internal.tts.generateAudio, {
@@ -1045,9 +1081,21 @@ export const getBlogById = query({
 });
 
 export const getBlogWithAuthorPosts = query({
-  args: { blogId: v.id("blogs") },
+  args: { blogTitleId: v.string() },
   handler: async (ctx, args) => {
-    const blog = await ctx.db.get(args.blogId);
+    let blog = await ctx.db
+      .query("blogs")
+      .withIndex("by_blogTitleId", (q) => q.eq("blogTitleId", args.blogTitleId))
+      .first();
+
+    if (!blog) {
+      try {
+        blog = await ctx.db.get(args.blogTitleId as Id<"blogs">);
+      } catch {
+        blog = null;
+      }
+    }
+
     if (!blog) return null;
 
     const identity = await ctx.auth.getUserIdentity();
@@ -1081,7 +1129,7 @@ export const getBlogWithAuthorPosts = query({
         ? ctx.db
             .query("blogVotes")
             .withIndex("by_user_and_blog", (q) =>
-              q.eq("userId", userId).eq("blogId", args.blogId)
+              q.eq("userId", userId).eq("blogId", blog._id)
             )
             .unique()
         : Promise.resolve(null),
@@ -1090,7 +1138,7 @@ export const getBlogWithAuthorPosts = query({
         ? ctx.db
             .query("blogReactions")
             .withIndex("by_user_blog_and_type", (q) =>
-              q.eq("userId", userId).eq("blogId", args.blogId)
+              q.eq("userId", userId).eq("blogId", blog._id)
             )
             .collect()
         : Promise.resolve([]),
@@ -1099,7 +1147,7 @@ export const getBlogWithAuthorPosts = query({
         ? ctx.db
             .query("featuredBlogs")
             .withIndex("by_user_and_blog", (q) =>
-              q.eq("userId", userId).eq("blogId", args.blogId)
+              q.eq("userId", userId).eq("blogId", blog._id)
             )
             .unique()
         : Promise.resolve(null),
@@ -1108,7 +1156,7 @@ export const getBlogWithAuthorPosts = query({
         ? ctx.db
             .query("bookmarks")
             .withIndex("by_user_and_blog", (q) =>
-              q.eq("userId", userId).eq("blogId", args.blogId)
+              q.eq("userId", userId).eq("blogId", blog._id)
             )
             .unique()
         : Promise.resolve(null),
@@ -1146,8 +1194,8 @@ export const getBlogWithAuthorPosts = query({
       blog: {
         ...blog,
         imageUrl: blogImageUrl ?? "/noImage.png",
-        profilePicUrl, 
-        defaultProfilePicUrl, 
+        profilePicUrl,
+        defaultProfilePicUrl,
       },
       authorPosts: authorPostsWithImages,
       interactionState: {
@@ -1391,3 +1439,15 @@ export const getStorageUrl = query({
     return url;
   },
 });
+
+function slugify(text: string): string {
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/[\s\_]+/g, "-") 
+    .replace(/[^\w\-]+/g, "")
+    .replace(/\-\-+/g, "-")
+    .replace(/^-+/, "")
+    .replace(/-+$/, "");
+}

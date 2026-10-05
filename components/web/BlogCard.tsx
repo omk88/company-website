@@ -14,6 +14,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
 interface BlogCardProps {
   id: string;
+  blogTitleId: string;
   imageUrl: string;
   displayName: string | undefined;
   username: string;
@@ -31,6 +32,7 @@ interface BlogCardProps {
 
 export function BlogCard({
   id,
+  blogTitleId,
   imageUrl,
   displayName,
   title,
@@ -107,7 +109,7 @@ export function BlogCard({
     return (
       <div className="group flex flex-col md:flex-row h-auto md:h-[190px] rounded-none px-2">
         <Link 
-          href={`/insights/${id}`}
+          href={`/insights/${blogTitleId}`}
           className="rounded-2xl relative aspect-video md:aspect-auto w-full md:w-2/5 md:h-full overflow-hidden bg-muted border-b md:border-b-0 md:border-r border-border/50 shrink-0 block"
         >
           <div className="relative w-full aspect-[16/9] bg-zinc-100 dark:bg-zinc-800">
@@ -151,7 +153,7 @@ export function BlogCard({
             </div>
           </div>
 
-          <Link href={`/insights/${id}`} className="space-y-2 py-2 block hover:no-underline">
+          <Link href={`/insights/${blogTitleId}`} className="space-y-2 py-2 block hover:no-underline">
             <h3 className="leading-tight text-lg font-bold tracking-tight line-clamp-2 text-foreground transition-colors duration-100 group-hover:text-blue-600 break-words">
               {title}
             </h3>
@@ -243,7 +245,7 @@ export function BlogCard({
     return (
       <div className="group flex flex-col gap-2 p-2 bg-zinc-50/80 hover:bg-zinc-100/90 rounded-xl transition-colors duration-100 dark:bg-muted/30">
         <div className="flex items-center justify-between p-1 gap-2">
-          <Link href={`/insights/${id}`} className="block hover:no-underline flex-1 min-w-0">
+          <Link href={`/insights/${blogTitleId}`} className="block hover:no-underline flex-1 min-w-0">
             <h3 className="leading-tight text-lg md:text-sm font-bold tracking-tight line-clamp-1 text-foreground transition-colors group-hover:text-blue-600">
               {title}
             </h3>
@@ -254,7 +256,7 @@ export function BlogCard({
 
           {imageUrl && (
             <Link 
-              href={`/insights/${id}`}
+              href={`/insights/${blogTitleId}`}
               className="relative w-14 h-14 shrink-0 overflow-hidden rounded-xl block"
             >
               <Image
@@ -349,7 +351,7 @@ export function BlogCard({
   return (
     <div className="group flex flex-col md:flex-row h-auto md:h-[190px] border border-border/50 rounded-none transition-colors duration-100 hover:bg-muted bg-background/95">
       <Link 
-        href={`/insights/${id}`}
+        href={`/insights/${blogTitleId}`}
         className="relative aspect-video md:aspect-auto w-full md:w-2/5 md:h-full overflow-hidden bg-muted border-b md:border-b-0 md:border-r border-border/50 shrink-0 block"
       >
         <div className="relative w-full aspect-[16/9] bg-zinc-100 dark:bg-zinc-800">
@@ -378,7 +380,7 @@ export function BlogCard({
           </div>
         </div>
 
-        <Link href={`/insights/${id}`} className="space-y-2 py-1 block hover:no-underline">
+        <Link href={`/insights/${blogTitleId}`} className="space-y-2 py-1 block hover:no-underline">
           <h3 className="leading-tight text-xl font-bold tracking-tight line-clamp-2 text-foreground transition-colors duration-100 group-hover:text-blue-600 break-words">
             {title}
           </h3>

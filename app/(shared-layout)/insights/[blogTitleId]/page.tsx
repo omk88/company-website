@@ -1,28 +1,27 @@
 import { cache } from "react";
 import { Metadata } from "next";
+import { redirect, RedirectType } from "next/navigation";
 import { fetchQuery, preloadQuery } from "convex/nextjs";
 import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { LeftSidebarControls } from "@/components/web/LeftSidebarControls";
 import { RightSidebarArticles } from "@/components/web/RightSidebarArticles";
 import { BlogContent } from "@/components/web/Blogs/BlogContent";
-import { preloadAuthQuery } from "@/lib/auth-server";
 import { BlogStoreHydrator } from "@/components/web/BlogStoreHydrator";
 import { MobileControls } from "./_components/MobileControls";
 import ScrollToTop from "@/hooks/resetScroll";
 
 interface BlogPageProps {
-  params: Promise<{ blogId: Id<"blogs"> }>;
+  params: Promise<{ blogTitleId: string }>;
 }
 
-const getBlogData = cache(async (blogId: Id<"blogs">) => {
-  return await fetchQuery(api.blogs.getBlogWithAuthorPosts, { blogId });
+const getBlogData = cache(async (blogTitleId: string) => {
+  return await fetchQuery(api.blogs.getBlogWithAuthorPosts, { blogTitleId });
 });
 
 export async function generateMetadata({ params }: BlogPageProps): Promise<Metadata> {
-  const { blogId } = await params;
-  const blogData = await getBlogData(blogId);
+  const { blogTitleId } = await params;
+  const blogData = await getBlogData(blogTitleId);
 
   if (!blogData?.blog) {
     return {
@@ -33,7 +32,7 @@ export async function generateMetadata({ params }: BlogPageProps): Promise<Metad
 
   const { blog } = blogData;
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.taqtiq.tech";
-  const postUrl = `${baseUrl}/insights/${blog._id}`;
+  const postUrl = `${baseUrl}/insights/${blog.blogTitleId || blog._id}`;
 
   const imageUrl = blog.imageUrl?.startsWith("http")
     ? blog.imageUrl
@@ -73,12 +72,9 @@ export async function generateMetadata({ params }: BlogPageProps): Promise<Metad
 }
 
 export default async function BlogPage({ params }: BlogPageProps) {
-  const { blogId } = await params;
+  const { blogTitleId } = await params;
 
-  const [blogData, preloadedComments] = await Promise.all([
-    getBlogData(blogId),
-    preloadQuery(api.comments.getCommentsByBlog, { blogId }),
-  ]);
+  const blogData = await getBlogData(blogTitleId);
 
   if (!blogData?.blog) {
     return (
@@ -89,6 +85,15 @@ export default async function BlogPage({ params }: BlogPageProps) {
   }
 
   const { blog, authorPosts, interactionState } = blogData;
+
+  if (blog.blogTitleId && blogTitleId !== blog.blogTitleId) {
+    redirect(`/insights/${blog.blogTitleId}`, RedirectType.replace);
+  }
+
+  const preloadedComments = await preloadQuery(api.comments.getCommentsByBlog, {
+    blogId: blog._id,
+  });
+
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.taqtiq.tech";
 
   const jsonLd = {
@@ -105,9 +110,9 @@ export default async function BlogPage({ params }: BlogPageProps) {
     },
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `${baseUrl}/blog/${blog._id}`,
+      "@id": `${baseUrl}/insights/${blog.blogTitleId || blog._id}`,
     },
-  }; 
+  };
 
   return (
     <div>

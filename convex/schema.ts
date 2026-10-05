@@ -3,6 +3,7 @@ import { v } from "convex/values";
 
 const schema = defineSchema({
   blogs: defineTable({
+    blogTitleId: v.optional(v.string()),
     storageId: v.string(),
     author: v.string(),
     authorProfileId: v.optional(v.id("profiles")),
@@ -61,6 +62,8 @@ const schema = defineSchema({
     .index("by_type_likes", ["postType", "likes"])
 
     .index("by_author_createdAt", ["author", "createdAt"])
+
+    .index("by_blogTitleId", ["blogTitleId"])
 
     .searchIndex("search_title", { searchField: "title", filterFields: ["username"] })
     .searchIndex("search_title_by_type", { searchField: "title", filterFields: ["postType"] }),

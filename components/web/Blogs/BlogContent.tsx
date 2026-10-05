@@ -15,10 +15,10 @@ import { Doc } from "@/convex/_generated/dataModel";
 import { Preloaded } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { BlogName } from "./BlogName";
-import { CodeBlock } from "../../../app/(shared-layout)/insights/[blogId]/_components/CodeBlock";
-import { AudioPlayer } from "@/app/(shared-layout)/insights/[blogId]/_components/AudioPlayer";
-import { extractHeadings } from "@/app/(shared-layout)/insights/[blogId]/_utils/extractHeadings";
-import { TableOfContents } from "@/app/(shared-layout)/insights/[blogId]/_components/TableOfContents";
+import { CodeBlock } from "../../../app/(shared-layout)/insights/[blogTitleId]/_components/CodeBlock";
+import { AudioPlayer } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/AudioPlayer";
+import { extractHeadings } from "@/app/(shared-layout)/insights/[blogTitleId]/_utils/extractHeadings";
+import { TableOfContents } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/TableOfContents";
 import rehypeSlug from "rehype-slug";
 import { ImageDialog } from "../ImageDialog";
 
