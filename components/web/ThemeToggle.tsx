@@ -29,7 +29,7 @@ export function ThemeToggle() {
         </TooltipTrigger>
         
         <TooltipContent side="bottom" align="center">
-          <p className="text-xs font-medium">Toggle theme</p>
+          <p className="text-xs font-medium">Theme</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
