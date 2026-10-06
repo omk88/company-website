@@ -14,8 +14,26 @@ export function TableOfContents({ headings }: TOCProps) {
   const [activeId, setActiveId] = React.useState<string>("");
   const dropdownRef = React.useRef<HTMLDivElement>(null);
 
+  const processedHeadings = React.useMemo(() => {
+    const idCounts = new Map<string, number>();
+
+    return headings.map((heading, index) => {
+      const rawId = heading.id || heading.text.toLowerCase().replace(/\s+/g, "-");
+      const count = idCounts.get(rawId) || 0;
+      idCounts.set(rawId, count + 1);
+
+      const uniqueId = count === 0 ? rawId : `${rawId}-${count}`;
+
+      return {
+        ...heading,
+        uniqueId,
+        index,
+      };
+    });
+  }, [headings]);
+
   React.useEffect(() => {
-    if (headings.length === 0) return;
+    if (processedHeadings.length === 0) return;
 
     const visibleHeadings = new Map<string, IntersectionObserverEntry>();
 
@@ -40,13 +58,13 @@ export function TableOfContents({ headings }: TOCProps) {
       { rootMargin: "-10% 0px -65% 0px", threshold: 0 }
     );
 
-    headings.forEach((heading) => {
-      const element = document.getElementById(heading.id);
+    processedHeadings.forEach((heading) => {
+      const element = document.getElementById(heading.uniqueId);
       if (element) observer.observe(element);
     });
 
     return () => observer.disconnect();
-  }, [headings]);
+  }, [processedHeadings]);
 
   React.useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -58,16 +76,16 @@ export function TableOfContents({ headings }: TOCProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  if (headings.length === 0) return null;
+  if (processedHeadings.length === 0) return null;
 
-  const activeHeading = headings.find((h) => h.id === activeId);
+  const activeHeading = processedHeadings.find((h) => h.uniqueId === activeId);
 
-  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, uniqueId: string) => {
     e.preventDefault();
     setIsOpen(false);
-    setActiveId(id);
+    setActiveId(uniqueId);
 
-    const targetElement = document.getElementById(id);
+    const targetElement = document.getElementById(uniqueId);
     if (targetElement) {
       targetElement.scrollIntoView({ behavior: "smooth", block: "start" });
     }
@@ -76,19 +94,19 @@ export function TableOfContents({ headings }: TOCProps) {
   return (
     <div
       ref={dropdownRef}
-      className="sticky top-12 md:top-16 z-40 w-full h-12 mb-8 border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 transform-gpu touch-pan-y"
+      className="sticky top-12 md:top-16 z-40 w-full h-12 mb-8 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 transform-gpu touch-pan-y"
     >
       <div className="relative max-w-none px-2 h-full">
         <button
           onClick={() => setIsOpen((prev) => !prev)}
-          className="cursor-pointer flex items-center justify-between w-full h-full text-sm text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white transition-colors"
+          className="cursor-pointer flex items-center justify-between w-full h-full text-sm text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
           aria-expanded={isOpen}
         >
-          <div className="flex items-center gap-2 overflow-hidden truncate pr-4 min-w-0 h-full leading-none">
-            <span className="font-medium text-neutral-500 dark:text-neutral-400 shrink-0">
+          <div className="flex items-center gap-2 overflow-hidden min-w-0 pr-4 py-1">
+            <span className="font-medium text-zinc-500 dark:text-zinc-400 shrink-0">
               On this page:
             </span>
-            <span className="font-semibold text-neutral-900 dark:text-white truncate">
+            <span className="font-semibold text-zinc-900 dark:text-zinc-100 truncate">
               {activeHeading ? activeHeading.text : "Overview"}
             </span>
           </div>
@@ -100,30 +118,33 @@ export function TableOfContents({ headings }: TOCProps) {
         </button>
 
         {isOpen && (
-          <div className="absolute top-full left-0 right-0 z-50 border-t border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 shadow-lg">
+          <div className="absolute top-full left-0 right-0 z-50 border-t border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-lg">
             <ScrollArea className="h-64 p-3">
               <div className="space-y-1">
-                {headings.map((heading) => {
-                  const isActive = heading.id === activeId;
+                {processedHeadings.map((heading) => {
+                  const isActive = heading.uniqueId === activeId;
                   const indentClass =
                     heading.level === 1
-                      ? "pl-0"
+                      ? "ml-0"
                       : heading.level === 2
-                      ? "pl-3"
+                      ? "ml-3"
                       : heading.level === 3
-                      ? "pl-6"
-                      : "pl-9";
+                      ? "ml-6"
+                      : "ml-9";
 
                   return (
                     <a
-                      key={heading.id}
-                      href={`#${heading.id}`}
-                      onClick={(e) => handleLinkClick(e, heading.id)}
-                      className={`block text-sm py-1.5 transition-colors rounded-sm ${indentClass} ${
-                        isActive
-                          ? "text-blue-600 dark:text-blue-400 font-medium bg-neutral-100 dark:bg-neutral-900/50"
-                          : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
-                      }`}
+                      key={heading.uniqueId}
+                      href={`#${heading.uniqueId}`}
+                      onClick={(e) => handleLinkClick(e, heading.uniqueId)}
+                      className={`
+                        block text-sm px-2.5 py-1.5 rounded-lg transition-colors truncate ${indentClass}
+                        ${
+                          isActive
+                            ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-semibold"
+                            : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/60 font-medium"
+                        }
+                      `}
                     >
                       {heading.text}
                     </a>
