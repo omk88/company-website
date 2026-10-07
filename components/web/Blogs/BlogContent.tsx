@@ -93,7 +93,7 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
           {blog.subtitle}
         </p>
 
-        <AudioPlayer audioUrl={blog.audioUrl} title={blog.title} />
+        <AudioPlayer audioUrl={blog.audioUrl} title={blog.title} chapters={blog.chapters} />
       </header>
 
       <Separator className="mt-8" />

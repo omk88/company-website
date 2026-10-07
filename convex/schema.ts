@@ -11,6 +11,14 @@ const schema = defineSchema({
     subtitle: v.string(),
     imageUrl: v.string(),
     audioStorageId: v.optional(v.string()),
+    chapters: v.optional(
+      v.array(
+        v.object({
+          title: v.string(),
+          startTime: v.number(),
+        })
+      )
+    ),
     audioUrl: v.optional(v.string()),
     content: v.string(),
     displayName: v.optional(v.string()),

@@ -44,9 +44,58 @@ function chunkText(text: string, maxChunkLength = 1800): string[] {
   return chunks;
 }
 
+
+function cleanTextForTTS(text: string): string {
+  return text
+    .replace(/```[\s\S]*?```/g, " See code block for more information. ")
+    .replace(/!\[.*?\]\(.*?\)/g, " See image for more information. ")
+    .replace(/<[^>]*>/g, "")
+    .replace(/[#*`~_\[\]()]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function parseMarkdownSections(markdown: string) {
+  const lines = markdown.split("\n");
+  const sections: { title: string; content: string }[] = [];
+
+  let currentTitle = "Introduction";
+  let currentContentLines: string[] = [];
+
+  for (const line of lines) {
+    const headingMatch = line.match(/^(#{1,6})\s+(.+)$/);
+    if (headingMatch) {
+      if (currentContentLines.join(" ").trim()) {
+        sections.push({
+          title: currentTitle,
+          content: currentContentLines.join(" "),
+        });
+        currentContentLines = [];
+      }
+      currentTitle = headingMatch[2].trim();
+    } else {
+      currentContentLines.push(line);
+    }
+  }
+
+  if (currentContentLines.join(" ").trim()) {
+    sections.push({
+      title: currentTitle,
+      content: currentContentLines.join(" "),
+    });
+  }
+
+  return sections;
+}
+
+function estimateAudioDurationInSeconds(bufferLengthInBytes: number): number {
+  const BYTES_PER_SECOND = 6000;
+  return bufferLengthInBytes / BYTES_PER_SECOND;
+}
+
 export const generateAudio = internalAction({
-  args: { 
-    blogId: v.id("blogs"), 
+  args: {
+    blogId: v.id("blogs"),
     content: v.string(),
     title: v.string(),
     author: v.string(),
@@ -54,64 +103,81 @@ export const generateAudio = internalAction({
   },
   handler: async (ctx, args) => {
     try {
-      const cleanedBody = args.content
-        .replace(/```[\s\S]*?```/g, " See code block for more information. ")
-        .replace(/!\[.*?\]\(.*?\)/g, " See image for more information. ")
-        .replace(/<[^>]*>/g, "")
-        .replace(/[#*`~_\[\]()]/g, "")
-        .replace(/\s+/g, " ")
-        .trim();
-
-      let intro = `${args.title.trim()} by ${args.author.trim()}.`;
-
-      if (args.subtitle && args.subtitle.trim()) {
-        const cleanedSubtitle = args.subtitle
-          .replace(/<[^>]*>/g, "")
-          .replace(/[#*`~_\[\]()]/g, "")
-          .trim();
-        
-        intro += ` ${cleanedSubtitle}.`;
-      }
-
-      const plainText = `${intro}${cleanedBody}`;
-
       const accessKeyId = (process.env.AWS_ACCESS_KEY_ID || "").trim();
       const secretAccessKey = (process.env.AWS_SECRET_ACCESS_KEY || "").trim();
       const region = (process.env.AWS_REGION || "eu-north-1").trim();
 
       if (!accessKeyId || !secretAccessKey) {
-        throw new Error("AWS Credentials are missing from Convex environment variables.");
+        throw new Error("AWS Credentials missing from Convex variables.");
       }
 
       const polly = new PollyClient({
-        region: region,
-        credentials: {
-          accessKeyId: accessKeyId,
-          secretAccessKey: secretAccessKey,
-        },
+        region,
+        credentials: { accessKeyId, secretAccessKey },
       });
 
-      const textChunks = chunkText(plainText, 1800);
+      // 1. Build intro text
+      let intro = `${args.title.trim()} by ${args.author.trim()}.`;
+      if (args.subtitle?.trim()) {
+        intro += ` ${cleanTextForTTS(args.subtitle)}.`;
+      }
+
+      // 2. Parse Markdown into sections with titles
+      const sections = parseMarkdownSections(args.content);
+
       const audioBuffers: Buffer[] = [];
+      const chapters: { title: string; startTime: number }[] = [];
+      let currentTimestampInSeconds = 0;
 
-      for (const [index, chunk] of textChunks.entries()) {
-        console.log(`Processing chunk ${index + 1}/${textChunks.length} \vert{} Character Count:${chunk.length}`);
+      // Process Intro first
+      const introClean = cleanTextForTTS(intro);
+      const introCommand = new SynthesizeSpeechCommand({
+        OutputFormat: "mp3",
+        Text: introClean,
+        VoiceId: "Joanna",
+        Engine: "standard",
+      });
 
-        const command = new SynthesizeSpeechCommand({
-          OutputFormat: "mp3",
-          Text: chunk,
-          VoiceId: "Joanna",
-          Engine: "standard",
+      const introRes = await polly.send(introCommand);
+      if (introRes.AudioStream) {
+        const bytes = await introRes.AudioStream.transformToByteArray();
+        const buffer = Buffer.from(bytes);
+        audioBuffers.push(buffer);
+
+        // Add intro duration to timestamp baseline
+        currentTimestampInSeconds += estimateAudioDurationInSeconds(buffer.length);
+      }
+
+      // 3. Synthesize speech section-by-section and track startTime
+      for (const section of sections) {
+        const cleanedContent = cleanTextForTTS(section.content);
+        if (!cleanedContent) continue;
+
+        // Record Chapter Start Time rounded to 1 decimal place
+        chapters.push({
+          title: section.title,
+          startTime: Math.round(currentTimestampInSeconds * 10) / 10,
         });
 
-        const response = await polly.send(command);
+        const textChunks = chunkText(cleanedContent, 1800);
 
-        if (!response.AudioStream) {
-          throw new Error("No audio stream received from AWS Polly");
+        for (const chunk of textChunks) {
+          const command = new SynthesizeSpeechCommand({
+            OutputFormat: "mp3",
+            Text: chunk,
+            VoiceId: "Joanna",
+            Engine: "standard",
+          });
+
+          const response = await polly.send(command);
+          if (!response.AudioStream) continue;
+
+          const bytes = await response.AudioStream.transformToByteArray();
+          const buffer = Buffer.from(bytes);
+
+          audioBuffers.push(buffer);
+          currentTimestampInSeconds += estimateAudioDurationInSeconds(buffer.length);
         }
-
-        const audioByteArray = await response.AudioStream.transformToByteArray();
-        audioBuffers.push(Buffer.from(audioByteArray));
       }
 
       const fullAudioBuffer = Buffer.concat(audioBuffers);
@@ -124,9 +190,10 @@ export const generateAudio = internalAction({
         blogId: args.blogId,
         audioStorageId,
         audioUrl: audioUrl || "",
+        chapters,
       });
 
-      console.log(`Audio generated successfully for blog: ${args.blogId}`);
+      console.log(`Audio and ${chapters.length} chapters generated for: ${args.blogId}`);
     } catch (error) {
       console.error("Polly TTS error:", error);
     }

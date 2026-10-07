@@ -5,12 +5,18 @@ import { Play, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BlogNarrationControls } from "@/components/web/BlogNarrationControls";
 
+export interface Chapter {
+  title: string;
+  startTime: number;
+}
+
 interface AudioPlayerProps {
   audioUrl?: string;
   title?: string;
+  chapters?: Chapter[];
 }
 
-export function AudioPlayer({ audioUrl, title = "Listen to article" }: AudioPlayerProps) {
+export function AudioPlayer({ audioUrl, title = "Listen to article", chapters }: AudioPlayerProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   if (!audioUrl) return null;
@@ -48,6 +54,7 @@ export function AudioPlayer({ audioUrl, title = "Listen to article" }: AudioPlay
           title={title}
           autoPlay={true}
           onClose={() => setIsOpen(false)}
+          chapters={chapters}
         />
       )}
     </>

@@ -115,13 +115,20 @@ export const createPost = mutation({
 export const updateBlogAudio = internalMutation({
   args: {
     blogId: v.id("blogs"),
-    audioStorageId: v.string(),
+    audioStorageId: v.id("_storage"),
     audioUrl: v.string(),
+    chapters: v.array(
+      v.object({
+        title: v.string(),
+        startTime: v.number(),
+      })
+    ),
   },
   handler: async (ctx, args) => {
     await ctx.db.patch(args.blogId, {
       audioStorageId: args.audioStorageId,
       audioUrl: args.audioUrl,
+      chapters: args.chapters,
     });
   },
 });
