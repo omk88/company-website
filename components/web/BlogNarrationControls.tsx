@@ -28,6 +28,15 @@ interface BlogNarrationControlsProps {
   onClose?: () => void;
 }
 
+const slugify = (text: string) => {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/[\s_-]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+};
+
 export function BlogNarrationControls({
   audioUrl,
   title = "Listen to article",
@@ -49,6 +58,17 @@ export function BlogNarrationControls({
         .find((chapter) => currentTime >= chapter.startTime) || chapters[0]
     );
   }, [currentTime, chapters]);
+
+  const handleChapterClick = (chapterTitle: string) => {
+    const cleanId = slugify(chapterTitle);
+
+    const element = document.getElementById(cleanId);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+
+    window.history.pushState(null, "", `#${cleanId}`);
+  };
 
   useEffect(() => {
     if (autoPlay && audioRef.current) {
@@ -156,10 +176,14 @@ export function BlogNarrationControls({
               </span>
 
               {currentChapter && (
-                <span className="inline-flex items-center gap-1 text-[11px] font-medium text-zinc-500 dark:text-zinc-400 truncate">
-                  <List className="h-3 w-3 shrink-0 text-zinc-400 dark:text-zinc-500" />
+                <button
+                  type="button"
+                  onClick={() => handleChapterClick(currentChapter.title)}
+                  className="group inline-flex items-center gap-1 text-[11px] font-medium text-zinc-500 dark:text-zinc-400 truncate cursor-pointer hover:text-blue-600 dark:hover:text-blue-600 transition-colors text-left"
+                >
+                  <List className="h-3 w-3 shrink-0 text-zinc-400 dark:text-zinc-500 group-hover:text-blue-600 dark:group-hover:text-blue-600 transition-colors" />
                   <span className="truncate">{currentChapter.title}</span>
-                </span>
+                </button>
               )}
             </div>
 
