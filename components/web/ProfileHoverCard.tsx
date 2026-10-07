@@ -8,6 +8,7 @@ import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "../ui/
 import { ReactNode } from "react";
 import Link from "next/link";
 import { FollowButton } from "./FollowButton";
+import MessageButton from "./MessageButton";
 
 interface ProfileHoverCardProps {
     displayName: string | undefined;
@@ -137,7 +138,7 @@ export function ProfileHoverCard({ displayName, authorUsername, children, align 
                                     )}
                                 </div>
 
-                                <div>
+                                <div className="flex flex-row gap-2">
                                     <FollowButton 
                                         userId={profileData?.profile?.userId || ""} 
                                         username={profileData?.profile?.username || ""} 
@@ -146,6 +147,8 @@ export function ProfileHoverCard({ displayName, authorUsername, children, align 
                                         initialIsBell={profileData?.viewerStatus.isBell} 
                                         isSelf={profileData?.viewerStatus.isSelf} 
                                     />
+
+                                    <MessageButton recipientId={profileData?.profile?.userId || ""} />
                                 </div>
                             </div>
 
