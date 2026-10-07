@@ -158,18 +158,45 @@ export function ProfileHoverCard({ displayName, authorUsername, children, align 
                                     <p>{ formattedProfileDate }</p>
                                 </div>
                                 <div className="flex flex-row ml-auto">
-                                    <div className="flex items-start gap-1.5 min-w-[3rem] justify-start">
-                                        <Library className="w-4 h-4 stroke-[2.3] shrink-0 mt-0.5" />
-                                        <p>{ profileData?.articleCount }</p>
-                                    </div>
-                                    <div className="flex items-start gap-1.5 min-w-[3rem] justify-start">
-                                        <MessageSquare className="w-4 h-4 stroke-[2.3] shrink-0 mt-0.5" />
-                                        <p>{ profileData?.commentCount }</p>
-                                    </div>
-                                    <div className="flex items-start gap-1.5 min-w-[3rem] justify-start">
-                                        <UsersRound className="w-4 h-4 stroke-[2.3] shrink-0 mt-0.5" />
-                                        <p>{ profileData?.profile?.followerCount }</p>
-                                    </div>
+                                    <TooltipProvider delayDuration={200}>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <div className="flex items-start gap-1.5 min-w-[3rem] justify-start">
+                                                    <Library className="w-4 h-4 stroke-[2.3] shrink-0 mt-0.5" />
+                                                    <p>{ profileData?.articleCount }</p>
+                                                </div>
+                                            </TooltipTrigger>
+                                            <TooltipContent side="bottom" align="center">
+                                                <p className="text-xs font-medium">{ profileData?.articleCount } insights</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                    <TooltipProvider delayDuration={200}>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <div className="flex items-start gap-1.5 min-w-[3rem] justify-start">
+                                                    <MessageSquare className="w-4 h-4 stroke-[2.3] shrink-0 mt-0.5" />
+                                                    <p>{ profileData?.commentCount }</p>
+                                                </div>
+                                            </TooltipTrigger>
+                                            <TooltipContent side="bottom" align="center">
+                                                <p className="text-xs font-medium">{ profileData?.commentCount } comments</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                    <TooltipProvider delayDuration={200}>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <div className="flex items-start gap-1.5 min-w-[3rem] justify-start">
+                                                    <UsersRound className="w-4 h-4 stroke-[2.3] shrink-0 mt-0.5" />
+                                                    <p>{ profileData?.profile?.followerCount }</p>
+                                                </div>
+                                            </TooltipTrigger>
+                                            <TooltipContent side="bottom" align="center">
+                                                <p className="text-xs font-medium">{ profileData?.profile?.followerCount } followers</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
                                 </div>
                             </div>
 
