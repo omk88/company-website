@@ -20,6 +20,7 @@ import { AudioPlayer } from "@/app/(shared-layout)/insights/[blogTitleId]/_compo
 import { extractHeadings } from "@/app/(shared-layout)/insights/[blogTitleId]/_utils/extractHeadings";
 import { TableOfContents } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/TableOfContents";
 import rehypeSlug from "rehype-slug";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import { ImageDialog } from "../ImageDialog";
 
 const lowlight = createLowlight();
@@ -102,7 +103,25 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
 
       <section className="prose prose-neutral dark:prose-invert max-w-none text-lg leading-relaxed w-full min-w-0 [&_p]:break-words">
         <ReactMarkdown
-          rehypePlugins={[rehypeSlug]}
+          rehypePlugins={[
+            rehypeSlug,
+            [
+              rehypeAutolinkHeadings,
+              {
+                behavior: "wrap",
+                properties: {
+                  className: [
+                    "no-underline",
+                    "text-inherit",
+                    "hover:text-blue-600",
+                    "dark:hover:text-blue-400",
+                    "transition-colors",
+                    "cursor-pointer",
+                  ],
+                },
+              },
+            ],
+          ]}
           components={{
             pre: CodeBlock,
             code({ node, className, children, ...props }: any) {
