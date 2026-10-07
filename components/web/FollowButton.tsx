@@ -7,6 +7,8 @@ import { toast } from "sonner";
 import { Bell, BellPlus, Loader2 } from "lucide-react";
 import { AnimatePresence, motion, LayoutGroup, Transition } from "framer-motion";
 import { useGuardedMutation } from "@/hooks/useGuardedMutation";
+import router from "next/router";
+import { useCurrentUser } from "@/app/ConvexClientProvider";
 
 interface FollowButtonProps {
   userId: string;
@@ -40,6 +42,8 @@ export function FollowButton({
   const [isFollowing, setIsFollowing] = useState(initialIsFollowing);
   const [isBell, setIsBell] = useState(initialIsBell);
 
+  const currentUser = useCurrentUser();
+
   useEffect(() => {
     setIsFollowing(initialIsFollowing);
   }, [initialIsFollowing]);
@@ -55,6 +59,16 @@ export function FollowButton({
   const bellMutation = useGuardedMutation(api.profiles.toggleBell);
 
   const handleFollowClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (!currentUser) {
+        toast.error("You must be logged in to follow another user.", {
+            action: {
+                label: "Sign in",
+                onClick: () => router.push("/sign-in"),
+            },
+        });
+        return;
+    }
+
     e.preventDefault();
     e.stopPropagation();
 
@@ -63,7 +77,6 @@ export function FollowButton({
     try {
       const result = await followMutation({ targetUserId: userId });
 
-      // Stop immediately if user is banned (useGuardedMutation returns undefined)
       if (result === undefined) return;
 
       if (result?.isFollowing) {

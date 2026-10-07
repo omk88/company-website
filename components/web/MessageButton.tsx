@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Button } from "../ui/button";
+import { useCurrentUser } from "@/app/ConvexClientProvider";
+import { toast } from "sonner";
 
 interface MessageButtonProps {
   recipientId: string; 
@@ -15,7 +16,18 @@ export default function MessageButton({ recipientId }: MessageButtonProps) {
   
   const startConversation = useMutation(api.messaging.getOrCreateAndStartConversation);
 
+  const currentUser = useCurrentUser();
+
   const handleMessageClick = async () => {
+    if (!currentUser) {
+        toast.error("You must be logged in to message another user.", {
+            action: {
+                label: "Sign in",
+                onClick: () => router.push("/sign-in"),
+            },
+        });
+        return;
+    }
 
     try {
       const conversationId = await startConversation({
