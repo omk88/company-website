@@ -116,20 +116,17 @@ export const generateAudio = internalAction({
         credentials: { accessKeyId, secretAccessKey },
       });
 
-      // 1. Build intro text
       let intro = `${args.title.trim()} by ${args.author.trim()}.`;
       if (args.subtitle?.trim()) {
         intro += ` ${cleanTextForTTS(args.subtitle)}.`;
       }
 
-      // 2. Parse Markdown into sections with titles
       const sections = parseMarkdownSections(args.content);
 
       const audioBuffers: Buffer[] = [];
       const chapters: { title: string; startTime: number }[] = [];
       let currentTimestampInSeconds = 0;
 
-      // Process Intro first
       const introClean = cleanTextForTTS(intro);
       const introCommand = new SynthesizeSpeechCommand({
         OutputFormat: "mp3",
@@ -144,16 +141,13 @@ export const generateAudio = internalAction({
         const buffer = Buffer.from(bytes);
         audioBuffers.push(buffer);
 
-        // Add intro duration to timestamp baseline
         currentTimestampInSeconds += estimateAudioDurationInSeconds(buffer.length);
       }
 
-      // 3. Synthesize speech section-by-section and track startTime
       for (const section of sections) {
         const cleanedContent = cleanTextForTTS(section.content);
         if (!cleanedContent) continue;
 
-        // Record Chapter Start Time rounded to 1 decimal place
         chapters.push({
           title: section.title,
           startTime: Math.round(currentTimestampInSeconds * 10) / 10,

@@ -1484,3 +1484,26 @@ export const getSitemapUsernames = query({
     return usernames;
   },
 });
+
+export const regenerateAudio = mutation({
+  args: {
+    blogId: v.id("blogs"),
+  },
+  handler: async (ctx, args) => {
+    const blog = await ctx.db.get(args.blogId);
+
+    if (!blog) {
+      throw new Error(`Blog with ID ${args.blogId} not found.`);
+    }
+
+    await ctx.scheduler.runAfter(0, internal.tts.generateAudio, {
+      blogId: args.blogId,
+      content: blog.content,
+      title: blog.title,
+      author: blog.displayName ?? blog.username,
+      subtitle: blog.subtitle,
+    });
+
+    return { success: true, message: "Audio regeneration scheduled successfully." };
+  },
+});
