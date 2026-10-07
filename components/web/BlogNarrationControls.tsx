@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import {
   Play,
   Pause,
@@ -45,10 +45,16 @@ export function BlogNarrationControls({
   onClose,
 }: BlogNarrationControlsProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
+
+  const chapterMarks = useMemo(
+    () => chapters.map((c) => c.startTime),
+    [chapters]
+  );
 
   const currentChapter = useMemo(() => {
     if (!chapters.length) return null;
@@ -69,6 +75,36 @@ export function BlogNarrationControls({
 
     window.history.pushState(null, "", `#${cleanId}`);
   };
+
+  const formatTime = (time: number) => {
+    if (isNaN(time)) return "0:00";
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+  };
+
+  const renderTooltipContent = useCallback(
+    (hoverVal: number) => {
+      const chapter =
+        [...chapters]
+          .reverse()
+          .find((c) => hoverVal >= c.startTime) || chapters[0];
+
+      return (
+        <div className="flex flex-col items-center gap-0.5">
+          {chapter && (
+            <span className="text-[10px] font-medium text-zinc-300 dark:text-zinc-700 max-w-[160px] truncate">
+              {chapter.title}
+            </span>
+          )}
+          <span className="font-mono text-[11px] font-bold tabular-nums">
+            {formatTime(hoverVal)}
+          </span>
+        </div>
+      );
+    },
+    [chapters]
+  );
 
   useEffect(() => {
     if (autoPlay && audioRef.current) {
@@ -136,15 +172,8 @@ export function BlogNarrationControls({
     }
   };
 
-  const formatTime = (time: number) => {
-    if (isNaN(time)) return "0:00";
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
-  };
-
   return (
-    <div className="fixed bottom-6 left-1/2 z-50 w-[calc(100%-2rem)] max-w-2xl -translate-x-1/2 rounded-2xl border border-zinc-200/80 bg-white/90 p-3.5 shadow-2xl backdrop-blur-md dark:border-zinc-800/80 dark:bg-zinc-950/90">
+    <div className="fixed bottom-6 left-1/2 z-50 w-[calc(100%-2rem)] max-w-2xl -translate-x-1/2 rounded-2xl border border-zinc-200 bg-white p-3.5 shadow-2xl dark:border-zinc-800 dark:bg-zinc-950">
       <audio
         ref={audioRef}
         src={audioUrl}
@@ -158,7 +187,7 @@ export function BlogNarrationControls({
           onClick={togglePlay}
           size="icon"
           variant="default"
-          className="h-9 w-9 shrink-0 rounded-full bg-zinc-900 text-zinc-50 hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+          className="cursor-pointer h-9 w-9 shrink-0 rounded-full bg-zinc-900 text-zinc-50 hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
           aria-label={isPlaying ? "Pause" : "Play"}
         >
           {isPlaying ? (
@@ -192,29 +221,17 @@ export function BlogNarrationControls({
             </span>
           </div>
 
-          <div className="relative flex items-center">
-            <Slider
-              value={[currentTime]}
-              max={duration || 100}
-              step={0.1}
-              onValueChange={handleSliderChange}
-              className="cursor-pointer relative z-10"
-            />
-
-            {duration > 0 &&
-              chapters.map((chapter, index) => {
-                if (chapter.startTime <= 0) return null;
-                const percentage = (chapter.startTime / duration) * 100;
-                return (
-                  <div
-                    key={index}
-                    className="absolute top-1/2 -translate-y-1/2 h-2.5 w-0.5 bg-white dark:bg-zinc-950 z-20 pointer-events-none rounded-full"
-                    style={{ left: `${percentage}%` }}
-                    title={`Chapter: ${chapter.title}`}
-                  />
-                );
-              })}
-          </div>
+          <Slider
+            value={[currentTime]}
+            max={duration || 100}
+            step={0.1}
+            marks={chapterMarks}
+            showTooltipArrow={false}
+            showTooltip
+            getTooltipContent={renderTooltipContent}
+            onValueChange={handleSliderChange}
+            className="cursor-pointer relative w-full"
+          />
         </div>
 
         <div className="flex items-center gap-0.5 border-l border-zinc-200/80 pl-2 dark:border-zinc-800/80">
@@ -222,7 +239,7 @@ export function BlogNarrationControls({
             onClick={restartAudio}
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-50"
+            className="cursor-pointer h-8 w-8 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-50"
             title="Reset to start"
             aria-label="Reset narration to start"
           >
@@ -233,7 +250,7 @@ export function BlogNarrationControls({
             onClick={() => skipSeconds(-15)}
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-50"
+            className="cursor-pointer h-8 w-8 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-50"
             title="Skip back 15s"
             aria-label="Skip back 15 seconds"
           >
@@ -244,7 +261,7 @@ export function BlogNarrationControls({
             onClick={() => skipSeconds(15)}
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-50"
+            className="cursor-pointer h-8 w-8 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-50"
             title="Skip forward 15s"
             aria-label="Skip forward 15 seconds"
           >
@@ -255,7 +272,7 @@ export function BlogNarrationControls({
             onClick={toggleMute}
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-50"
+            className="cursor-pointer h-8 w-8 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-50"
             title={isMuted ? "Unmute" : "Mute"}
             aria-label={isMuted ? "Unmute audio" : "Mute audio"}
           >
@@ -271,7 +288,7 @@ export function BlogNarrationControls({
               onClick={onClose}
               variant="ghost"
               size="icon"
-              className="h-8 w-8 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-50"
+              className="cursor-pointer h-8 w-8 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-50"
               title="Close player"
               aria-label="Close narration player"
             >

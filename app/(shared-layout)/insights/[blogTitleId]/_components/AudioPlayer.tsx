@@ -40,7 +40,7 @@ export function AudioPlayer({ audioUrl, title = "Listen to article", chapters }:
 
         <Button
           onClick={() => setIsOpen(true)}
-          className="gap-2 rounded-full px-4"
+          className="cursor-pointer gap-2 rounded-full px-4"
           variant="default"
         >
           <Play className="h-4 w-4 fill-current" />
