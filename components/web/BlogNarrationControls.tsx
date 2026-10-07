@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
+import { motion } from "framer-motion";
 import {
   Play,
   Pause,
@@ -50,6 +51,7 @@ export function BlogNarrationControls({
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
 
   const chapterMarks = useMemo(
     () => chapters.map((c) => c.startTime),
@@ -117,6 +119,16 @@ export function BlogNarrationControls({
 
   if (!audioUrl) return null;
 
+  const handleClose = () => {
+    setIsClosing(true);
+  };
+
+  const handleAnimationComplete = () => {
+    if (isClosing && onClose) {
+      onClose();
+    }
+  };
+
   const togglePlay = () => {
     if (!audioRef.current) return;
     if (isPlaying) {
@@ -173,7 +185,13 @@ export function BlogNarrationControls({
   };
 
   return (
-    <div className="fixed bottom-6 left-1/2 z-50 w-[calc(100%-2rem)] max-w-2xl -translate-x-1/2 rounded-2xl border border-zinc-200 bg-white p-3.5 shadow-2xl dark:border-zinc-800 dark:bg-zinc-950">
+    <motion.div
+      initial={{ y: "100%", opacity: 0 }}
+      animate={isClosing ? { y: "100%", opacity: 0 } : { y: 0, opacity: 1 }}
+      transition={{ type: "spring", damping: 25, stiffness: 250 }}
+      onAnimationComplete={handleAnimationComplete}
+      className="fixed bottom-6 left-1/2 z-50 w-[calc(100%-2rem)] max-w-2xl -translate-x-1/2 rounded-2xl border border-zinc-200 bg-white p-3.5 shadow-2xl dark:border-zinc-800 dark:bg-zinc-950"
+    >
       <audio
         ref={audioRef}
         src={audioUrl}
@@ -197,8 +215,8 @@ export function BlogNarrationControls({
           )}
         </Button>
 
-        <div className="flex flex-1 flex-col justify-center gap-1.5 min-w-0">
-          <div className="flex items-start justify-between gap-2">
+        <div className="flex flex-1 flex-col justify-center gap-1 min-w-0">
+          <div className="flex items-end justify-between gap-2">
             <div className="flex flex-col min-w-0">
               <span className="font-semibold text-xs tracking-tight text-zinc-900 dark:text-zinc-100 truncate">
                 {title}
@@ -216,7 +234,7 @@ export function BlogNarrationControls({
               )}
             </div>
 
-            <span className="font-mono text-[11px] tabular-nums shrink-0 text-zinc-500 dark:text-zinc-400 pt-0.5">
+            <span className="font-mono text-[11px] tabular-nums shrink-0 text-zinc-500 dark:text-zinc-400">
               {formatTime(currentTime)} / {formatTime(duration)}
             </span>
           </div>
@@ -230,7 +248,7 @@ export function BlogNarrationControls({
             showTooltip
             getTooltipContent={renderTooltipContent}
             onValueChange={handleSliderChange}
-            className="cursor-pointer relative w-full"
+            className="cursor-pointer relative w-full [&_[role=slider]]:bg-zinc-900 [&_[role=slider]]:border-zinc-900 dark:[&_[role=slider]]:bg-zinc-50 dark:[&_[role=slider]]:border-zinc-50"
           />
         </div>
 
@@ -285,7 +303,7 @@ export function BlogNarrationControls({
 
           {onClose && (
             <Button
-              onClick={onClose}
+              onClick={handleClose}
               variant="ghost"
               size="icon"
               className="cursor-pointer h-8 w-8 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-50"
@@ -297,6 +315,6 @@ export function BlogNarrationControls({
           )}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
