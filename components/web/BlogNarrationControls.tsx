@@ -10,7 +10,7 @@ import {
   Volume2,
   VolumeX,
   X,
-  Bookmark,
+  List,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -149,21 +149,21 @@ export function BlogNarrationControls({
         </Button>
 
         <div className="flex flex-1 flex-col justify-center gap-1.5 min-w-0">
-          <div className="flex items-center justify-between text-xs font-medium tracking-tight text-zinc-500 dark:text-zinc-400">
-            <div className="flex items-center gap-2 truncate pr-2">
-              <span className="font-semibold text-zinc-900 dark:text-zinc-100 truncate">
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex flex-col min-w-0">
+              <span className="font-semibold text-xs tracking-tight text-zinc-900 dark:text-zinc-100 truncate">
                 {title}
               </span>
 
               {currentChapter && (
-                <span className="inline-flex items-center gap-1 rounded-md bg-zinc-100 px-2 py-0.5 text-[10px] font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 truncate max-w-[160px]">
-                  <Bookmark className="h-2.5 w-2.5 shrink-0 text-zinc-400" />
+                <span className="inline-flex items-center gap-1 text-[11px] font-medium text-zinc-500 dark:text-zinc-400 truncate">
+                  <List className="h-3 w-3 shrink-0 text-zinc-400 dark:text-zinc-500" />
                   <span className="truncate">{currentChapter.title}</span>
                 </span>
               )}
             </div>
 
-            <span className="font-mono text-[11px] tabular-nums shrink-0">
+            <span className="font-mono text-[11px] tabular-nums shrink-0 text-zinc-500 dark:text-zinc-400 pt-0.5">
               {formatTime(currentTime)} / {formatTime(duration)}
             </span>
           </div>
