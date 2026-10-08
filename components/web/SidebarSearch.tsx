@@ -49,12 +49,11 @@ export function SidebarSearch({
       <Search className="h-5 w-5 md:h-4 md:w-4 text-zinc-400 md:text-zinc-500 shrink-0 mr-2 translate-y-[0.5px]" />
 
       <Input
-        iconCentered
         type="text"
         placeholder={fullPlaceholder}
         value={localValue}
         onChange={(e) => setLocalValue(e.target.value)}
-        className="h-full border-0 bg-transparent px-0 text-lg md:text-sm text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 md:placeholder:text-zinc-500 focus-visible:ring-0 focus-visible:border-0 shadow-none w-full min-w-0 flex-1"
+        className="h-full border-0 bg-transparent dark:bg-transparent px-0 text-lg md:text-sm text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 md:placeholder:text-zinc-500 focus-visible:ring-0 focus-visible:border-0 shadow-none w-full min-w-0 flex-1"
       />
 
       {localValue && (
