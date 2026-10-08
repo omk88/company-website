@@ -47,6 +47,7 @@ function chunkText(text: string, maxChunkLength = 1800): string[] {
 }
 
 function cleanTextForTTS(text: string): string {
+  if (!text) return "";
   return (
     text
       .replace(/```[\s\S]*?```/g, " See code block for more information. ")
@@ -174,18 +175,26 @@ export const generateAudio = internalAction({
       const sections = parseMarkdownSections(args.content);
 
       for (const section of sections) {
+        const cleanTitle = cleanTextForTTS(section.title);
         const cleanedBody = cleanTextForTTS(section.content);
-        if (!cleanedBody) continue;
+
+        if (!cleanTitle && !cleanedBody) continue;
 
         chapters.push({
           title: section.title,
           startTime: Math.round(currentTimestampInSeconds * 10) / 10,
         });
 
-        const cleanTitle = cleanTextForTTS(section.title);
-        const fullSectionText = /[.?!]$/.test(cleanTitle)
-          ? `${cleanTitle} ${cleanedBody}`
-          : `${cleanTitle}. ${cleanedBody}`;
+        let fullSectionText = "";
+        if (cleanTitle && cleanedBody) {
+          fullSectionText = /[.?!]$/.test(cleanTitle)
+            ? `${cleanTitle} ${cleanedBody}`
+            : `${cleanTitle}. ${cleanedBody}`;
+        } else if (cleanTitle) {
+          fullSectionText = /[.?!]$/.test(cleanTitle) ? cleanTitle : `${cleanTitle}.`;
+        } else {
+          fullSectionText = cleanedBody;
+        }
 
         const textChunks = chunkText(fullSectionText, 1800);
 
