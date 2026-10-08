@@ -30,7 +30,7 @@ export function AudioPlayer({ audioUrl, title = "Listen to article", chapters }:
           </div>
           <div>
             <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-              Audio Version
+              Listen to Article
             </p>
             <p className="text-xs text-zinc-500 dark:text-zinc-400">
               {title}
