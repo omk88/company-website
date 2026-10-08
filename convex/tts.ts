@@ -68,7 +68,11 @@ function cleanTextForTTS(text: string): string {
 
       .replace(/`([^`]+)`/g, " $1 ")
 
-      .replace(/^#{1,6}\s+/gm, "") 
+      .replace(/^#{1,6}\s+(.+)$/gm, (_, title) => {
+        const trimmed = title.trim();
+        return /[.?!]$/.test(trimmed) ? `${trimmed}\n` : `${trimmed}.\n`;
+      })
+
       .replace(/^\s*[-*+]\s+/gm, "")
       .replace(/^\s*\d+\.\s+/gm, "") 
       .replace(/^\s*>\s*/gm, "")
@@ -77,7 +81,7 @@ function cleanTextForTTS(text: string): string {
       .replace(/[*_~=]/g, "")
 
       .replace(/\s+/g, " ")
-      .replace(/\s+([,.?!])/g, "$1")
+      .replace(/\s+([,.?!])/g, "$1") 
       .replace(/\.+/g, ".")
       .trim()
   );
