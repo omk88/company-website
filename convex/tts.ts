@@ -91,29 +91,29 @@ function parseMarkdownSections(markdown: string) {
 
   let currentTitle = "Introduction";
   let currentContentLines: string[] = [];
+  let hasEncounteredFirstHeading = false;
 
   for (const line of lines) {
     const headingMatch = line.match(/^(#{1,6})\s+(.+)$/);
     if (headingMatch) {
-      if (currentContentLines.join("\n").trim()) {
+      if (hasEncounteredFirstHeading || currentContentLines.join("\n").trim()) {
         sections.push({
           title: currentTitle,
-          content: currentContentLines.join("\n"),
+          content: currentContentLines.join("\n").trim(),
         });
-        currentContentLines = [];
       }
       currentTitle = headingMatch[2].trim();
+      currentContentLines = [];
+      hasEncounteredFirstHeading = true;
     } else {
       currentContentLines.push(line);
     }
   }
 
-  if (currentContentLines.join("\n").trim()) {
-    sections.push({
-      title: currentTitle,
-      content: currentContentLines.join("\n"),
-    });
-  }
+  sections.push({
+    title: currentTitle,
+    content: currentContentLines.join("\n").trim(),
+  });
 
   return sections;
 }
