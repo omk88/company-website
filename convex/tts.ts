@@ -6,7 +6,9 @@ import { internal } from "./_generated/api";
 import { PollyClient, SynthesizeSpeechCommand } from "@aws-sdk/client-polly";
 
 function chunkText(text: string, maxChunkLength = 1800): string[] {
-  const sentences = text.match(/[^.!?\n]+[.!?\n]+(\s+|$)/g) || [text];
+  if (!text || !text.trim()) return [];
+
+  const sentences = text.match(/[^.!?\n]+[.!?\n]+(?:\s+|$)\vert{}[^.!?\n]+$/g) || [text];
   const chunks: string[] = [];
   let currentChunk = "";
 
@@ -44,29 +46,25 @@ function chunkText(text: string, maxChunkLength = 1800): string[] {
   return chunks;
 }
 
-
 function cleanTextForTTS(text: string): string {
   return (
     text
       .replace(/```[\s\S]*?```/g, " See code block for more information. ")
-      .replace(/(?:^|\n)(?: {4}|\t).+/g, " See code block for more information. ")
 
       .replace(/<!--[\s\S]*?-->/g, "")
       .replace(/<[^>]*>/g, "")
 
       .replace(/!\[.*?\]\([^)]+\)/g, " See image for more information. ")
 
-      .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+      .replace(/`([^`]+)`/g, " $1 ")
 
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
       .replace(/^\[[^\]]+\]:\s*\S+.*$/gm, "")
       .replace(/\[([^\]]+)\]\[[^\]]*\]/g, "$1")
 
       .replace(/^\[\^[^\]]+\]:\s*.*$/gm, "")
       .replace(/\[\^[^\]]+\]/g, "")
-
       .replace(/https?:\/\/\S+|www\.\S+/gi, " link ")
-
-      .replace(/`([^`]+)`/g, " $1 ")
 
       .replace(/^#{1,6}\s+(.+)$/gm, (_, title) => {
         const trimmed = title.trim();
@@ -74,14 +72,14 @@ function cleanTextForTTS(text: string): string {
       })
 
       .replace(/^\s*[-*+]\s+/gm, "")
-      .replace(/^\s*\d+\.\s+/gm, "") 
+      .replace(/^\s*\d+\.\s+/gm, "")
       .replace(/^\s*>\s*/gm, "")
       .replace(/\|/g, ", ")
 
       .replace(/[*_~=]/g, "")
 
       .replace(/\s+/g, " ")
-      .replace(/\s+([,.?!])/g, "$1") 
+      .replace(/\s+([,.?!])/g, "$1")
       .replace(/\.+/g, ".")
       .trim()
   );
@@ -97,10 +95,10 @@ function parseMarkdownSections(markdown: string) {
   for (const line of lines) {
     const headingMatch = line.match(/^(#{1,6})\s+(.+)$/);
     if (headingMatch) {
-      if (currentContentLines.join(" ").trim()) {
+      if (currentContentLines.join("\n").trim()) {
         sections.push({
           title: currentTitle,
-          content: currentContentLines.join(" "),
+          content: currentContentLines.join("\n"),
         });
         currentContentLines = [];
       }
@@ -110,10 +108,10 @@ function parseMarkdownSections(markdown: string) {
     }
   }
 
-  if (currentContentLines.join(" ").trim()) {
+  if (currentContentLines.join("\n").trim()) {
     sections.push({
       title: currentTitle,
-      content: currentContentLines.join(" "),
+      content: currentContentLines.join("\n"),
     });
   }
 
@@ -121,7 +119,7 @@ function parseMarkdownSections(markdown: string) {
 }
 
 function estimateAudioDurationInSeconds(bufferLengthInBytes: number): number {
-  const BYTES_PER_SECOND = 6000;
+  const BYTES_PER_SECOND = 6000; 
   return bufferLengthInBytes / BYTES_PER_SECOND;
 }
 
@@ -148,18 +146,16 @@ export const generateAudio = internalAction({
         credentials: { accessKeyId, secretAccessKey },
       });
 
-      let intro = `${args.title.trim()} by ${args.author.trim()}.`;
-      if (args.subtitle?.trim()) {
-        intro += ` ${cleanTextForTTS(args.subtitle)}.`;
-      }
-
-      const sections = parseMarkdownSections(args.content);
-
       const audioBuffers: Buffer[] = [];
       const chapters: { title: string; startTime: number }[] = [];
       let currentTimestampInSeconds = 0;
 
-      const introClean = cleanTextForTTS(intro);
+      let introRaw = `${args.title.trim()} by ${args.author.trim()}.`;
+      if (args.subtitle?.trim()) {
+        introRaw += ` ${args.subtitle.trim()}`;
+      }
+
+      const introClean = cleanTextForTTS(introRaw);
       const introCommand = new SynthesizeSpeechCommand({
         OutputFormat: "mp3",
         Text: introClean,
@@ -172,20 +168,26 @@ export const generateAudio = internalAction({
         const bytes = await introRes.AudioStream.transformToByteArray();
         const buffer = Buffer.from(bytes);
         audioBuffers.push(buffer);
-
         currentTimestampInSeconds += estimateAudioDurationInSeconds(buffer.length);
       }
 
+      const sections = parseMarkdownSections(args.content);
+
       for (const section of sections) {
-        const cleanedContent = cleanTextForTTS(section.content);
-        if (!cleanedContent) continue;
+        const cleanedBody = cleanTextForTTS(section.content);
+        if (!cleanedBody) continue;
 
         chapters.push({
           title: section.title,
           startTime: Math.round(currentTimestampInSeconds * 10) / 10,
         });
 
-        const textChunks = chunkText(cleanedContent, 1800);
+        const cleanTitle = cleanTextForTTS(section.title);
+        const fullSectionText = /[.?!]$/.test(cleanTitle)
+          ? `${cleanTitle} ${cleanedBody}`
+          : `${cleanTitle}. ${cleanedBody}`;
+
+        const textChunks = chunkText(fullSectionText, 1800);
 
         for (const chunk of textChunks) {
           const command = new SynthesizeSpeechCommand({
@@ -219,7 +221,7 @@ export const generateAudio = internalAction({
         chapters,
       });
 
-      console.log(`Audio and ${chapters.length} chapters generated for: ${args.blogId}`);
+      console.log(`Audio generated successfully with ${chapters.length} chapters.`);
     } catch (error) {
       console.error("Polly TTS error:", error);
     }
