@@ -22,6 +22,7 @@ import { TableOfContents } from "@/app/(shared-layout)/insights/[blogTitleId]/_c
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import { ImageDialog } from "../ImageDialog";
+import { BlogImage } from "../BlogImage";
 
 const lowlight = createLowlight();
 lowlight.register("javascript", js);
@@ -146,15 +147,7 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
               );
             },
             img({ src, alt, ...props }) {
-              if (!src || typeof src !== "string") return null;
-
-              return (
-                <ImageDialog
-                  src={src}
-                  alt={alt}
-                  {...props}
-                />
-              );
+              return <BlogImage src={src} alt={alt} {...props} />;
             },
           }}
         >

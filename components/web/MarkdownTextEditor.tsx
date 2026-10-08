@@ -155,16 +155,14 @@ export function MarkdownTextEditor({
 
       const { storageId } = (await result.json()) as { storageId: Id<"_storage"> };
 
-      const imageUrl = await convex.query(api.files.getImageUrl, { storageId });
-
-      if (!imageUrl) throw new Error("Could not retrieve image URL from Convex");
+      const permanentImageUrl = `/api/storage/${storageId}`;
 
       await trackUploadMutation({ 
         storageId, 
-        fullUrl: imageUrl 
+        fullUrl: permanentImageUrl 
       });
 
-      const finalMarkdown = `![${altText}](${imageUrl})`;
+      const finalMarkdown = `![${altText}](${permanentImageUrl})`;
 
       if (textareaRef.current) {
         const currentText = textareaRef.current.value;

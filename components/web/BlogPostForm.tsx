@@ -36,6 +36,7 @@ import { useBlogDraft } from "@/hooks/useBlogDraft";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { ConvexError } from "convex/values";
 import { useGuardedMutation } from "@/hooks/useGuardedMutation";
+import { BlogImage } from "./BlogImage";
 
 const lowlight = createLowlight();
 lowlight.register("javascript", js);
@@ -82,7 +83,11 @@ function toTitleCase(str: string): string {
     .join(' ');
 }
 
-const MemoizedMarkdown = memo(function MemoizedMarkdown({ content }: { content: string }) {
+export const MemoizedMarkdown = memo(function MemoizedMarkdown({
+  content,
+}: {
+  content: string;
+}) {
   return (
     <div className="prose prose-neutral dark:prose-invert max-w-none text-base leading-relaxed text-neutral-800 dark:text-neutral-200 w-full min-w-0 [&_p]:break-words">
       <ReactMarkdown
@@ -108,6 +113,9 @@ const MemoizedMarkdown = memo(function MemoizedMarkdown({ content }: { content: 
                 {children}
               </code>
             );
+          },
+          img({ src, alt, ...props }) {
+            return <BlogImage src={src} alt={alt} {...props} />;
           },
         }}
       >
