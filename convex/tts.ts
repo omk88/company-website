@@ -46,13 +46,41 @@ function chunkText(text: string, maxChunkLength = 1800): string[] {
 
 
 function cleanTextForTTS(text: string): string {
-  return text
-    .replace(/```[\s\S]*?```/g, " See code block for more information. ")
-    .replace(/!\[.*?\]\(.*?\)/g, " See image for more information. ")
-    .replace(/<[^>]*>/g, "")
-    .replace(/[#*`~_\[\]()]/g, "")
-    .replace(/\s+/g, " ")
-    .trim();
+  return (
+    text
+      .replace(/```[\s\S]*?```/g, " See code block for more information. ")
+      .replace(/(?:^|\n)(?: {4}|\t).+/g, " See code block for more information. ")
+
+      .replace(/<!--[\s\S]*?-->/g, "")
+      .replace(/<[^>]*>/g, "")
+
+      .replace(/!\[.*?\]\([^)]+\)/g, " See image for more information. ")
+
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+
+      .replace(/^\[[^\]]+\]:\s*\S+.*$/gm, "")
+      .replace(/\[([^\]]+)\]\[[^\]]*\]/g, "$1")
+
+      .replace(/^\[\^[^\]]+\]:\s*.*$/gm, "")
+      .replace(/\[\^[^\]]+\]/g, "")
+
+      .replace(/https?:\/\/\S+|www\.\S+/gi, " link ")
+
+      .replace(/`([^`]+)`/g, " $1 ")
+
+      .replace(/^#{1,6}\s+/gm, "") 
+      .replace(/^\s*[-*+]\s+/gm, "")
+      .replace(/^\s*\d+\.\s+/gm, "") 
+      .replace(/^\s*>\s*/gm, "")
+      .replace(/\|/g, ", ")
+
+      .replace(/[*_~=]/g, "")
+
+      .replace(/\s+/g, " ")
+      .replace(/\s+([,.?!])/g, "$1")
+      .replace(/\.+/g, ".")
+      .trim()
+  );
 }
 
 function parseMarkdownSections(markdown: string) {
