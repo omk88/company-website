@@ -99,7 +99,7 @@ export function FeaturedBlogs({ preloadedData }: { preloadedData: Preloaded<type
         href={`/insights/${currentPost._id}`}
         className="group/card flex items-start justify-between gap-3 w-full text-inherit no-underline cursor-pointer my-1 min-w-0" // <-- Added min-w-0
       >
-        <div className="flex flex-col justify-between flex-1 min-w-0"> {/* <-- min-w-0 is here */}
+        <div className="flex flex-col justify-between flex-1 min-w-0">
           <div>
             <div className="font-roboto flex items-center gap-1.5 text-[11px] tracking-tight uppercase text-zinc-500 mb-1 min-w-0">
               <ProfileHoverCard authorUsername={currentPost.username} displayName={currentPost.displayName}>
@@ -124,10 +124,10 @@ export function FeaturedBlogs({ preloadedData }: { preloadedData: Preloaded<type
               src={post.imageUrl}
               alt={post.title}
               fill
-              className={`object-cover transition-opacity duration-100 ${
+              className={`object-cover transition-opacity duration-100 image-render-crisp ${
                 index === currentIndex ? "opacity-100 block" : "opacity-0 hidden"
               }`}
-              sizes="56px"
+              sizes="112px"
               priority={index === 0} 
             />
           ))}

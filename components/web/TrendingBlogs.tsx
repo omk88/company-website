@@ -61,8 +61,8 @@ export function TrendingBlogs({ preloadedData }: { preloadedData: Preloaded<type
                     src={blog.imageUrl}
                     alt={blog.title}
                     fill
-                    sizes="44px"
-                    className="object-cover"
+                    sizes="88px"
+                    className="object-cover [image-rendering:high-quality]"
                   />
                 </div>
               </div>
