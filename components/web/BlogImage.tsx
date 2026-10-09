@@ -6,7 +6,7 @@ import { Id } from "@/convex/_generated/dataModel";
 import { ImageDialog } from "./ImageDialog";
 
 interface BlogImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
-  src?: string;
+  src?: string | Blob;
   alt?: string;
 }
 
