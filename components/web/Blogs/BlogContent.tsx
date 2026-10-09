@@ -64,7 +64,7 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
 
       <div className="relative w-full h-[300px] md:h-[400px] mb-2 md:mb-6 rounded-lg overflow-hidden">
         <Image
-          quality={90}
+          unoptimized
           src={blog.imageUrl}
           alt={blog.title}
           fill

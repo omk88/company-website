@@ -356,6 +356,7 @@ export function BlogCard({
       >
         <div className="relative w-full aspect-[16/9] bg-zinc-100 dark:bg-zinc-800">
           <Image
+            unoptimized
             src={imageUrl}
             alt={title}
             fill
