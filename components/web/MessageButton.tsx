@@ -9,9 +9,10 @@ import { toast } from "sonner";
 
 interface MessageButtonProps {
   recipientId: string; 
+  isSelf?: boolean;
 }
 
-export default function MessageButton({ recipientId }: MessageButtonProps) {
+export default function MessageButton({ recipientId, isSelf }: MessageButtonProps) {
   const router = useRouter();
   
   const startConversation = useMutation(api.messaging.getOrCreateAndStartConversation);
@@ -39,6 +40,8 @@ export default function MessageButton({ recipientId }: MessageButtonProps) {
       console.error("Failed to start conversation:", error);
     }
   };
+
+  if (isSelf) return null;
 
   return (
     <div>

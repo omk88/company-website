@@ -148,7 +148,10 @@ export function ProfileHoverCard({ displayName, authorUsername, children, align 
                                         isSelf={profileData?.viewerStatus.isSelf} 
                                     />
 
-                                    <MessageButton recipientId={profileData?.profile?.userId || ""} />
+                                    <MessageButton
+                                        recipientId={profileData?.profile?.userId || ""}
+                                        isSelf={profileData?.viewerStatus.isSelf} 
+                                    />
                                 </div>
                             </div>
 
