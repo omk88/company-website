@@ -18,19 +18,17 @@ export const migrateBlogImageUrls = internalMutation({
     const blogs = await ctx.db.query("blogs").collect();
     let updatedCount = 0;
 
-    const convexUrlRegex = /https:\/\/[^\s\)\"]+\.convex\.(?:cloud|site)\/api\/storage\/([a-zA-Z0-9_\-]+)/g;
+    const convexUrlRegex = /https:\/\/[^\s\)\"]+\/api\/storage\/([a-zA-Z0-9_\-]+)/g;
 
     for (const blog of blogs) {
       if (!blog.content) continue;
 
-      if (convexUrlRegex.test(blog.content)) {
-        convexUrlRegex.lastIndex = 0;
+      const updatedContent = blog.content.replace(
+        convexUrlRegex,
+        "/api/storage/$1"
+      );
 
-        const updatedContent = blog.content.replace(
-          convexUrlRegex,
-          "/api/storage/$1"
-        );
-
+      if (updatedContent !== blog.content) {
         await ctx.db.patch(blog._id, {
           content: updatedContent,
         });

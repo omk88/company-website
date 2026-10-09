@@ -6,15 +6,18 @@ import { Id } from "@/convex/_generated/dataModel";
 import { ImageDialog } from "./ImageDialog";
 
 interface BlogImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
-  src?: string | Blob;
+  src?: string;
   alt?: string;
 }
 
 export function BlogImage({ src, alt, ...props }: BlogImageProps) {
   if (!src || typeof src !== "string") return null;
 
-  const storageMatch = src.match(/\/api\/storage\/(.+)/);
-  const storageId = storageMatch ? (storageMatch[1] as Id<"_storage">) : null;
+  const relativeMatch = src.match(/\/api\/storage\/([a-zA-Z0-9_\-]+)/);
+
+  const legacyMatch = src.match(/https:\/\/[^\s\)\"]+\/api\/storage\/([a-zA-Z0-9_\-]+)/);
+
+  const storageId = (relativeMatch?.[1] || legacyMatch?.[1]) as Id<"_storage"> | null;
 
   const resolvedUrl = useQuery(
     api.files.getImageUrl,
