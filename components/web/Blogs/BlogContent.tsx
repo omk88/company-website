@@ -1,5 +1,6 @@
 import Image from "next/image";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { createLowlight } from "lowlight";
 import js from "highlight.js/lib/languages/javascript";
 import ts from "highlight.js/lib/languages/typescript";
@@ -21,8 +22,8 @@ import { extractHeadings } from "@/app/(shared-layout)/insights/[blogTitleId]/_u
 import { TableOfContents } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/TableOfContents";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
-import { ImageDialog } from "../ImageDialog";
 import { BlogImage } from "../BlogImage";
+import { MarkdownTable, MarkdownTableBody, MarkdownTableCell, MarkdownTableHead, MarkdownTableHeader, MarkdownTableRow } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/MarkdownTable";
 
 const lowlight = createLowlight();
 lowlight.register("javascript", js);
@@ -104,6 +105,7 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
 
       <section className="prose prose-neutral dark:prose-invert max-w-none text-lg leading-relaxed w-full min-w-0 [&_p]:break-words">
         <ReactMarkdown
+          remarkPlugins={[remarkGfm, remarkMetaAsData]}
           rehypePlugins={[
             rehypeSlug,
             [
@@ -125,6 +127,12 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
           ]}
           components={{
             pre: CodeBlock,
+            table: MarkdownTable,
+            thead: MarkdownTableHeader,
+            tbody: MarkdownTableBody,
+            tr: MarkdownTableRow,
+            th: MarkdownTableHead,
+            td: MarkdownTableCell,
             code({ node, className, children, ...props }: any) {
               const isInline =
                 !node?.parent || node?.parent?.tagName !== "pre";
