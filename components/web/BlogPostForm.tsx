@@ -34,9 +34,10 @@ import { useBlogStore } from "@/stores/useBlogStore";
 import { ScrollArea } from "../ui/scroll-area";
 import { useBlogDraft } from "@/hooks/useBlogDraft";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { ConvexError } from "convex/values";
 import { useGuardedMutation } from "@/hooks/useGuardedMutation";
 import { BlogImage } from "./BlogImage";
+import remarkGfm from "remark-gfm";
+import { MarkdownTable, MarkdownTableBody, MarkdownTableCell, MarkdownTableHead, MarkdownTableHeader, MarkdownTableRow } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/MarkdownTable";
 
 const lowlight = createLowlight();
 lowlight.register("javascript", js);
@@ -91,9 +92,16 @@ export const MemoizedMarkdown = memo(function MemoizedMarkdown({
   return (
     <div className="prose prose-neutral dark:prose-invert max-w-none text-base leading-relaxed text-neutral-800 dark:text-neutral-200 w-full min-w-0 [&_p]:break-words">
       <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
         rehypePlugins={[[rehypeHighlight, { lowlight }]]}
         components={{
           pre: CodeBlock,
+          table: MarkdownTable,
+          thead: MarkdownTableHeader,
+          tbody: MarkdownTableBody,
+          tr: MarkdownTableRow,
+          th: MarkdownTableHead,
+          td: MarkdownTableCell,
           code({ className, children, node, ...props }: any) {
             const isInline = !node?.parent || node?.parent?.tagName !== "pre";
 
