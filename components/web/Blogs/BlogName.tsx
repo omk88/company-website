@@ -19,7 +19,7 @@ export function BlogName({ avatarSrc, username, displayName, date, readTime }: B
 
     if (isDesktop) {
         return (
-            <div className="py-4 flex flex-row justify-between gap-1.5 items-center w-full">
+            <div className="flex flex-row justify-between gap-1.5 items-center w-full">
                 <div className="relative w-5 h-5 rounded-full overflow-hidden shrink-0">
                     <Image
                         src={avatarSrc}

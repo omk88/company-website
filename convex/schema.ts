@@ -44,6 +44,8 @@ const schema = defineSchema({
     controversialScore: v.number(), 
     readTime: v.number(),
     postType: v.union(v.literal("community"), v.literal("team")),
+
+    updatedAt: v.optional(v.number()),
   })
     .index("by_popular_createdAt", ["isPopular", "createdAt"])
     .index("by_popular_likes", ["isPopular", "likes"])

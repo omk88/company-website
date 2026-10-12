@@ -24,6 +24,7 @@ import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import { BlogImage } from "../BlogImage";
 import { MarkdownTable, MarkdownTableBody, MarkdownTableCell, MarkdownTableHead, MarkdownTableHeader, MarkdownTableRow } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/MarkdownTable";
+import { BlogLastUpdated } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/BlogLastUpdated";
 
 const lowlight = createLowlight();
 lowlight.register("javascript", js);
@@ -80,13 +81,17 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
           {blog.title}
         </h1>
 
-        <BlogName
-          avatarSrc={avatarSrc}
-          username={blog.username}
-          displayName={blog.displayName}
-          date={blog._creationTime}
-          readTime={blog.readTime}
-        />
+        <div className="flex flex-col py-4 gap-1">
+          <BlogName
+            avatarSrc={avatarSrc}
+            username={blog.username}
+            displayName={blog.displayName}
+            date={blog._creationTime}
+            readTime={blog.readTime}
+          />
+
+          <BlogLastUpdated date={blog.updatedAt} />
+        </div>
 
         <div className="mb-4">
           <BlogEmojiReactions initialBlog={blog} />

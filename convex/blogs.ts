@@ -513,11 +513,14 @@ export const updatePost = mutation({
       await Promise.all(tagOperations);
     }
 
+    const updatedAt = Date.now();
+
     await ctx.db.patch(blogId, {
       ...fieldsToUpdate,
       blogTitleId,
       imageUrl: finalImageUrl,
       readTime: readTimeMinutes,
+      updatedAt,
     });
 
     await ctx.scheduler.runAfter(0, internal.tts.generateAudio, {
