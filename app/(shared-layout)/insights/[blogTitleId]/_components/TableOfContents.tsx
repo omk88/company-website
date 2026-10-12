@@ -152,7 +152,7 @@ export function TableOfContents({ headings }: TOCProps) {
                             : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/60 font-medium"
                         }
                       `}
-                    >
+                    > 
                       {heading.text}
                     </a>
                   );
