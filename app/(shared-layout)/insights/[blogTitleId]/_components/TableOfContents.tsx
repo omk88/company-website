@@ -9,6 +9,10 @@ interface TOCProps {
   headings: Heading[];
 }
 
+function stripMarkdownLinks(text: string): string {
+  return text.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
+}
+
 export function TableOfContents({ headings }: TOCProps) {
   const [isOpen, setIsOpen] = React.useState(false);
   const [activeId, setActiveId] = React.useState<string>("");
@@ -18,7 +22,9 @@ export function TableOfContents({ headings }: TOCProps) {
     const idCounts = new Map<string, number>();
 
     return headings.map((heading, index) => {
-      const rawId = heading.id || heading.text.toLowerCase().replace(/\s+/g, "-");
+      const cleanText = stripMarkdownLinks(heading.text);
+
+      const rawId = heading.id || cleanText.toLowerCase().replace(/\s+/g, "-");
       const count = idCounts.get(rawId) || 0;
       idCounts.set(rawId, count + 1);
 
@@ -26,6 +32,7 @@ export function TableOfContents({ headings }: TOCProps) {
 
       return {
         ...heading,
+        text: cleanText,
         uniqueId,
         index,
       };
