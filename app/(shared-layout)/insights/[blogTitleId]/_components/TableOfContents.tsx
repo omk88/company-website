@@ -24,7 +24,13 @@ export function TableOfContents({ headings }: TOCProps) {
     return headings.map((heading, index) => {
       const cleanText = stripMarkdownLinks(heading.text);
 
-      const rawId = heading.id || cleanText.toLowerCase().replace(/\s+/g, "-");
+      const rawId = heading.id || cleanText
+        .toLowerCase()
+        .replace(/\//g, "-")
+        .replace(/[^\w\s-]/g, "")
+        .replace(/\s+/g, "-")
+        .replace(/-+/g, "-");
+        
       const count = idCounts.get(rawId) || 0;
       idCounts.set(rawId, count + 1);
 

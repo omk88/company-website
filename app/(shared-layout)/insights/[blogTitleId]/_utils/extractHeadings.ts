@@ -21,8 +21,10 @@ export function extractHeadings(markdown: string): Heading[] {
     
     const id = text
       .toLowerCase()
-      .replace(/[^\w\s-]/g, "")
-      .replace(/\s+/g, "-");
+      .replace(/\//g, "-")        
+      .replace(/[^\w\s-]/g, "")    
+      .replace(/\s+/g, "-")       
+      .replace(/-+/g, "-");       
 
     headings.push({ id, text, level });
   }
