@@ -9,14 +9,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let usernames: string[] = [];
 
   try {
-    const [fetchedPosts, fetchedUsernames] = await Promise.all([
+    const fetchPromise = Promise.all([
       fetchQuery(api.blogs.getSitemapBlogs, {}),
       fetchQuery(api.blogs.getSitemapUsernames, {}),
     ]);
-    blogPosts = fetchedPosts;
-    usernames = fetchedUsernames;
+
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Sitemap fetch timed out')), 7000)
+    );
+
+    const [fetchedPosts, fetchedUsernames] = (await Promise.race([
+      fetchPromise,
+      timeoutPromise,
+    ])) as [any, any];
+
+    blogPosts = fetchedPosts || [];
+    usernames = fetchedUsernames || [];
   } catch (error) {
-    console.error("Error fetching sitemap data:", error);
+    console.error("Error fetching sitemap data during build (falling back to static routes):", error);
   }
 
   const blogUrls: MetadataRoute.Sitemap = blogPosts.map((post) => ({
