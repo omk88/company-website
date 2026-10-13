@@ -3,11 +3,11 @@
 import React, { useState, Children, isValidElement } from "react";
 import Image from "next/image";
 import { Check, Copy, FileCode } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"; 
 import { toast } from "sonner";
 import { common, createLowlight } from "lowlight";
 
-import jsIcon from "./jsvector.svg";
+import jsIcon from "./jsvector.svg"; 
 import tsIcon from "./tsvector.svg";
 
 const lowlight = createLowlight(common);

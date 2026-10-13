@@ -12,5 +12,8 @@ export function extractHeadings(markdown: string): Heading[] {
     });
   }
 
+
+
+  
   return processHeadings(rawHeadings);
 }
