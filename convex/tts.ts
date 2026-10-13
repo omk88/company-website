@@ -221,7 +221,7 @@ export const generateAudio = internalAction({
       const audioBlob = new Blob([fullAudioBuffer], { type: "audio/mpeg" });
 
       const audioStorageId = await ctx.storage.store(audioBlob);
-      const audioUrl = await ctx.storage.getUrl(audioStorageId);
+      const audioUrl = await ctx.storage.getUrl(audioStorageId); 
 
       await ctx.runMutation(internal.blogs.updateBlogAudio, {
         blogId: args.blogId,
