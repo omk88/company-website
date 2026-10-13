@@ -4,6 +4,7 @@ import { internalAction } from "./_generated/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import { PollyClient, SynthesizeSpeechCommand } from "@aws-sdk/client-polly";
+import { processHeadings, stripMarkdownLinks } from "@/app/(shared-layout)/insights/[blogTitleId]/_utils/headingUtils";
 
 function chunkText(text: string, maxChunkLength = 1800): string[] {
   if (!text || !text.trim()) return [];
@@ -51,34 +52,25 @@ function cleanTextForTTS(text: string): string {
   return (
     text
       .replace(/```[\s\S]*?```/g, " See code block for more information. ")
-
       .replace(/<!--[\s\S]*?-->/g, "")
       .replace(/<[^>]*>/g, "")
-
       .replace(/!\[.*?\]\([^)]+\)/g, " See image for more information. ")
-
       .replace(/`([^`]+)`/g, " $1 ")
-
       .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
       .replace(/^\[[^\]]+\]:\s*\S+.*$/gm, "")
       .replace(/\[([^\]]+)\]\[[^\]]*\]/g, "$1")
-
       .replace(/^\[\^[^\]]+\]:\s*.*$/gm, "")
       .replace(/\[\^[^\]]+\]/g, "")
       .replace(/https?:\/\/\S+|www\.\S+/gi, " link ")
-
       .replace(/^#{1,6}\s+(.+)$/gm, (_, title) => {
         const trimmed = title.trim();
         return /[.?!]$/.test(trimmed) ? `${trimmed}\n` : `${trimmed}.\n`;
       })
-
       .replace(/^\s*[-*+]\s+/gm, "")
       .replace(/^\s*\d+\.\s+/gm, "")
       .replace(/^\s*>\s*/gm, "")
       .replace(/\|/g, ", ")
-
       .replace(/[*_~=]/g, "")
-
       .replace(/\s+/g, " ")
       .replace(/\s+([,.?!])/g, "$1")
       .replace(/\.+/g, ".")
@@ -88,10 +80,11 @@ function cleanTextForTTS(text: string): string {
 
 function parseMarkdownSections(markdown: string) {
   const lines = markdown.split("\n");
-  const sections: { title: string; content: string }[] = [];
+  const sections: { title: string; content: string; level: number }[] = [];
 
   let currentTitle = "Introduction";
   let currentContentLines: string[] = [];
+  let currentLevel = 1;
   let hasEncounteredFirstHeading = false;
 
   for (const line of lines) {
@@ -101,8 +94,10 @@ function parseMarkdownSections(markdown: string) {
         sections.push({
           title: currentTitle,
           content: currentContentLines.join("\n").trim(),
+          level: currentLevel,
         });
       }
+      currentLevel = headingMatch[1].length;
       currentTitle = headingMatch[2].trim();
       currentContentLines = [];
       hasEncounteredFirstHeading = true;
@@ -114,6 +109,7 @@ function parseMarkdownSections(markdown: string) {
   sections.push({
     title: currentTitle,
     content: currentContentLines.join("\n").trim(),
+    level: currentLevel,
   });
 
   return sections;
@@ -148,7 +144,6 @@ export const generateAudio = internalAction({
       });
 
       const audioBuffers: Buffer[] = [];
-      const chapters: { title: string; startTime: number }[] = [];
       let currentTimestampInSeconds = 0;
 
       let introRaw = `${args.title.trim()} by ${args.author.trim()}.`;
@@ -173,15 +168,27 @@ export const generateAudio = internalAction({
       }
 
       const sections = parseMarkdownSections(args.content);
+      
+      const processedHeadings = processHeadings(
+        sections.map((s) => ({ text: s.title, level: s.level }))
+      );
 
-      for (const section of sections) {
+      const chapters: { id: string; title: string; startTime: number }[] = [];
+
+      for (let i = 0; i < sections.length; i++) {
+        const section = sections[i];
+        const headingMeta = processedHeadings[i];
+        
         const cleanTitle = cleanTextForTTS(section.title);
         const cleanedBody = cleanTextForTTS(section.content);
 
         if (!cleanTitle && !cleanedBody) continue;
 
+        const displayTitle = stripMarkdownLinks(section.title);
+
         chapters.push({
-          title: section.title,
+          id: headingMeta.id, 
+          title: displayTitle, 
           startTime: Math.round(currentTimestampInSeconds * 10) / 10,
         });
 

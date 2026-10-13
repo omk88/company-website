@@ -14,6 +14,7 @@ const schema = defineSchema({
     chapters: v.optional(
       v.array(
         v.object({
+          id: v.string(),
           title: v.string(),
           startTime: v.number(),
         })

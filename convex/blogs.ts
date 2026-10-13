@@ -119,6 +119,7 @@ export const updateBlogAudio = internalMutation({
     audioUrl: v.string(),
     chapters: v.array(
       v.object({
+        id: v.string(),
         title: v.string(),
         startTime: v.number(),
       })

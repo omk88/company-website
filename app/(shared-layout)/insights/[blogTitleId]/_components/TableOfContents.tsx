@@ -2,15 +2,11 @@
 
 import * as React from "react";
 import { ChevronDown } from "lucide-react";
-import { Heading } from "../_utils/extractHeadings";
+import { Heading } from "../_utils/headingUtils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface TOCProps {
   headings: Heading[];
-}
-
-function stripMarkdownLinks(text: string): string {
-  return text.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
 }
 
 export function TableOfContents({ headings }: TOCProps) {
@@ -18,32 +14,7 @@ export function TableOfContents({ headings }: TOCProps) {
   const [activeId, setActiveId] = React.useState<string>("");
   const dropdownRef = React.useRef<HTMLDivElement>(null);
 
-  const processedHeadings = React.useMemo(() => {
-    const idCounts = new Map<string, number>();
-
-    return headings.map((heading, index) => {
-      const cleanText = stripMarkdownLinks(heading.text);
-
-      const rawId = heading.id || cleanText
-        .toLowerCase()
-        .replace(/\//g, "-")
-        .replace(/[^\w\s-]/g, "")
-        .replace(/\s+/g, "-")
-        .replace(/-+/g, "-");
-        
-      const count = idCounts.get(rawId) || 0;
-      idCounts.set(rawId, count + 1);
-
-      const uniqueId = count === 0 ? rawId : `${rawId}-${count}`;
-
-      return {
-        ...heading,
-        text: cleanText,
-        uniqueId,
-        index,
-      };
-    });
-  }, [headings]);
+  const processedHeadings = headings;
 
   React.useEffect(() => {
     if (processedHeadings.length === 0) return;
@@ -72,7 +43,7 @@ export function TableOfContents({ headings }: TOCProps) {
     );
 
     processedHeadings.forEach((heading) => {
-      const element = document.getElementById(heading.uniqueId);
+      const element = document.getElementById(heading.id);
       if (element) observer.observe(element);
     });
 
@@ -91,14 +62,16 @@ export function TableOfContents({ headings }: TOCProps) {
 
   if (processedHeadings.length === 0) return null;
 
-  const activeHeading = processedHeadings.find((h) => h.uniqueId === activeId);
+  const activeHeading = processedHeadings.find((h) => h.id === activeId);
 
-  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, uniqueId: string) => {
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault();
     setIsOpen(false);
-    setActiveId(uniqueId);
+    setActiveId(id);
 
-    const targetElement = document.getElementById(uniqueId);
+    window.history.pushState(null, "", `#${id}`);
+
+    const targetElement = document.getElementById(id);
     if (targetElement) {
       targetElement.scrollIntoView({ behavior: "smooth", block: "start" });
     }
@@ -135,7 +108,7 @@ export function TableOfContents({ headings }: TOCProps) {
             <ScrollArea className="h-64 p-3">
               <div className="space-y-1">
                 {processedHeadings.map((heading) => {
-                  const isActive = heading.uniqueId === activeId;
+                  const isActive = heading.id === activeId;
                   const indentClass =
                     heading.level === 1
                       ? "ml-0"
@@ -147,9 +120,9 @@ export function TableOfContents({ headings }: TOCProps) {
 
                   return (
                     <a
-                      key={heading.uniqueId}
-                      href={`#${heading.uniqueId}`}
-                      onClick={(e) => handleLinkClick(e, heading.uniqueId)}
+                      key={heading.id}
+                      href={`#${heading.id}`}
+                      onClick={(e) => handleLinkClick(e, heading.id)}
                       className={`
                         block text-sm px-2.5 py-1.5 rounded-lg transition-colors truncate ${indentClass}
                         ${
@@ -158,7 +131,7 @@ export function TableOfContents({ headings }: TOCProps) {
                             : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/60 font-medium"
                         }
                       `}
-                    > 
+                    >
                       {heading.text}
                     </a>
                   );

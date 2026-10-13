@@ -1,33 +1,16 @@
-export interface Heading {
-  id: string;
-  text: string;
-  level: number;
-}
-
-function stripMarkdownLinks(text: string): string {
-  return text.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
-}
+import { Heading, processHeadings } from "../_utils/headingUtils";
 
 export function extractHeadings(markdown: string): Heading[] {
   const headingRegex = /^(#{1,6})\s+(.+)$/gm;
-  const headings: Heading[] = [];
+  const rawHeadings: { text: string; level: number }[] = [];
   let match;
 
   while ((match = headingRegex.exec(markdown)) !== null) {
-    const level = match[1].length;
-    
-    const linkStripped = stripMarkdownLinks(match[2]);
-    const text = linkStripped.trim().replace(/[*_~`]/g, "");
-    
-    const id = text
-      .toLowerCase()
-      .replace(/\//g, "-")        
-      .replace(/[^\w\s-]/g, "")    
-      .replace(/\s+/g, "-")       
-      .replace(/-+/g, "-");       
-
-    headings.push({ id, text, level });
+    rawHeadings.push({
+      level: match[1].length,
+      text: match[2],
+    });
   }
 
-  return headings;
+  return processHeadings(rawHeadings);
 }

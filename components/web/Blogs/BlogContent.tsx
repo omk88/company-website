@@ -21,7 +21,6 @@ import { AudioPlayer } from "@/app/(shared-layout)/insights/[blogTitleId]/_compo
 import { extractHeadings } from "@/app/(shared-layout)/insights/[blogTitleId]/_utils/extractHeadings";
 import { TableOfContents } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/TableOfContents";
 import rehypeSlug from "rehype-slug";
-import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import { BlogImage } from "../BlogImage";
 import { MarkdownTable, MarkdownTableBody, MarkdownTableCell, MarkdownTableHead, MarkdownTableHeader, MarkdownTableRow } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/MarkdownTable";
 import { BlogLastUpdated } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/BlogLastUpdated";
@@ -39,6 +38,37 @@ function remarkMetaAsData() {
         node.data = node.data || {};
         node.data.hProperties = node.data.hProperties || {};
         node.data.hProperties["data-meta"] = node.meta;
+      }
+    });
+  };
+}
+
+function rehypeConditionalAutolink() {
+  return (tree: any) => {
+    visit(tree, "element", (node: any) => {
+      if (/^h[1-6]$/.test(node.tagName) && node.properties?.id) {
+        const hasLink = node.children.some((child: any) => child.tagName === "a");
+
+        if (!hasLink) {
+          node.children = [
+            {
+              type: "element",
+              tagName: "a",
+              properties: {
+                href: `#${node.properties.id}`,
+                className: [
+                  "no-underline",
+                  "text-inherit",
+                  "hover:text-blue-600",
+                  "dark:hover:text-blue-400",
+                  "transition-colors",
+                  "cursor-pointer",
+                ],
+              },
+              children: node.children,
+            },
+          ];
+        }
       }
     });
   };
@@ -113,22 +143,7 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
           remarkPlugins={[remarkGfm, remarkMetaAsData]}
           rehypePlugins={[
             rehypeSlug,
-            [
-              rehypeAutolinkHeadings,
-              {
-                behavior: "wrap",
-                properties: {
-                  className: [
-                    "no-underline",
-                    "text-inherit",
-                    "hover:text-blue-600",
-                    "dark:hover:text-blue-400",
-                    "transition-colors",
-                    "cursor-pointer",
-                  ],
-                },
-              },
-            ],
+            rehypeConditionalAutolink,
           ]}
           components={{
             pre: CodeBlock,
