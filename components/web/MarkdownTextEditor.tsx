@@ -21,6 +21,7 @@ import {
   X,
   AlertCircle,
   Expand,
+  Minimize2,
 } from "lucide-react";
 import { useConvex, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -42,6 +43,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Id } from "@/convex/_generated/dataModel";
 import imageCompression from "browser-image-compression";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 interface MarkdownTextEditorProps {
   value?: string;
@@ -92,15 +95,16 @@ export function MarkdownTextEditor({
   const [internalContent, setInternalContent] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const content = value !== undefined ? value : internalContent;
 
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const expandedTextareaRef = useRef<HTMLTextAreaElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const convex = useConvex();
   const generateUploadUrlMutation = useMutation(api.files.generateUploadUrl);
-
   const trackUploadMutation = useMutation(api.postImageCleanup.trackUpload);
 
   const handleContentChange = (newContent: string) => {
@@ -110,8 +114,8 @@ export function MarkdownTextEditor({
     setInternalContent(newContent);
   };
 
-  const insertTextAtCursor = (textToInsert: string) => {
-    const textarea = textareaRef.current;
+  const insertTextAtCursor = (textToInsert: string, isDialog = false) => {
+    const textarea = isDialog ? expandedTextareaRef.current : textareaRef.current;
     if (!textarea) return textToInsert;
 
     const start = textarea.selectionStart;
@@ -139,11 +143,10 @@ export function MarkdownTextEditor({
     const altText = file.name.replace(/\.[^/.]+$/, "");
     const placeholderText = `![Uploading ${file.name}...](#)`;
 
-    insertTextAtCursor(placeholderText);
+    insertTextAtCursor(placeholderText, isExpanded);
 
     try {
       const fileToUpload = await compressImage(file);
-
       const postUrl = await generateUploadUrlMutation();
 
       const result = await fetch(postUrl, {
@@ -155,7 +158,6 @@ export function MarkdownTextEditor({
       if (!result.ok) throw new Error("Failed to upload image.");
 
       const { storageId } = (await result.json()) as { storageId: Id<"_storage"> };
-
       const permanentImageUrl = `/api/storage/${storageId}`;
 
       await trackUploadMutation({ 
@@ -164,15 +166,17 @@ export function MarkdownTextEditor({
       });
 
       const finalMarkdown = `![${altText}](${permanentImageUrl})`;
+      const activeTextarea = isExpanded ? expandedTextareaRef.current : textareaRef.current;
 
-      if (textareaRef.current) {
-        const currentText = textareaRef.current.value;
+      if (activeTextarea) {
+        const currentText = activeTextarea.value;
         handleContentChange(currentText.replace(placeholderText, finalMarkdown));
       }
     } catch (err) {
       console.error("Image upload failed:", err);
-      if (textareaRef.current) {
-        const currentText = textareaRef.current.value;
+      const activeTextarea = isExpanded ? expandedTextareaRef.current : textareaRef.current;
+      if (activeTextarea) {
+        const currentText = activeTextarea.value;
         handleContentChange(
           currentText.replace(placeholderText, `![Upload failed: ${file.name}](#)`)
         );
@@ -209,24 +213,24 @@ export function MarkdownTextEditor({
     }
   };
 
-  const handleDragOver = (e: DragEvent<HTMLTextAreaElement>) => {
+const handleDragOver = (e: DragEvent<HTMLElement>) => {
     e.preventDefault();
     e.stopPropagation();
     if (!isDragging) setIsDragging(true);
   };
 
-  const handleDragLeave = (e: DragEvent<HTMLTextAreaElement>) => {
+  const handleDragLeave = (e: DragEvent<HTMLElement>) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
   };
 
-  const handleDrop = (e: DragEvent<HTMLTextAreaElement>) => {
+  const handleDrop = (e: DragEvent<HTMLElement>) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
 
-    const files = e.dataTransfer?.files;
+  const files = e.dataTransfer?.files;
     if (files && files.length > 0) {
       for (const file of Array.from(files)) {
         if (file.type.startsWith("image/")) {
@@ -239,9 +243,10 @@ export function MarkdownTextEditor({
   const insertInlineMarkdown = (
     prefix: string,
     suffix: string = "",
-    defaultText: string = "text"
+    defaultText: string = "text",
+    isDialog = false
   ) => {
-    const textarea = textareaRef.current;
+    const textarea = isDialog ? expandedTextareaRef.current : textareaRef.current;
     if (!textarea) return;
 
     const start = textarea.selectionStart;
@@ -265,8 +270,8 @@ export function MarkdownTextEditor({
     }, 0);
   };
 
-  const insertLinePrefix = (prefix: string, defaultText: string = "text") => {
-    const textarea = textareaRef.current;
+  const insertLinePrefix = (prefix: string, defaultText: string = "text", isDialog = false) => {
+    const textarea = isDialog ? expandedTextareaRef.current : textareaRef.current;
     if (!textarea) return;
 
     const start = textarea.selectionStart;
@@ -276,12 +281,10 @@ export function MarkdownTextEditor({
     if (lineEnd === -1) lineEnd = content.length;
 
     const currentLine = content.substring(lineStart, lineEnd);
-
-    const existingPrefixMatch = currentLine.match(/^(#{1,6}\s+|> \s*|\d+\.\s+|- \s*|\*\s*)/);
+    const existingPrefixMatch = currentLine.match(/^(#{1,6}\s+|> \s*|\d+\.\s+|\s*|\*\s*)/);
 
     if (existingPrefixMatch) {
       const existingPrefix = existingPrefixMatch[0];
-
       const isSamePrefix =
         existingPrefix.trim() === prefix.trim() ||
         (prefix === "1. " && /^\d+\.\s+$/.test(existingPrefix));
@@ -338,10 +341,10 @@ export function MarkdownTextEditor({
     }, 0);
   };
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>, isDialog = false) => {
     if (e.key !== "Enter") return;
 
-    const textarea = textareaRef.current;
+    const textarea = isDialog ? expandedTextareaRef.current : textareaRef.current;
     if (!textarea) return;
 
     const start = textarea.selectionStart;
@@ -406,51 +409,15 @@ export function MarkdownTextEditor({
   const defListItemSnippet = "Term\n: Definition goes here";
 
   const toolbarActions = [
-    {
-      label: "Bold",
-      icon: Bold,
-      action: () => insertInlineMarkdown("**", "**", "bold text"),
-    },
-    {
-      label: "Italic",
-      icon: Italic,
-      action: () => insertInlineMarkdown("*", "*", "italic text"),
-    },
-    {
-      label: "Heading",
-      icon: Heading,
-      action: () => insertLinePrefix("## ", "Heading"),
-    },
-    {
-      label: "Inline Code",
-      icon: Code,
-      action: () => insertInlineMarkdown("`", "`", "code"),
-    },
-    {
-      label: "Link",
-      icon: Link,
-      action: () => insertInlineMarkdown("[", "](https://example.com)", "link text"),
-    },
-    {
-      label: "Unordered List",
-      icon: List,
-      action: () => insertLinePrefix("- ", "List item"),
-    },
-    {
-      label: "Ordered List",
-      icon: ListOrdered,
-      action: () => insertLinePrefix("1. ", "List item"),
-    },
-    {
-      label: "Blockquote",
-      icon: ChevronRight,
-      action: () => insertLinePrefix("> ", "Quote text"),
-    },
-    {
-      label: "Image",
-      icon: ImagePlus,
-      action: insertImage,
-    },
+    { label: "Bold", icon: Bold, action: (isDialog = false) => insertInlineMarkdown("**", "**", "bold text", isDialog) },
+    { label: "Italic", icon: Italic, action: (isDialog = false) => insertInlineMarkdown("*", "*", "italic text", isDialog) },
+    { label: "Heading", icon: Heading, action: (isDialog = false) => insertLinePrefix("## ", "Heading", isDialog) },
+    { label: "Inline Code", icon: Code, action: (isDialog = false) => insertInlineMarkdown("`", "`", "code", isDialog) },
+    { label: "Link", icon: Link, action: (isDialog = false) => insertInlineMarkdown("[", "](https://example.com)", "link text", isDialog) },
+    { label: "Unordered List", icon: List, action: (isDialog = false) => insertLinePrefix("- ", "List item", isDialog) },
+    { label: "Ordered List", icon: ListOrdered, action: (isDialog = false) => insertLinePrefix("1. ", "List item", isDialog) },
+    { label: "Blockquote", icon: ChevronRight, action: (isDialog = false) => insertLinePrefix("> ", "Quote text", isDialog) },
+    { label: "Image", icon: ImagePlus, action: insertImage },
   ];
 
   const getCounterColor = (length: number, min: number) => {
@@ -495,7 +462,7 @@ export function MarkdownTextEditor({
                         size="icon"
                         disabled={disabled}
                         className="h-8 w-8 cursor-pointer text-muted-foreground hover:text-foreground"
-                        onClick={item.action}
+                        onClick={() => item.action(false)}
                       >
                         <Icon className="size-5 md:size-4" />
                         <span className="sr-only">{item.label}</span>
@@ -540,7 +507,7 @@ export function MarkdownTextEditor({
                   
                   <DropdownMenuItem
                     className="cursor-pointer"
-                    onClick={() => insertInlineMarkdown("~~", "~~", "strikethrough text")}
+                    onClick={() => insertInlineMarkdown("~~", "~~", "strikethrough text", false)}
                   >
                     <Strikethrough className="mr-2 h-4 w-4" />
                     <span>Strikethrough</span>
@@ -550,7 +517,7 @@ export function MarkdownTextEditor({
 
                   <DropdownMenuItem
                     className="cursor-pointer"
-                    onClick={() => insertTextAtCursor(codeBlockSnippet)}
+                    onClick={() => insertTextAtCursor(codeBlockSnippet, false)}
                   >
                     <Code2 className="mr-2 h-4 w-4" />
                     <span>Code Block</span>
@@ -558,7 +525,7 @@ export function MarkdownTextEditor({
 
                   <DropdownMenuItem
                     className="cursor-pointer"
-                    onClick={() => insertTextAtCursor(tableSnippet)}
+                    onClick={() => insertTextAtCursor(tableSnippet, false)}
                   >
                     <Table className="mr-2 h-4 w-4" />
                     <span>Table</span>
@@ -566,7 +533,7 @@ export function MarkdownTextEditor({
 
                   <DropdownMenuItem
                     className="cursor-pointer"
-                    onClick={() => insertLinePrefix("- [ ] ", "Task item")}
+                    onClick={() => insertLinePrefix("- [ ] ", "Task item", false)}
                   >
                     <CheckSquare className="mr-2 h-4 w-4" />
                     <span>Task List</span>
@@ -576,7 +543,7 @@ export function MarkdownTextEditor({
 
                   <DropdownMenuItem
                     className="cursor-pointer"
-                    onClick={() => insertTextAtCursor(footnoteSnippet)}
+                    onClick={() => insertTextAtCursor(footnoteSnippet, false)}
                   >
                     <Asterisk className="mr-2 h-4 w-4" />
                     <span>Footnote</span>
@@ -584,7 +551,7 @@ export function MarkdownTextEditor({
 
                   <DropdownMenuItem
                     className="cursor-pointer"
-                    onClick={() => insertTextAtCursor(defListItemSnippet)}
+                    onClick={() => insertTextAtCursor(defListItemSnippet, false)}
                   >
                     <BookOpen className="mr-2 h-4 w-4" />
                     <span>Definition List</span>
@@ -600,16 +567,17 @@ export function MarkdownTextEditor({
                   variant="ghost"
                   size="icon"
                   disabled={disabled}
+                  onClick={() => setIsExpanded(true)}
                   className="h-8 w-8 cursor-pointer text-muted-foreground hover:text-foreground"
                 >
                   <Expand className="size-5 md:size-4" />
                   <span className="sr-only">Expand</span>
                 </Button>
-                </TooltipTrigger>
-                <TooltipContent side="top">
-                  <p className="text-xs">Expand Text Area</p>
-                </TooltipContent>
-              </Tooltip>
+              </TooltipTrigger>
+              <TooltipContent side="top">
+                <p className="text-xs">Expand Text Area</p>
+              </TooltipContent>
+            </Tooltip>
           </div>
         </TooltipProvider>
 
@@ -624,7 +592,7 @@ export function MarkdownTextEditor({
               setIsFocused(false);
               onBlur?.();
             }}
-            onKeyDown={handleKeyDown}
+            onKeyDown={(e) => handleKeyDown(e, false)}
             onPaste={handlePaste}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
@@ -678,6 +646,80 @@ export function MarkdownTextEditor({
           </span>
         </div>
       </div>
+
+      <Dialog open={isExpanded} onOpenChange={setIsExpanded}>
+        <DialogContent className="!max-w-[85vw] w-[85vw] h-[90vh] flex flex-col p-0 overflow-hidden bg-background">
+          <VisuallyHidden>
+            <DialogTitle>Post Content (Markdown)</DialogTitle>
+          </VisuallyHidden>
+
+          {isExpanded && (
+            <div 
+              className={cn(
+                "flex-1 flex flex-col overflow-hidden transition-all border-2 border-transparent",
+                isDragging && "border-primary bg-primary/5 ring-2 ring-primary"
+              )}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
+              <div className="flex items-center justify-between px-4 py-3 border-b border-border/60 bg-muted/30 pr-12">
+                <span className="text-sm font-semibold tracking-tight text-foreground">
+                  Post Content (Markdown)
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between p-2 border-b border-border/60 bg-muted/10">
+                <div className="flex items-center gap-1">
+                  {toolbarActions.map((item, index) => {
+                    const Icon = item.icon;
+                    return (
+                      <Button
+                        key={index}
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 cursor-pointer text-muted-foreground hover:text-foreground"
+                        onClick={() => item.action(true)}
+                      >
+                        <Icon className="size-4" />
+                        <span className="sr-only">{item.label}</span>
+                      </Button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="relative w-full flex-1 flex flex-col">
+                <textarea
+                  ref={expandedTextareaRef}
+                  value={content}
+                  disabled={disabled}
+                  onChange={(e) => handleContentChange(e.target.value)}
+                  onKeyDown={(e) => handleKeyDown(e, true)}
+                  onPaste={handlePaste}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  placeholder={placeholder}
+                  className="w-full h-full bg-transparent p-4 text-base focus:outline-none resize-none flex-1"
+                />
+              </div>
+
+              <div className="flex items-center justify-between px-4 py-2 bg-muted/20 border-t border-border/40 text-xs">
+                <span className="text-muted-foreground">Press Esc or click outside to close</span>
+                <span className={cn("font-mono transition-colors", getCounterColor(content.length, minLength))}>
+                  {isMet ? (
+                    <span>✓ {content.length}</span>
+                  ) : (
+                    <span>{content.length} / {minLength}</span>
+                  )}
+                </span>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
