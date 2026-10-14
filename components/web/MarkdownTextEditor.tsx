@@ -648,7 +648,7 @@ const handleDragOver = (e: DragEvent<HTMLElement>) => {
       </div>
 
       <Dialog open={isExpanded} onOpenChange={setIsExpanded}>
-        <DialogContent className="!max-w-[85vw] w-[85vw] h-[90vh] flex flex-col p-0 overflow-hidden bg-background">
+        <DialogContent className="!max-w-full !rounded-none w-full h-full flex flex-col p-0 overflow-hidden bg-background">
           <VisuallyHidden>
             <DialogTitle>Post Content (Markdown)</DialogTitle>
           </VisuallyHidden>
@@ -702,7 +702,7 @@ const handleDragOver = (e: DragEvent<HTMLElement>) => {
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
                   placeholder={placeholder}
-                  className="w-full h-full bg-transparent p-4 text-base focus:outline-none resize-none flex-1"
+                  className="w-full h-full bg-transparent p-4 text-3xl focus:outline-none resize-none flex-1"
                 />
               </div>
 
