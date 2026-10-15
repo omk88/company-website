@@ -707,9 +707,9 @@ const handleDragOver = (e: DragEvent<HTMLElement>) => {
                               variant="ghost"
                               size="icon"
                               disabled={disabled}
-                              className="h-8 w-8 cursor-pointer text-muted-foreground hover:text-foreground"
+                              className="h-12 w-12 cursor-pointer text-muted-foreground hover:text-foreground"
                             >
-                              <MoreHorizontal className="h-4 w-4" />
+                              <MoreHorizontal className="h-6 w-6" />
                               <span className="sr-only">More formatting</span>
                             </Button>
                           </DropdownMenuTrigger>
