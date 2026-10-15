@@ -674,19 +674,114 @@ const handleDragOver = (e: DragEvent<HTMLElement>) => {
                   {toolbarActions.map((item, index) => {
                     const Icon = item.icon;
                     return (
-                      <Button
-                        key={index}
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 cursor-pointer text-muted-foreground hover:text-foreground"
-                        onClick={() => item.action(true)}
-                      >
-                        <Icon className="size-4" />
-                        <span className="sr-only">{item.label}</span>
-                      </Button>
+                      <TooltipProvider>
+                        <Tooltip key={index+1}>
+                          <TooltipTrigger asChild>
+                            <Button
+                              key={index}
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="h-12 w-12 cursor-pointer text-muted-foreground hover:text-foreground"
+                              onClick={() => item.action(true)}
+                            >
+                              <Icon className="size-6" />
+                              <span className="sr-only">{item.label}</span>
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent side="top">
+                            <p className="text-xs">{item.label}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     );
                   })}
+
+                  <DropdownMenu>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              disabled={disabled}
+                              className="h-8 w-8 cursor-pointer text-muted-foreground hover:text-foreground"
+                            >
+                              <MoreHorizontal className="h-4 w-4" />
+                              <span className="sr-only">More formatting</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">
+                          <p className="text-xs">More options</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+
+                    <DropdownMenuContent
+                      align="end"
+                      className="w-52"
+                      onCloseAutoFocus={(e) => e.preventDefault()}
+                    >
+                      <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground">
+                        Extended Formatting
+                      </DropdownMenuLabel>
+                      
+                      <DropdownMenuItem
+                        className="cursor-pointer"
+                        onClick={() => insertInlineMarkdown("~~", "~~", "strikethrough text", false)}
+                      >
+                        <Strikethrough className="mr-2 h-4 w-4" />
+                        <span>Strikethrough</span>
+                      </DropdownMenuItem>
+
+                      <DropdownMenuSeparator />
+
+                      <DropdownMenuItem
+                        className="cursor-pointer"
+                        onClick={() => insertTextAtCursor(codeBlockSnippet, false)}
+                      >
+                        <Code2 className="mr-2 h-4 w-4" />
+                        <span>Code Block</span>
+                      </DropdownMenuItem>
+
+                      <DropdownMenuItem
+                        className="cursor-pointer"
+                        onClick={() => insertTextAtCursor(tableSnippet, false)}
+                      >
+                        <Table className="mr-2 h-4 w-4" />
+                        <span>Table</span>
+                      </DropdownMenuItem>
+
+                      <DropdownMenuItem
+                        className="cursor-pointer"
+                        onClick={() => insertLinePrefix("- [ ] ", "Task item", false)}
+                      >
+                        <CheckSquare className="mr-2 h-4 w-4" />
+                        <span>Task List</span>
+                      </DropdownMenuItem>
+
+                      <DropdownMenuSeparator />
+
+                      <DropdownMenuItem
+                        className="cursor-pointer"
+                        onClick={() => insertTextAtCursor(footnoteSnippet, false)}
+                      >
+                        <Asterisk className="mr-2 h-4 w-4" />
+                        <span>Footnote</span>
+                      </DropdownMenuItem>
+
+                      <DropdownMenuItem
+                        className="cursor-pointer"
+                        onClick={() => insertTextAtCursor(defListItemSnippet, false)}
+                      >
+                        <BookOpen className="mr-2 h-4 w-4" />
+                        <span>Definition List</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
 
