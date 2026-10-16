@@ -28,6 +28,7 @@ import { Button } from "@/components/ui/button";
 import { Copy } from "lucide-react";
 import { FaFacebook, FaXTwitter } from "react-icons/fa6";
 import { RxLinkedinLogo } from "react-icons/rx";
+import { ShareLinks } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/ShareLinks";
 
 const lowlight = createLowlight();
 lowlight.register("javascript", js);
@@ -135,39 +136,7 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
           {blog.subtitle}
         </p>
 
-        <div className="flex flex-row items-center gap-4 p-2 w-fit border px-4 rounded-2xl ml-auto mb-4 bg-zinc-50/80 dark:border-zinc-800 dark:bg-zinc-900/50">
-          <span className="font-semibold text-base text-zinc-600 dark:text-zinc-400">Share </span>
-
-          <div className="flex flex-row gap-1">
-            <Button
-              variant="ghost"
-              className="flex flex-row items-center justify-center gap-1 h-9 w-9 p-0 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-            >
-              <Copy className="h-3.5 w-3.5 shrink-0 stroke-[2.5]" />
-            </Button>
-
-            <Button
-              variant="ghost"
-              className="flex flex-row items-center justify-center gap-1 h-9 w-9 p-0 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-            >
-              <FaXTwitter className="h-3.5 w-3.5 shrink-0 stroke-[2.5]" />
-            </Button>
-
-            <Button
-              variant="ghost"
-              className="flex flex-row items-center justify-center gap-1 h-9 w-9 p-0 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-            >
-              <RxLinkedinLogo className="h-3.5 w-3.5 shrink-0" />
-            </Button>
-
-            <Button
-              variant="ghost"
-              className="flex flex-row items-center justify-center gap-1 h-9 w-9 p-0 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-            >
-              <FaFacebook className="h-3.5 w-3.5 shrink-0 stroke-[2.5]" />
-            </Button>
-          </div>
-        </div>
+        <ShareLinks />
 
         <AudioPlayer audioUrl={blog.audioUrl} title={blog.title} chapters={blog.chapters} />
       </header>
