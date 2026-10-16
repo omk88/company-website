@@ -201,6 +201,22 @@ const schema = defineSchema({
     .index("by_userId", ["userId"])
     .index("by_username", ["username"]),
 
+  series: defineTable({
+    title: v.string(),
+    slug: v.string(),
+    description: v.optional(v.string()),
+    coverImage: v.optional(v.string()),
+  })
+    .index("by_slug", ["slug"]),
+
+  seriesItems: defineTable({
+    seriesId: v.id("series"),
+    articleId: v.id("articles"),
+    order: v.number(),
+  })
+    .index("by_series_and_order", ["seriesId", "order"])
+    .index("by_article", ["articleId"]),
+
   commentVotes: defineTable({
     userId: v.string(),
     commentId: v.id("comments"),

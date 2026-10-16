@@ -3,7 +3,7 @@
 import { api } from "@/convex/_generated/api";
 import { Doc } from "@/convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
-import { Bookmark, Copy, Ellipsis, MessageSquare, Share2, SmilePlus, SquarePen, Star, ThumbsUp, Trash2 } from "lucide-react";
+import { Bookmark, Copy, Ellipsis, ListPlus, MessageSquare, Share2, SmilePlus, SquarePen, Star, ThumbsUp, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "../ui/dropdown-menu";
@@ -281,7 +281,7 @@ export function IncrementBlogLikesDislikes({ blog, initialInteractionState }: In
   const setSelectedBlog = useBlogStore((state) => state.setSelectedBlog);
 
   return (
-    <div className="flex flex-col items-center gap-2 py-2 text-zinc-500">
+    <div className="flex flex-col items-center gap-1 py-2 text-zinc-500">
       <Button
         variant="ghost"
         onClick={handleLikeClick}
@@ -444,6 +444,15 @@ export function IncrementBlogLikesDislikes({ blog, initialInteractionState }: In
 
           {canEditOrDelete && (
             <>
+              <Button
+                variant="ghost"
+                className="flex items-center justify-center h-11 w-11 p-0 rounded-full text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                asChild
+              >
+                
+                <ListPlus className="w-4 h-4" />
+              </Button>
+
               <Button
                 onClick={() => setSelectedBlog(blog)}
                 variant="ghost"
