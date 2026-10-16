@@ -648,7 +648,7 @@ const handleDragOver = (e: DragEvent<HTMLElement>) => {
       </div>
 
       <Dialog open={isExpanded} onOpenChange={setIsExpanded}>
-        <DialogContent className="!max-w-full !rounded-none w-full h-full flex flex-col p-0 overflow-hidden bg-background">
+        <DialogContent onOpenAutoFocus={(e) => e.preventDefault()} className="!max-w-full !rounded-none w-full h-full flex flex-col p-0 overflow-hidden bg-background">
           <VisuallyHidden>
             <DialogTitle>Post Content (Markdown)</DialogTitle>
           </VisuallyHidden>
@@ -669,16 +669,15 @@ const handleDragOver = (e: DragEvent<HTMLElement>) => {
                 </span>
               </div>
 
-              <div className="flex items-center justify-between p-2 border-b border-border/60 bg-muted/10">
-                <div className="flex items-center gap-1">
-                  {toolbarActions.map((item, index) => {
-                    const Icon = item.icon;
-                    return (
-                      <TooltipProvider>
-                        <Tooltip key={index+1}>
+              <TooltipProvider>
+                <div className="flex items-center justify-between p-2 border-b border-border/60 bg-muted/10">
+                  <div className="flex items-center gap-1">
+                    {toolbarActions.map((item) => {
+                      const Icon = item.icon;
+                      return (
+                        <Tooltip key={item.label}>
                           <TooltipTrigger asChild>
                             <Button
-                              key={index}
                               type="button"
                               variant="ghost"
                               size="icon"
@@ -693,12 +692,10 @@ const handleDragOver = (e: DragEvent<HTMLElement>) => {
                             <p className="text-xs">{item.label}</p>
                           </TooltipContent>
                         </Tooltip>
-                      </TooltipProvider>
-                    );
-                  })}
+                      );
+                    })}
 
-                  <DropdownMenu>
-                    <TooltipProvider>
+                    <DropdownMenu>
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <DropdownMenuTrigger asChild>
@@ -709,7 +706,7 @@ const handleDragOver = (e: DragEvent<HTMLElement>) => {
                               disabled={disabled}
                               className="h-12 w-12 cursor-pointer text-muted-foreground hover:text-foreground"
                             >
-                              <MoreHorizontal className="h-6 w-6" />
+                              <MoreHorizontal className="size-6" />
                               <span className="sr-only">More formatting</span>
                             </Button>
                           </DropdownMenuTrigger>
@@ -718,72 +715,72 @@ const handleDragOver = (e: DragEvent<HTMLElement>) => {
                           <p className="text-xs">More options</p>
                         </TooltipContent>
                       </Tooltip>
-                    </TooltipProvider>
 
-                    <DropdownMenuContent
-                      align="end"
-                      className="w-52"
-                      onCloseAutoFocus={(e) => e.preventDefault()}
-                    >
-                      <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground">
-                        Extended Formatting
-                      </DropdownMenuLabel>
-                      
-                      <DropdownMenuItem
-                        className="cursor-pointer"
-                        onClick={() => insertInlineMarkdown("~~", "~~", "strikethrough text", false)}
+                      <DropdownMenuContent
+                        align="end"
+                        className="w-52"
+                        onCloseAutoFocus={(e) => e.preventDefault()}
                       >
-                        <Strikethrough className="mr-2 h-4 w-4" />
-                        <span>Strikethrough</span>
-                      </DropdownMenuItem>
+                        <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground">
+                          Extended Formatting
+                        </DropdownMenuLabel>
+                        
+                        <DropdownMenuItem
+                          className="cursor-pointer"
+                          onClick={() => insertInlineMarkdown("~~", "~~", "strikethrough text", false)}
+                        >
+                          <Strikethrough className="mr-2 h-4 w-4" />
+                          <span>Strikethrough</span>
+                        </DropdownMenuItem>
 
-                      <DropdownMenuSeparator />
+                        <DropdownMenuSeparator />
 
-                      <DropdownMenuItem
-                        className="cursor-pointer"
-                        onClick={() => insertTextAtCursor(codeBlockSnippet, false)}
-                      >
-                        <Code2 className="mr-2 h-4 w-4" />
-                        <span>Code Block</span>
-                      </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="cursor-pointer"
+                          onClick={() => insertTextAtCursor(codeBlockSnippet, false)}
+                        >
+                          <Code2 className="mr-2 h-4 w-4" />
+                          <span>Code Block</span>
+                        </DropdownMenuItem>
 
-                      <DropdownMenuItem
-                        className="cursor-pointer"
-                        onClick={() => insertTextAtCursor(tableSnippet, false)}
-                      >
-                        <Table className="mr-2 h-4 w-4" />
-                        <span>Table</span>
-                      </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="cursor-pointer"
+                          onClick={() => insertTextAtCursor(tableSnippet, false)}
+                        >
+                          <Table className="mr-2 h-4 w-4" />
+                          <span>Table</span>
+                        </DropdownMenuItem>
 
-                      <DropdownMenuItem
-                        className="cursor-pointer"
-                        onClick={() => insertLinePrefix("- [ ] ", "Task item", false)}
-                      >
-                        <CheckSquare className="mr-2 h-4 w-4" />
-                        <span>Task List</span>
-                      </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="cursor-pointer"
+                          onClick={() => insertLinePrefix("- [ ] ", "Task item", false)}
+                        >
+                          <CheckSquare className="mr-2 h-4 w-4" />
+                          <span>Task List</span>
+                        </DropdownMenuItem>
 
-                      <DropdownMenuSeparator />
+                        <DropdownMenuSeparator />
 
-                      <DropdownMenuItem
-                        className="cursor-pointer"
-                        onClick={() => insertTextAtCursor(footnoteSnippet, false)}
-                      >
-                        <Asterisk className="mr-2 h-4 w-4" />
-                        <span>Footnote</span>
-                      </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="cursor-pointer"
+                          onClick={() => insertTextAtCursor(footnoteSnippet, false)}
+                        >
+                          <Asterisk className="mr-2 h-4 w-4" />
+                          <span>Footnote</span>
+                        </DropdownMenuItem>
 
-                      <DropdownMenuItem
-                        className="cursor-pointer"
-                        onClick={() => insertTextAtCursor(defListItemSnippet, false)}
-                      >
-                        <BookOpen className="mr-2 h-4 w-4" />
-                        <span>Definition List</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                        <DropdownMenuItem
+                          className="cursor-pointer"
+                          onClick={() => insertTextAtCursor(defListItemSnippet, false)}
+                        >
+                          <BookOpen className="mr-2 h-4 w-4" />
+                          <span>Definition List</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </div>
-              </div>
+              </TooltipProvider>
 
               <div className="relative w-full flex-1 flex flex-col">
                 <textarea
