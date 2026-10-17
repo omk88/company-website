@@ -213,7 +213,7 @@ const schema = defineSchema({
 
   seriesItems: defineTable({
     seriesId: v.id("series"),
-    articleId: v.id("articles"),
+    articleId: v.id("blogs"),
     order: v.number(),
   })
     .index("by_series_and_order", ["seriesId", "order"])

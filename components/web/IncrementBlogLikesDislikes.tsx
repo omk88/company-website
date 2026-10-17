@@ -18,6 +18,7 @@ import { useCurrentUser } from "@/app/ConvexClientProvider";
 import { useBlogStore } from "@/stores/useBlogStore";
 import { useState } from "react";
 import { useGuardedMutation } from "@/hooks/useGuardedMutation";
+import { AddToSeriesDialog } from "@/app/(shared-layout)/[username]/_components/AddToSeriesDialog";
 
 export interface InteractionState {
   voteState: {
@@ -62,6 +63,7 @@ export function IncrementBlogLikesDislikes({ blog, initialInteractionState }: In
 
   const [isBannedDialogOpen, setIsBannedDialogOpen] = useState(false);
   const [banDetails, setBanDetails] = useState<BanDetails | null>(null);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
   const liveState = useQuery(api.blogs.getBlogInteractionState, { blogId: blog._id });
 
@@ -446,6 +448,7 @@ export function IncrementBlogLikesDislikes({ blog, initialInteractionState }: In
             <>
               <Button
                 variant="ghost"
+                onClick={() => setIsAddDialogOpen(true)}
                 className="flex items-center justify-center h-11 w-11 p-0 rounded-full text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
                 asChild
               >
@@ -453,6 +456,13 @@ export function IncrementBlogLikesDislikes({ blog, initialInteractionState }: In
                   <ListPlus className="w-4 h-4" />
                 </div>
               </Button>
+
+              <AddToSeriesDialog
+                open={isAddDialogOpen}
+                onOpenChange={setIsAddDialogOpen}
+                articleId={blog._id}  
+                authorId={blog.author}
+              />
 
               <Button
                 onClick={() => setSelectedBlog(blog)}
