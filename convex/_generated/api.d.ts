@@ -29,6 +29,7 @@ import type * as notifications from "../notifications.js";
 import type * as postImageCleanup from "../postImageCleanup.js";
 import type * as profiles from "../profiles.js";
 import type * as scoreAlgorithm from "../scoreAlgorithm.js";
+import type * as series from "../series.js";
 import type * as settings from "../settings.js";
 import type * as subscribers from "../subscribers.js";
 import type * as tts from "../tts.js";
@@ -61,6 +62,7 @@ declare const fullApi: ApiFromModules<{
   postImageCleanup: typeof postImageCleanup;
   profiles: typeof profiles;
   scoreAlgorithm: typeof scoreAlgorithm;
+  series: typeof series;
   settings: typeof settings;
   subscribers: typeof subscribers;
   tts: typeof tts;

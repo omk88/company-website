@@ -5,6 +5,7 @@ interface EmptyStateProps {
   description?: string;
   icon?: LucideIcon;
   size?: "lg" | "sm";
+  action?: React.ReactNode;
 }
 
 export function EmptyState({
@@ -12,6 +13,7 @@ export function EmptyState({
   description = "We couldn't find any articles matching your search or filters. Try adjusting your search term or clearing filters.",
   icon: IconComponent,
   size = "lg",
+  action,
 }: EmptyStateProps) {
 
   const Icon = IconComponent ?? (size === "lg" ? FileSearch : Inbox);
@@ -49,6 +51,8 @@ export function EmptyState({
           {description}
         </p>
       </div>
+
+      {action && <div className="mt-4">{action}</div>}
     </div>
   );
 }
