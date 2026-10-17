@@ -59,24 +59,24 @@ export function ProfileContent({
   }, [setSelectedMetric]);
 
   return (
-    <div className="w-full">
-      <div className={selectedMetric === "insights" ? "block w-full" : "hidden"}>
+    <div className="w-full flex flex-col flex-1 h-full">
+      <div className={selectedMetric === "insights" ? "flex flex-col flex-1 w-full h-full" : "hidden"}>
         <ProfileBlogsWrapper profile={profileData} preloadedBlogs={preloadedBlogs} />
       </div>
 
-      <div className={selectedMetric === "comments" ? "block w-full" : "hidden"}>
+      <div className={selectedMetric === "comments" ? "flex flex-col flex-1 w-full h-full" : "hidden"}>
         <ProfileComments profile={profileData} />
       </div>
 
-      <div className={selectedMetric === "bookmarks" ? "block w-full" : "hidden"}>
+      <div className={selectedMetric === "bookmarks" ? "flex flex-col flex-1 w-full h-full" : "hidden"}>
         <ProfileBookmarks profile={profileData} />
       </div>
 
-      <div className={selectedMetric === "followers" ? "block w-full" : "hidden"}>
+      <div className={selectedMetric === "followers" ? "flex flex-col flex-1 w-full" : "hidden"}>
         <ProfileFollowers profile={profileData} currentUser={currentUser} />
       </div>
 
-      <div className={selectedMetric === "following" ? "block w-full" : "hidden"}>
+      <div className={selectedMetric === "following" ? "flex flex-col flex-1 w-full" : "hidden"}>
         <ProfileFollowing profile={profileData} currentUser={currentUser} />
       </div>
     </div>

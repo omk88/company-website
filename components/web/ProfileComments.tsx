@@ -77,8 +77,13 @@ export function ProfileComments({ profile, preloadedData }: ProfileCommentsProps
             ))}
           </ul>
         ) : displayResults.length === 0 ? (
-          <div className="flex flex-col flex-1 h-full min-h-0">
-            <EmptyState icon={MessageSquareText} size="sm" title="No comments found" description="This user hasn't posted any comments yet." />
+          <div className="flex flex-1 h-full w-full items-center">
+            <EmptyState
+              icon={MessageSquareText}
+              size="sm"
+              title="No comments found"
+              description="This user hasn't posted any comments yet."
+            />
           </div>
         ) : (
           <>

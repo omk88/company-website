@@ -75,8 +75,13 @@ export function ProfileFollowing({ profile, currentUser, preloadedData }: Profil
 
   if (displayResults.length === 0) {
     return (
-      <div className="flex flex-col flex-1 h-full min-h-0">
-        <EmptyState icon={UserRoundCheck} size="sm" title="No users found" description="This user isn't following anyone yet." />
+      <div className="flex flex-1 h-full w-full items-center">
+        <EmptyState
+          icon={UserRoundCheck}
+          size="sm"
+          title="No users found"
+          description="This user isn't following anyone yet."
+        />
       </div>
     );
   }

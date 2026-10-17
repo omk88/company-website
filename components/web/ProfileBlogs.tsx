@@ -76,8 +76,12 @@ export function ProfileBlogs({ profile, preloadedData }: ProfileBlogsProps) {
             ))}
           </ul>
         ) : displayResults.length === 0 ? (
-          <div className="w-full py-8">
-            <EmptyState icon={Library} size="sm" description="This user hasn't posted any insights yet." />
+          <div className="flex flex-1 h-full w-full items-center">
+            <EmptyState
+              icon={Library}
+              size="sm"
+              description="This user hasn't posted any insights yet."
+            />
           </div>
         ) : (
           <>

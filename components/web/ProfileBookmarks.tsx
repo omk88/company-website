@@ -66,7 +66,7 @@ export function ProfileBookmarks({ profile, preloadedData }: ProfileBookmarksPro
 
   return (
     <div className="flex flex-col flex-1 h-full min-h-0 w-full p-2">
-      <div className="w-full mx-auto flex-1">
+      <div className="w-full mx-auto flex-1 flex flex-col">
         {isFirstLoad && displayResults.length === 0 ? (
           <ul className="flex flex-col gap-2">
             {[1, 2, 3].map((i) => (
@@ -76,7 +76,7 @@ export function ProfileBookmarks({ profile, preloadedData }: ProfileBookmarksPro
             ))}
           </ul>
         ) : displayResults.length === 0 ? (
-          <div className="flex flex-col flex-1 h-full min-h-0">
+          <div className="flex flex-1 h-full w-full items-center">
             <EmptyState
               icon={Bookmark}
               size="sm"

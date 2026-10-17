@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 
-import { Library, MessageSquareText, Bookmark, UsersRound, UserRoundCheck, Inbox } from "lucide-react";
+import { Library, MessageSquareText, Bookmark, UsersRound, UserRoundCheck, Inbox, ListTree } from "lucide-react";
 import { useCurrentUser } from "@/app/ConvexClientProvider";
 import Link from "next/link";
 
@@ -26,6 +26,7 @@ interface LeftSidebarProfileProps {
 
 const NAV_ITEMS = [
   { id: "insights", label: "Insights", icon: Library },
+  { id: "series", label: "Article Series", icon: ListTree },
   { id: "comments", label: "Comments", icon: MessageSquareText },
   { id: "bookmarks", label: "Bookmarks", icon: Bookmark },
   { id: "followers", label: "Followers", icon: UsersRound },
