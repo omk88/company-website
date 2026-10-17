@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Play } from "lucide-react";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export type Series = Doc<"series">;
 
@@ -15,13 +17,18 @@ interface ProfileArticleSeriesProps {
 }
 
 export default function SeriesCard({ series, index, articleCount = 0 }: ProfileArticleSeriesProps) {
+  const pathname = usePathname();
+  
   const imageUrl = useQuery(
     api.series.getImageUrl, 
     series.coverImage ? { storageId: series.coverImage } : "skip"
   ) ?? "/noImage.png";
 
   return (
-    <div className="group flex flex-col sm:flex-row items-center gap-3 p-3 bg-zinc-50/80 hover:bg-zinc-100/90 rounded-xl dark:bg-muted/30">
+    <Link
+      href={`${pathname}/series/${series.slug}`}
+      className="group flex flex-col sm:flex-row items-center gap-3 p-3 bg-zinc-50/80 hover:bg-zinc-100/90 rounded-xl dark:bg-muted/30"
+    >
       
       {imageUrl && (
         <div className="relative w-20 h-20 sm:w-24 sm:h-24 shrink-0 overflow-hidden rounded-xl">
@@ -72,6 +79,6 @@ export default function SeriesCard({ series, index, articleCount = 0 }: ProfileA
         </div>
 
       </div>
-    </div>
+    </Link>
   );
 }
