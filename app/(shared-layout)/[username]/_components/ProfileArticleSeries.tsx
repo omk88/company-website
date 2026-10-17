@@ -2,7 +2,7 @@
 
 import { api } from "@/convex/_generated/api";
 import { usePaginatedQuery } from "convex/react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import SeriesCard from "./SeriesCard";
 import { Doc } from "@/convex/_generated/dataModel";
 import { FunctionReturnType } from "convex/server";
@@ -10,6 +10,7 @@ import { CompactSeriesCardSkeleton } from "@/components/web/LoadingSkeletons/Com
 import { EmptyState } from "@/components/web/EmptyState";
 import { List, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CreateSeriesDialog } from "./CreateSeriesDialog";
 
 type ProfileData = FunctionReturnType<typeof api.profiles.getProfileByUsername>;
 
@@ -19,6 +20,7 @@ interface ProfileArticleSeriesProps {
 }
 
 export function ProfileArticleSeries({ profile, preloadedData }: ProfileArticleSeriesProps) {
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
   const userId = profile?.profile?.userId;
 
   const { results, status, loadMore, isLoading } = usePaginatedQuery(
@@ -69,6 +71,22 @@ export function ProfileArticleSeries({ profile, preloadedData }: ProfileArticleS
   return (
     <div className="flex flex-col flex-1 h-full min-h-0 w-full p-2">
       <div className="w-full mx-auto flex flex-col flex-1 h-full min-h-0">
+        
+        {/* Optional header row if you want a permanent "Create" button when items exist */}
+        {displayResults.length > 0 && (
+          <div className="flex justify-between items-center mb-4 px-2">
+            <h3 className="text-sm font-medium text-zinc-500">Article Series</h3>
+            <Button
+              onClick={() => setIsCreateOpen(true)}
+              variant="outline"
+              size="sm"
+              className="h-8 rounded-full border-zinc-200 dark:border-zinc-800 text-xs flex items-center gap-1.5"
+            >
+              <Plus className="h-3.5 w-3.5" /> New Series
+            </Button>
+          </div>
+        )}
+
         {isFirstLoad && displayResults.length === 0 ? (
           <ul className="flex flex-col gap-2">
             {[1, 2, 3].map((i) => (
@@ -86,11 +104,11 @@ export function ProfileArticleSeries({ profile, preloadedData }: ProfileArticleS
               description="This user hasn't created any article series yet."
               action={
                 <Button
-                    onClick={() => console.log("Clicked!")}
-                    variant="outline"
-                    className="h-11 md:h-8 rounded-full border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs text-zinc-700 dark:text-zinc-200 shadow-none transition-all flex items-center gap-2 px-3.5 cursor-pointer"
+                  onClick={() => setIsCreateOpen(true)}
+                  variant="outline"
+                  className="h-11 md:h-8 rounded-full border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs text-zinc-700 dark:text-zinc-200 shadow-none transition-all flex items-center gap-2 px-3.5 cursor-pointer"
                 >
-                    <Plus className="h-4 w-4" /> Create New
+                  <Plus className="h-4 w-4" /> Create New
                 </Button>
               }
             />
@@ -118,6 +136,11 @@ export function ProfileArticleSeries({ profile, preloadedData }: ProfileArticleS
           </>
         )}
       </div>
+
+      <CreateSeriesDialog
+        open={isCreateOpen}
+        onOpenChange={setIsCreateOpen}
+      />
     </div>
   );
 }
