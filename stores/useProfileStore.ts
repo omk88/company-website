@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-export type ProfileMetricType = "insights" | "comments" | "bookmarks" | "followers" | "following";
+export type ProfileMetricType = "insights" | "series" | "comments" | "bookmarks" | "followers" | "following";
 
 interface ProfileState {
   selectedMetric: ProfileMetricType;

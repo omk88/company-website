@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 
-import { Library, MessageSquareText, Bookmark, UsersRound, UserRoundCheck, Inbox, ListTree } from "lucide-react";
+import { Library, MessageSquareText, Bookmark, UsersRound, UserRoundCheck, Inbox, List } from "lucide-react";
 import { useCurrentUser } from "@/app/ConvexClientProvider";
 import Link from "next/link";
 
@@ -26,7 +26,7 @@ interface LeftSidebarProfileProps {
 
 const NAV_ITEMS = [
   { id: "insights", label: "Insights", icon: Library },
-  { id: "series", label: "Article Series", icon: ListTree },
+  { id: "series", label: "Article Series", icon: List },
   { id: "comments", label: "Comments", icon: MessageSquareText },
   { id: "bookmarks", label: "Bookmarks", icon: Bookmark },
   { id: "followers", label: "Followers", icon: UsersRound },
@@ -38,12 +38,14 @@ export function LeftSidebarProfile({ preloadedProfile }: LeftSidebarProfileProps
 
   const bookmarkCount = profileData.bookmarkCount;
   const articleCount = profileData.articleCount;
+  const seriesCount = 0;
   const commentCount = profileData.commentCount;
   const followerCount = profileData.profile?.followerCount ?? 0;
   const followingCount = profileData.profile?.followingCount ?? 0;
 
   const counts: Record<ProfileMetricType, number> = {
     insights: articleCount,
+    series: seriesCount,
     comments: commentCount,
     bookmarks: bookmarkCount,
     followers: followerCount,

@@ -9,6 +9,7 @@ import { Preloaded, usePreloadedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useProfileStore } from "@/stores/useProfileStore";
 import { useEffect } from "react";
+import { ProfileArticleSeries } from "@/app/(shared-layout)/[username]/_components/ProfileArticleSeries";
 
 interface ProfileContentProps {
   preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
@@ -62,6 +63,10 @@ export function ProfileContent({
     <div className="w-full flex flex-col flex-1 h-full">
       <div className={selectedMetric === "insights" ? "flex flex-col flex-1 w-full h-full" : "hidden"}>
         <ProfileBlogsWrapper profile={profileData} preloadedBlogs={preloadedBlogs} />
+      </div>
+
+      <div className={selectedMetric === "series" ? "flex flex-col flex-1 w-full h-full" : "hidden"}>
+        <ProfileArticleSeries profile={profileData} />
       </div>
 
       <div className={selectedMetric === "comments" ? "flex flex-col flex-1 w-full h-full" : "hidden"}>

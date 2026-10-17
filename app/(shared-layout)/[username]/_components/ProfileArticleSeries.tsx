@@ -8,7 +8,8 @@ import { Doc } from "@/convex/_generated/dataModel";
 import { FunctionReturnType } from "convex/server";
 import { CompactSeriesCardSkeleton } from "@/components/web/LoadingSkeletons/CompactSeriesCardSkeleton";
 import { EmptyState } from "@/components/web/EmptyState";
-import { Library } from "lucide-react";
+import { List, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type ProfileData = FunctionReturnType<typeof api.profiles.getProfileByUsername>;
 
@@ -79,10 +80,19 @@ export function ProfileArticleSeries({ profile, preloadedData }: ProfileArticleS
         ) : displayResults.length === 0 ? (
           <div className="flex flex-1 h-full w-full items-center">
             <EmptyState
-              icon={Library}
+              icon={List}
               size="sm"
               title="No series found"
               description="This user hasn't created any article series yet."
+              action={
+                <Button
+                    onClick={() => console.log("Clicked!")}
+                    variant="outline"
+                    className="h-11 md:h-8 rounded-full border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs text-zinc-700 dark:text-zinc-200 shadow-none transition-all flex items-center gap-2 px-3.5 cursor-pointer"
+                >
+                    <Plus className="h-4 w-4" /> Create New
+                </Button>
+              }
             />
           </div>
         ) : (

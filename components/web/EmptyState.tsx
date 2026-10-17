@@ -52,7 +52,7 @@ export function EmptyState({
         </p>
       </div>
 
-      {action && <div className="mt-4">{action}</div>}
+      {action && <div className="mt-2">{action}</div>}
     </div>
   );
 }
