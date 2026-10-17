@@ -4,7 +4,7 @@ import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider } from
 import { api } from "@/convex/_generated/api";
 import { ProfileMetricType, useProfileStore } from "@/stores/useProfileStore";
 import { Preloaded, usePreloadedQuery } from "convex/react";
-import { Library, MessageSquareText, Bookmark, UsersRound, UserRoundCheck } from "lucide-react";
+import { Library, MessageSquareText, Bookmark, UsersRound, UserRoundCheck, List } from "lucide-react";
 
 interface MobileProfileSwitchBarProps {
   preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
@@ -13,6 +13,7 @@ interface MobileProfileSwitchBarProps {
 
 const NAV_ITEMS = [
   { id: "insights", label: "Insights", icon: Library },
+  { id: "series", label: "Aricle Series", icon: List },
   { id: "comments", label: "Comments", icon: MessageSquareText },
   { id: "bookmarks", label: "Bookmarks", icon: Bookmark },
   { id: "followers", label: "Followers", icon: UsersRound },
@@ -24,12 +25,14 @@ export function MobileProfileSwitchBar({ preloadedProfile }: MobileProfileSwitch
 
     const bookmarkCount = profileData.bookmarkCount;
     const articleCount = profileData.articleCount;
+    const seriesCount = 0;
     const commentCount = profileData.commentCount;
     const followerCount = profileData.profile?.followerCount ?? 0;
     const followingCount = profileData.profile?.followingCount ?? 0;
 
     const counts: Record<ProfileMetricType, number> = {
         insights: articleCount,
+        series: seriesCount,
         comments: commentCount,
         bookmarks: bookmarkCount,
         followers: followerCount,
