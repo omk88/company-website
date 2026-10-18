@@ -10,6 +10,7 @@ import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
+import { ProfileHoverCard } from "@/components/web/ProfileHoverCard";
 
 interface LeftSidebarArticleSeriesProps {
     slug: string;
@@ -86,9 +87,7 @@ export function LeftSidebarArticleSeries({ slug }: LeftSidebarArticleSeriesProps
                     />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-base font-semibold truncate leading-tight">
-                      {seriesData.profile?.displayName || seriesData.profile?.username}
-                    </span>
+                    <ProfileHoverCard displayName={seriesData.profile?.displayName} authorUsername={seriesData.profile?.username || ""}><span className="text-base font-semibold truncate leading-tight cursor-pointer">{seriesData.profile?.displayName || seriesData.profile?.username}</span></ProfileHoverCard>
                   </div>
                 </div>
               }
