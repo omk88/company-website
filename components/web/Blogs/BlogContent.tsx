@@ -134,10 +134,10 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
         </div>
 
         <div className="flex flex-col gap-4">
+          <BlogSeriesNavbar blogId={blog._id} />
           <p className="text-lg text-neutral-600 dark:text-neutral-400 font-medium">
             {blog.subtitle}
           </p>
-          <BlogSeriesNavbar blogId={blog._id} />
           <AudioPlayer audioUrl={blog.audioUrl} title={blog.title} chapters={blog.chapters} />
           <ShareLinks />
         </div>
