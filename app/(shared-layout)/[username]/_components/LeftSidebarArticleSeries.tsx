@@ -23,6 +23,8 @@ export function LeftSidebarArticleSeries({ slug }: LeftSidebarArticleSeriesProps
     seriesData?.coverImage ? { storageId: seriesData.coverImage } : "skip"
   ) ?? "/noImage.png";
 
+  const avatarSrc = seriesData?.profile?.profilePicUrl;
+
   if (seriesData === undefined) {
     return (
       <Sidebar className="flex flex-col !top-16 !z-40 border-r" bgClass="bg-background/95" collapsible="icon">
@@ -50,6 +52,30 @@ export function LeftSidebarArticleSeries({ slug }: LeftSidebarArticleSeriesProps
       collapsible="icon"
     >
       <SidebarContent className="!p-0 w-full">
+        <SidebarGroup className="pt-3 !px-2 w-full">
+          <div className="relative p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 flex flex-col gap-3">
+            {avatarSrc &&
+              <div className="flex flex-row gap-2 items-center">
+                <div className="h-12 w-12 border border-border rounded-full overflow-hidden bg-muted shrink-0">
+                  <img
+                    src={avatarSrc}
+                    alt="profile"
+                    className="h-full w-full object-cover"
+                    decoding="async"
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-base font-semibold truncate leading-tight">
+                    {seriesData.profile?.displayName || seriesData.profile?.username}
+                  </span>
+                  <span className="text-base text-zinc-600 dark:text-zinc-400 group-hover:text-accent-foreground/80 truncate md:mt-0.5">
+                    @{seriesData.profile?.username}
+                  </span>
+                </div>
+              </div>
+            }
+          </div>
+        </SidebarGroup>
         <SidebarGroup className="pt-3 !px-2 w-full">
           <div className="relative p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 flex flex-col gap-3">
             

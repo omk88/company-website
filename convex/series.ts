@@ -145,6 +145,19 @@ export const getSeriesBySlug = query({
 
     if (!series) return null;
 
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_userId", (q) => q.eq("userId", series.authorId))
+      .first();
+
+    let profilePicUrl = null;
+    if (profile) {
+      const storageIdToFetch = profile.profilePic ?? profile.defaultProfilePic;
+      if (storageIdToFetch) {
+        profilePicUrl = await ctx.storage.getUrl(storageIdToFetch);
+      }
+    }
+
     const seriesItems = await ctx.db
       .query("seriesItems")
       .withIndex("by_series_and_order", (q) => q.eq("seriesId", series._id))
@@ -153,12 +166,18 @@ export const getSeriesBySlug = query({
     const blogs = await Promise.all(
       seriesItems.map(async (item) => {
         const blog = await ctx.db.get(item.articleId);
-        return { ...blog, order: item.order };
+        return blog ? { ...blog, order: item.order } : null;
       })
     );
 
     return {
       ...series,
+      profile: profile
+        ? {
+            ...profile,
+            profilePicUrl,
+          }
+        : null,
       blogs: blogs.filter(Boolean),
     };
   },
