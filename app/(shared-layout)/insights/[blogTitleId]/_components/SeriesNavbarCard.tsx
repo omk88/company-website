@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Layers, List } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { SeriesHoverCard } from "./SeriesHoverCard";
 
 interface BlogSeriesNavbarProps {
   blogId: Doc<"blogs">["_id"];
@@ -29,7 +30,7 @@ export function BlogSeriesNavbar({ blogId }: BlogSeriesNavbarProps) {
       <div className="flex flex-row items-center gap-2 justify-between text-sm font-medium text-zinc-500">
         <div className="flex items-center gap-1.5">
           <List className="w-4 h-4" />
-          <span>Part of the series: <strong className="text-foreground cursor-pointer">{series.title}</strong></span>
+          <span>Part of the series: <SeriesHoverCard slug={"demystifying-2231e"} username={"info"}><strong className="text-foreground cursor-pointer">{series.title}</strong></SeriesHoverCard></span>
         </div>
         <span>Article {currentIndex} of {totalCount}</span>
       </div>
