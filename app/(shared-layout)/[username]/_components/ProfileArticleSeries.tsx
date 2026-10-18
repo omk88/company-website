@@ -73,8 +73,8 @@ export function ProfileArticleSeries({ profile, preloadedData }: ProfileArticleS
       <div className="w-full mx-auto flex flex-col flex-1 h-full min-h-0">
         
         {displayResults.length > 0 && (
-          <div className="flex justify-between items-center mb-4 px-2">
-            <h3 className="text-sm font-medium text-zinc-500">Article Series</h3>
+          <div className="flex justify-between items-center mb-2 px-2">
+            <h3 className="text-sm font-medium bg-muted/80 px-2 p-0.5 rounded-lg text-zinc-500">Article Series</h3>
             <Button
               onClick={() => setIsCreateOpen(true)}
               variant="outline"

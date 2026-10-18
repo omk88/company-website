@@ -14,7 +14,47 @@ export const getPaginatedSeriesByAuthor = query({
       .order("desc")
       .paginate(args.paginationOpts);
 
-    return paginatedSeries;
+    const enrichedPage = await Promise.all(
+      paginatedSeries.page.map(async (series) => {
+        const seriesItems = await ctx.db
+          .query("seriesItems")
+          .withIndex("by_series_and_order", (q) => q.eq("seriesId", series._id))
+          .collect();
+
+        const articleCount = seriesItems.length;
+
+        let storageIdToFetch = series.coverImage;
+        let firstArticleId: string | null = null;
+
+        if (articleCount > 0) {
+          seriesItems.sort((a, b) => a.order - b.order);
+          const firstBlog = await ctx.db.get(seriesItems[0].articleId);
+          
+          if (firstBlog) {
+            firstArticleId = firstBlog.blogTitleId || null;
+            if (!storageIdToFetch) {
+              storageIdToFetch = firstBlog.storageId;
+            }
+          }
+        }
+
+        const imageUrl = storageIdToFetch 
+          ? await ctx.storage.getUrl(storageIdToFetch) 
+          : null;
+
+        return {
+          ...series,
+          imageUrl,
+          articleCount,
+          firstArticleId,
+        };
+      })
+    );
+
+    return {
+      ...paginatedSeries,
+      page: enrichedPage,
+    };
   },
 });
 
@@ -241,5 +281,20 @@ export const getImageUrl = query({
   args: { storageId: v.string() },
   handler: async (ctx, args) => {
     return await ctx.storage.getUrl(args.storageId);
+  },
+});
+
+export const getFirstArticleInSeries = query({
+  args: { seriesId: v.id("series") },
+  handler: async (ctx, args) => {
+    const firstItem = await ctx.db
+      .query("seriesItems")
+      .withIndex("by_series_and_order", (q) => q.eq("seriesId", args.seriesId))
+      .first();
+
+    if (!firstItem) return null;
+
+    const blog = await ctx.db.get(firstItem.articleId);
+    return blog ? blog.blogTitleId : null;
   },
 });
