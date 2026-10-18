@@ -29,6 +29,7 @@ import { Copy } from "lucide-react";
 import { FaFacebook, FaXTwitter } from "react-icons/fa6";
 import { RxLinkedinLogo } from "react-icons/rx";
 import { ShareLinks } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/ShareLinks";
+import { BlogSeriesNavbar } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/SeriesNavbarCard";
 
 const lowlight = createLowlight();
 lowlight.register("javascript", js);
@@ -139,6 +140,8 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
         <ShareLinks />
 
         <AudioPlayer audioUrl={blog.audioUrl} title={blog.title} chapters={blog.chapters} />
+      
+        <BlogSeriesNavbar blogId={blog._id} />
       </header>
 
       <Separator className="mt-8" />

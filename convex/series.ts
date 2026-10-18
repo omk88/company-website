@@ -183,6 +183,52 @@ export const getSeriesBySlug = query({
   },
 });
 
+export const getSeriesForBlog = query({
+  args: { blogId: v.id("blogs") },
+  handler: async (ctx, args) => {
+    const seriesItemEntries = await ctx.db
+      .query("seriesItems")
+      .withIndex("by_article", (q) => q.eq("articleId", args.blogId))
+      .collect();
+
+    if (seriesItemEntries.length === 0) return [];
+
+    const seriesWithNavigation = await Promise.all(
+      seriesItemEntries.map(async (entry) => {
+        const series = await ctx.db.get(entry.seriesId);
+        if (!series) return null;
+
+        const allItemsInSeries = await ctx.db
+          .query("seriesItems")
+          .withIndex("by_series_and_order", (q) => q.eq("seriesId", series._id))
+          .collect();
+
+        allItemsInSeries.sort((a, b) => a.order - b.order);
+
+        const currentIndex = allItemsInSeries.findIndex(
+          (item) => item.articleId === args.blogId
+        );
+
+        const prevItem = currentIndex > 0 ? allItemsInSeries[currentIndex - 1] : null;
+        const nextItem = currentIndex < allItemsInSeries.length - 1 ? allItemsInSeries[currentIndex + 1] : null;
+
+        const prevBlog = prevItem ? await ctx.db.get(prevItem.articleId) : null;
+        const nextBlog = nextItem ? await ctx.db.get(nextItem.articleId) : null;
+
+        return {
+          series,
+          currentIndex: currentIndex + 1,
+          totalCount: allItemsInSeries.length,
+          prev: prevBlog ? { title: prevBlog.title, id: prevBlog._id } : null,
+          next: nextBlog ? { title: nextBlog.title, id: nextBlog._id } : null,
+        };
+      })
+    );
+
+    return seriesWithNavigation.filter(Boolean);
+  },
+});
+
 export const generateUploadUrl = mutation(async (ctx) => {
   const identity = await ctx.auth.getUserIdentity();
   if (!identity) {
