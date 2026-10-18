@@ -72,7 +72,6 @@ export function ProfileArticleSeries({ profile, preloadedData }: ProfileArticleS
     <div className="flex flex-col flex-1 h-full min-h-0 w-full p-2">
       <div className="w-full mx-auto flex flex-col flex-1 h-full min-h-0">
         
-        {/* Optional header row if you want a permanent "Create" button when items exist */}
         {displayResults.length > 0 && (
           <div className="flex justify-between items-center mb-4 px-2">
             <h3 className="text-sm font-medium text-zinc-500">Article Series</h3>

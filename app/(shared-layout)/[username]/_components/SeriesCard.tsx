@@ -8,7 +8,7 @@ import { api } from "@/convex/_generated/api";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export type Series = Doc<"series">;
+type Series = Doc<"series">;
 
 interface ProfileArticleSeriesProps {
   series: Series;

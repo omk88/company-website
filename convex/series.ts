@@ -101,6 +101,69 @@ export const addArticleToSeries = mutation({
   },
 });
 
+export const getPaginatedSeriesItemsBySlug = query({
+  args: {
+    slug: v.string(),
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, args) => {
+    const series = await ctx.db
+      .query("series")
+      .withIndex("by_slug", (q) => q.eq("slug", args.slug))
+      .first();
+
+    if (!series) {
+      return { page: [], isDone: true, continueCursor: "" };
+    }
+
+    const paginatedItems = await ctx.db
+      .query("seriesItems")
+      .withIndex("by_series_and_order", (q) => q.eq("seriesId", series._id))
+      .paginate(args.paginationOpts);
+
+    const blogs = await Promise.all(
+      paginatedItems.page.map(async (item) => {
+        const blog = await ctx.db.get(item.articleId);
+        return blog;
+      })
+    );
+
+    return {
+      ...paginatedItems,
+      page: blogs.filter(Boolean),
+    };
+  },
+});
+
+export const getSeriesBySlug = query({
+  args: { slug: v.string() },
+  handler: async (ctx, args) => {
+    const series = await ctx.db
+      .query("series")
+      .withIndex("by_slug", (q) => q.eq("slug", args.slug))
+      .first();
+
+    if (!series) return null;
+
+    const seriesItems = await ctx.db
+      .query("seriesItems")
+      .withIndex("by_series_and_order", (q) => q.eq("seriesId", series._id))
+      .collect();
+
+    const blogs = await Promise.all(
+      seriesItems.map(async (item) => {
+        const blog = await ctx.db.get(item.articleId);
+        return { ...blog, order: item.order };
+      })
+    );
+
+    return {
+      ...series,
+      blogs: blogs.filter(Boolean),
+    };
+  },
+});
+
 export const generateUploadUrl = mutation(async (ctx) => {
   const identity = await ctx.auth.getUserIdentity();
   if (!identity) {
