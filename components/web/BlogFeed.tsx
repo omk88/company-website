@@ -89,7 +89,7 @@ function StandardBlogFeed({
       ? results
       : isFirstLoad && canUsePreloadedData
       ? preloadedItems
-      : [];
+      : results;
 
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const isDone = status === "Exhausted";
@@ -111,6 +111,8 @@ function StandardBlogFeed({
     return () => observer.disconnect();
   }, [isActive, isDone, isLoadingMore, status, loadMore]);
 
+  const isActuallyEmpty = !isFirstLoad && displayResults.length === 0;
+
   return (
     <div className="flex flex-col flex-1 h-full min-h-0 w-full">
       {isFirstLoad && displayResults.length === 0 ? (
@@ -121,7 +123,7 @@ function StandardBlogFeed({
             </li>
           ))}
         </ul>
-      ) : displayResults.length === 0 ? (
+      ) : isActuallyEmpty ? (
         <div className="flex flex-col flex-1 h-full min-h-0">
           <EmptyState icon={FileSearchCorner} size="lg" />
         </div>
