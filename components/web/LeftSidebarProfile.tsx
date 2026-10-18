@@ -38,7 +38,7 @@ export function LeftSidebarProfile({ preloadedProfile }: LeftSidebarProfileProps
 
   const bookmarkCount = profileData.bookmarkCount;
   const articleCount = profileData.articleCount;
-  const seriesCount = 0;
+  const seriesCount = profileData.seriesCount;
   const commentCount = profileData.commentCount;
   const followerCount = profileData.profile?.followerCount ?? 0;
   const followingCount = profileData.profile?.followingCount ?? 0;

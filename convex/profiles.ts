@@ -101,6 +101,7 @@ export const getProfileByUsername = query({
         profile: null,
         bookmarkCount: 0,
         articleCount: 0,
+        seriesCount: 0,
         commentCount: 0,
         viewerStatus: { isFollowing: false, isBell: false, isSelf: false },
       };
@@ -108,7 +109,7 @@ export const getProfileByUsername = query({
 
     const identity = await ctx.auth.getUserIdentity();
 
-    const [currentProfile, bookmarks, blogs, comments, picStorageUrl, defaultPicStorageUrl] =
+    const [currentProfile, bookmarks, blogs, seriesList, comments, picStorageUrl, defaultPicStorageUrl] =
       await Promise.all([
         identity
           ? ctx.db
@@ -123,6 +124,10 @@ export const getProfileByUsername = query({
         ctx.db
           .query("blogs")
           .withIndex("by_author", (q) => q.eq("author", profile.userId))
+          .collect(),
+        ctx.db
+          .query("series")
+          .withIndex("by_authorId", (q) => q.eq("authorId", profile.userId))
           .collect(),
         ctx.db
           .query("comments")
@@ -160,6 +165,7 @@ export const getProfileByUsername = query({
       },
       bookmarkCount: bookmarks.length,
       articleCount: blogs.length,
+      seriesCount: seriesList.length,
       commentCount: comments.length,
       viewerStatus: {
         isFollowing: Boolean(followRecord),
