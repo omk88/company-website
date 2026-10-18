@@ -10,7 +10,7 @@ import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
-import { ProfileHoverCard } from "@/components/web/ProfileHoverCard";
+import { formatSmartDate, ProfileHoverCard } from "@/components/web/ProfileHoverCard";
 
 interface LeftSidebarArticleSeriesProps {
     slug: string;
@@ -66,15 +66,6 @@ export function LeftSidebarArticleSeries({ slug }: LeftSidebarArticleSeriesProps
               />
             </div>
 
-            <div className="flex flex-col gap-1">
-              <span className="font-bold text-lg text-foreground">{seriesData.title}</span>
-              {seriesData.description && (
-                <span className="text-base text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                  {seriesData.description}
-                </span>
-              )}
-            </div>
-
             <div className="relative rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 flex flex-col gap-3">
               {avatarSrc &&
                 <div className="flex flex-row gap-2 items-center">
@@ -87,12 +78,24 @@ export function LeftSidebarArticleSeries({ slug }: LeftSidebarArticleSeriesProps
                     />
                   </div>
                   <div className="flex flex-col">
-                    <ProfileHoverCard displayName={seriesData.profile?.displayName} authorUsername={seriesData.profile?.username || ""}><span className="text-base font-semibold truncate leading-tight cursor-pointer">{seriesData.profile?.displayName || seriesData.profile?.username}</span></ProfileHoverCard>
+                    <ProfileHoverCard displayName={seriesData.profile?.displayName} authorUsername={seriesData.profile?.username || ""}><span className="text-sm truncate leading-tight cursor-pointer">{seriesData.profile?.displayName || seriesData.profile?.username}</span></ProfileHoverCard>
                   </div>
+
+                  <time className="capitalize font-semibold text-lg md:text-xs tracking-tight text-zinc-400 mt-0.5 select-none ml-auto">
+                    {formatSmartDate(seriesData._creationTime, false)}
+                  </time>
                 </div>
               }
             </div>
 
+            <div className="flex flex-col gap-1">
+              <span className="font-bold text-lg text-foreground">{seriesData.title}</span>
+              {seriesData.description && (
+                <span className="text-base text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                  {seriesData.description}
+                </span>
+              )}
+            </div>
           </div>
         </SidebarGroup>
       </SidebarContent>
