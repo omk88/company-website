@@ -133,15 +133,15 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
           <BlogEmojiReactions initialBlog={blog} />
         </div>
 
-        <p className="mb-4 text-lg text-neutral-600 dark:text-neutral-400 font-medium">
-          {blog.subtitle}
-        </p>
+        <div className="flex flex-col gap-4">
+          <p className="text-lg text-neutral-600 dark:text-neutral-400 font-medium">
+            {blog.subtitle}
+          </p>
+          <BlogSeriesNavbar blogId={blog._id} />
+          <AudioPlayer audioUrl={blog.audioUrl} title={blog.title} chapters={blog.chapters} />
+          <ShareLinks />
+        </div>
 
-        <ShareLinks />
-
-        <AudioPlayer audioUrl={blog.audioUrl} title={blog.title} chapters={blog.chapters} />
-      
-        <BlogSeriesNavbar blogId={blog._id} />
       </header>
 
       <Separator className="mt-8" />

@@ -219,8 +219,8 @@ export const getSeriesForBlog = query({
           series,
           currentIndex: currentIndex + 1,
           totalCount: allItemsInSeries.length,
-          prev: prevBlog ? { title: prevBlog.title, id: prevBlog._id } : null,
-          next: nextBlog ? { title: nextBlog.title, id: nextBlog._id } : null,
+          prev: prevBlog ? { title: prevBlog.title, id: prevBlog._id, blogTitleId: prevBlog.blogTitleId } : null,
+          next: nextBlog ? { title: nextBlog.title, id: nextBlog._id, blogTitleId: nextBlog.blogTitleId } : null,
         };
       })
     );

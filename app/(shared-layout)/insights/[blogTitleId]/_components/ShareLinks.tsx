@@ -10,7 +10,7 @@ import { toast } from "sonner";
 
 export function ShareLinks() {
     return (
-        <div className="flex flex-row items-center gap-4 p-2 w-fit border px-4 rounded-2xl ml-auto mb-4 bg-zinc-50/80 dark:border-zinc-800 dark:bg-zinc-900/50">
+        <div className="flex flex-row items-center gap-4 p-2 w-fit border px-4 rounded-2xl ml-auto bg-zinc-50/80 dark:border-zinc-800 dark:bg-zinc-900/50">
             <span className="font-semibold text-base text-zinc-600 dark:text-zinc-400">Share </span>
 
             <div className="flex flex-row gap-1">
