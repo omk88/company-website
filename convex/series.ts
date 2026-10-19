@@ -253,6 +253,10 @@ export const getSeriesBySlug = query({
       })
     );
 
+    const validBlogs = blogs.filter(Boolean);
+
+    const totalReadTime = validBlogs.reduce((acc, blog) => acc + (blog?.readTime ?? 0), 0);
+
     return {
       ...series,
       profile: profile
@@ -261,7 +265,8 @@ export const getSeriesBySlug = query({
             profilePicUrl,
           }
         : null,
-      blogs: blogs.filter(Boolean),
+      blogs: validBlogs,
+      totalReadTime,
     };
   },
 });

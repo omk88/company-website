@@ -8,12 +8,39 @@ import {
 } from "@/components/ui/sidebar";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { Loader2 } from "lucide-react";
+import { Loader2, Clock } from "lucide-react";
 import Image from "next/image";
 import { formatSmartDate, ProfileHoverCard } from "@/components/web/ProfileHoverCard";
+import { Badge } from "@/components/ui/badge";
 
 interface LeftSidebarArticleSeriesProps {
   slug: string;
+}
+
+function formatReadTime(totalMinutes: number): string {
+  if (!totalMinutes || totalMinutes <= 0) return "0 min read";
+
+  if (totalMinutes < 60) {
+    return `${totalMinutes} min read`;
+  }
+
+  const hours = Math.floor(totalMinutes / 60);
+  const remainingMinutes = totalMinutes % 60;
+
+  if (hours < 24) {
+    if (remainingMinutes === 0) {
+      return `${hours} hr read`;
+    }
+    return `${hours} hr ${remainingMinutes} min read`;
+  }
+
+  const days = Math.floor(hours / 24);
+  const remainingHours = hours % 24;
+
+  if (remainingHours === 0) {
+    return `${days} day read`;
+  }
+  return `${days} day ${remainingHours} hr read`;
 }
 
 export function LeftSidebarArticleSeries({ slug }: LeftSidebarArticleSeriesProps) {
@@ -96,6 +123,14 @@ export function LeftSidebarArticleSeries({ slug }: LeftSidebarArticleSeriesProps
                 </span>
               )}
             </div>
+
+            <div className="flex items-center">
+              <Badge variant={"outline"} className="gap-1.5 py-1 px-2.5 text-zinc-600 dark:text-zinc-300">
+                <Clock className="w-3.5 h-3.5 text-zinc-400" />
+                <span>{formatReadTime(seriesData.totalReadTime)}</span>
+              </Badge>
+            </div>
+
           </div>
         </SidebarGroup>
       </SidebarContent>
