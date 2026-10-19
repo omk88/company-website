@@ -75,19 +75,22 @@ export function RightSidebarArticleSeries({ slug }: RightSidebarArticleSeriesPro
 
             <div className="flex flex-col gap-5 pb-6">
               {seriesData.blogs.map((blog, index) => {
-                if (!blog?._id) return null;
+                if (!blog?._id || !blog?.blogTitleId) return null;
+
+                const blogTitleId = blog.blogTitleId;
+                const blogId = blog._id;
 
                 const processedTopics = parseRawHeadingsFromMarkdown(blog.content);
-                const isOpen = openItems[blog._id] || false;
+                const isOpen = openItems[blogId] || false;
 
                 return (
-                  <div key={blog._id} className="flex flex-col gap-1.5 text-xs">
+                  <div key={blogId} className="flex flex-col gap-1.5 text-xs">
                     <div className="flex flex-col gap-0.5">
                       <span className="text-[10px] font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wide">
                         Part {index + 1}
                       </span>
                       <Link 
-                        href={`/insights/${blog.blogTitleId}`}
+                        href={`/insights/${blogTitleId}`}
                         className="w-fit"
                       >
                         <span className="font-medium text-foreground hover:text-blue-600 dark:hover:text-blue-400 transition-colors leading-snug">
@@ -99,7 +102,7 @@ export function RightSidebarArticleSeries({ slug }: RightSidebarArticleSeriesPro
                     {processedTopics.length > 0 && (
                       <Collapsible 
                         open={isOpen} 
-                        onOpenChange={() => toggleItem(blog._id!)}
+                        onOpenChange={() => toggleItem(blogId)}
                         className="mt-1 flex flex-col gap-1"
                       >
                         <CollapsibleTrigger className="flex items-center gap-1 text-[11px] font-medium text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors py-0.5 w-fit cursor-pointer">
@@ -110,8 +113,13 @@ export function RightSidebarArticleSeries({ slug }: RightSidebarArticleSeriesPro
                         <CollapsibleContent>
                           <ul className="pl-3 ml-1 border-l-2 border-zinc-200 dark:border-zinc-800 flex flex-col gap-1 pt-1">
                             {processedTopics.map((topic) => (
-                              <li key={topic.id} className="text-zinc-500 dark:text-zinc-400 truncate">
-                                {topic.text}
+                              <li key={topic.id} className="truncate">
+                                <Link
+                                  href={`/insights/${blogTitleId}#${topic.id}`}
+                                  className="text-zinc-500 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer block"
+                                >
+                                  {topic.text}
+                                </Link>
                               </li>
                             ))}
                           </ul>

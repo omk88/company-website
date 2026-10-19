@@ -24,10 +24,6 @@ import rehypeSlug from "rehype-slug";
 import { BlogImage } from "../BlogImage";
 import { MarkdownTable, MarkdownTableBody, MarkdownTableCell, MarkdownTableHead, MarkdownTableHeader, MarkdownTableRow } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/MarkdownTable";
 import { BlogLastUpdated } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/BlogLastUpdated";
-import { Button } from "@/components/ui/button";
-import { Copy } from "lucide-react";
-import { FaFacebook, FaXTwitter } from "react-icons/fa6";
-import { RxLinkedinLogo } from "react-icons/rx";
 import { ShareLinks } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/ShareLinks";
 import { BlogSeriesNavbar } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/SeriesNavbarCard";
 
