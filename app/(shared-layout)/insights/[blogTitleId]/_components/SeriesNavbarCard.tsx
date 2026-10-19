@@ -28,9 +28,14 @@ export function BlogSeriesNavbar({ blogId }: BlogSeriesNavbarProps) {
   return (
     <div className="flex flex-col gap-3 w-full">
       <div className="flex flex-row items-center gap-2 justify-between text-sm font-medium text-zinc-500">
-        <div className="flex items-center gap-1.5">
+        <div className="flex flex-row items-center gap-1.5">
           <List className="w-4 h-4" />
-          <span>Part of the series: <SeriesHoverCard slug={"demystifying-2231e"} username={"info"}><strong className="text-foreground cursor-pointer">{series.title}</strong></SeriesHoverCard></span>
+          <span>Part of the series:</span>
+          <SeriesHoverCard slug={"demystifying-2231e"} username={"info"}>
+            <strong className="text-foreground cursor-pointer">
+              {series.title}
+            </strong>
+          </SeriesHoverCard>
         </div>
         <span>Article {currentIndex} of {totalCount}</span>
       </div>
