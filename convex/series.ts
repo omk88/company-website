@@ -85,6 +85,38 @@ export const createSeries = mutation({
   },
 });
 
+export const getSeriesWithBlogsBySlug = query({
+  args: { slug: v.string() },
+  handler: async (ctx, args) => {
+    const series = await ctx.db
+      .query("series")
+      .withIndex("by_slug", (q) => q.eq("slug", args.slug))
+      .unique();
+
+    if (!series) return null;
+
+    const seriesItems = await ctx.db
+      .query("seriesItems")
+      .withIndex("by_series_and_order", (q) => q.eq("seriesId", series._id))
+      .collect();
+
+    const blogs = await Promise.all(
+      seriesItems.map(async (item) => {
+        const blog = await ctx.db.get(item.articleId);
+        return {
+          ...blog,
+          order: item.order,
+        };
+      })
+    );
+
+    return {
+      ...series,
+      blogs: blogs.filter(Boolean),
+    };
+  },
+});
+
 export const getSeriesWithArticleCounts = query({
   args: { author: v.string() },
   handler: async (ctx, args) => {

@@ -13,7 +13,7 @@ import Image from "next/image";
 import { formatSmartDate, ProfileHoverCard } from "@/components/web/ProfileHoverCard";
 
 interface LeftSidebarArticleSeriesProps {
-    slug: string;
+  slug: string;
 }
 
 export function LeftSidebarArticleSeries({ slug }: LeftSidebarArticleSeriesProps) {

@@ -28,7 +28,7 @@ export default async function ArticleSeriesPage({ params }: ArticleSeriesPagePro
                         style={{ "--sidebar-width": "20rem" } as React.CSSProperties} 
                         className="hidden md:block w-[20rem] shrink-0 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto"
                     >
-                        <RightSidebarArticleSeries />
+                        <RightSidebarArticleSeries slug={slug} />
                     </aside>
                 </div>
             </SidebarProvider>
