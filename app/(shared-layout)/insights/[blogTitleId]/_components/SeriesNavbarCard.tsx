@@ -23,7 +23,7 @@ export function BlogSeriesNavbar({ blogId }: BlogSeriesNavbarProps) {
 
   if (!currentSeriesData) return null;
 
-  const { series, currentIndex, totalCount, prev, next } = currentSeriesData;
+  const { series, slug, username, currentIndex, totalCount, prev, next } = currentSeriesData;
 
   return (
     <div className="flex flex-col gap-3 w-full">
@@ -31,7 +31,7 @@ export function BlogSeriesNavbar({ blogId }: BlogSeriesNavbarProps) {
         <div className="flex flex-row items-center gap-1.5">
           <List className="w-4 h-4" />
           <span>Part of the series:</span>
-          <SeriesHoverCard slug={"demystifying-2231e"} username={"info"}>
+          <SeriesHoverCard slug={slug} username={username}>
             <strong className="text-foreground cursor-pointer">
               {series.title}
             </strong>

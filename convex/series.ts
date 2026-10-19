@@ -238,6 +238,13 @@ export const getSeriesForBlog = query({
         const series = await ctx.db.get(entry.seriesId);
         if (!series) return null;
 
+        const profile = await ctx.db
+          .query("profiles")
+          .withIndex("by_userId", (q) => q.eq("userId", series.authorId))
+          .unique();
+
+        const username = profile?.username ?? "unknown";
+
         const allItemsInSeries = await ctx.db
           .query("seriesItems")
           .withIndex("by_series_and_order", (q) => q.eq("seriesId", series._id))
@@ -257,6 +264,8 @@ export const getSeriesForBlog = query({
 
         return {
           series,
+          slug: series.slug,     
+          username,             
           currentIndex: currentIndex + 1,
           totalCount: allItemsInSeries.length,
           prev: prevBlog ? { title: prevBlog.title, id: prevBlog._id, blogTitleId: prevBlog.blogTitleId } : null,
