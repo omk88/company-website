@@ -209,7 +209,8 @@ const schema = defineSchema({
     authorId: v.string(),
   })
     .index("by_authorId", ["authorId"])
-    .index("by_slug", ["slug"]),
+    .index("by_slug", ["slug"])
+    .index("by_author_and_slug", ["authorId", "slug"]),
 
   seriesItems: defineTable({
     seriesId: v.id("series"),

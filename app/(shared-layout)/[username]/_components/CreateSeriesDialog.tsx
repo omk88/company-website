@@ -92,7 +92,7 @@ export function CreateSeriesDialog({
         coverImageStorageId = storageId;
       }
 
-      const slug = generateSlug(title) + "-" + Math.random().toString(36).substring(2, 7);
+      const slug = generateSlug(title);
       
       const newSeriesId = await createSeries({
         title: title.trim(),

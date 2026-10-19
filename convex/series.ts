@@ -73,6 +73,17 @@ export const createSeries = mutation({
 
     const userId = identity.subject;
 
+    const existingSeries = await ctx.db
+      .query("series")
+      .withIndex("by_author_and_slug", (q) => 
+        q.eq("authorId", userId).eq("slug", args.slug)
+      )
+      .first();
+
+    if (existingSeries) {
+      throw new Error("You already have a series with this title. Please choose a different title.");
+    }
+
     const seriesId = await ctx.db.insert("series", {
       title: args.title,
       slug: args.slug,
