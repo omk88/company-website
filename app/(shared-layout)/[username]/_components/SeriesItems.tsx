@@ -40,6 +40,9 @@ export function SeriesItems({ slug, preloadedData }: SeriesItemsProps) {
       ? preloadedItems
       : lastResultsRef.current;
 
+  const hasInitialData = displayResults.length > 0 || preloadedItems.length > 0;
+  const isInitialLoading = isFirstLoad && !hasInitialData;
+
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -63,7 +66,7 @@ export function SeriesItems({ slug, preloadedData }: SeriesItemsProps) {
   return (
     <div className="w-full p-2">
       <div className="w-full mx-auto">
-        {isFirstLoad && displayResults.length === 0 ? (
+        {isInitialLoading ? (
           <ul className="flex flex-col gap-4">
             {[1, 2, 3].map((i) => (
               <li key={i} className="flex flex-col gap-1.5">
@@ -85,7 +88,6 @@ export function SeriesItems({ slug, preloadedData }: SeriesItemsProps) {
             <ul className="flex flex-col gap-4">
               {displayResults.map((blog: any, index: number) => (
                 <li key={blog._id} className="flex flex-col gap-1.5">
-                  {/* Part Header */}
                   <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase px-1">
                     Part {index + 1}
                   </span>
@@ -112,9 +114,12 @@ export function SeriesItems({ slug, preloadedData }: SeriesItemsProps) {
 
             <div ref={loadMoreRef} className="w-full">
               {isLoading && status === "LoadingMore" && (
-                <div className="py-4 flex justify-center">
-                  <CompactBlogCardSkeleton />
-                </div>
+                <ul className="flex flex-col gap-4 mt-4">
+                  <li className="flex flex-col gap-1.5">
+                    <Skeleton className="h-3 w-12 rounded bg-muted/60" />
+                    <CompactBlogCardSkeleton />
+                  </li>
+                </ul>
               )}
             </div>
           </>
