@@ -6,6 +6,7 @@ import { useEffect, useRef } from "react";
 import { BlogCard } from "@/components/web/BlogCard";
 import { EmptyState } from "@/components/web/EmptyState";
 import { CompactBlogCardSkeleton } from "@/components/web/LoadingSkeletons/CompactBlogCardSkeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Library } from "lucide-react";
 
 interface SeriesItemsProps {
@@ -63,9 +64,10 @@ export function SeriesItems({ slug, preloadedData }: SeriesItemsProps) {
     <div className="w-full p-2">
       <div className="w-full mx-auto">
         {isFirstLoad && displayResults.length === 0 ? (
-          <ul className="flex flex-col gap-2">
+          <ul className="flex flex-col gap-4">
             {[1, 2, 3].map((i) => (
-              <li key={i}>
+              <li key={i} className="flex flex-col gap-1.5">
+                <Skeleton className="h-3 w-12 rounded bg-muted/60" />
                 <CompactBlogCardSkeleton />
               </li>
             ))}
@@ -80,7 +82,7 @@ export function SeriesItems({ slug, preloadedData }: SeriesItemsProps) {
           </div>
         ) : (
           <>
-            <ul className="flex flex-col gap-4"> {/* Increased gap slightly to accommodate headers */}
+            <ul className="flex flex-col gap-4">
               {displayResults.map((blog: any, index: number) => (
                 <li key={blog._id} className="flex flex-col gap-1.5">
                   {/* Part Header */}
