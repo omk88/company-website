@@ -13,7 +13,7 @@ export default function CreatePostButton() {
     const pathname = usePathname();
     const setSelectedBlog = useBlogStore((state) => state.setSelectedBlog);
 
-    const allowedRoutes = ["/insights"];
+    const allowedRoutes = [""];
     const shouldShow = allowedRoutes.includes(pathname);
     
     if (!shouldShow) return null;
