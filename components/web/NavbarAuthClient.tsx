@@ -701,7 +701,7 @@ export function NavbarAuthClient({
                       className="flex items-center text-zinc-600 dark:text-zinc-400 gap-2.5 px-2.5 py-2 text-xs rounded-md hover:bg-accent hover:text-accent-foreground transition-colors duration-100 cursor-pointer"
                     >
                       <Plus className="size-5 md:size-4 stroke-[2.5] md:stroke-2 text-foreground transition-all shrink-0" />
-                      <span className="md:text-sm text-base text-foreground">Create a post</span>
+                      <span className="md:text-sm text-base text-foreground">Create a Post</span>
                     </Link>
 
                     <Link

@@ -55,15 +55,6 @@ export async function LeftSidebar() {
               </div>
             </div>
           </SidebarGroup>
-          <div className="px-2">
-            
-            <SidebarMenuButton asChild className={buttonStyleClass}>
-              <Link href="/rules">
-                <Gavel className="h-4 w-4 shrink-0 stroke-[2.5] transition-colors" />
-                <span>Platform Rules</span>
-              </Link>
-            </SidebarMenuButton>
-          </div>
         </SidebarContent>
         <SidebarFooter className="hidden" />
       </Sidebar>
