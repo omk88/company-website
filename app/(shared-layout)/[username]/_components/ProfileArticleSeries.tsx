@@ -79,9 +79,9 @@ export function ProfileArticleSeries({ profile, preloadedData }: ProfileArticleS
               onClick={() => setIsCreateOpen(true)}
               variant="outline"
               size="sm"
-              className="h-8 rounded-full border-zinc-200 dark:border-zinc-800 text-xs flex items-center gap-1.5"
+              className="h-11 md:h-8 rounded-full border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs text-zinc-700 dark:text-zinc-200 shadow-none transition-all flex items-center gap-2 px-3.5 cursor-pointer"
             >
-              <Plus className="h-3.5 w-3.5" /> New Series
+              <Plus className="size-6 md:size-3.5 shrink-0 stroke-[2.5]" /> New Series
             </Button>
           </div>
         )}

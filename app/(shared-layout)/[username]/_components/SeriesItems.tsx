@@ -80,9 +80,14 @@ export function SeriesItems({ slug, preloadedData }: SeriesItemsProps) {
           </div>
         ) : (
           <>
-            <ul className="flex flex-col gap-2">
-              {displayResults.map((blog: any) => (
-                <li key={blog._id}>
+            <ul className="flex flex-col gap-4"> {/* Increased gap slightly to accommodate headers */}
+              {displayResults.map((blog: any, index: number) => (
+                <li key={blog._id} className="flex flex-col gap-1.5">
+                  {/* Part Header */}
+                  <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase px-1">
+                    Part {index + 1}
+                  </span>
+
                   <BlogCard
                     id={blog._id}
                     blogTitleId={blog.blogTitleId}
