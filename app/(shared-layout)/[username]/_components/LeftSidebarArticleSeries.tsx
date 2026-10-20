@@ -8,10 +8,11 @@ import {
 } from "@/components/ui/sidebar";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { Loader2, Clock } from "lucide-react";
+import { Clock } from "lucide-react";
 import Image from "next/image";
 import { formatSmartDate, ProfileHoverCard } from "@/components/web/ProfileHoverCard";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface LeftSidebarArticleSeriesProps {
   slug: string;
@@ -55,10 +56,39 @@ export function LeftSidebarArticleSeries({ slug }: LeftSidebarArticleSeriesProps
 
   if (seriesData === undefined) {
     return (
-      <Sidebar className="flex flex-col !top-16 !z-40 border-r" bgClass="bg-background/95" collapsible="icon">
-        <SidebarContent className="flex items-center justify-center h-40">
-          <Loader2 className="h-5 w-5 animate-spin text-zinc-400" />
+      <Sidebar 
+        className="flex flex-col !top-16 !z-40 border-r"
+        bgClass="bg-background/95" 
+        collapsible="icon"
+      >
+        <SidebarContent className="!p-0 w-full">
+          <SidebarGroup className="pt-3 !px-2 w-full">
+            <div className="relative p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 flex flex-col gap-3">
+              
+              <Skeleton className="w-full h-64 rounded-lg" />
+
+              <div className="relative rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 flex flex-col gap-3">
+                <div className="flex flex-row gap-2 items-center">
+                  <Skeleton className="h-6 w-6 rounded-full shrink-0" />
+                  <Skeleton className="h-4 w-28 rounded" />
+                  <Skeleton className="h-4 w-12 rounded ml-auto" />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2 pt-1">
+                <Skeleton className="h-6 w-4/5 rounded-md" />
+                <Skeleton className="h-4 w-full rounded-md" />
+                <Skeleton className="h-4 w-2/3 rounded-md" />
+              </div>
+
+              <div className="flex items-center pt-1">
+                <Skeleton className="h-6 w-24 rounded-full" />
+              </div>
+
+            </div>
+          </SidebarGroup>
         </SidebarContent>
+        <SidebarFooter className="hidden" />
       </Sidebar>
     );
   }

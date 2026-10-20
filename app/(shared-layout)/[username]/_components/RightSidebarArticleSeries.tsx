@@ -9,6 +9,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { processHeadings } from "../../insights/[blogTitleId]/_utils/headingUtils";
 import Link from "next/link";
 import { ChevronRight, List } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface RightSidebarArticleSeriesProps {
   slug: string;
@@ -28,12 +29,43 @@ export function RightSidebarArticleSeries({ slug }: RightSidebarArticleSeriesPro
 
   if (!seriesData) {
     return (
-      <Sidebar side="right" bgClass="bg-background/95" className="flex flex-col !top-16 !z-40 overflow-hidden !p-0" style={{ height: "calc(100vh - 4rem)" }}>
+      <Sidebar
+        side="right" 
+        bgClass="bg-background/95" 
+        className="flex flex-col !top-16 !z-40 overflow-hidden !p-0 border-l border-zinc-200 dark:border-zinc-800"
+        style={{ height: "calc(100vh - 4rem)" }}
+      >
         <SidebarContent className="!p-0 h-full">
-          <SidebarGroup className="pt-3 !px-2 w-full">
-            <div className="p-3 text-xs text-zinc-500">Loading series...</div>
-          </SidebarGroup>
+          <ScrollArea className="h-full w-full">
+            <SidebarGroup className="pt-4 !px-3 w-full flex flex-col gap-4">
+              
+              <div className="flex flex-col gap-1 pb-3 border-b border-zinc-200/60 dark:border-zinc-800">
+                <div className="flex items-center gap-1.5">
+                  <Skeleton className="w-3.5 h-3.5 rounded" />
+                  <Skeleton className="w-12 h-3 rounded" />
+                </div>
+                <Skeleton className="w-3/4 h-4 rounded-md mt-1" />
+              </div>
+
+              <div className="flex flex-col gap-5 pb-6">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="flex flex-col gap-1.5 text-xs">
+                    <div className="flex flex-col gap-1">
+                      <Skeleton className="w-10 h-2.5 rounded" />
+                      <Skeleton className="w-full h-4 rounded-md" />
+                      <Skeleton className="w-2/3 h-4 rounded-md" />
+                    </div>
+                    <div className="mt-1">
+                      <Skeleton className="w-16 h-3 rounded" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+            </SidebarGroup>
+          </ScrollArea>
         </SidebarContent>
+        <SidebarFooter className="hidden" />
       </Sidebar>
     );
   }
