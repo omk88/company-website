@@ -108,13 +108,15 @@ export function ProfileArticleSeries({ profile, preloadedData }: ProfileArticleS
               title="No series found"
               description="This user hasn't created any article series yet."
               action={
-                <Button
-                  onClick={() => setIsCreateOpen(true)}
-                  variant="outline"
-                  className="h-11 md:h-8 rounded-full border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs text-zinc-700 dark:text-zinc-200 shadow-none transition-all flex items-center gap-2 px-3.5 cursor-pointer"
-                >
-                  <Plus className="h-4 w-4" /> Create New
-                </Button>
+                isOwnProfile ? (
+                  <Button
+                    onClick={() => setIsCreateOpen(true)}
+                    variant="outline"
+                    className="h-11 md:h-8 rounded-full border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs text-zinc-700 dark:text-zinc-200 shadow-none transition-all flex items-center gap-2 px-3.5 cursor-pointer"
+                  >
+                    <Plus className="h-4 w-4" /> Create New
+                  </Button>
+                ) : undefined
               }
             />
           </div>
