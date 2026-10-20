@@ -6,8 +6,8 @@ import { fetchQuery } from "convex/nextjs";
 import { LeftSidebarProfile } from "@/components/web/LeftSidebarProfile";
 import { ProfileContent } from "@/components/web/ProfileContent";
 import { RightSidebarProfile } from "@/components/web/RightSidebarProfile";
-import { MobileProfileSection } from "./_components/MobileProfileSection";
-import { MobileProfileSwitchBar } from "./_components/MobileProfileSwitchBar";
+import { MobileProfileSection } from "../_components/MobileProfileSection";
+import { MobileProfileSwitchBar } from "../_components/MobileProfileSwitchBar";
 
 interface ProfileRouteProps {
   params: Promise<{ username: string }>;
