@@ -42,7 +42,7 @@ function formatReadTime(totalMinutes: number): string {
     return `${days} day read`;
   }
   return `${days} day ${remainingHours} hr read`;
-}
+} 
 
 export function LeftSidebarArticleSeries({ slug }: LeftSidebarArticleSeriesProps) {
   const seriesData = useQuery(api.series.getSeriesBySlug, { slug });
