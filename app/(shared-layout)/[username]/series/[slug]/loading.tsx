@@ -37,7 +37,7 @@ export default function SeriesLoading() {
             <ul className="flex flex-col gap-2">
               {[1, 2, 3].map((i) => (
                 <li key={i}>
-                  <CompactBlogCardSkeleton />
+                  <CompactBlogCardSkeleton showPartHeader={true} />
                 </li>
               ))}
             </ul>
