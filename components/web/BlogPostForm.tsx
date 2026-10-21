@@ -57,6 +57,20 @@ interface BlogFormValues {
 
 export type User = FunctionReturnType<typeof api.auth.getCurrentUser>;
 
+const SPECIAL_TERMS: Record<string, string> = {
+  javascript: "JavaScript",
+  typescript: "TypeScript",
+  github: "GitHub",
+  reactjs: "ReactJS",
+  nodejs: "Node.js",
+  graphql: "GraphQL",
+  html: "HTML",
+  css: "CSS",
+  api: "API",
+  ui: "UI",
+  ux: "UX",
+};
+
 function toTitleCase(str: string): string {
   if (!str) return "";
   
@@ -70,6 +84,13 @@ function toTitleCase(str: string): string {
     .split(' ')
     .map((word, index, wordsArray) => {
       if (!word) return word;
+
+      const cleanWord = word.replace(/[^a-z0-9]/gi, "");
+      const punctuation = word.replace(/[a-z0-9]/gi, "");
+
+      if (SPECIAL_TERMS[cleanWord.toLowerCase()]) {
+        return SPECIAL_TERMS[cleanWord.toLowerCase()] + punctuation;
+      }
 
       const isFirstWord = index === 0;
       const isLastWord = index === wordsArray.length - 1;
@@ -248,13 +269,6 @@ export const LivePostPreview = memo(function LivePostPreview({
     </div>
   );
 });
-
-interface BanDetails {
-  banReason: string;
-  banViolations: string[];
-  bannedAt: number | null;
-  bannedUntil: number | null;
-}
 
 export default function BlogPostForm() {
     const router = useRouter();
