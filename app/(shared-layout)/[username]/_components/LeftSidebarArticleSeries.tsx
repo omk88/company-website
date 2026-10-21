@@ -50,9 +50,11 @@ export function LeftSidebarArticleSeries({ slug }: LeftSidebarArticleSeriesProps
   const imageUrl = useQuery(
     api.series.getImageUrl,
     seriesData?.coverImage ? { storageId: seriesData.coverImage } : "skip"
-  ) ?? "/noImage.png";
+  );
 
   const avatarSrc = seriesData?.profile?.profilePicUrl;
+
+  const isImageLoading = seriesData?.coverImage && imageUrl === undefined;
 
   if (seriesData === undefined) {
     return (
@@ -114,13 +116,17 @@ export function LeftSidebarArticleSeries({ slug }: LeftSidebarArticleSeriesProps
           <div className="relative p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 flex flex-col gap-3">
             
             <div className="relative w-full h-64 overflow-hidden rounded-lg">
-              <Image
-                src={imageUrl}
-                alt={seriesData.title || "Series cover"}
-                fill
-                className="object-cover"
-                sizes="300px"
-              />
+              {isImageLoading ? (
+                <Skeleton className="w-full h-full rounded-lg" />
+              ) : imageUrl ? (
+                <Image
+                  src={imageUrl}
+                  alt={seriesData.title || "Series cover"}
+                  fill
+                  className="object-cover"
+                  sizes="300px"
+                />
+              ) : null}
             </div>
 
             <div className="relative rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 flex flex-col gap-3">
