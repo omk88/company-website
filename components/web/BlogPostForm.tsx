@@ -69,6 +69,7 @@ const SPECIAL_TERMS: Record<string, string> = {
   api: "API",
   ui: "UI",
   ux: "UX",
+  objected_oriented: "Object-Oriented"
 };
 
 function toTitleCase(str: string): string {
