@@ -11,9 +11,9 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 export function MarkdownTable({ children, ...props }: React.ComponentPropsWithoutRef<"table">) {
   return (
-    <div className="not-prose my-4 w-full border border-neutral-200 dark:border-neutral-800 rounded-none overflow-hidden">
-      <ScrollArea className="w-full whitespace-nowrap pb-3">
-        <Table className="!m-0 w-full border-collapse" {...props}>
+    <div className="not-prose my-4 w-full max-w-full min-w-0 grid grid-cols-1 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 overflow-hidden">
+      <ScrollArea className="w-full max-w-full min-w-0 whitespace-nowrap pb-3">
+        <Table className="!m-0 w-full table-auto border-collapse" {...props}>
           {children}
         </Table>
         <ScrollBar orientation="horizontal" />
@@ -37,7 +37,7 @@ export function MarkdownTableRow({ children, ...props }: React.ComponentPropsWit
 export function MarkdownTableHead({ children, ...props }: React.ComponentPropsWithoutRef<"th">) {
   return (
     <TableHead 
-      className="!m-0 py-3.5 px-4 bg-muted text-sm font-bold text-neutral-900 dark:text-neutral-100" 
+      className="!m-0 py-3.5 px-4 bg-muted text-sm font-bold text-neutral-900 dark:text-neutral-100 whitespace-nowrap" 
       {...props}
     >
       {children}
@@ -48,8 +48,8 @@ export function MarkdownTableHead({ children, ...props }: React.ComponentPropsWi
 export function MarkdownTableCell({ children, ...props }: React.ComponentPropsWithoutRef<"td">) {
   return (
     <TableCell 
-      className="!m-0 py-3.5 px-4 text-sm font-medium [&:first-child]:font-bold [&:first-child]:text-neutral-900 dark:[&:first-child]:text-neutral-100" 
       {...props}
+      className="!m-0 py-3.5 px-4 text-sm font-medium whitespace-nowrap min-w-0 [&:first-child]:font-bold [&:first-child]:text-neutral-900 dark:[&:first-child]:text-neutral-100" 
     >
       {children}
     </TableCell>
