@@ -8,6 +8,7 @@ import { EmptyState } from "./EmptyState";
 import { CompactBlogCardSkeleton } from "./LoadingSkeletons/CompactBlogCardSkeleton";
 import { FunctionReturnType } from "convex/server";
 import { Bookmark } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type ProfileData = FunctionReturnType<typeof api.profiles.getProfileByUsername>;
 
@@ -64,10 +65,26 @@ export function ProfileBookmarks({ profile, preloadedData }: ProfileBookmarksPro
     };
   }, [canLoadMore, loadMore]);
 
+  const hasPreloadedData = preloadedItems.length > 0;
+  const isInitialLoading = isFirstLoad && displayResults.length === 0 && !hasPreloadedData;
+
   return (
     <div className="flex flex-col flex-1 h-full min-h-0 w-full p-2">
       <div className="w-full mx-auto flex-1 flex flex-col">
-        {isFirstLoad && displayResults.length === 0 ? (
+        
+        {(isInitialLoading || displayResults.length > 0) && (
+          <div className="flex justify-between items-center mb-2 px-2">
+            {isInitialLoading ? (
+              <Skeleton className="h-6 w-24 rounded-lg" />
+            ) : (
+              <h3 className="text-sm font-medium bg-muted/80 px-2 p-0.5 rounded-lg text-zinc-500">
+                Bookmarks
+              </h3>
+            )}
+          </div>
+        )}
+
+        {isInitialLoading ? (
           <ul className="flex flex-col gap-2">
             {[1, 2, 3].map((i) => (
               <li key={i}>
