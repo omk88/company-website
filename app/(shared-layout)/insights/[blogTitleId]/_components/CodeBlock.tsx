@@ -176,7 +176,7 @@ export function CodeBlock({
   };
 
   return (
-    <div className="not-prose flex flex-col max-h-[270px] h-auto w-full my-6 rounded-lg bg-black border border-neutral-800 shadow-md overflow-hidden min-w-0">
+    <div className="not-prose grid grid-cols-1 max-h-[270px] h-auto w-full max-w-full my-6 rounded-lg bg-black border border-neutral-800 shadow-md overflow-hidden min-w-0">
       <div className="flex items-center justify-between px-4 h-10 shrink-0 bg-neutral-900/80 border-b border-neutral-800 text-xs select-none">
         <div className="flex items-center gap-2 font-mono text-neutral-400 min-w-0">
           {hasKnownLanguage && (
@@ -234,7 +234,7 @@ export function CodeBlock({
         </div>
       </div>
 
-      <div className="w-full max-h-[calc(270px-2.5rem)] overflow-auto scrollbar-thin scrollbar-thumb-neutral-800">
+      <div className="w-full min-w-0 max-h-[calc(270px-2.5rem)] overflow-auto scrollbar-thin scrollbar-thumb-neutral-800">
         <pre
           {...props}
           className="hljs !bg-black !m-0 p-4 text-sm leading-relaxed font-mono min-w-full w-max block whitespace-pre"
