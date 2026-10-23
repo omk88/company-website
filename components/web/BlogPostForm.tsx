@@ -69,7 +69,7 @@ const SPECIAL_TERMS: Record<string, string> = {
   api: "API",
   ui: "UI",
   ux: "UX",
-  objected_oriented: "Object-Oriented"
+  "object-oriented": "Object-Oriented"
 };
 
 function toTitleCase(str: string): string {
@@ -86,8 +86,8 @@ function toTitleCase(str: string): string {
     .map((word, index, wordsArray) => {
       if (!word) return word;
 
-      const cleanWord = word.replace(/[^a-z0-9]/gi, "");
-      const punctuation = word.replace(/[a-z0-9]/gi, "");
+      const cleanWord = word.replace(/[^a-z0-9-]/gi, "").toLowerCase();
+      const punctuation = word.replace(/[a-z0-9-]/gi, "");
 
       if (SPECIAL_TERMS[cleanWord.toLowerCase()]) {
         return SPECIAL_TERMS[cleanWord.toLowerCase()] + punctuation;

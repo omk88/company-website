@@ -19,12 +19,16 @@ export function BlogImage({ src, alt, ...props }: BlogImageProps) {
 
   const storageId = (relativeMatch?.[1] || legacyMatch?.[1]) as Id<"_storage"> | null;
 
+  console.log("STOREE", storageId);
+
   const resolvedUrl = useQuery(
     api.files.getImageUrl,
     storageId ? { storageId } : "skip"
   );
 
   const finalSrc = storageId ? resolvedUrl : src;
+
+  console.log("Final SRC:", finalSrc);
 
   if (storageId && !resolvedUrl) {
     return (
