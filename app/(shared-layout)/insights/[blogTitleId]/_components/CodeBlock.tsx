@@ -12,13 +12,6 @@ import tsIcon from "./tsvector.svg";
 
 const lowlight = createLowlight(common);
 
-interface CodeElementProps {
-  className?: string;
-  children?: React.ReactNode;
-  "data-meta"?: string;
-  node?: { meta?: string };
-}
-
 function extractText(node: React.ReactNode): string {
   if (node === null || node === undefined || typeof node === "boolean") return "";
   if (typeof node === "string" || typeof node === "number") return String(node);
@@ -51,99 +44,88 @@ function renderLowlightTree(nodes: any[], keyPrefix = "ll"): React.ReactNode {
 
 export function CodeBlock({
   children,
+  node: preNode,
   ...props
 }: React.HTMLAttributes<HTMLPreElement> & { node?: any; "data-meta"?: string }) {
   const [copied, setCopied] = useState(false);
-  const [language, setLanguage] = useState<"ts" | "js">("ts");
+  const [language, setLanguage] = useState<string>("ts");
 
   const codeChild = Children.toArray(children).find(
-    (child): child is React.ReactElement<CodeElementProps> =>
+    (child): child is React.ReactElement<any> =>
       isValidElement(child) && child.type === "code"
   );
 
-  const className = codeChild?.props?.className || props.className || "";
-  const langMatch = /language-([^\s]+)/.exec(className);
-  const detectedLang = langMatch ? langMatch[1].toLowerCase() : "";
+  const codeProps = codeChild?.props || {};
+  const rawClassName =
+    codeProps.className ||
+    codeProps.node?.properties?.className ||
+    preNode?.properties?.className ||
+    props.className ||
+    "";
 
-  const isTs = detectedLang === "ts" || detectedLang === "typescript" || detectedLang === "tsx";
-  const isJs = detectedLang === "js" || detectedLang === "javascript" || detectedLang === "jsx";
-  const hasKnownLanguage = isTs || isJs;
+  const className = Array.isArray(rawClassName)
+    ? rawClassName.join(" ")
+    : String(rawClassName);
 
-  const rawText = extractText(codeChild?.props?.children || children);
+  const rawText = extractText(codeProps.children || children);
   const lines = rawText.split("\n");
 
-  let topTitle: string | null = null;
-  let tsTitle: string | undefined = undefined;
-  let jsTitle: string | undefined = undefined;
+  const isClassJs = /js|javascript|jsx/i.test(className);
+  const isClassTs = /ts|typescript|tsx/i.test(className);
 
-  const tsLines: string[] = [];
-  const jsLines: string[] = [];
-  let currentTarget: "ts" | "js" = "ts";
-  let hasDualVersion = false;
+  const sections: Record<string, string[]> = { ts: [], js: [] };
+  const sectionTitles: Record<string, string> = {};
+  let globalTitle: string | null = null;
+  let currentTarget: string = isClassJs && !isClassTs ? "js" : "ts";
+  const explicitLangs = new Set<string>();
 
   lines.forEach((line) => {
     const trimmed = line.trim();
 
-    if (trimmed === "--- JS ---") {
-      currentTarget = "js";
-      hasDualVersion = true;
-      return;
-    }
-    if (trimmed === "--- TS ---") {
-      currentTarget = "ts";
-      hasDualVersion = true;
+    const langMatch = /^\/\/\s*(?:lang|language):\s*(.+)$/i.exec(trimmed);
+    if (langMatch) {
+      const langStr = langMatch[1].trim().toLowerCase();
+      if (/js|javascript|jsx/.test(langStr)) {
+        currentTarget = "js";
+        explicitLangs.add("js");
+      } else if (/ts|typescript|tsx/.test(langStr)) {
+        currentTarget = "ts";
+        explicitLangs.add("ts");
+      }
       return;
     }
 
     const titleMatch = /^\/\/\s*title:\s*(.+)$/i.exec(trimmed);
     if (titleMatch) {
       const extractedTitle = titleMatch[1].trim();
-      if (!topTitle) topTitle = extractedTitle;
-
-      if (currentTarget === "ts" && !tsTitle) tsTitle = extractedTitle;
-      if (currentTarget === "js" && !jsTitle) jsTitle = extractedTitle;
+      if (!globalTitle) globalTitle = extractedTitle;
+      if (!sectionTitles[currentTarget]) {
+        sectionTitles[currentTarget] = extractedTitle;
+      }
       return;
     }
 
-    if (currentTarget === "ts") tsLines.push(line);
-    else jsLines.push(line);
+    if (!sections[currentTarget]) {
+      sections[currentTarget] = [];
+    }
+    sections[currentTarget].push(line);
   });
 
-  const meta =
-    codeChild?.props["data-meta"] ||
-    codeChild?.props?.node?.meta ||
-    props["data-meta"] ||
-    props?.node?.meta ||
-    "";
-  const metaTitleMatch = /title=(?:"([^"]+)"|'([^']+)'|([^\s]+))/.exec(meta);
-  const metaTitle = metaTitleMatch
-    ? metaTitleMatch[1] || metaTitleMatch[2] || metaTitleMatch[3]
-    : null;
+  const activeLangs = Object.keys(sections).filter((l) => sections[l].length > 0);
+  const hasDualVersion = activeLangs.length > 1 || explicitLangs.size > 1;
 
-  const baseTitle = topTitle || metaTitle || "";
+  const defaultLang = explicitLangs.size === 1
+    ? Array.from(explicitLangs)[0]
+    : (isClassJs && !isClassTs ? "js" : "ts");
 
-  const resolveFilename = (
-    lang: "ts" | "js",
-    fallback: string,
-    tTitle?: string,
-    jTitle?: string
-  ): string => {
-    if (lang === "js") {
-      if (jTitle) return jTitle;
-      if (tTitle) return tTitle.replace(/\.ts(x)?$/, ".js$1");
-      return fallback.replace(/\.ts(x)?$/, ".js$1");
-    }
-    return tTitle || fallback;
-  };
+  const activeLanguage = hasDualVersion ? language : defaultLang;
+  const hasKnownLanguage = activeLangs.length > 0 || isClassJs || isClassTs;
 
-  const activeLanguage = hasDualVersion ? language : isJs ? "js" : "ts";
-  const filename = resolveFilename(activeLanguage, baseTitle, tsTitle, jsTitle);
+  const filename = sectionTitles[activeLanguage] || globalTitle || null;
 
-  const activeCodeLines = hasDualVersion
-    ? language === "ts"
-      ? tsLines
-      : jsLines
-    : tsLines;
+  const activeCodeLines = sections[activeLanguage]?.length > 0
+    ? sections[activeLanguage]
+    : (sections["ts"].length > 0 ? sections["ts"] : sections["js"]);
 
   const cleanCode = activeCodeLines.join("\n").replace(/^[\r\n]+|[\r\n]+\s*$/g, "");
 
@@ -185,12 +167,8 @@ export function CodeBlock({
     if (!cleanCode) return null;
 
     const targetLang = activeLanguage === "ts" ? "typescript" : "javascript";
-    const highlightLang = lowlight.registered(detectedLang)
-      ? detectedLang
-      : targetLang;
-
     try {
-      const tree = lowlight.highlight(highlightLang, cleanCode);
+      const tree = lowlight.highlight(targetLang, cleanCode);
       return renderLowlightTree(tree.children);
     } catch {
       return cleanCode;
@@ -201,7 +179,7 @@ export function CodeBlock({
     <div className="not-prose flex flex-col max-h-[270px] h-auto w-full my-6 rounded-lg bg-black border border-neutral-800 shadow-md overflow-hidden min-w-0">
       <div className="flex items-center justify-between px-4 h-10 shrink-0 bg-neutral-900/80 border-b border-neutral-800 text-xs select-none">
         <div className="flex items-center gap-2 font-mono text-neutral-400 min-w-0">
-          {(hasKnownLanguage || hasDualVersion || filename) && (
+          {hasKnownLanguage && (
             <div className="flex items-center justify-center shrink-0">
               {renderIcon()}
             </div>
