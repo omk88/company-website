@@ -30,7 +30,10 @@ export async function generateMetadata({ params }: ArticleSeriesPageProps): Prom
     const seriesUrl = `${baseUrl}/${username}/series/${slug}`;
 
     const rawImage = series.coverImageUrl || "/noImage.png";
-    const imageUrl = rawImage.startsWith("http") ? rawImage : `${baseUrl}${rawImage}`;
+
+    const ogImageUrl = rawImage.includes(".svg") || rawImage.includes("image/svg")
+        ? `${baseUrl}/api/og/series?imageUrl=${encodeURIComponent(rawImage)}`
+        : rawImage.startsWith("http") ? rawImage : `${baseUrl}${rawImage}`;
 
     const publishedTime = new Date(series._creationTime).toISOString();
 
@@ -49,7 +52,7 @@ export async function generateMetadata({ params }: ArticleSeriesPageProps): Prom
             authors: [series.authorName],
             images: [
                 {
-                    url: imageUrl,
+                    url: ogImageUrl,
                     alt: series.title,
                 },
             ],
@@ -58,7 +61,7 @@ export async function generateMetadata({ params }: ArticleSeriesPageProps): Prom
             card: "summary_large_image",
             title: series.title,
             description: series.description,
-            images: [imageUrl],
+            images: [ogImageUrl],
         },
         robots: {
             index: true,
