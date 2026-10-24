@@ -32,6 +32,9 @@ export async function generateMetadata({ params }: ArticleSeriesPageProps): Prom
     const rawImage = series.coverImageUrl || "/noImage.png";
     const imageUrl = rawImage.startsWith("http") ? rawImage : `${baseUrl}${rawImage}`;
 
+    console.log("AAAAA", rawImage);
+    console.log("AAAAA", imageUrl);
+
     const publishedTime = new Date(series._creationTime).toISOString();
 
     return {
