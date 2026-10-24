@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: ArticleSeriesPageProps): Prom
     }
 
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.taqtiq.tech";
-    const seriesUrl = `${baseUrl}/insights/series/${username}/${slug}`;
+    const seriesUrl = `${baseUrl}/${username}/series//${slug}`;
 
     const imageUrl = series.coverImage?.startsWith("http")
         ? series.coverImage
