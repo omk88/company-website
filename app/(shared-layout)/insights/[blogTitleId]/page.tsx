@@ -146,4 +146,4 @@ export default async function BlogPage({ params }: BlogPageProps) {
       </SidebarProvider>
     </div>
   );
-}
+} 
