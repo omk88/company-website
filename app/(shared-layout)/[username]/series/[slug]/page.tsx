@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: ArticleSeriesPageProps): Prom
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.taqtiq.tech";
     const seriesUrl = `${baseUrl}/${username}/series/${slug}`;
 
-    const rawImage = series.coverImage || "/noImage.png";
+    const rawImage = series.coverImageUrl || "/noImage.png";
     const imageUrl = rawImage.startsWith("http") ? rawImage : `${baseUrl}${rawImage}`;
 
     const publishedTime = new Date(series._creationTime).toISOString();

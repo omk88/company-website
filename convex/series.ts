@@ -265,7 +265,8 @@ export const getSeriesBySlug = query({
 
     return {
       ...series,
-      coverImage: coverImageUrl,
+      coverImage: series.coverImage,
+      coverImageUrl,                
       authorName,
       profile: profile
         ? {
