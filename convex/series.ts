@@ -228,6 +228,11 @@ export const getSeriesBySlug = query({
 
     if (!series) return null;
 
+    let coverImageUrl = null;
+    if (series.coverImage) {
+      coverImageUrl = await ctx.storage.getUrl(series.coverImage as any);
+    }
+
     const profile = await ctx.db
       .query("profiles")
       .withIndex("by_userId", (q) => q.eq("userId", series.authorId))
@@ -241,7 +246,7 @@ export const getSeriesBySlug = query({
       }
     }
 
-    const authorName = profile ? (profile.displayName || profile.username): "";
+    const authorName = profile ? (profile.displayName || profile.username) : "Unknown Author";
 
     const seriesItems = await ctx.db
       .query("seriesItems")
@@ -256,11 +261,11 @@ export const getSeriesBySlug = query({
     );
 
     const validBlogs = blogs.filter(Boolean);
-
     const totalReadTime = validBlogs.reduce((acc, blog) => acc + (blog?.readTime ?? 0), 0);
 
     return {
       ...series,
+      coverImage: coverImageUrl,
       authorName,
       profile: profile
         ? {
