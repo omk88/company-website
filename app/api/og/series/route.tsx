@@ -1,8 +1,6 @@
 import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
 
-export const runtime = "edge";
-
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
@@ -13,7 +11,17 @@ export async function GET(req: NextRequest) {
     }
 
     const res = await fetch(imageUrl);
+    const contentType = res.headers.get("content-type") || "";
+
+    if (contentType.includes("image/png") || contentType.includes("image/jpeg")) {
+      const buffer = await res.arrayBuffer();
+      return new Response(buffer, {
+        headers: { "Content-Type": contentType },
+      });
+    }
+
     const svgText = await res.text();
+    const base64Svg = btoa(unescape(encodeURIComponent(svgText)));
 
     return new ImageResponse(
       (
@@ -28,7 +36,7 @@ export async function GET(req: NextRequest) {
           }}
         >
           <img
-            src={`data:image/svg+xml;base64,${Buffer.from(svgText).toString("base64")}`}
+            src={`data:image/svg+xml;base64,${base64Svg}`}
             width="1200"
             height="630"
             style={{ objectFit: "contain" }}
@@ -41,6 +49,7 @@ export async function GET(req: NextRequest) {
       }
     );
   } catch (e) {
-    return new Response("Failed to generate OG image", { status: 500 });
+    console.error("Error generating OG image:", e);
+    return new Response("Failed to process image", { status: 500 });
   }
 }

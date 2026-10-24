@@ -19,6 +19,8 @@ export async function generateMetadata({ params }: ArticleSeriesPageProps): Prom
     const { slug, username } = await params;
     const series = await getSeriesData(slug);
 
+    console.log("DEBUG - Series Data fetched:", { title: series?.title, coverImageUrl: series?.coverImageUrl, coverImage: series?.coverImage });
+
     if (!series) {
         return {
             title: "Series Not Found",
@@ -26,14 +28,17 @@ export async function generateMetadata({ params }: ArticleSeriesPageProps): Prom
         };
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.taqtiq.tech";
+    const baseUrl = process.env.NODE_ENV === "development"
+        ? "http://localhost:3000"
+        : (process.env.NEXT_PUBLIC_SITE_URL || "https://www.taqtiq.tech");
+
     const seriesUrl = `${baseUrl}/${username}/series/${slug}`;
 
-    const rawImage = series.coverImageUrl || "/noImage.png";
+    const rawImage = series.coverImageUrl || series.coverImage;
 
-    const ogImageUrl = rawImage.includes(".svg") || rawImage.includes("image/svg")
+    const ogImageUrl = rawImage
         ? `${baseUrl}/api/og/series?imageUrl=${encodeURIComponent(rawImage)}`
-        : rawImage.startsWith("http") ? rawImage : `${baseUrl}${rawImage}`;
+        : `${baseUrl}/noImage.png`;
 
     const publishedTime = new Date(series._creationTime).toISOString();
 
@@ -53,6 +58,8 @@ export async function generateMetadata({ params }: ArticleSeriesPageProps): Prom
             images: [
                 {
                     url: ogImageUrl,
+                    width: 1200,
+                    height: 630,
                     alt: series.title,
                 },
             ],
@@ -74,7 +81,9 @@ export default async function ArticleSeriesPage({ params }: ArticleSeriesPagePro
     const { slug, username } = await params;
     const series = await getSeriesData(slug);
 
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.taqtiq.tech";
+    const baseUrl = process.env.NODE_ENV === "development"
+        ? "http://localhost:3000"
+        : (process.env.NEXT_PUBLIC_SITE_URL || "https://www.taqtiq.tech");
     
     const jsonLd = {
         "@context": "https://schema.org",
