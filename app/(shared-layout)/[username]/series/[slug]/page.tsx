@@ -27,11 +27,12 @@ export async function generateMetadata({ params }: ArticleSeriesPageProps): Prom
     }
 
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.taqtiq.tech";
-    const seriesUrl = `${baseUrl}/${username}/series//${slug}`;
+    const seriesUrl = `${baseUrl}/${username}/series/${slug}`;
 
-    const imageUrl = series.coverImage?.startsWith("http")
-        ? series.coverImage
-        : `${baseUrl}${series.coverImage || "/noImage.png"}`;
+    const rawImage = series.coverImage || "/noImage.png";
+    const imageUrl = rawImage.startsWith("http") ? rawImage : `${baseUrl}${rawImage}`;
+
+    const publishedTime = new Date(series._creationTime).toISOString();
 
     return {
         title: series.title,
@@ -43,10 +44,14 @@ export async function generateMetadata({ params }: ArticleSeriesPageProps): Prom
             title: series.title,
             description: series.description,
             url: seriesUrl,
-            type: "website", 
+            type: "article",
+            publishedTime: publishedTime,
+            authors: [series.authorName],
             images: [
                 {
                     url: imageUrl,
+                    width: 1200,
+                    height: 630,
                     alt: series.title,
                 },
             ],
@@ -75,7 +80,7 @@ export default async function ArticleSeriesPage({ params }: ArticleSeriesPagePro
         "@type": "CollectionPage",
         name: series?.title,
         description: series?.description,
-        url: `${baseUrl}/insights/series/${username}/${slug}`,
+        url: `${baseUrl}/${username}/series/${slug}`,
     };
 
     return (

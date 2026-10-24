@@ -241,6 +241,8 @@ export const getSeriesBySlug = query({
       }
     }
 
+    const authorName = profile ? (profile.displayName || profile.username): "";
+
     const seriesItems = await ctx.db
       .query("seriesItems")
       .withIndex("by_series_and_order", (q) => q.eq("seriesId", series._id))
@@ -259,6 +261,7 @@ export const getSeriesBySlug = query({
 
     return {
       ...series,
+      authorName,
       profile: profile
         ? {
             ...profile,
