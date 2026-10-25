@@ -66,6 +66,81 @@ export function CreateSeriesDialog({
     }
   };
 
+  const convertImageToPngFile = async (file: File): Promise<File> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const fileContent = event.target?.result as string;
+          
+          let processedContent = fileContent;
+          let svgWidth = 1200;
+          let svgHeight = 630;
+
+          if (file.type === "image/svg+xml" || file.name.endsWith(".svg")) {
+            const viewBoxMatch = processedContent.match(/viewBox\s*=\s*["']([\d\s.-]+)["']/i);
+            if (viewBoxMatch) {
+              const parts = viewBoxMatch[1].trim().split(/[\s,]+/);
+              if (parts.length === 4) {
+                svgWidth = parseFloat(parts[2]) || 1200;
+                svgHeight = parseFloat(parts[3]) || 630;
+              }
+            }
+
+            if (!processedContent.includes('fill="#ffffff"') && !processedContent.includes('fill="white"')) {
+              processedContent = processedContent.replace(
+                /(<svg[^>]*>)/i,
+                `$1<rect width="${svgWidth}" height="${svgHeight}" fill="#ffffff"/>`
+              );
+            }
+          }
+
+          const dataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(processedContent)}`;
+          const img = new window.Image();
+          img.crossOrigin = "anonymous";
+
+          img.onload = () => {
+            try {
+              const canvas = document.createElement("canvas");
+              canvas.width = file.type === "image/svg+xml" || file.name.endsWith(".svg") ? svgWidth : (img.naturalWidth || 1200);
+              canvas.height = file.type === "image/svg+xml" || file.name.endsWith(".svg") ? svgHeight : (img.naturalHeight || 630);
+
+              const ctx = canvas.getContext("2d");
+              if (!ctx) {
+                reject(new Error("Could not create canvas context"));
+                return;
+              }
+
+              ctx.fillStyle = "#ffffff";
+              ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+              ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+              canvas.toBlob((pngBlob) => {
+                if (!pngBlob) {
+                  reject(new Error("Failed to convert image to PNG blob"));
+                  return;
+                }
+                const pngFileName = file.name.replace(/\.[^/.]+$/, "") + ".png";
+                const pngFile = new File([pngBlob], pngFileName, { type: "image/png" });
+                resolve(pngFile);
+              }, "image/png");
+            } catch (err) {
+              reject(err);
+            }
+          };
+
+          img.onerror = () => reject(new Error("Failed to load image into canvas"));
+          img.src = dataUrl;
+        } catch (err) {
+          reject(err);
+        }
+      };
+      reader.onerror = (err) => reject(err);
+      reader.readAsText(file);
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) return;
@@ -75,21 +150,31 @@ export function CreateSeriesDialog({
 
     try {
       let coverImageStorageId: string | undefined = undefined;
+      let coverImagePngStorageId: string | undefined = undefined;
 
       if (selectedImage) {
-        const postUrl = await generateUploadUrl();
-        const result = await fetch(postUrl, {
+        const postUrl1 = await generateUploadUrl();
+        const result1 = await fetch(postUrl1, {
           method: "POST",
           headers: { "Content-Type": selectedImage.type },
           body: selectedImage,
         });
 
-        if (!result.ok) {
-          throw new Error("Failed to upload cover image.");
-        }
+        if (!result1.ok) throw new Error("Failed to upload original cover image.");
+        const json1 = await result1.json();
+        coverImageStorageId = json1.storageId;
 
-        const { storageId } = await result.json();
-        coverImageStorageId = storageId;
+        const pngFile = await convertImageToPngFile(selectedImage);
+        const postUrl2 = await generateUploadUrl();
+        const result2 = await fetch(postUrl2, {
+          method: "POST",
+          headers: { "Content-Type": "image/png" },
+          body: pngFile,
+        });
+
+        if (!result2.ok) throw new Error("Failed to upload processed PNG cover image.");
+        const json2 = await result2.json();
+        coverImagePngStorageId = json2.storageId;
       }
 
       const slug = generateSlug(title);
@@ -99,6 +184,7 @@ export function CreateSeriesDialog({
         slug,
         description: description.trim() || undefined,
         coverImage: coverImageStorageId,
+        coverImagePng: coverImagePngStorageId,
       });
 
       setTitle("");
@@ -182,7 +268,7 @@ export function CreateSeriesDialog({
                   <p className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
                     Click to upload cover image
                   </p>
-                  <p className="text-[10px] text-zinc-400">PNG, JPG or WEBP</p>
+                  <p className="text-[10px] text-zinc-400">SVG, PNG, or JPG</p>
                 </div>
               )}
               <input

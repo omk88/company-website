@@ -206,6 +206,7 @@ const schema = defineSchema({
     slug: v.string(),
     description: v.optional(v.string()),
     coverImage: v.optional(v.string()),
+    coverImagePng: v.optional(v.string()),
     authorId: v.string(),
   })
     .index("by_authorId", ["authorId"])

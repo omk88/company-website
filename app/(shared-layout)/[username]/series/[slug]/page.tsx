@@ -19,8 +19,6 @@ export async function generateMetadata({ params }: ArticleSeriesPageProps): Prom
     const { slug, username } = await params;
     const series = await getSeriesData(slug);
 
-    console.log("DEBUG - Series Data fetched:", { title: series?.title, coverImageUrl: series?.coverImageUrl, coverImage: series?.coverImage });
-
     if (!series) {
         return {
             title: "Series Not Found",
@@ -34,11 +32,7 @@ export async function generateMetadata({ params }: ArticleSeriesPageProps): Prom
 
     const seriesUrl = `${baseUrl}/${username}/series/${slug}`;
 
-    const rawImage = series.coverImageUrl || series.coverImage;
-
-    const ogImageUrl = rawImage
-        ? `${baseUrl}/api/og/series?imageUrl=${encodeURIComponent(rawImage)}`
-        : `${baseUrl}/noImage.png`;
+    const ogImageUrl = series.coverImagePng || series.coverImageUrl || series.coverImage || `${baseUrl}/noImage.png`;
 
     const publishedTime = new Date(series._creationTime).toISOString();
 
