@@ -34,9 +34,10 @@ export async function generateMetadata({ params }: BlogPageProps): Promise<Metad
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.taqtiq.tech";
   const postUrl = `${baseUrl}/insights/${blog.blogTitleId || blog._id}`;
 
-  const imageUrl = blog.imageUrl?.startsWith("http")
-    ? blog.imageUrl
-    : `${baseUrl}${blog.imageUrl || "/noImage.png"}`;
+  const rawImage = blog.imageUrlPng || blog.imageUrl;
+  const imageUrl = rawImage?.startsWith("http")
+    ? rawImage
+    : `${baseUrl}${rawImage || "/noImage.png"}`;
 
   return {
     title: blog.title,
@@ -54,6 +55,8 @@ export async function generateMetadata({ params }: BlogPageProps): Promise<Metad
       images: [
         {
           url: imageUrl,
+          width: 1200,
+          height: 630,
           alt: blog.title,
         },
       ],
@@ -96,12 +99,14 @@ export default async function BlogPage({ params }: BlogPageProps) {
 
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.taqtiq.tech";
 
+  const schemaImage = blog.imageUrlPng || blog.imageUrl;
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     headline: blog.title,
     description: blog.subtitle,
-    image: blog.imageUrl ? [blog.imageUrl] : [],
+    image: schemaImage ? [schemaImage] : [],
     datePublished: new Date(blog._creationTime).toISOString(),
     author: {
       "@type": "Person",
@@ -146,4 +151,4 @@ export default async function BlogPage({ params }: BlogPageProps) {
       </SidebarProvider>
     </div>
   );
-} 
+}

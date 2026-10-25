@@ -5,11 +5,13 @@ const schema = defineSchema({
   blogs: defineTable({
     blogTitleId: v.optional(v.string()),
     storageId: v.string(),
+    storageIdPng: v.optional(v.string()),
     author: v.string(),
     authorProfileId: v.optional(v.id("profiles")),
     title: v.string(),
     subtitle: v.string(),
     imageUrl: v.string(),
+    imageUrlPng: v.optional(v.string()),
     audioStorageId: v.optional(v.string()),
     chapters: v.optional(
       v.array(

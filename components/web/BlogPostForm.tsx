@@ -369,6 +369,79 @@ export default function BlogPostForm() {
         return "text-emerald-500 dark:text-emerald-400";
     };
 
+    const convertImageToPngFile = async (file: File): Promise<File> => {
+        return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+            const fileContent = event.target?.result as string;
+            let processedContent = fileContent;
+            let svgWidth = 1200;
+            let svgHeight = 630;
+
+            if (file.type === "image/svg+xml" || file.name.endsWith(".svg")) {
+                const viewBoxMatch = processedContent.match(/viewBox\s*=\s*["']([\d\s.-]+)["']/i);
+                if (viewBoxMatch) {
+                const parts = viewBoxMatch[1].trim().split(/[\s,]+/);
+                if (parts.length === 4) {
+                    svgWidth = parseFloat(parts[2]) || 1200;
+                    svgHeight = parseFloat(parts[3]) || 630;
+                }
+                }
+
+                if (!processedContent.includes('fill="#ffffff"') && !processedContent.includes('fill="white"')) {
+                processedContent = processedContent.replace(
+                    /(<svg[^>]*>)/i,
+                    `$1<rect width="${svgWidth}" height="${svgHeight}" fill="#ffffff"/>`
+                );
+                }
+            }
+
+            const dataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(processedContent)}`;
+            const img = new window.Image();
+            img.crossOrigin = "anonymous";
+
+            img.onload = () => {
+                try {
+                const canvas = document.createElement("canvas");
+                canvas.width = file.type === "image/svg+xml" || file.name.endsWith(".svg") ? svgWidth : (img.naturalWidth || 1200);
+                canvas.height = file.type === "image/svg+xml" || file.name.endsWith(".svg") ? svgHeight : (img.naturalHeight || 630);
+
+                const ctx = canvas.getContext("2d");
+                if (!ctx) {
+                    reject(new Error("Could not create canvas context"));
+                    return;
+                }
+
+                ctx.fillStyle = "#ffffff";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                canvas.toBlob((pngBlob) => {
+                    if (!pngBlob) {
+                    reject(new Error("Failed to convert image to PNG blob"));
+                    return;
+                    }
+                    const pngFileName = file.name.replace(/\.[^/.]+$/, "") + ".png";
+                    const pngFile = new File([pngBlob], pngFileName, { type: "image/png" });
+                    resolve(pngFile);
+                }, "image/png");
+                } catch (err) {
+                reject(err);
+                }
+            };
+
+            img.onerror = () => reject(new Error("Failed to load image into canvas"));
+            img.src = dataUrl;
+            } catch (err) {
+            reject(err);
+            }
+        };
+        reader.onerror = (err) => reject(err);
+        reader.readAsText(file);
+        });
+    };
+
     const onSubmit = async (data: BlogFormValues) => {
         if (!userData?.userId) {
             toast.error("User session not found. Please log in.");
@@ -387,33 +460,43 @@ export default function BlogPostForm() {
 
         try {
             let storageId = selectedBlog?.storageId || activeDraft?.storageId || "";
+            let storageIdPng = selectedBlog?.storageIdPng || activeDraft?.storageIdPng || "";
             const formattedTitle = toTitleCase(data.title);
 
             if (selectedImage) {
-            const options = {
-                maxSizeMB: 1.0,
-                maxWidthOrHeight: 1920,
-                useWebWorker: true,
-                fileType: "image/webp" as const,
-                initialQuality: 0.85,
-            };
+                const options = {
+                    maxSizeMB: 1.0,
+                    maxWidthOrHeight: 1920,
+                    useWebWorker: true,
+                    fileType: "image/webp" as const,
+                    initialQuality: 0.85,
+                };
 
-            const compressedFile = (await imageCompression(selectedImage, options)) as File;
-            const uploadUrl = await generateUploadUrl();
+                const compressedFile = (await imageCompression(selectedImage, options)) as File;
+                const uploadUrl1 = await generateUploadUrl();
 
-            const result = await fetch(uploadUrl, {
-                method: "POST",
-                headers: { "Content-Type": compressedFile.type },
-                body: compressedFile,
-            });
+                const result1 = await fetch(uploadUrl1, {
+                    method: "POST",
+                    headers: { "Content-Type": compressedFile.type },
+                    body: compressedFile,
+                });
 
-            if (!result.ok) throw new Error("Failed to upload image bundle.");
+                if (!result1.ok) throw new Error("Failed to upload cover image.");
+                const resJson1 = await result1.json();
+                storageId = resJson1.storageId;
 
-            const resJson = await result.json();
-            const responseSchema = z.object({ storageId: z.string() });
-            const parsedResponse = responseSchema.parse(resJson);
+                const pngFile = await convertImageToPngFile(selectedImage);
+                const uploadUrl2 = await generateUploadUrl();
 
-            storageId = parsedResponse.storageId;
+                const result2 = await fetch(uploadUrl2, {
+                    method: "POST",
+                    headers: { "Content-Type": "image/png" },
+                    body: pngFile,
+                });
+
+                if (!result2.ok) throw new Error("Failed to upload Open Graph PNG cover image.");
+                const resJson2 = await result2.json();
+                storageIdPng = resJson2.storageId;
             }
 
             let result;
@@ -428,6 +511,7 @@ export default function BlogPostForm() {
                     username: String(userData?.profile?.username || ""),
                     tags: data.tags,
                     storageId: storageId,
+                    storageIdPng: storageIdPng,
                 });
             } else {
                 result = await createBlog({
@@ -440,6 +524,7 @@ export default function BlogPostForm() {
                     authorAvatarUrl: userData.profile?.profilePicUrl || undefined,
                     tags: data.tags,
                     storageId: storageId,
+                    storageIdPng: storageIdPng,
                     postType: postType,
                 });
             }
@@ -447,9 +532,9 @@ export default function BlogPostForm() {
             if (result === undefined) return;
 
             toast.success(
-            selectedBlog?._id
-                ? "Blog article updated successfully!"
-                : "Blog article published successfully!"
+                selectedBlog?._id
+                    ? "Blog article updated successfully!"
+                    : "Blog article published successfully!"
             );
 
             if (!selectedBlog?._id) {
@@ -461,7 +546,7 @@ export default function BlogPostForm() {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                    tags: ["featured-blogs", "main-blogs", "morefrom-blogs", "trending-blogs"],
+                        tags: ["featured-blogs", "main-blogs", "morefrom-blogs", "trending-blogs"],
                     }),
                 });
             } catch (err) {

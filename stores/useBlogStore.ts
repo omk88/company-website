@@ -7,7 +7,9 @@ export interface Draft {
   content: string;
   tags?: string[];
   storageId?: string;
+  storageIdPng?: string;
   imageUrl?: string | null;
+  imageUrlPng?: string | null;
 }
 
 export interface Blog {
@@ -18,7 +20,9 @@ export interface Blog {
   author: string;
   tags?: string[];
   storageId?: string;
+  storageIdPng?: string;
   imageUrl?: string | null;
+  imageUrlPng?: string | null;
 }
 
 interface BlogStore {

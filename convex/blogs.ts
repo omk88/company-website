@@ -27,13 +27,18 @@ export const createPost = mutation({
     authorAvatarUrl: v.optional(v.string()),
     tags: v.array(v.string()),
     storageId: v.string(), 
+    storageIdPng: v.optional(v.string()),
     postType: v.union(v.literal("community"), v.literal("team")),
   },
   handler: async (ctx, args) => {
     const { identity, profile } = await requireActiveUser(ctx);
 
     await claimMarkdownImages(ctx, args.content);
+    
     const generatedImageUrl = await ctx.storage.getUrl(args.storageId);
+    const generatedImageUrlPng = args.storageIdPng 
+      ? await ctx.storage.getUrl(args.storageIdPng) 
+      : "";
 
     const words = args.content.trim().split(/\s+/);
     const wordCount = words.filter((word) => word.length > 0).length;
@@ -64,7 +69,9 @@ export const createPost = mutation({
       authorAvatarUrl: args.authorAvatarUrl,
       tags: args.tags,
       storageId: args.storageId,
+      storageIdPng: args.storageIdPng,
       imageUrl: generatedImageUrl || "",
+      imageUrlPng: generatedImageUrlPng || "",
       audioStorageId: undefined,
       audioUrl: undefined,
       totalViews: 0,
@@ -433,6 +440,7 @@ export const updatePost = mutation({
     username: v.string(),
     tags: v.array(v.string()),
     storageId: v.string(), 
+    storageIdPng: v.optional(v.string()), 
   },
   handler: async (ctx, args) => {
     const { identity, profile } = await requireActiveUser(ctx);
@@ -444,6 +452,7 @@ export const updatePost = mutation({
     if (!currentPost) return null;
 
     let finalImageUrl = currentPost.imageUrl;
+    let finalImageUrlPng = currentPost.imageUrlPng ?? "";
 
     if (fieldsToUpdate.storageId !== currentPost.storageId) {
       const generatedImageUrl = await ctx.storage.getUrl(fieldsToUpdate.storageId);
@@ -454,6 +463,21 @@ export const updatePost = mutation({
           await ctx.storage.delete(currentPost.storageId);
         } catch (e) {
           console.warn("Could not remove old asset:", e);
+        }
+      }
+    }
+
+    if (fieldsToUpdate.storageIdPng !== currentPost.storageIdPng) {
+      const generatedImageUrlPng = fieldsToUpdate.storageIdPng
+        ? await ctx.storage.getUrl(fieldsToUpdate.storageIdPng)
+        : "";
+      finalImageUrlPng = generatedImageUrlPng || "";
+
+      if (currentPost.storageIdPng) {
+        try {
+          await ctx.storage.delete(currentPost.storageIdPng);
+        } catch (e) {
+          console.warn("Could not remove old PNG asset:", e);
         }
       }
     }
@@ -520,6 +544,7 @@ export const updatePost = mutation({
       ...fieldsToUpdate,
       blogTitleId,
       imageUrl: finalImageUrl,
+      imageUrlPng: finalImageUrlPng,
       readTime: readTimeMinutes,
       updatedAt,
     });
