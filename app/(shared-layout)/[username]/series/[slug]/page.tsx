@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: ArticleSeriesPageProps): Prom
 
     const seriesUrl = `${baseUrl}/${username}/series/${slug}`;
 
-    const ogImageUrl = series.coverImagePng || series.coverImageUrl || series.coverImage || `${baseUrl}/noImage.png`;
+    const ogImageUrl = series.coverImagePngUrl || series.coverImageUrl || `${baseUrl}/noImage.png`;
 
     const publishedTime = new Date(series._creationTime).toISOString();
 

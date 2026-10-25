@@ -235,6 +235,11 @@ export const getSeriesBySlug = query({
       coverImageUrl = await ctx.storage.getUrl(series.coverImage as any);
     }
 
+    let coverImagePngUrl = null;
+    if (series.coverImagePng) {
+      coverImagePngUrl = await ctx.storage.getUrl(series.coverImagePng as any);
+    }
+
     const profile = await ctx.db
       .query("profiles")
       .withIndex("by_userId", (q) => q.eq("userId", series.authorId))
@@ -267,8 +272,8 @@ export const getSeriesBySlug = query({
 
     return {
       ...series,
-      coverImage: series.coverImage,
-      coverImageUrl,                
+      coverImageUrl,
+      coverImagePngUrl,
       authorName,
       profile: profile
         ? {
