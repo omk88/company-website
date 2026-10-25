@@ -88,8 +88,16 @@ function toTitleCase(str: string): string {
       const cleanWord = word.replace(/[^a-z0-9-]/gi, "").toLowerCase();
       const punctuation = word.replace(/[a-z0-9-]/gi, "");
 
-      if (SPECIAL_TERMS[cleanWord.toLowerCase()]) {
-        return SPECIAL_TERMS[cleanWord.toLowerCase()] + punctuation;
+      if (SPECIAL_TERMS[cleanWord]) {
+        return SPECIAL_TERMS[cleanWord] + punctuation;
+      }
+
+      if (cleanWord.includes('-')) {
+        const capitalizedHyphenated = cleanWord
+          .split('-')
+          .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+          .join('-');
+        return capitalizedHyphenated + punctuation;
       }
 
       const isFirstWord = index === 0;
