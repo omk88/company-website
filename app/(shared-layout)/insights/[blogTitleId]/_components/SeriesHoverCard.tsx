@@ -45,7 +45,7 @@ export function SeriesHoverCard({
                         href={`/${username}/series/${slug}`}
                         className="group flex flex-col p-3 gap-3 hover:bg-accent hover:text-accent-foreground transition-colors duration-100 cursor-pointer w-full"
                     >
-                        <div className="relative w-full h-32 overflow-hidden rounded-xl bg-muted">
+                        <div className="relative w-full h-48 overflow-hidden rounded-xl bg-muted">
                             {imageUrl === undefined ? (
                                 <div className="w-full h-full animate-pulse bg-muted-foreground/20" />
                             ) : imageUrl ? (
