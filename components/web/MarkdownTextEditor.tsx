@@ -137,7 +137,7 @@ export function MarkdownTextEditor({
     return textToInsert;
   };
 
-  const uploadAndInsertImage = async (file: File) => {
+const uploadAndInsertImage = async (file: File) => {
     if (!file.type.startsWith("image/")) return;
 
     const altText = file.name.replace(/\.[^/.]+$/, "");
@@ -181,6 +181,37 @@ export function MarkdownTextEditor({
           currentText.replace(placeholderText, `![Upload failed: ${file.name}](#)`)
         );
       }
+    }
+  };
+
+  const compressImage = async (file: File): Promise<File> => {
+    if (
+      file.type === "image/gif" || 
+      file.type === "image/svg+xml" || 
+      file.name.endsWith(".svg")
+    ) {
+      return file;
+    }
+
+    const options = {
+      maxSizeMB: 1.0,
+      maxWidthOrHeight: 1920,
+      useWebWorker: true,
+      fileType: "image/webp" as const,
+      initialQuality: 0.85,
+    };
+
+    try {
+      const compressedBlob = await imageCompression(file, options);
+      const originalNameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
+      const newFileName = `${originalNameWithoutExt}.webp`;
+
+      return new File([compressedBlob], newFileName, {
+        type: "image/webp",
+      });
+    } catch (error) {
+      console.warn("Image compression failed, using original file:", error);
+      return file; 
     }
   };
 
