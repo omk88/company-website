@@ -3,7 +3,7 @@
 import { Controller, useForm, useWatch, Control } from "react-hook-form";
 import { FieldGroup, Field } from "../ui/field";
 import { toast } from "sonner";
-import { useState, useRef, useEffect, useMemo, memo, useDeferredValue, Suspense } from "react";
+import { useState, useRef, useEffect, useMemo, memo, useDeferredValue } from "react";
 import { cn } from "@/lib/utils";
 import { api } from "@/convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
@@ -22,7 +22,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/
 import { Button } from "../ui/button";
 import { useCurrentUser } from "@/app/ConvexClientProvider";
 import { TAGS } from "@/app/constants/tags";
-import z from "zod";
 
 import { CodeBlock } from "../../app/(shared-layout)/insights/[blogTitleId]/_components/CodeBlock";
 import rehypeHighlight from "rehype-highlight";
@@ -464,21 +463,25 @@ export default function BlogPostForm() {
             const formattedTitle = toTitleCase(data.title);
 
             if (selectedImage) {
-                const options = {
-                    maxSizeMB: 1.0,
-                    maxWidthOrHeight: 1920,
-                    useWebWorker: true,
-                    fileType: "image/webp" as const,
-                    initialQuality: 0.85,
-                };
+                let fileToUpload = selectedImage;
 
-                const compressedFile = (await imageCompression(selectedImage, options)) as File;
+                if (selectedImage.type !== "image/svg+xml" && !selectedImage.name.endsWith(".svg")) {
+                    const options = {
+                        maxSizeMB: 1.0,
+                        maxWidthOrHeight: 1920,
+                        useWebWorker: true,
+                        fileType: "image/webp" as const,
+                        initialQuality: 0.85,
+                    };
+
+                    fileToUpload = (await imageCompression(selectedImage, options)) as File;
+                }
+
                 const uploadUrl1 = await generateUploadUrl();
-
                 const result1 = await fetch(uploadUrl1, {
                     method: "POST",
-                    headers: { "Content-Type": compressedFile.type },
-                    body: compressedFile,
+                    headers: { "Content-Type": fileToUpload.type },
+                    body: fileToUpload,
                 });
 
                 if (!result1.ok) throw new Error("Failed to upload cover image.");
