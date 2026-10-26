@@ -367,257 +367,249 @@ export function NavbarAuthClient({
       <div className="flex items-center gap-2 shrink-0">
         {isLoggedIn ? (
           <>
-            <Tooltip>
-              <Popover open={openNotifications} onOpenChange={handleOpenNotifications}>
-                <TooltipTrigger asChild>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="w-9 h-9 relative flex items-center justify-center cursor-pointer"
-                    >
-                      <Bell className="size-5 md:size-4 stroke-[2.5] md:stroke-2 text-foreground transition-all shrink-0" />
-
-                      <AnimatePresence>
-                        {hasUnread && (
-                          <motion.span
-                            key="unread-badge"
-                            initial={{ opacity: 0, scale: 0 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0 }}
-                            transition={{ duration: 0.2, ease: "easeInOut" }}
-                            className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500 pointer-events-none"
-                          />
-                        )}
-                      </AnimatePresence>
-                    </Button>
-                  </PopoverTrigger>
-                </TooltipTrigger>
-
-                <TooltipContent side="bottom" align="center">
-                  <p className="text-xs font-medium">Notifications</p>
-                </TooltipContent>
-
-                <PopoverContent
-                  align="end"
-                  className="w-90 p-1.5 rounded-xl border border-border bg-popover"
+            <Popover open={openNotifications} onOpenChange={handleOpenNotifications}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="w-9 h-9 relative flex items-center justify-center cursor-pointer"
                 >
-                  <div className="flex flex-row gap-2 items-center text-sm px-2 pt-2 pb-1.5">
-                    <Bell className="h-4 w-4 text-foreground transition-all" />
-                    <span className="font-medium">Notifications</span>
+                  <Bell className="size-5 md:size-4 stroke-[2.5] md:stroke-2 text-foreground transition-all shrink-0" />
 
-                    {unreadCount > 0 && (
-                      <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[11px] font-semibold text-white leading-none">
-                        {unreadCount > 99 ? "99+" : unreadCount}
-                      </span>
+                  <AnimatePresence>
+                    {hasUnread && (
+                      <motion.span
+                        key="unread-badge"
+                        initial={{ opacity: 0, scale: 0 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0 }}
+                        transition={{ duration: 0.2, ease: "easeInOut" }}
+                        className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500 pointer-events-none"
+                      />
                     )}
-                  </div>
+                  </AnimatePresence>
+                </Button>
+              </PopoverTrigger>
 
-                  <Separator className="mb-1" />
+              <PopoverContent
+                align="end"
+                className="w-90 p-1.5 rounded-xl border border-border bg-popover"
+              >
+                <div className="flex flex-row gap-2 items-center text-sm px-2 pt-2 pb-1.5">
+                  <Bell className="h-4 w-4 text-foreground transition-all" />
+                  <span className="font-medium">Notifications</span>
 
-                  <ScrollArea 
-                    className="h-80"
-                    onReachBottom={() => {
-                      if (status === "CanLoadMore") {
-                        loadMore(8);
-                      }
-                    }}
-                  >
-                    {notificationsList && notificationsList.length > 0 ? (
-                      <>
-                        {(["Today", "Yesterday", "Older"] as const).map((timeCategory) => {
-                          const authorGroups = groupedNotifications[timeCategory];
-                          if (!authorGroups || authorGroups.length === 0) return null;
+                  {unreadCount > 0 && (
+                    <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[11px] font-semibold text-white leading-none">
+                      {unreadCount > 99 ? "99+" : unreadCount}
+                    </span>
+                  )}
+                </div>
 
-                          return (
-                            <div key={timeCategory} className="flex flex-col gap-2">
-                              <span className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 px-2 pt-1 tracking-wider">
-                                {timeCategory}
-                              </span>
+                <Separator className="mb-1" />
 
-                              {authorGroups.map((group) => (
-                                <div key={group.groupKey} className="flex flex-col gap-1.5 pl-1 mr-4">
-                                  <div className="flex flex-row gap-2 items-center text-xs font-roboto text-zinc-600 dark:text-zinc-400 px-2 py-0.5">
-                                    <div className="h-5 w-5 rounded-full overflow-hidden border border-border bg-muted shrink-0 flex items-center justify-center">
-                                      <img
-                                        src={group.authorAvatar}
-                                        alt={group.authorName}
-                                        loading="eager"
-                                        decoding="sync"
-                                        suppressHydrationWarning
-                                        className="h-full w-full object-cover"
-                                      />
-                                    </div>
+                <ScrollArea 
+                  className="h-80"
+                  onReachBottom={() => {
+                    if (status === "CanLoadMore") {
+                      loadMore(8);
+                    }
+                  }}
+                >
+                  {notificationsList && notificationsList.length > 0 ? (
+                    <>
+                      {(["Today", "Yesterday", "Older"] as const).map((timeCategory) => {
+                        const authorGroups = groupedNotifications[timeCategory];
+                        if (!authorGroups || authorGroups.length === 0) return null;
 
-                                    <span className="font-medium truncate min-w-0 flex-1">
-                                      {group.authorName}
-                                    </span>
+                        return (
+                          <div key={timeCategory} className="flex flex-col gap-2">
+                            <span className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 px-2 pt-1 tracking-wider">
+                              {timeCategory}
+                            </span>
 
-                                    <div className="flex items-center gap-2 shrink-0 ml-auto">
-                                      {(() => {
-                                        const totalCount = group.items.reduce((sum, item) => {
-                                          if (item.notificationType === "reaction" && Array.isArray(item.reactions)) {
-                                            return sum + item.reactions.length;
-                                          }
-                                          return sum + 1;
-                                        }, 0);
-
-                                        return (
-                                          <span className="whitespace-nowrap">
-                                            +{totalCount}{" "}
-                                            {group.type === "follow"
-                                              ? totalCount === 1
-                                                ? "follower"
-                                                : "followers"
-                                              : group.type === "comment"
-                                              ? totalCount === 1
-                                                ? "comment"
-                                                : "comments"
-                                              : group.type === "reaction"
-                                              ? totalCount === 1
-                                                ? "reaction"
-                                                : "reactions"
-                                              : group.type === "blog"
-                                              ? totalCount === 1
-                                                ? "insight"
-                                                : "insights"
-                                              : group.type === "blogLike"
-                                              ? totalCount === 1
-                                                ? "like"
-                                                : "likes"
-                                              : group.type === "commentLike"
-                                              ? totalCount === 1
-                                                ? "like"
-                                                : "likes"
-                                              : totalCount === 1
-                                                ? "message" 
-                                                : "messages"
-                                            }
-                                          </span>
-                                        );
-                                      })()}
-
-                                      {group.type === "follow" ? (
-                                        <UserRoundPlus className="h-3.5 w-3.5 text-muted-foreground" />
-                                      ) : group.type === "comment" ? (
-                                        <MessageSquare className="h-3.5 w-3.5 text-muted-foreground" />
-                                      ) : group.type === "reaction" ? (
-                                        <Smile className="h-3.5 w-3.5 text-muted-foreground" />
-                                      ) : group.type === "blog" ? (
-                                        <Library className="h-3.5 w-3.5 text-muted-foreground" />
-                                      ) : group.type === "blogLike" ? (
-                                        <ThumbsUp className="h-3.5 w-3.5 text-muted-foreground" />
-                                      ) : group.type === "commentLike" ? (
-                                        <ThumbsUp className="h-3.5 w-3.5 text-muted-foreground" />
-                                      ) : (
-                                        <MessageCircle className="h-3.5 w-3.5 text-muted-foreground" />
-                                      )}
-                                    </div>
+                            {authorGroups.map((group) => (
+                              <div key={group.groupKey} className="flex flex-col gap-1.5 pl-1 mr-4">
+                                <div className="flex flex-row gap-2 items-center text-xs font-roboto text-zinc-600 dark:text-zinc-400 px-2 py-0.5">
+                                  <div className="h-5 w-5 rounded-full overflow-hidden border border-border bg-muted shrink-0 flex items-center justify-center">
+                                    <img
+                                      src={group.authorAvatar}
+                                      alt={group.authorName}
+                                      loading="eager"
+                                      decoding="sync"
+                                      suppressHydrationWarning
+                                      className="h-full w-full object-cover"
+                                    />
                                   </div>
 
-                                  <div className="flex flex-col gap-1.5">
-                                    {group.items.map((item) =>
-                                      item.notificationType === "follow" ? (
-                                        <FollowerNotificationCard
-                                          userId={item._id} 
-                                          key={item._id}
-                                          username={item.username}
-                                          displayName={item.displayName}
-                                          profilePicUrl={item.profilePicUrl ?? ""}
-                                          defaultProfilePicUrl={item.defaultProfilePicUrl ?? ""}
-                                          createdAt={item.createdAt}
-                                          isUnread={item.isUnread}    
-                                          initialIsFollowing={item.viewerStatus?.isFollowing}
-                                          initialIsBell={item.viewerStatus?.isBell}
-                                          isSelf={item.viewerStatus?.isSelf}  
-                                          onNotificationClick={() => setOpenNotifications(false)}                     
-                                        />
-                                      ) : item.notificationType === "comment" ? (
-                                        <CommentNotificationCard
-                                          key={item._id}
-                                          _id={item._id}
-                                          blogId={item.blogId}
-                                          title={item.blogTitle}
-                                          body={item.body}
-                                          createdAt={item.createdAt}
-                                          isUnread={item.isUnread}
-                                          onNotificationClick={() => setOpenNotifications(false)}
-                                        />
-                                      ) : item.notificationType === "blogLike" ? (
-                                        <BlogLikesNotificationCard
-                                          key={item._id}
-                                          _id={item.blogId}
-                                          title={item.blogTitle}
-                                          createdAt={item.createdAt}
-                                          isUnread={item.isUnread}
-                                          onNotificationClick={() => setOpenNotifications(false)}
-                                        />
-                                      ) : item.notificationType === "commentLike" ? (
-                                        <CommentLikesNotificationCard
-                                          key={item._id}
-                                          _id={item.blogId}
-                                          commentBody={item.commentBody}
-                                          createdAt={item.createdAt}
-                                          isUnread={item.isUnread}
-                                          onNotificationClick={() => setOpenNotifications(false)}
-                                        />
-                                      ) : item.notificationType === "reaction" ? (
-                                        <ReactionsNotificationCard
-                                          key={item._id}
-                                          _id={item.blogId}
-                                          title={item.blogTitle}
-                                          reactions={item.reactions}
-                                          createdAt={item.createdAt}
-                                          isUnread={item.isUnread}
-                                          onNotificationClick={() => setOpenNotifications(false)}
-                                        />
-                                      ) : item.notificationType === "blog" ? (
-                                        <BlogNotificationCard
-                                          key={item._id}
-                                          _id={item._id}
-                                          title={item.title}
-                                          imageUrl={item.imageUrl ?? undefined}
-                                          createdAt={item.createdAt}
-                                          isUnread={item.isUnread}
-                                          onNotificationClick={() => setOpenNotifications(false)}
-                                        />
-                                      ) : item.notificationType === "message" ? (
-                                        <MessageNotificationCard
-                                          key={item._id}
-                                          _id={item._id}
-                                          mediaUrl={item.mediaUrl}
-                                          mediaType={item.mediaType}
-                                          content={item.content}
-                                          createdAt={item.createdAt}
-                                          isUnread={item.isUnread}
-                                          onNotificationClick={() => setOpenNotifications(false)}
-                                        />
-                                      ) : null
+                                  <span className="font-medium truncate min-w-0 flex-1">
+                                    {group.authorName}
+                                  </span>
+
+                                  <div className="flex items-center gap-2 shrink-0 ml-auto">
+                                    {(() => {
+                                      const totalCount = group.items.reduce((sum, item) => {
+                                        if (item.notificationType === "reaction" && Array.isArray(item.reactions)) {
+                                          return sum + item.reactions.length;
+                                        }
+                                        return sum + 1;
+                                      }, 0);
+
+                                      return (
+                                        <span className="whitespace-nowrap">
+                                          +{totalCount}{" "}
+                                          {group.type === "follow"
+                                            ? totalCount === 1
+                                              ? "follower"
+                                              : "followers"
+                                            : group.type === "comment"
+                                            ? totalCount === 1
+                                              ? "comment"
+                                              : "comments"
+                                            : group.type === "reaction"
+                                            ? totalCount === 1
+                                              ? "reaction"
+                                              : "reactions"
+                                            : group.type === "blog"
+                                            ? totalCount === 1
+                                              ? "insight"
+                                              : "insights"
+                                            : group.type === "blogLike"
+                                            ? totalCount === 1
+                                              ? "like"
+                                              : "likes"
+                                            : group.type === "commentLike"
+                                            ? totalCount === 1
+                                              ? "like"
+                                              : "likes"
+                                            : totalCount === 1
+                                              ? "message" 
+                                              : "messages"
+                                          }
+                                        </span>
+                                      );
+                                    })()}
+
+                                    {group.type === "follow" ? (
+                                      <UserRoundPlus className="h-3.5 w-3.5 text-muted-foreground" />
+                                    ) : group.type === "comment" ? (
+                                      <MessageSquare className="h-3.5 w-3.5 text-muted-foreground" />
+                                    ) : group.type === "reaction" ? (
+                                      <Smile className="h-3.5 w-3.5 text-muted-foreground" />
+                                    ) : group.type === "blog" ? (
+                                      <Library className="h-3.5 w-3.5 text-muted-foreground" />
+                                    ) : group.type === "blogLike" ? (
+                                      <ThumbsUp className="h-3.5 w-3.5 text-muted-foreground" />
+                                    ) : group.type === "commentLike" ? (
+                                      <ThumbsUp className="h-3.5 w-3.5 text-muted-foreground" />
+                                    ) : (
+                                      <MessageCircle className="h-3.5 w-3.5 text-muted-foreground" />
                                     )}
                                   </div>
                                 </div>
-                              ))}
-                            </div>
-                          );
-                        })}
 
-                        {status === "LoadingMore" && (
-                          <div className="py-2 text-center text-xs text-zinc-500">
-                            Loading more...
+                                <div className="flex flex-col gap-1.5">
+                                  {group.items.map((item) =>
+                                    item.notificationType === "follow" ? (
+                                      <FollowerNotificationCard
+                                        userId={item._id} 
+                                        key={item._id}
+                                        username={item.username}
+                                        displayName={item.displayName}
+                                        profilePicUrl={item.profilePicUrl ?? ""}
+                                        defaultProfilePicUrl={item.defaultProfilePicUrl ?? ""}
+                                        createdAt={item.createdAt}
+                                        isUnread={item.isUnread}    
+                                        initialIsFollowing={item.viewerStatus?.isFollowing}
+                                        initialIsBell={item.viewerStatus?.isBell}
+                                        isSelf={item.viewerStatus?.isSelf}  
+                                        onNotificationClick={() => setOpenNotifications(false)}                     
+                                      />
+                                    ) : item.notificationType === "comment" ? (
+                                      <CommentNotificationCard
+                                        key={item._id}
+                                        _id={item._id}
+                                        blogId={item.blogId}
+                                        title={item.blogTitle}
+                                        body={item.body}
+                                        createdAt={item.createdAt}
+                                        isUnread={item.isUnread}
+                                        onNotificationClick={() => setOpenNotifications(false)}
+                                      />
+                                    ) : item.notificationType === "blogLike" ? (
+                                      <BlogLikesNotificationCard
+                                        key={item._id}
+                                        _id={item.blogId}
+                                        title={item.blogTitle}
+                                        createdAt={item.createdAt}
+                                        isUnread={item.isUnread}
+                                        onNotificationClick={() => setOpenNotifications(false)}
+                                      />
+                                    ) : item.notificationType === "commentLike" ? (
+                                      <CommentLikesNotificationCard
+                                        key={item._id}
+                                        _id={item.blogId}
+                                        commentBody={item.commentBody}
+                                        createdAt={item.createdAt}
+                                        isUnread={item.isUnread}
+                                        onNotificationClick={() => setOpenNotifications(false)}
+                                      />
+                                    ) : item.notificationType === "reaction" ? (
+                                      <ReactionsNotificationCard
+                                        key={item._id}
+                                        _id={item.blogId}
+                                        title={item.blogTitle}
+                                        reactions={item.reactions}
+                                        createdAt={item.createdAt}
+                                        isUnread={item.isUnread}
+                                        onNotificationClick={() => setOpenNotifications(false)}
+                                      />
+                                    ) : item.notificationType === "blog" ? (
+                                      <BlogNotificationCard
+                                        key={item._id}
+                                        _id={item._id}
+                                        title={item.title}
+                                        imageUrl={item.imageUrl ?? undefined}
+                                        createdAt={item.createdAt}
+                                        isUnread={item.isUnread}
+                                        onNotificationClick={() => setOpenNotifications(false)}
+                                      />
+                                    ) : item.notificationType === "message" ? (
+                                      <MessageNotificationCard
+                                        key={item._id}
+                                        _id={item._id}
+                                        mediaUrl={item.mediaUrl}
+                                        mediaType={item.mediaType}
+                                        content={item.content}
+                                        createdAt={item.createdAt}
+                                        isUnread={item.isUnread}
+                                        onNotificationClick={() => setOpenNotifications(false)}
+                                      />
+                                    ) : null
+                                  )}
+                                </div>
+                              </div>
+                            ))}
                           </div>
-                        )}
-                      </>
-                    ) : isLoading ? (
-                      <div className="p-4 text-center text-xs text-zinc-500">Loading...</div>
-                    ) : (
-                      <div className="p-4 text-center text-xs text-zinc-500">
-                        No notifications yet
-                      </div>
-                    )}
-                  </ScrollArea>
-                </PopoverContent>
-              </Popover>
-            </Tooltip>
+                        );
+                      })}
+
+                      {status === "LoadingMore" && (
+                        <div className="py-2 text-center text-xs text-zinc-500">
+                          Loading more...
+                        </div>
+                      )}
+                    </>
+                  ) : isLoading ? (
+                    <div className="p-4 text-center text-xs text-zinc-500">Loading...</div>
+                  ) : (
+                    <div className="p-4 text-center text-xs text-zinc-500">
+                      No notifications yet
+                    </div>
+                  )}
+                </ScrollArea>
+              </PopoverContent>
+            </Popover>
 
             <UserProfilePopover
               openProfile={openProfile}
@@ -630,19 +622,12 @@ export function NavbarAuthClient({
             />
           </>
         ) : (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link
-                className={`${buttonVariants({ variant: "ghost", size: "icon" })} cursor-pointer h-9 w-9 shrink-0`}
-                href="/sign-in"
-              >
-                <LogIn className="size-5 md:size-4 stroke-[2.5] md:stroke-2 text-foreground transition-all shrink-0" />
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent side="bottom" align="center">
-              <p className="text-xs font-medium">Sign In</p>
-            </TooltipContent>
-          </Tooltip>
+          <Link
+            className={`${buttonVariants({ variant: "ghost", size: "icon" })} cursor-pointer h-9 w-9 shrink-0`}
+            href="/sign-in"
+          >
+            <LogIn className="size-5 md:size-4 stroke-[2.5] md:stroke-2 text-foreground transition-all shrink-0" />
+          </Link>
         )}
       </div>
     </TooltipProvider>
