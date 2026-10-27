@@ -1066,7 +1066,12 @@ export const getTrendingPosts = query({
         if (!blog) return null;
 
         return {
-          ...blog,
+          _id: blog._id,
+          title: blog.title,
+          imageUrl: blog.imageUrl,
+          totalViews: blog.totalViews,
+          likes: blog.likes,
+          commentCount: blog.commentCount,
           recentViews: viewCounts[id],
           windowDaysUsed: currentDays,
         };
