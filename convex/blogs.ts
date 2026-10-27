@@ -644,7 +644,17 @@ export const getFeaturedPosts = query({
         .take(3);
     }
 
-    return posts.map(({ content, ...previewFields }) => previewFields);
+    return posts.map((blog) => ({
+      _id: blog._id,
+      createdAt: blog.createdAt,
+      username: blog.username,
+      displayName: blog.displayName,
+      title: blog.title,
+      imageUrl: blog.imageUrl,
+      totalViews: blog.totalViews,
+      likes: blog.likes,
+      commentCount: blog.commentCount,
+    }));
   },
 });
 
