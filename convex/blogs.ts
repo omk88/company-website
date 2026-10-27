@@ -1228,11 +1228,18 @@ export const getBlogWithAuthorPosts = query({
           ? await ctx.storage.getUrl(post.storageId)
           : null;
 
-        const { content, ...previewFields } = post;
-
         return {
-          ...previewFields,
+          _id: post._id,
+          blogTitleId: post.blogTitleId,
+          title: post.title,
+          subtitle: post.subtitle,
           imageUrl: resolvedUrl ?? "/noImage.png",
+          createdAt: post.createdAt,
+          totalViews: post.totalViews,
+          likes: post.likes,
+          commentCount: post.commentCount,
+          readTime: post.readTime,
+          tags: post.tags,
         };
       })
     );
