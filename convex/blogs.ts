@@ -837,32 +837,11 @@ export const getPaginatedPostsByType = query({
       );
     }
 
-    const addBookmarks = async <T extends { _id: Id<"blogs">; content?: string }>(blogs: T[]) => {
-      const stripContent = (blog: T) => {
+    const stripContent = <T extends { content?: string }>(blogs: T[]) => {
+      return blogs.map((blog) => {
         const { content, ...rest } = blog;
         return rest;
-      };
-
-      if (!identity || !currentUserId) {
-        return blogs.map((blog) => ({
-          ...stripContent(blog),
-          isBookmarked: false,
-        }));
-      }
-
-      const userBookmarks = await ctx.db
-        .query("bookmarks")
-        .withIndex("by_user_and_blog", (q) => q.eq("userId", currentUserId))
-        .collect();
-
-      const bookmarkedBlogIds = new Set(
-        userBookmarks.map((bookmark) => bookmark.blogId)
-      );
-
-      return blogs.map((blog) => ({
-        ...stripContent(blog),
-        isBookmarked: bookmarkedBlogIds.has(blog._id),
-      }));
+      });
     };
 
     const cleanSearchTerm = args.searchTerm?.trim();
@@ -905,7 +884,7 @@ export const getPaginatedPostsByType = query({
 
       return {
         ...searchResults,
-        page: await addBookmarks(filteredPage),
+        page: stripContent(filteredPage),
       };
     }
 
@@ -962,7 +941,7 @@ export const getPaginatedPostsByType = query({
 
       return {
         ...paginatedTagEntries,
-        page: await addBookmarks(
+        page: stripContent(
           matchingBlogs.filter((b): b is NonNullable<typeof b> => b !== null)
         ),
       };
@@ -1006,7 +985,7 @@ export const getPaginatedPostsByType = query({
 
     return {
       ...paginatedBlogs,
-      page: await addBookmarks(filteredBlogs),
+      page: stripContent(filteredBlogs),
     };
   },
 });
