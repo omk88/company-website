@@ -1151,7 +1151,6 @@ export const getBlogWithAuthorPosts = query({
     const [
       authorProfile,
       rawAuthorPosts,
-      blogImageUrl,
       vote,
       userReactionsList,
       featured,
@@ -1167,10 +1166,6 @@ export const getBlogWithAuthorPosts = query({
         .withIndex("by_username", (q) => q.eq("username", blog.username))
         .order("desc")
         .take(6),
-
-      blog.storageId
-        ? ctx.storage.getUrl(blog.storageId)
-        : Promise.resolve(null),
 
       userId
         ? ctx.db
@@ -1209,40 +1204,33 @@ export const getBlogWithAuthorPosts = query({
         : Promise.resolve(null),
     ]);
 
-    const [profilePicUrl, defaultProfilePicUrl] = await Promise.all([
-      authorProfile?.profilePic
-        ? ctx.storage.getUrl(authorProfile.profilePic)
-        : Promise.resolve(null),
-      authorProfile?.defaultProfilePic
-        ? ctx.storage.getUrl(authorProfile.defaultProfilePic)
-        : Promise.resolve(null),
-    ]);
-
     const filteredAuthorPosts = rawAuthorPosts
       .filter((post) => post._id !== blog._id)
       .slice(0, 5);
 
-    const authorPostsWithImages = await Promise.all(
-      filteredAuthorPosts.map(async (post) => {
-        const resolvedUrl = post.storageId
-          ? await ctx.storage.getUrl(post.storageId)
-          : null;
-
-        return {
-          _id: post._id,
-          blogTitleId: post.blogTitleId,
-          title: post.title,
-          subtitle: post.subtitle,
-          imageUrl: resolvedUrl ?? "/noImage.png",
-          createdAt: post.createdAt,
-          totalViews: post.totalViews,
-          likes: post.likes,
-          commentCount: post.commentCount,
-          readTime: post.readTime,
-          tags: post.tags,
-        };
-      })
-    );
+    const [blogImageUrl, profilePicUrl, defaultProfilePicUrl, authorPostsWithImages] = await Promise.all([
+      blog.storageId ? ctx.storage.getUrl(blog.storageId) : Promise.resolve(null),
+      authorProfile?.profilePic ? ctx.storage.getUrl(authorProfile.profilePic) : Promise.resolve(null),
+      authorProfile?.defaultProfilePic ? ctx.storage.getUrl(authorProfile.defaultProfilePic) : Promise.resolve(null),
+      Promise.all(
+        filteredAuthorPosts.map(async (post) => {
+          const resolvedUrl = post.storageId ? await ctx.storage.getUrl(post.storageId) : null;
+          return {
+            _id: post._id,
+            blogTitleId: post.blogTitleId,
+            title: post.title,
+            subtitle: post.subtitle,
+            imageUrl: resolvedUrl ?? "/noImage.png",
+            createdAt: post.createdAt,
+            totalViews: post.totalViews,
+            likes: post.likes,
+            commentCount: post.commentCount,
+            readTime: post.readTime,
+            tags: post.tags,
+          };
+        })
+      ),
+    ]);
 
     return {
       blog: {
