@@ -128,7 +128,7 @@ export function UserProfilePopover({
             }}
           >
             <LogOut className="text-red-600 size-5 md:size-4 stroke-[2.5] md:stroke-2 text-foreground transition-all shrink-0" />
-            <span className="md:text-sm text-base">Sign Out</span>
+            <span className="md:text-sm text-base text-red-600">Sign Out</span>
           </button>
         </div>
       </PopoverContent>
