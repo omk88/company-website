@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { BlogFeed } from "./BlogFeed";
 import { useSearchStore, FeedType } from "@/stores/useSearchStore";
 import { Preloaded, usePreloadedQuery } from "convex/react";
@@ -19,11 +20,19 @@ export function BlogFeedWrapper({ preloadedData }: { preloadedData: Preloaded<ty
   const sortOrder = useSearchStore((state) => state.sortOrder);
 
   const initialData = usePreloadedQuery(preloadedData);
+  const [visitedFeeds, setVisitedFeeds] = useState<Set<FeedType>>(() => new Set([feedType]));
+
+  if (!visitedFeeds.has(feedType)) {
+    setVisitedFeeds((prev) => new Set(prev).add(feedType));
+  }
 
   return (
     <>
       {FEEDS.map((feed) => {
         const isActive = feedType === feed.id;
+        const hasBeenVisited = visitedFeeds.has(feed.id);
+
+        if (!hasBeenVisited) return null;
 
         return (
           <div
@@ -38,7 +47,7 @@ export function BlogFeedWrapper({ preloadedData }: { preloadedData: Preloaded<ty
               sortOrder={sortOrder}
               isActive={isActive}
               isInitialFeed={feed.id === "all"}
-              preloadedData={initialData}
+              preloadedData={feed.id === "all" ? initialData : undefined}
             />
           </div>
         );

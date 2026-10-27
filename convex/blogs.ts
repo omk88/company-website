@@ -837,9 +837,17 @@ export const getPaginatedPostsByType = query({
       );
     }
 
-    const addBookmarks = async <T extends { _id: Id<"blogs"> }>(blogs: T[]) => {
+    const addBookmarks = async <T extends { _id: Id<"blogs">; content?: string }>(blogs: T[]) => {
+      const stripContent = (blog: T) => {
+        const { content, ...rest } = blog;
+        return rest;
+      };
+
       if (!identity || !currentUserId) {
-        return blogs.map((blog) => ({ ...blog, isBookmarked: false }));
+        return blogs.map((blog) => ({
+          ...stripContent(blog),
+          isBookmarked: false,
+        }));
       }
 
       const userBookmarks = await ctx.db
@@ -852,7 +860,7 @@ export const getPaginatedPostsByType = query({
       );
 
       return blogs.map((blog) => ({
-        ...blog,
+        ...stripContent(blog),
         isBookmarked: bookmarkedBlogIds.has(blog._id),
       }));
     };

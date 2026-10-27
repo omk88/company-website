@@ -3,7 +3,7 @@ import { v } from "convex/values";
 
 const schema = defineSchema({
   blogs: defineTable({
-    blogTitleId: v.optional(v.string()),
+    blogTitleId: v.string(),
     storageId: v.string(),
     storageIdPng: v.optional(v.string()),
     author: v.string(),

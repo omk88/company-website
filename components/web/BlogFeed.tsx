@@ -7,6 +7,10 @@ import { BlogCard } from "./BlogCard";
 import { BlogCardSkeleton } from "./LoadingSkeletons/BlogCardSkeleton";
 import { EmptyState } from "./EmptyState";
 import { FileSearchCorner } from "lucide-react";
+import { FunctionReturnType } from "convex/server";
+
+type PaginatedBlogsResult = FunctionReturnType<typeof api.blogs.getPaginatedPostsByType>;
+type BlogPost = PaginatedBlogsResult["page"][number];
 
 interface BlogFeedProps {
   postType?: "community" | "team";
@@ -130,7 +134,7 @@ function StandardBlogFeed({
       ) : (
         <>
           <ul className="flex flex-col gap-2">
-            {displayResults.map((blog: any) => (
+            {displayResults.map((blog: BlogPost) => (
               <li key={blog._id}>
                 <BlogCard
                   id={blog._id}
