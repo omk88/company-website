@@ -837,12 +837,21 @@ export const getPaginatedPostsByType = query({
       );
     }
 
-    const stripContent = <T extends { content?: string }>(blogs: T[]) => {
-      return blogs.map((blog) => {
-        const { content, ...rest } = blog;
-        return rest;
-      });
-    };
+    const mapToCardDto = (blog: any) => ({
+      _id: blog._id,
+      _creationTime: blog._creationTime,
+      blogTitleId: blog.blogTitleId,
+      imageUrl: blog.imageUrl,
+      displayName: blog.displayName,
+      username: blog.username,
+      title: blog.title,
+      subtitle: blog.subtitle,
+      totalViews: blog.totalViews,
+      likes: blog.likes,
+      commentCount: blog.commentCount,
+      readTime: blog.readTime,
+      tags: blog.tags,
+    });
 
     const cleanSearchTerm = args.searchTerm?.trim();
     const sortOrder = args.sortOrder || "new";
@@ -884,7 +893,7 @@ export const getPaginatedPostsByType = query({
 
       return {
         ...searchResults,
-        page: stripContent(filteredPage),
+        page: filteredPage.map(mapToCardDto),
       };
     }
 
@@ -939,11 +948,11 @@ export const getPaginatedPostsByType = query({
         })
       );
 
+      const validBlogs = matchingBlogs.filter((b): b is NonNullable<typeof b> => b !== null);
+
       return {
         ...paginatedTagEntries,
-        page: stripContent(
-          matchingBlogs.filter((b): b is NonNullable<typeof b> => b !== null)
-        ),
+        page: validBlogs.map(mapToCardDto),
       };
     }
 
@@ -985,7 +994,7 @@ export const getPaginatedPostsByType = query({
 
     return {
       ...paginatedBlogs,
-      page: stripContent(filteredBlogs),
+      page: filteredBlogs.map(mapToCardDto),
     };
   },
 });
