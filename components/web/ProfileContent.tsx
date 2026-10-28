@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { ProfileBlogs } from "./ProfileBlogs";
 import { ProfileComments } from "./ProfileComments";
 import { ProfileBookmarks } from "./ProfileBookmarks";
@@ -53,6 +54,12 @@ export function ProfileContent({
   const selectedMetric = useProfileStore((state) => state.selectedMetric);
   const setSelectedMetric = useProfileStore((state) => state.setSelectedMetric);
 
+  const [visitedTabs, setVisitedTabs] = useState<Set<string>>(() => new Set([selectedMetric]));
+
+  if (!visitedTabs.has(selectedMetric)) {
+    setVisitedTabs((prev) => new Set(prev).add(selectedMetric));
+  }
+
   useEffect(() => {
     return () => {
       setSelectedMetric("insights");
@@ -61,29 +68,41 @@ export function ProfileContent({
 
   return (
     <div className="w-full flex flex-col flex-1 h-full">
-      <div className={selectedMetric === "insights" ? "flex flex-col flex-1 w-full h-full" : "hidden"}>
-        <ProfileBlogsWrapper profile={profileData} preloadedBlogs={preloadedBlogs} />
-      </div>
+      {(visitedTabs.has("insights") || selectedMetric === "insights") && (
+        <div className={selectedMetric === "insights" ? "flex flex-col flex-1 w-full h-full" : "hidden"}>
+          <ProfileBlogsWrapper profile={profileData} preloadedBlogs={preloadedBlogs} />
+        </div>
+      )}
 
-      <div className={selectedMetric === "series" ? "flex flex-col flex-1 w-full h-full" : "hidden"}>
-        <ProfileArticleSeries profile={profileData} />
-      </div>
+      {(visitedTabs.has("series") || selectedMetric === "series") && (
+        <div className={selectedMetric === "series" ? "flex flex-col flex-1 w-full h-full" : "hidden"}>
+          <ProfileArticleSeries profile={profileData} />
+        </div>
+      )}
 
-      <div className={selectedMetric === "comments" ? "flex flex-col flex-1 w-full h-full" : "hidden"}>
-        <ProfileComments profile={profileData} />
-      </div>
+      {(visitedTabs.has("comments") || selectedMetric === "comments") && (
+        <div className={selectedMetric === "comments" ? "flex flex-col flex-1 w-full h-full" : "hidden"}>
+          <ProfileComments profile={profileData} />
+        </div>
+      )}
 
-      <div className={selectedMetric === "bookmarks" ? "flex flex-col flex-1 w-full h-full" : "hidden"}>
-        <ProfileBookmarks profile={profileData} />
-      </div>
+      {(visitedTabs.has("bookmarks") || selectedMetric === "bookmarks") && (
+        <div className={selectedMetric === "bookmarks" ? "flex flex-col flex-1 w-full h-full" : "hidden"}>
+          <ProfileBookmarks profile={profileData} />
+        </div>
+      )}
 
-      <div className={selectedMetric === "followers" ? "flex flex-col flex-1 w-full" : "hidden"}>
-        <ProfileFollowers profile={profileData} currentUser={currentUser} />
-      </div>
+      {(visitedTabs.has("followers") || selectedMetric === "followers") && (
+        <div className={selectedMetric === "followers" ? "flex flex-col flex-1 w-full" : "hidden"}>
+          <ProfileFollowers profile={profileData} currentUser={currentUser} />
+        </div>
+      )}
 
-      <div className={selectedMetric === "following" ? "flex flex-col flex-1 w-full" : "hidden"}>
-        <ProfileFollowing profile={profileData} currentUser={currentUser} />
-      </div>
+      {(visitedTabs.has("following") || selectedMetric === "following") && (
+        <div className={selectedMetric === "following" ? "flex flex-col flex-1 w-full" : "hidden"}>
+          <ProfileFollowing profile={profileData} currentUser={currentUser} />
+        </div>
+      )}
     </div>
   );
 }
