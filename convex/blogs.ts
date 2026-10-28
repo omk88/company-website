@@ -782,7 +782,26 @@ export const getPaginatedPostsByAuthor = query({
       .order("desc")
       .paginate(args.paginationOpts);
 
-    return paginatedBlogs;
+    const projectedPage = paginatedBlogs.page.map((blog) => ({
+      _id: blog._id,
+      _creationTime: blog._creationTime,
+      blogTitleId: blog.blogTitleId,
+      imageUrl: blog.imageUrl,
+      displayName: blog.displayName,
+      username: blog.username,
+      title: blog.title,
+      subtitle: blog.subtitle,
+      totalViews: blog.totalViews,
+      likes: blog.likes,
+      commentCount: blog.commentCount,
+      readTime: blog.readTime,
+      tags: blog.tags,
+    }));
+
+    return {
+      ...paginatedBlogs,
+      page: projectedPage,
+    };
   },
 });
 
