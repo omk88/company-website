@@ -70,25 +70,6 @@ export function LeftSidebarProfile({ preloadedProfile }: LeftSidebarProfileProps
         <SidebarGroup className="pt-3 !px-2 w-full">
           
           <SidebarMenu className="w-full flex flex-col gap-0.5">
-            {/*{isOwnProfile && 
-              <div className="flex flex-col gap-2 mb-2">
-                <SidebarMenuItem className="w-full">
-                  <SidebarMenuButton
-                    asChild
-                    className={buttonStyleClass}
-                  >
-                    <Link href="/inbox">
-                      <Inbox className="h-4 w-4 shrink-0 stroke-[2.5] transition-colors" />
-                      
-                      <span className="flex items-center gap-1">
-                        Inbox
-                      </span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <Separator />
-              </div>
-            }*/}
             {NAV_ITEMS.map((item) => {
               const Icon = item.icon;
               const isActive = selectedMetric === item.id;
