@@ -111,8 +111,8 @@ export function ProfileHoverCard({ displayName, authorUsername, children, align 
                                     <TooltipProvider delayDuration={200}>
                                         <Tooltip>
                                             <TooltipTrigger asChild>
-                                                <div className="inline-flex w-fit items-center gap-1 text-xs font-sans font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/60 cursor-help select-none">
-                                                    <Zap className="w-3 h-3 fill-amber-500 stroke-amber-500 shrink-0" />
+                                                <div className="inline-flex w-fit items-center gap-1 text-xs font-sans font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded-full border border-amber-200/60 dark:border-amber-800/50 cursor-help select-none">
+                                                    <Zap className="w-3 h-3 fill-amber-500 dark:fill-amber-400 stroke-amber-500 dark:stroke-amber-400 shrink-0" />
                                                     <span>{profileData?.profile?.totalLikes}</span>
                                                 </div>
                                             </TooltipTrigger>
