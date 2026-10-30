@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import { connection } from "next/server";
 import { api } from "@/convex/_generated/api";
-import { fetchAuthMutation, fetchAuthQuery } from "@/lib/auth-server";
-import { authClient } from "@/lib/auth-client";
+import { fetchAuthQuery, fetchAuthMutation } from "@/lib/auth-server";
 import { Id } from "@/convex/_generated/dataModel";
 
 const GRADIENT_PALETTES = [
@@ -32,19 +31,18 @@ export async function GET(request: Request) {
   await connection();
 
   try {
-    const session = await authClient.getSession({
-      fetchOptions: { headers: request.headers },
-    });
+    const user = await fetchAuthQuery(api.auth.getCurrentUser, {});
 
-    if (!session || !session.data?.user) {
-      console.error("Profile callback failed: No active auth session found.");
+    if (!user || !user.userId || !user.email) {
+      console.error("Profile callback failed: No active auth session or email found.");
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
-    const userData = session.data.user as any;
-    const id = userData.id;
-    const email = userData.email;
-    const displayName = userData.displayName;
+    const { userId, email } = user;
+
+    if (user.profile) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
 
     let profilePicField: Id<"_storage">;
     let publicProfilePicUrl = "";
@@ -64,7 +62,6 @@ export async function GET(request: Request) {
       }
 
       const { storageId } = await uploadResponse.json();
-
       profilePicField = storageId as Id<"_storage">;
 
       const urlResult = await fetchAuthQuery(api.profiles.getImageUrl, {
@@ -79,22 +76,14 @@ export async function GET(request: Request) {
       throw new Error("Onboarding failed: Could not generate required profile picture.");
     }
 
+    const displayName = email.split("@")[0];
+
     await fetchAuthMutation(api.profiles.initialiseProfile, {
-      userId: id,
+      userId: userId,
       email: email,
       displayName: displayName,
       defaultProfilePic: profilePicField,
     });
-
-    if (publicProfilePicUrl) {
-      try {
-        await fetchAuthMutation(api.auth.updateAuthImage, {
-          image: publicProfilePicUrl,
-        });
-      } catch (authUpdateError) {
-        console.error("Failed to update Better Auth session image inside Convex backend:", authUpdateError);
-      }
-    }
 
     return NextResponse.redirect(new URL("/", request.url));
 
