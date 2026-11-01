@@ -2,6 +2,28 @@ import { paginationOptsValidator } from "convex/server";
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
+export const reorderSeriesItems = mutation({
+  args: {
+    seriesId: v.id("series"),
+    orderedItemIds: v.array(v.id("seriesItems")),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Unauthenticated: You must be logged in.");
+    }
+
+    const series = await ctx.db.get(args.seriesId);
+    if (!series || series.authorId !== identity.subject) {
+      throw new Error("Unauthorized: You do not own this series.");
+    }
+
+    for (let i = 0; i < args.orderedItemIds.length; i++) {
+      await ctx.db.patch(args.orderedItemIds[i], { order: i });
+    }
+  },
+});
+
 export const getPaginatedSeriesByAuthor = query({
   args: {
     author: v.string(),
@@ -55,6 +77,42 @@ export const getPaginatedSeriesByAuthor = query({
       ...paginatedSeries,
       page: enrichedPage,
     };
+  },
+});
+
+export const createSeriesWithItems = mutation({
+  args: {
+    title: v.string(),
+    slug: v.string(),
+    description: v.optional(v.string()),
+    coverImage: v.optional(v.string()),
+    coverImagePng: v.optional(v.string()),
+    articleIds: v.array(v.id("blogs")),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthenticated");
+
+    const userId = identity.subject;
+
+    const seriesId = await ctx.db.insert("series", {
+      title: args.title,
+      slug: args.slug,
+      description: args.description,
+      coverImage: args.coverImage,
+      coverImagePng: args.coverImagePng,
+      authorId: userId,
+    });
+
+    for (let i = 0; i < args.articleIds.length; i++) {
+      await ctx.db.insert("seriesItems", {
+        seriesId,
+        articleId: args.articleIds[i],
+        order: i,
+      });
+    }
+
+    return args.slug;
   },
 });
 
