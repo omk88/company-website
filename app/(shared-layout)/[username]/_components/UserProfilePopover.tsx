@@ -111,7 +111,7 @@ export function UserProfilePopover({
           </Link>
 
           <Link
-            href="/create-blog"
+            href="/create-article-series"
             onClick={closePopover}
             className="flex items-center text-zinc-600 dark:text-zinc-400 gap-2.5 px-2.5 py-2 text-xs rounded-md hover:bg-accent hover:text-accent-foreground transition-colors duration-100 cursor-pointer"
           >
