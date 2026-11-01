@@ -1,5 +1,4 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { Skeleton } from "@/components/ui/skeleton";
 import { CompactBlogCardSkeleton } from "@/components/web/LoadingSkeletons/CompactBlogCardSkeleton";
 import { LeftSidebarProfileSkeleton } from "@/components/web/LoadingSkeletons/LeftSidebarProfileSkeleton";
 import { RightSidebarProfileSkeleton } from "@/components/web/LoadingSkeletons/RightSidebarProfileSkeleton";
