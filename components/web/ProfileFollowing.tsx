@@ -8,7 +8,6 @@ import { FunctionReturnType } from "convex/server";
 import { EmptyState } from "./EmptyState";
 import { ProfileCardSkeleton } from "./ProfileFollows";
 import { UserRoundCheck } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
 
 type ProfileData = FunctionReturnType<typeof api.profiles.getProfileByUsername>;
 type CurrentUserData = FunctionReturnType<typeof api.auth.getCurrentUser>;
@@ -77,18 +76,6 @@ export function ProfileFollowing({ profile, currentUser, preloadedData }: Profil
     <div className="flex flex-col flex-1 h-full min-h-0 w-full p-2">
       <div className="w-full mx-auto flex flex-col flex-1 h-full min-h-0">
         
-        {(isInitialLoading || displayResults.length > 0) && (
-          <div className="flex justify-between items-center mb-2 px-2">
-            {isInitialLoading ? (
-              <Skeleton className="h-6 w-20 rounded-lg" />
-            ) : (
-              <h3 className="text-sm font-medium bg-muted/80 px-2 p-0.5 rounded-lg text-zinc-500">
-                Following
-              </h3>
-            )}
-          </div>
-        )}
-
         {isInitialLoading ? (
           <ul className="flex flex-col gap-2">
             {[1, 2, 3, 4, 5].map((i) => (
