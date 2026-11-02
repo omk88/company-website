@@ -8,7 +8,7 @@ import { BlogCard } from "@/components/web/BlogCard";
 import { EmptyState } from "@/components/web/EmptyState";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Library, GripVertical, Plus, Loader2, Check } from "lucide-react";
+import { Library, GripVertical, Plus, Loader2, Check, X } from "lucide-react"; // <--- Import X icon
 import { useCurrentUser } from "@/app/ConvexClientProvider";
 
 interface AddSeriesItemsProps {
@@ -20,10 +20,7 @@ export function AddSeriesItems({ items, setItems }: AddSeriesItemsProps) {
   const currentUser = useCurrentUser();
   const authorId = currentUser?.userId;
 
-  const userBlogs = useQuery(
-    api.blogs.getPostsByAuthor, 
-    authorId ? { author: authorId, includeContent: true } : "skip"
-  );
+  const userBlogs = useQuery(api.blogs.getPostsByAuthor, authorId ? { author: authorId, includeContent: true } : "skip");
 
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [mousePos, setMousePos] = useState<{ x: number; y: number } | null>(null);
@@ -80,10 +77,16 @@ export function AddSeriesItems({ items, setItems }: AddSeriesItemsProps) {
     }
   };
 
+  // Function to remove a blog from the series
+  const handleRemoveBlog = (blogId: string) => {
+    setItems(items.filter((i) => i._id !== blogId));
+  };
+
   const draggedBlog = draggedIndex !== null ? items[draggedIndex] : null;
 
   return (
     <div className="w-full p-2" ref={containerRef}>
+      {/* Floating physical card preview while dragging */}
       {draggedBlog && mousePos && (
         <div 
           className="fixed pointer-events-none z-50 w-[450px]"
@@ -160,6 +163,18 @@ export function AddSeriesItems({ items, setItems }: AddSeriesItemsProps) {
                         Part {index + 1}
                       </span>
                     </div>
+
+                    {/* Remove button appears on hover */}
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-6 w-6 text-zinc-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() => handleRemoveBlog(blog._id)}
+                      title="Remove from series"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
                   </div>
 
                   <div className={isBeingDragged ? "opacity-0 pointer-events-none select-none" : "opacity-100"}>

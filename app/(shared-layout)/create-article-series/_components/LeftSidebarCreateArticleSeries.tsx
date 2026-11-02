@@ -23,9 +23,10 @@ import { useRouter } from "next/navigation";
 
 interface LeftSidebarProps {
   stagedBlogIds: Id<"blogs">[];
+  stagedBlogs: any[];
 }
 
-export function LeftSidebarCreateArticleSeries({ stagedBlogIds }: LeftSidebarProps) {
+export function LeftSidebarCreateArticleSeries({ stagedBlogIds, stagedBlogs }: LeftSidebarProps) {
   const router = useRouter();
   const currentUser = useCurrentUser();
   const authorName = currentUser?.profile?.displayName || currentUser?.profile?.username || "User";
@@ -43,6 +44,8 @@ export function LeftSidebarCreateArticleSeries({ stagedBlogIds }: LeftSidebarPro
   const createSeriesWithItems = useMutation(api.series.createSeriesWithItems);
   const generateUploadUrl = useMutation(api.series.generateUploadUrl);
 
+  const totalReadMinutes = stagedBlogs.reduce((acc, blog) => acc + (blog.readTime || 0), 0);
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -56,6 +59,32 @@ export function LeftSidebarCreateArticleSeries({ stagedBlogIds }: LeftSidebarPro
     setImagePreview(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
+
+  function formatReadTime(totalMinutes: number): string {
+    if (!totalMinutes || totalMinutes <= 0) return "0 min read";
+
+    if (totalMinutes < 60) {
+      return `${totalMinutes} min read`;
+    }
+
+    const hours = Math.floor(totalMinutes / 60);
+    const remainingMinutes = totalMinutes % 60;
+
+    if (hours < 24) {
+      if (remainingMinutes === 0) {
+        return `${hours} hr read`;
+      }
+      return `${hours} hr ${remainingMinutes} min read`;
+    }
+
+    const days = Math.floor(hours / 24);
+    const remainingHours = hours % 24;
+
+    if (remainingHours === 0) {
+      return `${days} day read`;
+    }
+    return `${days} day ${remainingHours} hr read`;
+  }
 
   const convertImageToPngFile = async (file: File): Promise<File> => {
     return new Promise((resolve, reject) => {
@@ -212,7 +241,7 @@ export function LeftSidebarCreateArticleSeries({ stagedBlogIds }: LeftSidebarPro
               <div className="flex items-center">
                 <Badge variant={"outline"} className="gap-1.5 py-1 px-2.5 text-zinc-600 dark:text-zinc-300">
                   <Clock className="w-3.5 h-3.5 text-zinc-400" />
-                  <span>0 min read</span>
+                  <span>{formatReadTime(totalReadMinutes)}</span>
                 </Badge>
               </div>
 

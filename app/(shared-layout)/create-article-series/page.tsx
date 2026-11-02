@@ -19,6 +19,7 @@ export default function CreateArticleSeriesPage() {
                 >
                     <LeftSidebarCreateArticleSeries 
                         stagedBlogIds={stagedBlogs.map((b) => b._id)}
+                        stagedBlogs={stagedBlogs}
                     />
                 </aside>
 
