@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
 import { 
   Sidebar, 
   SidebarContent, 
@@ -20,20 +19,19 @@ import { Badge } from "@/components/ui/badge";
 import { useCurrentUser } from "@/app/ConvexClientProvider";
 import { ProfileHoverCard } from "@/components/web/ProfileHoverCard";
 import { useRouter } from "next/navigation";
+import { useSeriesStore } from "@/stores/useSeriesStore";
 
-interface LeftSidebarProps {
-  stagedBlogIds: Id<"blogs">[];
-  stagedBlogs: any[];
-}
-
-export function LeftSidebarCreateArticleSeries({ stagedBlogIds, stagedBlogs }: LeftSidebarProps) {
+export function LeftSidebarCreateArticleSeries() {
   const router = useRouter();
   const currentUser = useCurrentUser();
   const authorName = currentUser?.profile?.displayName || currentUser?.profile?.username || "User";
   const profilePic = currentUser?.profile?.profilePicUrl || currentUser?.profile?.defaultProfilePic;
 
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const { stagedBlogs, seriesTitle, description, setSeriesTitle, setDescription } = useSeriesStore();
+
+  const stagedBlogIds = stagedBlogs.map((b) => b._id);
+  const totalReadMinutes = stagedBlogs.reduce((acc, blog) => acc + (blog.readTime || 0), 0);
+
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -43,8 +41,6 @@ export function LeftSidebarCreateArticleSeries({ stagedBlogIds, stagedBlogs }: L
 
   const createSeriesWithItems = useMutation(api.series.createSeriesWithItems);
   const generateUploadUrl = useMutation(api.series.generateUploadUrl);
-
-  const totalReadMinutes = stagedBlogs.reduce((acc, blog) => acc + (blog.readTime || 0), 0);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -62,27 +58,19 @@ export function LeftSidebarCreateArticleSeries({ stagedBlogIds, stagedBlogs }: L
 
   function formatReadTime(totalMinutes: number): string {
     if (!totalMinutes || totalMinutes <= 0) return "0 min read";
-
-    if (totalMinutes < 60) {
-      return `${totalMinutes} min read`;
-    }
+    if (totalMinutes < 60) return `${totalMinutes} min read`;
 
     const hours = Math.floor(totalMinutes / 60);
     const remainingMinutes = totalMinutes % 60;
 
     if (hours < 24) {
-      if (remainingMinutes === 0) {
-        return `${hours} hr read`;
-      }
+      if (remainingMinutes === 0) return `${hours} hr read`;
       return `${hours} hr ${remainingMinutes} min read`;
     }
 
     const days = Math.floor(hours / 24);
     const remainingHours = hours % 24;
-
-    if (remainingHours === 0) {
-      return `${days} day read`;
-    }
+    if (remainingHours === 0) return `${days} day read`;
     return `${days} day ${remainingHours} hr read`;
   }
 
@@ -139,7 +127,7 @@ export function LeftSidebarCreateArticleSeries({ stagedBlogIds, stagedBlogs }: L
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim()) return;
+    if (!seriesTitle.trim()) return;
 
     setIsSubmitting(true);
     setError(null);
@@ -161,10 +149,10 @@ export function LeftSidebarCreateArticleSeries({ stagedBlogIds, stagedBlogs }: L
         coverImagePngStorageId = (await res2.json()).storageId;
       }
 
-      const slug = title.toLowerCase().trim().replace(/[^\w\s-]/g, "").replace(/[\s_-]+/g, "-");
+      const slug = seriesTitle.toLowerCase().trim().replace(/[^\w\s-]/g, "").replace(/[\s_-]+/g, "-");
 
       const newSlug = await createSeriesWithItems({
-        title: title.trim(),
+        title: seriesTitle.trim(),
         slug,
         description: description.trim() || undefined,
         coverImage: coverImageStorageId,
@@ -230,7 +218,7 @@ export function LeftSidebarCreateArticleSeries({ stagedBlogIds, stagedBlogs }: L
               <div className="flex flex-col gap-3">
                 <div className="grid gap-1.5">
                   <Label htmlFor="title" className="text-xs font-semibold">Title</Label>
-                  <Input id="title" placeholder="e.g., Next.js 15 Masterclass" value={title} onChange={(e) => setTitle(e.target.value)} disabled={isSubmitting} required />
+                  <Input id="title" placeholder="Next.js 16 Masterclass" value={seriesTitle} onChange={(e) => setSeriesTitle(e.target.value)} disabled={isSubmitting} required />
                 </div>
                 <div className="grid gap-1.5">
                   <Label htmlFor="description" className="text-xs font-semibold">Description (Optional)</Label>
@@ -247,7 +235,7 @@ export function LeftSidebarCreateArticleSeries({ stagedBlogIds, stagedBlogs }: L
 
               {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
 
-              <Button type="submit" disabled={isSubmitting || !title.trim()} className="w-full mt-2">
+              <Button type="submit" disabled={isSubmitting || !seriesTitle.trim()} className="w-full mt-2">
                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Create Series
               </Button>

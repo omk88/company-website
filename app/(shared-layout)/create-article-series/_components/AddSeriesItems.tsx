@@ -9,13 +9,9 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { GripVertical, Plus, Loader2, Check, X } from "lucide-react";
 import { useCurrentUser } from "@/app/ConvexClientProvider";
+import { useSeriesStore } from "@/stores/useSeriesStore";
 
-interface AddSeriesItemsProps {
-  items: Doc<"blogs">[];
-  setItems: React.Dispatch<React.SetStateAction<Doc<"blogs">[]>>;
-}
-
-export function AddSeriesItems({ items, setItems }: AddSeriesItemsProps) {
+export function AddSeriesItems() {
   const currentUser = useCurrentUser();
   const authorId = currentUser?.userId;
 
@@ -23,6 +19,9 @@ export function AddSeriesItems({ items, setItems }: AddSeriesItemsProps) {
     api.blogs.getPostsByAuthor, 
     authorId ? { author: authorId, includeContent: true } : "skip"
   );
+
+  const items = useSeriesStore((state) => state.stagedBlogs);
+  const setItems = useSeriesStore((state) => state.setStagedBlogs);
 
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [mousePos, setMousePos] = useState<{ x: number; y: number } | null>(null);
@@ -121,12 +120,14 @@ export function AddSeriesItems({ items, setItems }: AddSeriesItemsProps) {
         </div>
       )}
 
-      <div className="w-full flex flex-col gap-4">
-        <div className="flex items-center justify-between px-1">
-          <span className="text-sm font-semibold text-zinc-600 dark:text-zinc-400">
-            Series Articles ({items.length})
-          </span>
-          <Button size="sm" onClick={() => setIsAddModalOpen(true)} className="gap-1.5">
+      <div className="w-full flex flex-col">
+        <div className="flex items-center justify-between ml-auto">
+          <Button
+            variant={"ghost"}
+            size="sm"
+            onClick={() => setIsAddModalOpen(true)}
+            className="cursor-pointer"
+          >
             <Plus className="h-4 w-4" />
             Add Articles
           </Button>

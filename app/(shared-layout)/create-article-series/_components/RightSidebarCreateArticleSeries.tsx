@@ -1,23 +1,18 @@
 "use client";
 
 import * as React from "react";
-import { Doc } from "@/convex/_generated/dataModel";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup } from "@/components/ui/sidebar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { processHeadings } from "../../insights/[blogTitleId]/_utils/headingUtils";
 import Link from "next/link";
 import { ChevronRight, List } from "lucide-react";
+import { useSeriesStore } from "@/stores/useSeriesStore";
 
-interface RightSidebarCreateArticleSeriesProps {
-  items: Doc<"blogs">[];
-  seriesTitle?: string;
-}
+export function RightSidebarCreateArticleSeries() {
+  const items = useSeriesStore((state) => state.stagedBlogs);
+  const seriesTitle = useSeriesStore((state) => state.seriesTitle);
 
-export function RightSidebarCreateArticleSeries({ 
-  items, 
-  seriesTitle 
-}: RightSidebarCreateArticleSeriesProps) {
   const [openItems, setOpenItems] = React.useState<Record<string, boolean>>({});
 
   const toggleItem = (id: string) => {
@@ -59,11 +54,7 @@ export function RightSidebarCreateArticleSeries({
               </h3>
             </div>
 
-            {items.length === 0 ? (
-              <p className="text-xs text-zinc-400 italic py-4 text-center">
-                Add articles to view their topics here.
-              </p>
-            ) : (
+            {items.length > 0 && (
               <div className="flex flex-col gap-5 pb-6">
                 {items.map((blog, index) => {
                   if (!blog?._id) return null;
