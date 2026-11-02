@@ -86,9 +86,7 @@ export function AddSeriesItems({ items, setItems }: AddSeriesItemsProps) {
   const draggedBlog = draggedIndex !== null ? items[draggedIndex] : null;
 
   return (
-    // Changed from px-4 md:px-6 to px-0 to force edge-to-edge alignment
     <div className="w-full px-0 py-2" ref={containerRef}>
-      {/* Floating physical card preview while dragging */}
       {draggedBlog && mousePos && (
         <div 
           className="fixed pointer-events-none z-50 w-[450px]"
@@ -145,7 +143,22 @@ export function AddSeriesItems({ items, setItems }: AddSeriesItemsProps) {
                   className="flex flex-col gap-1.5 group relative w-full"
                 >
                   <div className="flex items-center justify-between px-1">
-                    <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                      Part {index + 1}
+                    </span>
+
+                    <div className="flex items-center gap-1">
+                      <Button 
+                        type="button" 
+                        variant="ghost" 
+                        size="icon" 
+                        className="cursor-pointer h-6 w-6 text-zinc-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => handleRemoveBlog(blog._id)}
+                        title="Remove from series"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+
                       <div 
                         onMouseDown={(e) => handleMouseDown(e, index)}
                         className="cursor-grab active:cursor-grabbing p-1 -m-1"
@@ -153,21 +166,7 @@ export function AddSeriesItems({ items, setItems }: AddSeriesItemsProps) {
                       >
                         <GripVertical className="h-4 w-4 text-zinc-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
-                      <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-                        Part {index + 1}
-                      </span>
                     </div>
-
-                    <Button 
-                      type="button" 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-6 w-6 text-zinc-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={() => handleRemoveBlog(blog._id)}
-                      title="Remove from series"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
                   </div>
 
                   <div className={`w-full ${isBeingDragged ? "opacity-0 pointer-events-none select-none" : "opacity-100"}`}>
