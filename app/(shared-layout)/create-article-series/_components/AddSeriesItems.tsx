@@ -20,7 +20,10 @@ export function AddSeriesItems({ items, setItems }: AddSeriesItemsProps) {
   const currentUser = useCurrentUser();
   const authorId = currentUser?.userId;
 
-  const userBlogs = useQuery(api.blogs.getPostsByAuthor, authorId ? { author: authorId } : "skip");
+  const userBlogs = useQuery(
+    api.blogs.getPostsByAuthor, 
+    authorId ? { author: authorId, includeContent: true } : "skip"
+  );
 
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [mousePos, setMousePos] = useState<{ x: number; y: number } | null>(null);

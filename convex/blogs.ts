@@ -1032,6 +1032,7 @@ export const getPostsByAuthor = query({
   args: {
     author: v.string(),
     excludeId: v.optional(v.id("blogs")),
+    includeContent: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     const blogs = await ctx.db
@@ -1048,7 +1049,11 @@ export const getPostsByAuthor = query({
           b.author.toLowerCase() === targetAuthor &&
           b._id !== args.excludeId
       )
-      .slice(0, 9)
+      .slice(0, 9);
+
+    if (args.includeContent) {
+      return matched;
+    }
 
     return matched.map(({ content, ...previewFields }) => previewFields);
   },

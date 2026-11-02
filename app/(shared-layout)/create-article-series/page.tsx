@@ -5,6 +5,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { Doc } from "@/convex/_generated/dataModel";
 import { LeftSidebarCreateArticleSeries } from "./_components/LeftSidebarCreateArticleSeries";
 import { AddSeriesItems } from "./_components/AddSeriesItems";
+import { RightSidebarCreateArticleSeries } from "./_components/RightSidebarCreateArticleSeries";
 
 export default function CreateArticleSeriesPage() {
     const [stagedBlogs, setStagedBlogs] = useState<Doc<"blogs">[]>([]);
@@ -26,6 +27,13 @@ export default function CreateArticleSeriesPage() {
                         items={stagedBlogs}
                         setItems={setStagedBlogs}
                     />
+
+                    <aside 
+                        style={{ "--sidebar-width": "20rem" } as React.CSSProperties} 
+                        className="hidden md:block w-[20rem] shrink-0 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto"
+                    >
+                        <RightSidebarCreateArticleSeries items={stagedBlogs} />
+                    </aside>
                 </div>
             </SidebarProvider>
         </div>
