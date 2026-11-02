@@ -23,7 +23,7 @@ export default function CreateArticleSeriesPage() {
                     />
                 </aside>
 
-                <div className="w-full md:flex-1 md:flex md:flex-row md:min-w-0 md:pt-16 p-4">
+                <div className="w-full md:flex-1 md:flex md:flex-row md:min-w-0 md:pt-16 p-2">
                     <AddSeriesItems 
                         items={stagedBlogs}
                         setItems={setStagedBlogs}

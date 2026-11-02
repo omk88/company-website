@@ -5,10 +5,9 @@ import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Doc } from "@/convex/_generated/dataModel";
 import { BlogCard } from "@/components/web/BlogCard";
-import { EmptyState } from "@/components/web/EmptyState";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Library, GripVertical, Plus, Loader2, Check, X } from "lucide-react"; // <--- Import X icon
+import { GripVertical, Plus, Loader2, Check, X } from "lucide-react";
 import { useCurrentUser } from "@/app/ConvexClientProvider";
 
 interface AddSeriesItemsProps {
@@ -20,7 +19,10 @@ export function AddSeriesItems({ items, setItems }: AddSeriesItemsProps) {
   const currentUser = useCurrentUser();
   const authorId = currentUser?.userId;
 
-  const userBlogs = useQuery(api.blogs.getPostsByAuthor, authorId ? { author: authorId, includeContent: true } : "skip");
+  const userBlogs = useQuery(
+    api.blogs.getPostsByAuthor, 
+    authorId ? { author: authorId, includeContent: true } : "skip"
+  );
 
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [mousePos, setMousePos] = useState<{ x: number; y: number } | null>(null);
@@ -77,7 +79,6 @@ export function AddSeriesItems({ items, setItems }: AddSeriesItemsProps) {
     }
   };
 
-  // Function to remove a blog from the series
   const handleRemoveBlog = (blogId: string) => {
     setItems(items.filter((i) => i._id !== blogId));
   };
@@ -85,7 +86,8 @@ export function AddSeriesItems({ items, setItems }: AddSeriesItemsProps) {
   const draggedBlog = draggedIndex !== null ? items[draggedIndex] : null;
 
   return (
-    <div className="w-full p-2" ref={containerRef}>
+    // Changed from px-4 md:px-6 to px-0 to force edge-to-edge alignment
+    <div className="w-full px-0 py-2" ref={containerRef}>
       {/* Floating physical card preview while dragging */}
       {draggedBlog && mousePos && (
         <div 
@@ -121,7 +123,7 @@ export function AddSeriesItems({ items, setItems }: AddSeriesItemsProps) {
         </div>
       )}
 
-      <div className="w-full mx-auto flex flex-col gap-4">
+      <div className="w-full flex flex-col gap-4">
         <div className="flex items-center justify-between px-1">
           <span className="text-sm font-semibold text-zinc-600 dark:text-zinc-400">
             Series Articles ({items.length})
@@ -132,23 +134,15 @@ export function AddSeriesItems({ items, setItems }: AddSeriesItemsProps) {
           </Button>
         </div>
 
-        {items.length === 0 ? (
-          <div className="flex flex-col h-64 w-full items-center justify-center border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl p-6 bg-card">
-            <EmptyState icon={Library} size="sm" description="There are no articles in this draft yet. Click 'Add Articles' to get started." />
-            <Button size="sm" variant="outline" onClick={() => setIsAddModalOpen(true)} className="gap-1.5 mt-3">
-              <Plus className="h-4 w-4" />
-              Add First Article
-            </Button>
-          </div>
-        ) : (
-          <ul className="flex flex-col gap-4">
+        {items.length > 0 && (
+          <ul className="flex flex-col gap-4 w-full">
             {items.map((blog, index) => {
               const isBeingDragged = draggedIndex === index;
               return (
                 <li 
                   key={blog._id} 
                   onMouseEnter={() => handleMouseEnter(index)}
-                  className="flex flex-col gap-1.5 group relative"
+                  className="flex flex-col gap-1.5 group relative w-full"
                 >
                   <div className="flex items-center justify-between px-1">
                     <div className="flex items-center gap-2">
@@ -164,7 +158,6 @@ export function AddSeriesItems({ items, setItems }: AddSeriesItemsProps) {
                       </span>
                     </div>
 
-                    {/* Remove button appears on hover */}
                     <Button 
                       type="button" 
                       variant="ghost" 
@@ -177,7 +170,7 @@ export function AddSeriesItems({ items, setItems }: AddSeriesItemsProps) {
                     </Button>
                   </div>
 
-                  <div className={isBeingDragged ? "opacity-0 pointer-events-none select-none" : "opacity-100"}>
+                  <div className={`w-full ${isBeingDragged ? "opacity-0 pointer-events-none select-none" : "opacity-100"}`}>
                     <BlogCard
                       id={blog._id}
                       blogTitleId={blog.blogTitleId}
