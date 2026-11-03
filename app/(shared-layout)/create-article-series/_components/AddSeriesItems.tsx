@@ -12,7 +12,7 @@ import { useCurrentUser } from "@/app/ConvexClientProvider";
 import { useSeriesStore } from "@/stores/useSeriesStore";
 
 export function AddSeriesItems() {
-  const currentUser = useCurrentUser();
+  const currentUser = useCurrentUser(); 
   const authorId = currentUser?.userId;
 
   const userBlogs = useQuery(
