@@ -50,7 +50,7 @@ export function RightSidebarCreateArticleSeries() {
                   <List className="w-3.5 h-3.5" />
                   <span>Topics</span>
                 </div>
-                <h3 className="text-sm font-bold text-foreground leading-snug truncate max-w-full">
+                <h3 className="text-sm font-bold text-foreground leading-snug break-words max-w-full">
                   {seriesTitle?.trim() ? seriesTitle : "Untitled Series"}
                 </h3>
               </div>
@@ -75,14 +75,14 @@ export function RightSidebarCreateArticleSeries() {
                             <Link 
                               href={`/insights/${blogTitleId}`}
                               target="_blank"
-                              className="max-w-full block truncate"
+                              className="max-w-full block"
                             >
-                              <span className="font-medium text-foreground hover:text-blue-600 dark:hover:text-blue-400 transition-colors leading-snug truncate block max-w-full">
+                              <span className="font-medium text-foreground hover:text-blue-600 dark:hover:text-blue-400 transition-colors leading-snug block break-words max-w-full">
                                 {blog.title}
                               </span>
                             </Link>
                           ) : (
-                            <span className="font-medium text-foreground leading-snug truncate block max-w-full">
+                            <span className="font-medium text-foreground leading-snug block break-words max-w-full">
                               {blog.title}
                             </span>
                           )}

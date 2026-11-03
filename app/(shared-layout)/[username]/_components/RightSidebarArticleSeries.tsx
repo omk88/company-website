@@ -78,7 +78,6 @@ export function RightSidebarArticleSeries({ slug }: RightSidebarArticleSeriesPro
     >
       <SidebarContent className="!p-0 h-full overflow-hidden">
         <ScrollArea className="h-full w-full">
-          {/* Constrain inner container to strict 20rem width boundary with hidden overflow */}
           <div className="w-[20rem] max-w-full overflow-hidden box-border">
             <SidebarGroup className="pt-4 !px-3 w-full flex flex-col gap-4 overflow-hidden">
               
@@ -87,7 +86,7 @@ export function RightSidebarArticleSeries({ slug }: RightSidebarArticleSeriesPro
                   <List className="w-3.5 h-3.5" />
                   <span>Topics</span>
                 </div>
-                <h3 className="text-sm font-bold text-foreground leading-snug truncate max-w-full">
+                <h3 className="text-sm font-bold text-foreground leading-snug break-words max-w-full">
                   {seriesData.title}
                 </h3>
               </div>
@@ -110,9 +109,9 @@ export function RightSidebarArticleSeries({ slug }: RightSidebarArticleSeriesPro
                         </span>
                         <Link 
                           href={`/insights/${blogTitleId}`}
-                          className="max-w-full block truncate"
+                          className="max-w-full block"
                         >
-                          <span className="font-medium text-foreground hover:text-blue-600 dark:hover:text-blue-400 transition-colors leading-snug truncate block max-w-full">
+                          <span className="font-medium text-foreground hover:text-blue-600 dark:hover:text-blue-400 transition-colors leading-snug block break-words max-w-full">
                             {blog.title}
                           </span>
                         </Link>
