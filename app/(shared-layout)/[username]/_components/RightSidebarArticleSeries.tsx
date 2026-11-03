@@ -143,12 +143,13 @@ export function RightSidebarArticleSeries({ slug }: RightSidebarArticleSeriesPro
                         </CollapsibleTrigger>
                         
                         <CollapsibleContent>
-                          <ul className="pl-3 ml-1 border-l-2 border-zinc-200 dark:border-zinc-800 flex flex-col gap-1 pt-1">
+                          <ul className="pl-3 ml-1 border-l-2 border-zinc-200 dark:border-zinc-800 flex flex-col gap-1 pt-1 overflow-hidden">
                             {processedTopics.map((topic) => (
-                              <li key={topic.id} className="truncate">
+                              <li key={topic.id} className="min-w-0">
                                 <Link
                                   href={`/insights/${blogTitleId}#${topic.id}`}
-                                  className="text-zinc-500 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer block"
+                                  target="_blank"
+                                  className="text-zinc-500 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer block truncate"
                                 >
                                   {topic.text}
                                 </Link>
