@@ -104,7 +104,7 @@ export function RightSidebarCreateArticleSeries() {
                                 <li key={topic.id} className="truncate">
                                   {blogTitleId ? (
                                     <Link
-                                      href={`/insights/${blogTitleId}#${topic.id}`}
+                                      href={`/insights/${blogTitleId}#${topic.id}`} 
                                       target="_blank"
                                       className="text-zinc-500 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer block"
                                     >
