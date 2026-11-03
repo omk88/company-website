@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -12,7 +12,7 @@ import { AddSeriesItems } from "./_components/AddSeriesItems";
 import { RightSidebarCreateArticleSeries } from "./_components/RightSidebarCreateArticleSeries";
 import { Loader2 } from "lucide-react";
 
-export default function CreateOrEditArticleSeriesPage() {
+function CreateOrEditArticleSeriesContent() {
   const searchParams = useSearchParams();
   const seriesId = searchParams.get("id") as Id<"series"> | null;
   const isEditing = Boolean(seriesId);
@@ -79,5 +79,19 @@ export default function CreateOrEditArticleSeriesPage() {
         </div>
       </SidebarProvider>
     </div>
+  );
+}
+
+export default function CreateOrEditArticleSeriesPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex h-screen w-full items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-zinc-400" />
+        </div>
+      }
+    >
+      <CreateOrEditArticleSeriesContent />
+    </Suspense>
   );
 }
