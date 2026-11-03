@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
 import { 
   Sidebar, 
   SidebarContent, 
@@ -21,7 +22,13 @@ import { ProfileHoverCard } from "@/components/web/ProfileHoverCard";
 import { useRouter } from "next/navigation";
 import { useSeriesStore } from "@/stores/useSeriesStore";
 
-export function LeftSidebarCreateArticleSeries() {
+interface LeftSidebarProps {
+  isEditing?: boolean;
+  seriesId?: Id<"series">;
+  existingData?: any;
+}
+
+export function LeftSidebarCreateArticleSeries({ isEditing, seriesId, existingData }: LeftSidebarProps) {
   const router = useRouter();
   const currentUser = useCurrentUser();
   const authorName = currentUser?.profile?.displayName || currentUser?.profile?.username || "User";
@@ -40,7 +47,15 @@ export function LeftSidebarCreateArticleSeries() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const createSeriesWithItems = useMutation(api.series.createSeriesWithItems);
+  const updateSeriesWithItems = useMutation(api.series.updateSeriesWithItems);
   const generateUploadUrl = useMutation(api.series.generateUploadUrl);
+  const getImageUrl = useQuery(api.series.getImageUrl, existingData?.coverImage ? { storageId: existingData.coverImage } : "skip");
+
+  useEffect(() => {
+    if (getImageUrl && !imagePreview && !selectedImage) {
+      setImagePreview(getImageUrl);
+    }
+  }, [getImageUrl, imagePreview, selectedImage]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -133,8 +148,8 @@ export function LeftSidebarCreateArticleSeries() {
     setError(null);
 
     try {
-      let coverImageStorageId: string | undefined = undefined;
-      let coverImagePngStorageId: string | undefined = undefined;
+      let coverImageStorageId: string | undefined = existingData?.coverImage;
+      let coverImagePngStorageId: string | undefined = existingData?.coverImagePng;
 
       if (selectedImage) {
         const postUrl1 = await generateUploadUrl();
@@ -151,18 +166,30 @@ export function LeftSidebarCreateArticleSeries() {
 
       const slug = seriesTitle.toLowerCase().trim().replace(/[^\w\s-]/g, "").replace(/[\s_-]+/g, "-");
 
-      const newSlug = await createSeriesWithItems({
-        title: seriesTitle.trim(),
-        slug,
-        description: description.trim() || undefined,
-        coverImage: coverImageStorageId,
-        coverImagePng: coverImagePngStorageId,
-        articleIds: stagedBlogIds,
-      });
-
-      router.push(`/series/${newSlug}`);
+      if (isEditing && seriesId) {
+        await updateSeriesWithItems({
+          seriesId,
+          title: seriesTitle.trim(),
+          slug,
+          description: description.trim() || undefined,
+          coverImage: coverImageStorageId,
+          coverImagePng: coverImagePngStorageId,
+          articleIds: stagedBlogIds,
+        });
+        router.push(`${currentUser?.username}/series/${slug}`);
+      } else {
+        const newSlug = await createSeriesWithItems({
+          title: seriesTitle.trim(),
+          slug,
+          description: description.trim() || undefined,
+          coverImage: coverImageStorageId,
+          coverImagePng: coverImagePngStorageId,
+          articleIds: stagedBlogIds,
+        });
+        router.push(`/series/${newSlug}`);
+      }
     } catch (err: any) {
-      setError(err.message || "Failed to create series.");
+      setError(err.message || "Failed to save series.");
     } finally {
       setIsSubmitting(false);
     }
@@ -237,7 +264,7 @@ export function LeftSidebarCreateArticleSeries() {
 
               <Button type="submit" disabled={isSubmitting || !seriesTitle.trim()} className="w-full mt-2">
                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Create Series
+                {isEditing ? "Save Changes" : "Create Series"}
               </Button>
 
             </div>

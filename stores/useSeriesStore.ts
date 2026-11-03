@@ -2,22 +2,24 @@ import { create } from "zustand";
 import { Doc } from "@/convex/_generated/dataModel";
 
 interface SeriesState {
-  stagedBlogs: Doc<"blogs">[];
   seriesTitle: string;
   description: string;
-  setStagedBlogs: (updater: Doc<"blogs">[] | ((prev: Doc<"blogs">[]) => Doc<"blogs">[])) => void;
+  stagedBlogs: Doc<"blogs">[];
   setSeriesTitle: (title: string) => void;
-  setDescription: (description: string) => void;
+  setDescription: (desc: string) => void;
+  setStagedBlogs: (blogs: Doc<"blogs">[]) => void;
+  hydrateSeries: (data: { title: string; description?: string; blogs: Doc<"blogs">[] }) => void;
+  resetSeries: () => void;
 }
 
 export const useSeriesStore = create<SeriesState>((set) => ({
-  stagedBlogs: [],
   seriesTitle: "",
   description: "",
-  setStagedBlogs: (updater) =>
-    set((state) => ({
-      stagedBlogs: typeof updater === "function" ? updater(state.stagedBlogs) : updater,
-    })),
-  setSeriesTitle: (seriesTitle) => set({ seriesTitle }),
+  stagedBlogs: [],
+  setSeriesTitle: (title) => set({ seriesTitle: title }),
   setDescription: (description) => set({ description }),
+  setStagedBlogs: (stagedBlogs) => set({ stagedBlogs }),
+  hydrateSeries: ({ title, description, blogs }) => 
+    set({ seriesTitle: title, description: description || "", stagedBlogs: blogs }),
+  resetSeries: () => set({ seriesTitle: "", description: "", stagedBlogs: [] }),
 }));

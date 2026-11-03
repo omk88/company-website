@@ -2,6 +2,81 @@ import { paginationOptsValidator } from "convex/server";
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
+export const getSeriesById = query({
+  args: { seriesId: v.id("series") },
+  handler: async (ctx, args) => {
+    const series = await ctx.db.get(args.seriesId);
+    if (!series) return null;
+
+    const seriesItems = await ctx.db
+      .query("seriesItems")
+      .withIndex("by_series_and_order", (q) => q.eq("seriesId", series._id))
+      .collect();
+
+    const articles = await Promise.all(
+      seriesItems.map(async (item) => {
+        const blog = await ctx.db.get(item.articleId);
+        return blog ? { ...blog, order: item.order } : null;
+      })
+    );
+
+    return {
+      ...series,
+      articles: articles.filter(Boolean),
+    };
+  },
+});
+
+export const updateSeriesWithItems = mutation({
+  args: {
+    seriesId: v.id("series"),
+    title: v.string(),
+    slug: v.string(),
+    description: v.optional(v.string()),
+    coverImage: v.optional(v.string()),
+    coverImagePng: v.optional(v.string()),
+    articleIds: v.array(v.id("blogs")),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Unauthenticated: You must be logged in.");
+    }
+
+    const series = await ctx.db.get(args.seriesId);
+    if (!series || series.authorId !== identity.subject) {
+      throw new Error("Unauthorized: You do not own this series.");
+    }
+
+    await ctx.db.patch(args.seriesId, {
+      title: args.title,
+      slug: args.slug,
+      description: args.description,
+      coverImage: args.coverImage,
+      coverImagePng: args.coverImagePng,
+    });
+
+    const existingItems = await ctx.db
+      .query("seriesItems")
+      .withIndex("by_series_and_order", (q) => q.eq("seriesId", args.seriesId))
+      .collect();
+
+    for (const item of existingItems) {
+      await ctx.db.delete(item._id);
+    }
+
+    for (let i = 0; i < args.articleIds.length; i++) {
+      await ctx.db.insert("seriesItems", {
+        seriesId: args.seriesId,
+        articleId: args.articleIds[i],
+        order: i,
+      });
+    }
+
+    return args.slug;
+  },
+});
+
 export const reorderSeriesItems = mutation({
   args: {
     seriesId: v.id("series"),

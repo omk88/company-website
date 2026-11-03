@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { useCurrentUser } from "@/app/ConvexClientProvider";
+import Link from "next/link";
 
 interface LeftSidebarArticleSeriesProps {
   slug: string;
@@ -175,7 +176,9 @@ export function LeftSidebarArticleSeries({ slug }: LeftSidebarArticleSeriesProps
 
             {isOwnProfile &&
               <Button type="submit" size={"sm"} className="cursor-pointer w-fit rounded-xl mt-2">
-                Edit Series
+                <Link href={`/create-article-series?id=${seriesData._id}`}>
+                  Edit Series
+                </Link>
               </Button>
             }
 
