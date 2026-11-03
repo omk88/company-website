@@ -13,6 +13,8 @@ import Image from "next/image";
 import { formatSmartDate, ProfileHoverCard } from "@/components/web/ProfileHoverCard";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { useCurrentUser } from "@/app/ConvexClientProvider";
 
 interface LeftSidebarArticleSeriesProps {
   slug: string;
@@ -55,6 +57,10 @@ export function LeftSidebarArticleSeries({ slug }: LeftSidebarArticleSeriesProps
   const avatarSrc = seriesData?.profile?.profilePicUrl;
 
   const isImageLoading = seriesData?.coverImage && imageUrl === undefined;
+
+  const currentUser = useCurrentUser();
+
+  const isOwnProfile = Boolean(currentUser?.userId && seriesData?.profile?.userId && currentUser.userId === seriesData?.profile.userId);
 
   if (seriesData === undefined) {
     return (
@@ -166,6 +172,12 @@ export function LeftSidebarArticleSeries({ slug }: LeftSidebarArticleSeriesProps
                 <span>{formatReadTime(seriesData.totalReadTime)}</span>
               </Badge>
             </div>
+
+            {isOwnProfile &&
+              <Button type="submit" size={"sm"} className="cursor-pointer w-fit rounded-xl mt-2">
+                Edit Series
+              </Button>
+            }
 
           </div>
         </SidebarGroup>
