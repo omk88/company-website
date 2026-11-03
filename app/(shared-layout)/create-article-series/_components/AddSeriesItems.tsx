@@ -25,37 +25,72 @@ export function AddSeriesItems() {
 
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [mousePos, setMousePos] = useState<{ x: number; y: number } | null>(null);
+  const [dragOffset, setDragOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [dragWidth, setDragWidth] = useState<number | null>(null);
+  const [dragHeight, setDragHeight] = useState<number | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (draggedIndex !== null) {
-        setMousePos({ x: e.clientX, y: e.clientY });
+      if (draggedIndex !== null && dragWidth !== null && dragHeight !== null) {
+        const minX = 0;
+        const maxX = window.innerWidth - dragWidth;
+        const minY = 0;
+        const maxY = window.innerHeight - dragHeight;
+
+        const rawX = e.clientX - dragOffset.x;
+        const rawY = e.clientY - dragOffset.y;
+
+        const clampedX = Math.max(minX, Math.min(rawX, maxX));
+        const clampedY = Math.max(minY, Math.min(rawY, maxY));
+
+        setMousePos({
+          x: clampedX + dragOffset.x,
+          y: clampedY + dragOffset.y,
+        });
       }
     };
 
     const handleMouseUp = () => {
       setDraggedIndex(null);
       setMousePos(null);
+      setDragWidth(null);
+      setDragHeight(null);
     };
+
+    let styleEl: HTMLStyleElement | null = null;
 
     if (draggedIndex !== null) {
       window.addEventListener("mousemove", handleMouseMove);
       window.addEventListener("mouseup", handleMouseUp);
+
+      styleEl = document.createElement("style");
+      styleEl.innerHTML = `* { cursor: grabbing !important; }`;
+      document.head.appendChild(styleEl);
     }
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
+      if (styleEl) {
+        styleEl.remove();
+      }
     };
-  }, [draggedIndex]);
+  }, [draggedIndex, dragOffset, dragWidth, dragHeight]);
 
-  const handleMouseDown = (e: React.MouseEvent, index: number) => {
+  const handleMouseDown = (e: React.MouseEvent, index: number, itemElement: HTMLElement) => {
     e.preventDefault();
+    const rect = itemElement.getBoundingClientRect();
     setDraggedIndex(index);
     setMousePos({ x: e.clientX, y: e.clientY });
+    setDragOffset({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+    setDragWidth(rect.width);
+    setDragHeight(rect.height);
   };
 
   const handleMouseEnter = (index: number) => {
@@ -86,37 +121,31 @@ export function AddSeriesItems() {
 
   return (
     <div className="w-full px-0 py-2" ref={containerRef}>
-      {draggedBlog && mousePos && (
+      {draggedBlog && mousePos && dragWidth !== null && (
         <div 
-          className="fixed pointer-events-none z-50 w-[450px]"
+          className="fixed pointer-events-none z-50 bg-background rounded-xl overflow-hidden"
           style={{ 
-            top: mousePos.y - 40, 
-            left: mousePos.x - 100,
+            top: mousePos.y - dragOffset.y, 
+            left: mousePos.x - dragOffset.x,
+            width: `${dragWidth}px`,
           }}
         >
-          <div className="flex flex-col gap-1.5 bg-background border border-border rounded-xl p-2 shadow-xl">
-            <div className="flex items-center justify-between px-1">
-              <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-                Part {(draggedIndex ?? 0) + 1}
-              </span>
-            </div>
-            <BlogCard
-              id={draggedBlog._id}
-              blogTitleId={draggedBlog.blogTitleId}
-              imageUrl={draggedBlog.imageUrl}
-              displayName={draggedBlog.displayName}
-              username={draggedBlog.username}
-              title={draggedBlog.title}
-              subtitle={draggedBlog.subtitle}
-              totalViews={draggedBlog.totalViews}
-              likes={draggedBlog.likes}
-              commentCount={draggedBlog.commentCount}
-              date={draggedBlog._creationTime}
-              readTime={draggedBlog.readTime}
-              tags={draggedBlog.tags}
-              variant="compact"
-            />
-          </div>
+          <BlogCard
+            id={draggedBlog._id}
+            blogTitleId={draggedBlog.blogTitleId}
+            imageUrl={draggedBlog.imageUrl}
+            displayName={draggedBlog.displayName}
+            username={draggedBlog.username}
+            title={draggedBlog.title}
+            subtitle={draggedBlog.subtitle}
+            totalViews={draggedBlog.totalViews}
+            likes={draggedBlog.likes}
+            commentCount={draggedBlog.commentCount}
+            date={draggedBlog._creationTime}
+            readTime={draggedBlog.readTime}
+            tags={draggedBlog.tags}
+            variant="compact"
+          />
         </div>
       )}
 
@@ -161,7 +190,10 @@ export function AddSeriesItems() {
                       </Button>
 
                       <div 
-                        onMouseDown={(e) => handleMouseDown(e, index)}
+                        onMouseDown={(e) => {
+                          const cardContainer = e.currentTarget.closest("li")?.querySelector(".w-full") as HTMLElement;
+                          if (cardContainer) handleMouseDown(e, index, cardContainer);
+                        }}
                         className="cursor-grab active:cursor-grabbing p-1 -m-1"
                         title="Click and drag to reorder"
                       >
