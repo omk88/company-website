@@ -217,7 +217,14 @@ export function LeftSidebarCreateArticleSeries({ isEditing, seriesId, existingDa
                 {imagePreview ? (
                   <div className="relative w-full h-full rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800">
                     <Image src={imagePreview} alt="Cover preview" fill className="object-cover" />
-                    <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 h-7 w-7 rounded-full shadow-md z-10" onClick={handleRemoveImage} disabled={isSubmitting}>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="cursor-pointer text-zinc-400 hover:text-red-500 absolute top-2 right-2 h-6 w-6 rounded-full z-10"
+                      onClick={handleRemoveImage}
+                      disabled={isSubmitting}
+                    >
                       <X className="h-4 w-4" />
                     </Button>
                   </div>
