@@ -269,7 +269,7 @@ export function LeftSidebarCreateArticleSeries({ isEditing, seriesId, existingDa
 
               {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
 
-              <Button type="submit" size={"sm"} disabled={isSubmitting || !seriesTitle.trim()} className="rounded-xl w-fit mt-2">
+              <Button type="submit" size={"sm"} disabled={isSubmitting || !seriesTitle.trim()} className="cursor-pointer rounded-xl w-fit mt-2">
                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {isEditing ? "Save Changes" : "Create Series"}
               </Button>

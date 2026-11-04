@@ -120,7 +120,7 @@ export function LeftSidebarArticleSeries({ slug }: LeftSidebarArticleSeriesProps
     >
       <SidebarContent className="!p-0 w-full">
         <SidebarGroup className="pt-3 !px-2 w-full">
-          <div className="relative p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 flex flex-col gap-3">
+          <div className="relative p-3 rounded-xl bg-background flex flex-col gap-3">
             
             <div className="relative w-full h-64 overflow-hidden rounded-lg">
               {isImageLoading ? (
@@ -136,7 +136,7 @@ export function LeftSidebarArticleSeries({ slug }: LeftSidebarArticleSeriesProps
               ) : null}
             </div>
 
-            <div className="relative rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 flex flex-col gap-3">
+            <div className="relative rounded-xl bg-background flex flex-col gap-3">
               {avatarSrc &&
                 <div className="flex flex-row gap-2 items-center">
                   <div className="h-6 w-6 border border-border rounded-full overflow-hidden bg-muted shrink-0">

@@ -1,23 +1,30 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { useQuery } from "convex/react";
+import { useState, useRef, useEffect, useMemo } from "react";
+import { usePaginatedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Doc } from "@/convex/_generated/dataModel";
 import { BlogCard } from "@/components/web/BlogCard";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { GripVertical, Plus, Loader2, Check, X } from "lucide-react";
+import { GripVertical, Plus, Loader2, Check, X, Search } from "lucide-react";
 import { useCurrentUser } from "@/app/ConvexClientProvider";
 import { useSeriesStore } from "@/stores/useSeriesStore";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export function AddSeriesItems() {
   const currentUser = useCurrentUser(); 
   const authorId = currentUser?.userId;
 
-  const userBlogs = useQuery(
-    api.blogs.getPostsByAuthor, 
-    authorId ? { author: authorId, includeContent: true } : "skip"
+  const {
+    results: userBlogs,
+    status,
+    loadMore,
+  } = usePaginatedQuery(
+    api.blogs.getPaginatedPostsByAuthor,
+    authorId ? { author: authorId } : "skip",
+    { initialNumItems: 6 }
   );
 
   const items = useSeriesStore((state) => state.stagedBlogs);
@@ -29,8 +36,21 @@ export function AddSeriesItems() {
   const [dragWidth, setDragWidth] = useState<number | null>(null);
   const [dragHeight, setDragHeight] = useState<number | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  
+  const [searchQuery, setSearchQuery] = useState("");
 
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const filteredBlogs = useMemo(() => {
+    if (!userBlogs) return [];
+    if (!searchQuery.trim()) return userBlogs;
+    const query = searchQuery.toLowerCase();
+    return userBlogs.filter(
+      (blog: any) =>
+        blog.title?.toLowerCase().includes(query) ||
+        blog.subtitle?.toLowerCase().includes(query)
+    );
+  }, [userBlogs, searchQuery]);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -238,31 +258,61 @@ export function AddSeriesItems() {
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
               <DialogTitle>Add Articles to Series</DialogTitle>
-              <DialogDescription>Select articles from your library to include in this series draft.</DialogDescription>
+              <DialogDescription>Select articles from your library to include in this series.</DialogDescription>
             </DialogHeader>
 
-            <div className="py-4 flex flex-col gap-3 max-h-[60vh] overflow-y-auto pr-1">
-              {userBlogs === undefined ? (
-                <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-zinc-400" /></div>
-              ) : userBlogs.length === 0 ? (
-                <p className="text-sm text-center text-zinc-500 py-6">No published articles found.</p>
-              ) : (
-                userBlogs.map((blog: any) => {
-                  const isSelected = items.some((item) => item._id === blog._id);
-                  return (
-                    <div key={blog._id} className="flex items-center justify-between p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-card">
-                      <div className="flex flex-col min-w-0 pr-3">
-                        <span className="text-sm font-semibold truncate">{blog.title}</span>
-                        <span className="text-xs text-zinc-400 truncate">{blog.subtitle || "No subtitle"}</span>
-                      </div>
-                      <Button size="sm" variant={isSelected ? "outline" : "default"} onClick={() => handleToggleBlog(blog)} className="shrink-0 gap-1">
-                        {isSelected ? <><Check className="h-3.5 w-3.5 text-emerald-500" /> Added</> : <><Plus className="h-3.5 w-3.5" /> Add</>}
-                      </Button>
-                    </div>
-                  );
-                })
-              )}
+            <div className="relative mt-2">
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-zinc-400" />
+              <Input
+                placeholder="Search articles by title..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9"
+              />
             </div>
+
+            <ScrollArea 
+              className="max-h-[50vh] py-2 pr-4"
+              onReachBottom={() => {
+                if (status === "CanLoadMore") {
+                  loadMore(6);
+                }
+              }}
+            >
+              <div className="flex flex-col gap-3">
+                {status === "LoadingFirstPage" ? (
+                  <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-zinc-400" /></div>
+                ) : filteredBlogs.length === 0 ? (
+                  <p className="text-sm text-center text-zinc-500 py-6">
+                    {searchQuery ? "No matching articles found." : "No published articles found."}
+                  </p>
+                ) : (
+                  filteredBlogs.map((blog: any) => {
+                    const isSelected = items.some((item) => item._id === blog._id);
+                    return (
+                      <div 
+                        key={blog._id} 
+                        className="flex items-center justify-between gap-3 p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-card"
+                      >
+                        <div className="flex flex-col flex-1 w-0 min-w-0 overflow-hidden">
+                          <span className="text-sm font-semibold truncate">{blog.title}</span>
+                          <span className="text-xs text-zinc-400 truncate">{blog.subtitle || "No subtitle"}</span>
+                        </div>
+                        
+                        <Button 
+                          size="sm" 
+                          variant={isSelected ? "outline" : "default"} 
+                          onClick={() => handleToggleBlog(blog)} 
+                          className="shrink-0 gap-1"
+                        >
+                          {isSelected ? <><Check className="h-3.5 w-3.5 text-emerald-500" /> Added</> : <><Plus className="h-3.5 w-3.5" /> Add</>}
+                        </Button>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </ScrollArea>
           </DialogContent>
         </Dialog>
       </div>
