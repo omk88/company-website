@@ -120,7 +120,7 @@ export function AddSeriesItems() {
   const draggedBlog = draggedIndex !== null ? items[draggedIndex] : null;
 
   return (
-    <div>
+    <div className="w-full">
       <div className="sticky top-16 z-25 flex items-center justify-between bg-background py-2 border-b border-zinc-100 dark:border-zinc-800">
         <div>
           <p className="text-sm font-semibold">
@@ -138,6 +138,7 @@ export function AddSeriesItems() {
           Add Articles
         </Button>
       </div>
+
       <div className="w-full px-0 py-2" ref={containerRef}>
         {draggedBlog && mousePos && dragWidth !== null && (
           <div 
@@ -168,8 +169,7 @@ export function AddSeriesItems() {
         )}
 
         <div className="w-full flex flex-col">
-
-          {items.length > 0 ? (
+          {items.length > 0 && (
             <ul className="flex flex-col gap-4 w-full">
               {items.map((blog, index) => {
                 const isBeingDragged = draggedIndex === index;
@@ -231,13 +231,6 @@ export function AddSeriesItems() {
                 );
               })}
             </ul>
-          ) : (
-            <div className="text-center py-12 border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl">
-              <p className="text-sm text-zinc-500 mb-2">No articles in this series yet.</p>
-              <Button variant="outline" size="sm" onClick={() => setIsAddModalOpen(true)}>
-                <Plus className="h-4 w-4 mr-1" /> Add your first article
-              </Button>
-            </div>
           )}
         </div>
 
