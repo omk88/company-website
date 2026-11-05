@@ -73,10 +73,6 @@ export default function ValuesSection() {
       <div className="relative z-10 w-full mx-auto">
 
         <div className="flex flex-col gap-2 items-center">
-          <div className="inline-flex w-fit items-center gap-1.5 px-3.5 py-1 rounded-full bg-white border border-gray-200/80 shadow-sm text-sm font-medium text-foreground">
-            <Heart className="w-4 h-4 text-foreground" />
-            <span>Values</span>
-          </div>
           
           <div className="text-center max-w-2xl mx-auto mb-12">
             <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-foreground">

@@ -37,7 +37,7 @@ export default function About() {
             "w-screen relative left-1/2 -translate-x-1/2 py-20 md:py-28 px-4 sm:px-8 lg:px-12 flex flex-col items-center",
             "border-y border-neutral-200/80 dark:border-neutral-800/80",
             "text-neutral-600 dark:text-neutral-400",
-            "bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] dark:bg-[radial-gradient(#262626_1px,transparent_1px)]",
+            "bg-white dark:bg-neutral-950 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] dark:bg-[radial-gradient(#262626_1px,transparent_1px)]",
             "[background-size:16px_16px]"
           )}
         >
