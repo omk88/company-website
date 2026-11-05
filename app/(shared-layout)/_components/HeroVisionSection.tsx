@@ -31,10 +31,11 @@ export default function HeroVisionSection({ spaceGroteskClassName }: { spaceGrot
         Building with precision, speed, and modern architectural principles.
       </p>
 
-      <div className="pt-2">
-        <Link
-          href="/about"
-          className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-neutral-900 dark:bg-neutral-100 text-neutral-100 dark:text-neutral-900 text-sm font-medium transition-all duration-200 hover:bg-neutral-800 dark:hover:bg-neutral-200 active:scale-[0.98] shadow-sm"
+      <div className="flex flex-wrap items-center gap-3 pt-1 isolate">
+        <Link 
+          href="/about" 
+          style={{ backgroundColor: 'var(--accent-primary)' }}
+          className="group px-4.5 py-2.5 text-white font-medium text-xs sm:text-sm rounded-lg transition-all duration-100 hover:opacity-90 active:scale-[0.98] inline-flex items-center gap-2"
         >
           <span>Explore our vision</span>
         </Link>

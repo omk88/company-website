@@ -1,33 +1,29 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { connection } from "next/server";
 import { api } from "@/convex/_generated/api";
 import { fetchAuthQuery, fetchAuthMutation } from "@/lib/auth-server";
 import { Id } from "@/convex/_generated/dataModel";
+import { userThemes, THEME_MAP } from "@/data/themes";
 
-const GRADIENT_PALETTES = [
-  { color1: "#FF512F", color2: "#DD2476" },
-  { color1: "#1FA2FF", color2: "#A6FFCB" },
-  { color1: "#00c6ff", color2: "#0072ff" },
-  { color1: "#f9d423", color2: "#ff4e50" },
-  { color1: "#11998e", color2: "#119499" },
-];
-
-function generateRandomGradientSVG() {
-  const palette = GRADIENT_PALETTES[Math.floor(Math.random() * GRADIENT_PALETTES.length)];
+function generateThemedGradientSVG(themeName?: string) {
+  const theme = (themeName && THEME_MAP[themeName]) 
+    ? THEME_MAP[themeName] 
+    : userThemes[Math.floor(Math.random() * userThemes.length)];
+    
   const angle = Math.floor(Math.random() * 360);
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
     <defs>
       <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%" gradientTransform="rotate(${angle})">
-        <stop offset="0%" style="stop-color:${palette.color1};stop-opacity:1" />
-        <stop offset="100%" style="stop-color:${palette.color2};stop-opacity:1" />
+        <stop offset="0%" style="stop-color:${theme.gradient[0]};stop-opacity:1" />
+        <stop offset="100%" style="stop-color:${theme.gradient[1]};stop-opacity:1" />
       </linearGradient>
     </defs>
     <rect width="200" height="200" fill="url(#grad)" />
   </svg>`;
 }
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   await connection();
 
   try {
@@ -44,11 +40,14 @@ export async function GET(request: Request) {
       return NextResponse.redirect(new URL("/", request.url));
     }
 
+    const themeCookie = request.cookies.get("taqtiq_theme_name");
+    const themeName = themeCookie?.value;
+
     let profilePicField: Id<"_storage">;
     let publicProfilePicUrl = "";
 
     try {
-      const svgString = generateRandomGradientSVG();
+      const svgString = generateThemedGradientSVG(themeName);
 
       const uploadUrl = await fetchAuthMutation(api.profiles.generateUploadUrl);
       const uploadResponse = await fetch(uploadUrl, {

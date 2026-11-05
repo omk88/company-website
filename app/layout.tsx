@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "next-themes";
 import { ConvexClientProvider } from "./ConvexClientProvider";
 import { BanProvider } from "@/components/web/BanProvider";
+import ThemeInitialiser from "./(shared-layout)/_components/ThemeInitialiser";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -53,6 +54,7 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.variable} ${poppins.variable} ${jetBrainsMono.variable} ${roboto.variable} font-sans flex flex-col bg-background text-foreground`}>
+        <ThemeInitialiser />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
