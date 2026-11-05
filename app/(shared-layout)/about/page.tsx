@@ -23,12 +23,15 @@ export default function About() {
               TaQtiQ is a dedicated team of software engineers and IT professionals delivering innovative digital solutions. 
             </p>
 
-            <Link 
-              href="/careers" 
-              className="group px-4.5 py-2.5 bg-foreground hover:bg-foreground/90 text-background font-medium text-xs sm:text-sm rounded-lg transition-all duration-150 active:scale-[0.98] inline-flex items-center gap-2 shadow-sm"
-            >
-              <span>View careers</span>
-            </Link>
+            <div className="flex flex-wrap items-center gap-3 pt-1 isolate">
+              <Link 
+                href="/careers" 
+                style={{ backgroundColor: 'var(--accent-primary)' }}
+                className="group px-4.5 py-2.5 text-white font-medium text-xs sm:text-sm rounded-lg transition-all duration-100 hover:opacity-90 active:scale-[0.98] inline-flex items-center gap-2"
+              >
+                <span>View careers</span>
+              </Link>
+            </div>
           </div>
         </section>
 
