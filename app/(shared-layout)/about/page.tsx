@@ -15,7 +15,7 @@ export default function About() {
     <div className="pt-16 w-full relative bg-neutral-50 dark:bg-neutral-950 min-h-screen text-foreground antialiased isolate flex flex-col overflow-x-hidden">
       <div className="w-full flex-1 flex flex-col">
 
-        <section className="max-w-6xl mx-auto w-full px-4 sm:px-8 py-20 md:py-28 flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] text-center">
+        <section className="max-w-6xl mx-auto w-full px-4 sm:px-8 py-16 md:py-20 flex flex-col items-center justify-center text-center">
           <div className="flex flex-col items-center justify-center gap-4">
             <HeroTitle />
             
@@ -37,7 +37,7 @@ export default function About() {
 
         <section 
           className={cn(
-            "w-screen relative left-1/2 -translate-x-1/2 py-20 md:py-28 px-4 sm:px-8 lg:px-12 flex flex-col items-center",
+            "w-screen relative left-1/2 -translate-x-1/2 py-16 md:py-20 px-4 sm:px-8 lg:px-12 flex flex-col items-center",
             "border-y border-neutral-200/80 dark:border-neutral-800/80",
             "text-neutral-600 dark:text-neutral-400",
             "bg-white dark:bg-neutral-950 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] dark:bg-[radial-gradient(#262626_1px,transparent_1px)]",
@@ -61,11 +61,11 @@ export default function About() {
           </div>
         </section>
 
-        <section className="max-w-6xl mx-auto w-full px-4 sm:px-8 py-20 md:py-28 text-center flex flex-col items-center">
+        <section className="max-w-6xl mx-auto w-full px-4 sm:px-8 py-12 md:py-16 text-center flex flex-col items-center">
           <h2
             className={cn(
-              "pb-8",
-              "text-2xl sm:text-4xl md:text-3xl", 
+              "pb-6",
+              "text-2xl sm:text-3xl md:text-4xl", 
               "font-semibold", 
               "tracking-tight", 
               "text-foreground",

@@ -1,13 +1,12 @@
-import { AnimatePresence, motion } from "framer-motion"
 import Image from "next/image"
 import Link from "next/link"
 import { FaGithub } from "react-icons/fa"
 import { RxLinkedinLogo } from "react-icons/rx"
 
-export default function () {
+export default function PersonCard() {
     return (
-        <div className="w-full p-6 overflow-hidden flex flex-col justify-between">
-            <div className="flex flex-col items-center p-6 gap-4">
+        <div className="w-full p-4 flex flex-col items-center">
+            <div className="flex flex-col items-center gap-3">
                 <div className="relative h-24 w-24 shrink-0 rounded-full overflow-hidden border-2 border-muted bg-muted">
                     <Image
                         src={"/emmanuellearmount.jpg"}
@@ -19,7 +18,8 @@ export default function () {
                         unoptimized
                     />
                 </div>
-                <div className="flex flex-col">
+                
+                <div className="flex flex-col items-center text-center">
                     <span className="text-base font-bold text-neutral-900 dark:text-neutral-100">
                         Emmanuel Learmount
                     </span>
@@ -27,11 +27,12 @@ export default function () {
                         Founder & CEO
                     </span>
                 </div>
-                <div className=" gap-4 px-8 sm:px-12 py-3.5 flex items-center justify-between text-xs text-neutral-500 isolate">
+
+                <div className="flex items-center gap-4 pt-2 text-neutral-500 isolate">
                     <Link href="https://www.linkedin.com/in/e-learmount" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
                         <RxLinkedinLogo className="h-6 w-6 hover:text-foreground transition-colors" />
                     </Link>
-                    <Link href="https://github.com/omk88" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                    <Link href="https://github.com/omk88" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
                         <FaGithub className="h-6 w-6 hover:text-foreground transition-colors" />
                     </Link>
                 </div>
