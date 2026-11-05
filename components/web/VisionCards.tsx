@@ -6,7 +6,7 @@ export default function RedesignedVisionCards() {
       
       <div className="w-full rounded-3xl dark:bg-neutral-950 p-6 flex flex-col justify-center text-center">
         <div>
-          <h3 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-3 leading-snug">
+          <h3 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 leading-snug">
             Providing tools that you need.
           </h3>
           <p className="text-base text-neutral-500 dark:text-neutral-400 leading-relaxed">
@@ -17,7 +17,7 @@ export default function RedesignedVisionCards() {
 
       <div className="w-full rounded-3xl dark:bg-neutral-950 p-6 flex flex-col justify-center text-center">
         <div>
-          <h3 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-3 leading-snug">
+          <h3 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 leading-snug">
             Staying lean. Doing what others can't.
           </h3>
           <p className="text-base text-neutral-500 dark:text-neutral-400 leading-relaxed">
@@ -28,7 +28,7 @@ export default function RedesignedVisionCards() {
 
       <div className="w-full rounded-3xl dark:bg-neutral-950 p-6 flex flex-col justify-center text-center">
         <div>
-          <h3 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-3 leading-snug">
+          <h3 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 leading-snug">
             Innovating where it's desperately desired.
           </h3>
           <p className="text-base text-neutral-500 dark:text-neutral-400 leading-relaxed">

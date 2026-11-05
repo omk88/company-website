@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import {  Crosshair, Eye, Handshake, Heart, Lightbulb } from "lucide-react";
+import { Crosshair, Eye, Handshake, Heart, Lightbulb } from "lucide-react";
 
 const values = [
   {
@@ -57,7 +57,7 @@ export default function ValuesSection() {
   return (
     <section 
       className={cn(
-        "relative overflow-hidden w-full my-16 py-12 px-4 sm:px-6",
+        "relative overflow-hidden w-full my-16 py-12 px-4 sm:px-8 lg:px-12",
         "border-y border-neutral-200/80 dark:border-neutral-800/80",
         "bg-background text-foreground"
       )}
@@ -70,10 +70,7 @@ export default function ValuesSection() {
         )} 
       />
 
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-emerald-500/10 dark:bg-emerald-500/15 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute top-1/3 left-1/4 w-[400px] h-[250px] bg-amber-500/10 dark:bg-amber-500/10 blur-[100px] rounded-full pointer-events-none" />
-
-      <div className="relative z-10 max-w-6xl mx-auto">
+      <div className="relative z-10 w-full mx-auto">
 
         <div className="flex flex-col gap-2 items-center">
           <div className="inline-flex w-fit items-center gap-1.5 px-3.5 py-1 rounded-full bg-white border border-gray-200/80 shadow-sm text-sm font-medium text-foreground">
@@ -93,7 +90,7 @@ export default function ValuesSection() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-50px" }}
-          className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8"
+          className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto"
         >
           {values.map((item, index) => {
             const Icon = item.icon;
@@ -108,11 +105,9 @@ export default function ValuesSection() {
                   "border border-neutral-200/80 dark:border-neutral-800/80",
                   "bg-background/80 backdrop-blur-md shadow-xs",
                   "hover:shadow-md hover:border-neutral-300 dark:hover:border-neutral-700",
-                  "transition-all ease-out"
+                  "transition-all ease-out flex flex-col justify-between"
                 )}
               >
-                <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-neutral-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-
                 <div className="flex flex-col gap-4 relative z-10">
                   <div className="p-3 w-fit rounded-lg bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 group-hover:scale-105 transition-transform duration-300">
                     <Icon className="w-6 h-6 stroke-[1.75]" />

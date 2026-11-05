@@ -65,7 +65,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* SECTION 2: HERO VISION, VISION CARDS & TRUSTED TOOLS (White Background) */}
         <section className="bg-white dark:bg-neutral-950 w-full py-20 md:py-28 flex flex-col gap-20 relative z-0">
           <HeroVisionSection spaceGroteskClassName={spaceGrotesk.className} />
 
@@ -78,8 +77,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* SECTION 3: GLOBAL REACH (Gray Background) */}
-        <section className="bg-gray-50 dark:bg-neutral-900 w-full py-20 md:py-28 flex flex-col items-center">
+        <section className="bg-gray-50 shadow-xs dark:bg-neutral-900 w-full py-20 md:py-28 flex flex-col items-center">
           <div className="flex flex-col items-center text-center gap-4 px-4">
             <h2
               className={cn(
