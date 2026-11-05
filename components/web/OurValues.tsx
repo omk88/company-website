@@ -105,7 +105,14 @@ export default function ValuesSection() {
                 )}
               >
                 <div className="flex flex-col gap-4 relative z-10">
-                  <div className="p-3 w-fit rounded-lg bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 group-hover:scale-105 transition-transform duration-300">
+                  {/* Themed Icon Container */}
+                  <div 
+                    style={{ 
+                      backgroundColor: 'color-mix(in srgb, var(--accent-primary) 12%, transparent)',
+                      color: 'var(--accent-primary)'
+                    }}
+                    className="p-3 w-fit rounded-lg group-hover:scale-105 transition-transform duration-300"
+                  >
                     <Icon className="w-6 h-6 stroke-[1.75]" />
                   </div>
 

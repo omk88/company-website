@@ -108,7 +108,13 @@ export default function NavbarResourcesDropdown({
                             )}
                           </AnimatePresence>
 
-                          <div className="relative z-10 p-2 rounded-md bg-neutral-100 dark:bg-neutral-800 text-foreground group-hover:scale-105 transition-transform duration-200 shrink-0">
+                          <div 
+                            style={{ 
+                              backgroundColor: 'color-mix(in srgb, var(--accent-primary) 12%, transparent)',
+                              color: 'var(--accent-primary)'
+                            }}
+                            className="relative z-10 p-2 rounded-md group-hover:scale-105 transition-transform duration-200 shrink-0"
+                          >
                             <Icon className="w-4 h-4 stroke-[1.75]" />
                           </div>
 
@@ -135,9 +141,12 @@ export default function NavbarResourcesDropdown({
                       <NavigationMenuLink key={legal.title} asChild>
                         <Link
                           href={legal.href}
-                          className="p-2.5 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-neutral-200/50 dark:hover:bg-neutral-800/60 flex items-center gap-2 transition-colors"
+                          className="group p-2.5 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-neutral-200/50 dark:hover:bg-neutral-800/60 flex items-center gap-2 transition-colors"
                         >
-                          <Icon className="w-3.5 h-3.5 shrink-0" />
+                          <Icon 
+                            style={{ '--hover-color': 'var(--accent-primary)' } as React.CSSProperties}
+                            className="w-3.5 h-3.5 shrink-0 transition-colors group-hover:text-[var(--hover-color)]" 
+                          />
                           <span>{legal.title}</span>
                         </Link>
                       </NavigationMenuLink>
