@@ -31,19 +31,7 @@ export default function Footer() {
             <h3 className="font-semibold text-foreground">About us</h3>
             <ul className="flex flex-col gap-2">
               <li><Link href="/vision" className="hover:text-foreground transition-colors">About TaQtiQ</Link></li>
-              <li><Link href="/vision" className="hover:text-foreground transition-colors">Company info</Link></li>
               <li><Link href="/contact" className="hover:text-foreground transition-colors">Careers</Link></li>
-              <li><Link href="/products" className="hover:text-foreground transition-colors">Media gallery</Link></li>
-              <li><Link href="/contact" className="hover:text-foreground transition-colors">For investors</Link></li>
-            </ul>
-          </div>
-
-          <div className="flex flex-col gap-3">
-            <h3 className="font-semibold text-foreground">Community</h3>
-            <ul className="flex flex-col gap-2">
-              <li><Link href="/vision" className="hover:text-foreground transition-colors">Creators</Link></li>
-              <li><Link href="/vision" className="hover:text-foreground transition-colors">Developers</Link></li>
-              <li><Link href="/vision" className="hover:text-foreground transition-colors">Businesses</Link></li>
             </ul>
           </div>
 
@@ -57,18 +45,9 @@ export default function Footer() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <h3 className="font-semibold text-foreground">Our actions</h3>
+            <h3 className="font-semibold text-foreground">Support</h3>
             <ul className="flex flex-col gap-2">
-              <li><Link href="/privacy-policy" className="hover:text-foreground transition-colors">Data and privacy</Link></li>
-              <li><Link href="/privacy-policy" className="hover:text-foreground transition-colors">Responsible business</Link></li>
-              <li><Link href="/terms-and-conditions" className="hover:text-foreground transition-colors">Accessibility</Link></li>
-            </ul>
-          </div>
-
-          <div className="flex flex-col gap-3">
-            <h3 className="font-semibold text-foreground">App support</h3>
-            <ul className="flex flex-col gap-2">
-              <li><Link href="/contact" className="hover:text-foreground transition-colors">Help Centre</Link></li>
+              <li><Link href="/contact" className="hover:text-foreground transition-colors">Contact Us</Link></li>
             </ul>
           </div>
 

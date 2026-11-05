@@ -3,7 +3,7 @@ import Footer from "@/components/web/Footer";
 import HeroTitle from "@/components/web/HeroTitle";
 import OurValues from "@/components/web/OurValues";
 import { cn } from "@/lib/utils";
-import { ArrowRight, ChevronRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
 
@@ -14,20 +14,10 @@ export const metadata: Metadata = {
 export default function About() {
   return (
     <>
-      <div className="max-w-6xl mx-auto w-full border-x border-neutral-200 dark:border-neutral-800 flex-1">
+      <div className="max-w-6xl mx-auto w-full flex-1">
 
         <div className="flex flex-col items-center mt-16 text-center gap-4">
           <div className="flex flex-col items-center justify-center min-h-screen gap-4">
-            <Link
-              href="/insights"
-              className={cn(
-                "inline-flex items-center gap-2 rounded-full bg-neutral-100/90 dark:bg-neutral-800/80 hover:bg-neutral-200/70 dark:hover:bg-neutral-800 px-3.5 py-1.5 text-xs font-medium text-neutral-700 dark:text-neutral-300 transition-colors border border-neutral-200 dark:border-neutral-700/60 shadow-xs"
-              )}
-            >
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Solutions</span>
-              <ChevronRight className="h-3.5 w-3.5 text-neutral-400" strokeWidth={1.5} />
-            </Link>
             <HeroTitle />
             
             <p className="text-neutral-600 dark:text-neutral-400 text-xl font-light max-w-lg">
@@ -39,10 +29,6 @@ export default function About() {
               className="group px-4.5 py-2.5 bg-foreground hover:bg-foreground/90 text-background font-medium text-xs sm:text-sm rounded-lg transition-all duration-150 active:scale-[0.98] inline-flex items-center gap-2 shadow-sm"
             >
               <span>View careers</span>
-              <ArrowRight 
-                className="w-4 h-4 transform transition-transform duration-150 group-hover:translate-x-0.5" 
-                strokeWidth={2} 
-              />
             </Link>
           </div>
 

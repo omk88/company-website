@@ -51,27 +51,15 @@ export default function HeroTitle() {
         Developing{" "}
       </motion.span>{" "}
 
-      <motion.span
-        variants={wordVariants}
-        className={cn(
-          "inline-block bg-gradient-to-r from-emerald-400 via-teal-300 to-green-300 bg-clip-text text-transparent",
-          "drop-shadow-[0_0_25px_rgba(52,211,153,0.4)]"
-        )}
-      >
-        effective solutions
+      <motion.span variants={wordVariants} className="text-foreground inline-block">
+        effective solutions{" "}
       </motion.span>{" "}
 
       <motion.span variants={wordVariants} className="text-foreground inline-block">
         to{" "}
       </motion.span>{" "}
 
-      <motion.span
-        variants={wordVariants}
-        className={cn(
-          "inline-block bg-gradient-to-r from-amber-400 via-orange-400 to-yellow-300 bg-clip-text text-transparent",
-          "drop-shadow-[0_0_25px_rgba(251,191,36,0.4)]"
-        )}
-      >
+      <motion.span variants={wordVariants} className="text-foreground inline-block">
         difficult problems
       </motion.span>
     </motion.h1>

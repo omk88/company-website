@@ -6,7 +6,7 @@ import { RxLinkedinLogo } from "react-icons/rx"
 
 export default function () {
     return (
-        <div className="w-full rounded-xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm overflow-hidden flex flex-col justify-between">
+        <div className="w-full p-6 overflow-hidden flex flex-col justify-between">
             <div className="flex flex-col items-center p-6 gap-4">
                 <div className="relative h-24 w-24 shrink-0 rounded-full overflow-hidden border-2 border-muted bg-muted">
                     <Image
