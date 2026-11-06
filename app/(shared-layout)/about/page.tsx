@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function About() {
   return (
-    <div className="pt-16 w-full relative bg-neutral-50 dark:bg-neutral-950 min-h-screen text-foreground antialiased isolate flex flex-col overflow-x-hidden">
+    <div style={{ backgroundColor: 'var(--accent-background)' }} className="pt-16 w-full relative min-h-screen text-foreground antialiased isolate flex flex-col overflow-x-hidden">
       <div className="w-full flex-1 flex flex-col">
 
         <section className="max-w-6xl mx-auto w-full px-4 sm:px-8 py-16 md:py-20 flex flex-col items-center justify-center text-center">
