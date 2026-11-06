@@ -19,7 +19,7 @@ export default function About() {
           <div className="flex flex-col items-center justify-center gap-4">
             <HeroTitle />
             
-            <p className="text-neutral-600 dark:text-neutral-400 text-xl font-light max-w-lg">
+            <p style={{ color: 'var(--accent-text-1)' }} className="text-xl font-light max-w-lg">
               TaQtiQ is a dedicated team of software engineers and IT professionals delivering innovative digital solutions. 
             </p>
 
@@ -29,7 +29,7 @@ export default function About() {
                 style={{ backgroundColor: 'var(--accent-primary)' }}
                 className="group px-4.5 py-2.5 text-white font-medium text-xs sm:text-sm rounded-lg transition-all duration-100 hover:opacity-90 active:scale-[0.98] inline-flex items-center gap-2"
               >
-                <span>View careers</span>
+                <span style={{ color: 'var(--accent-text-2)' }}>View careers</span>
               </Link>
             </div>
           </div>
