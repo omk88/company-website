@@ -22,7 +22,7 @@ export default function Home() {
 
       <div className="mx-auto w-full flex-1">
         
-        <section className="bg-gray-50 dark:bg-neutral-900 w-full flex flex-col justify-between py-20 md:py-28 min-h-[calc(100vh-4rem)] relative z-10 shadow-xs">
+        <section className="bg-teal-100 dark:bg-neutral-900 w-full flex flex-col justify-between md:py-5 relative z-10 shadow-xs">
           <div className="w-full px-4 sm:px-8 my-auto">
             <div className="w-full overflow-hidden">
               <div className="p-8 sm:p-12 items-center">
@@ -33,7 +33,7 @@ export default function Home() {
                     </h1>
                   </div>
 
-                  <p className="text-xl leading-relaxed text-neutral-600 dark:text-neutral-400 max-w-md font-normal">
+                  <p className="text-xl text-teal-900 leading-relaxed text-neutral-600 dark:text-neutral-400 max-w-md font-normal">
                     Building software that pushes boundaries. We are where the future happens.
                   </p>
 
@@ -43,7 +43,7 @@ export default function Home() {
                       style={{ backgroundColor: 'var(--accent-primary)' }}
                       className="group px-4.5 py-2.5 text-white font-medium text-xs sm:text-sm rounded-lg transition-all duration-100 hover:opacity-90 active:scale-[0.98] inline-flex items-center gap-2"
                     >
-                      <span>See our solutions</span>
+                      <span className='text-teal-50'>See our solutions</span>
                     </Link>
                   </div>
                 </div>
@@ -51,7 +51,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="px-8 sm:px-12 pt-6 flex items-center justify-center text-xs text-neutral-500">
+          <div className="px-8 sm:px-12 flex items-center justify-center text-xs text-neutral-500">
             <div className="flex items-center gap-4">
               <Link href="https://x.com/TaQtiQ_tech" target="_blank" rel="noopener noreferrer" aria-label="X">
                 <FaXTwitter className="h-5 w-5 hover:text-foreground transition-colors" />
@@ -66,19 +66,19 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="bg-white dark:bg-neutral-950 w-full py-20 md:py-28 flex flex-col gap-20 relative z-0">
+        <section className="bg-white dark:bg-neutral-950 w-full flex flex-col gap-20 relative z-0">
           <HeroVisionSection spaceGroteskClassName={spaceGrotesk.className} />
 
           <div>
             <VisionCards />
           </div>
 
-          <div>
+          <div className='mb-10'>
             <TrustedToolsSection />
           </div>
         </section>
 
-        <section className="bg-gray-50 shadow-xs dark:bg-neutral-900 w-full py-20 md:py-28 flex flex-col items-center">
+        <section className="bg-teal-100 shadow-xs dark:bg-neutral-900 w-full py-20 md:py-28 flex flex-col items-center">
           <div className="flex flex-col items-center text-center gap-4 px-4">
             <h2
               className={cn(
