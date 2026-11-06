@@ -36,6 +36,12 @@ export default function ThemeInitializer() {
     root.style.setProperty('--accent-primary', theme.primary);
     root.style.setProperty('--accent-grad-1', theme.gradient[0]);
     root.style.setProperty('--accent-grad-2', theme.gradient[1]);
+    root.style.setProperty('--accent-background', theme.background);
+    root.style.setProperty('--accent-text-1', theme.text[0]);
+    root.style.setProperty('--accent-text-2', theme.text[1]);
+
+    console.log("theme: ", theme);
+
   }, []);
 
   return null;
