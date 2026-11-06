@@ -94,7 +94,7 @@ export default function Home() {
               Designed for Global Reach, built for Zero Latency
             </h2>
             
-            <p className="text-neutral-600 dark:text-neutral-400 text-xl font-light max-w-lg">
+            <p style={{ color: 'var(--accent-text-1)' }} className="text-xl leading-relaxed max-w-md font-normal">
               Solutions that are truly boundless.
             </p>
           </div>
