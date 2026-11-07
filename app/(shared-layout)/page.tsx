@@ -22,7 +22,7 @@ export default function Home() {
 
       <div className="mx-auto w-full flex-1">
         
-        <section style={{ backgroundColor: 'var(--accent-background)' }} className="dark:bg-neutral-900 w-full flex flex-col justify-between md:py-5 relative z-10 shadow-xs">
+        <section style={{ backgroundColor: 'var(--accent-background)' }} className="dark:bg-neutral-900 w-full flex flex-col justify-between relative z-10 shadow-xs">
           <div className="w-full px-4 sm:px-8 my-auto">
             <div className="w-full overflow-hidden">
               <div className="p-8 sm:p-12 items-center">
@@ -46,22 +46,21 @@ export default function Home() {
                       <span style={{ color: 'var(--accent-text-2)' }} className='text-teal-50'>See our solutions</span>
                     </Link>
                   </div>
+                  <div className="px-8 sm:px-12 mt-4 flex items-center justify-center text-xs text-neutral-500">
+                    <div className="flex items-center gap-4">
+                      <Link href="https://x.com/TaQtiQ_tech" target="_blank" rel="noopener noreferrer" aria-label="X">
+                        <FaXTwitter className="h-5 w-5 hover:text-foreground transition-colors" />
+                      </Link>
+                      <Link href="https://www.instagram.com/taqtiq_tech" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                        <AiOutlineInstagram className="h-5.5 w-5.5 hover:text-foreground transition-colors" />
+                      </Link>
+                      <Link href="https://www.linkedin.com/company/taqtiq-tech" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                        <RxLinkedinLogo className="h-5.5 w-5.5 hover:text-foreground transition-colors" />
+                      </Link>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-
-          <div className="px-8 sm:px-12 flex items-center justify-center text-xs text-neutral-500">
-            <div className="flex items-center gap-4">
-              <Link href="https://x.com/TaQtiQ_tech" target="_blank" rel="noopener noreferrer" aria-label="X">
-                <FaXTwitter className="h-5 w-5 hover:text-foreground transition-colors" />
-              </Link>
-              <Link href="https://www.instagram.com/taqtiq_tech" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-                <AiOutlineInstagram className="h-5.5 w-5.5 hover:text-foreground transition-colors" />
-              </Link>
-              <Link href="https://www.linkedin.com/company/taqtiq-tech" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
-                <RxLinkedinLogo className="h-5.5 w-5.5 hover:text-foreground transition-colors" />
-              </Link>
             </div>
           </div>
         </section>
