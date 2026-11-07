@@ -96,6 +96,16 @@ export default function Home() {
             <p style={{ color: 'var(--accent-text-1)' }} className="text-xl leading-relaxed max-w-md font-normal">
               Solutions that are truly boundless.
             </p>
+
+            <div className="flex flex-wrap items-center gap-3 pt-1 isolate">
+              <Link 
+                href="/insights" 
+                style={{ backgroundColor: 'var(--accent-primary)' }}
+                className="group px-4.5 py-2.5 text-white font-medium text-xs sm:text-sm rounded-lg transition-all duration-100 hover:opacity-90 active:scale-[0.98] inline-flex items-center gap-2"
+              >
+                <span style={{ color: 'var(--accent-text-2)' }} className='text-teal-50'>Read our insights</span>
+              </Link>
+            </div>
           </div>
 
           <div className="w-full mt-12">
