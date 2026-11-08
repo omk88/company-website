@@ -10,6 +10,7 @@ import HeroVisionSection from './_components/HeroVisionSection';
 import { FaXTwitter } from 'react-icons/fa6';
 import { AiOutlineInstagram } from 'react-icons/ai';
 import { RxLinkedinLogo } from 'react-icons/rx';
+import ThemePicker from './_components/ThemePicker';
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
