@@ -10,6 +10,7 @@ import HeroVisionSection from './_components/HeroVisionSection';
 import { FaXTwitter } from 'react-icons/fa6';
 import { AiOutlineInstagram } from 'react-icons/ai';
 import { RxLinkedinLogo } from 'react-icons/rx';
+import Image from "next/image";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
@@ -112,26 +113,42 @@ export default function Home() {
             <GlobalReachMap />
           </div>
         </section>     
-        <section className='mt-12 mb-12'>
-          <div className="flex flex-col text-left gap-4 px-12">
-            <h2
-              className={cn(
-                spaceGrotesk.className,
-                "text-4xl md:text-6xl", 
-                "font-semibold", 
-                "tracking-tight", 
-                "text-foreground",
-                "leading-tight",
-                "max-w-3xl"
-              )}
-            >
-              What is TaQtiQ?
-            </h2>
-            <p className="text-xl leading-relaxed font-normal">
-              TaQtiQ is a London-based software development firm. We focus on driving progress within the technology sector with our innovative approach to problem solving.
-            </p>
+        <section className='mt-12 mb-12 px-12'>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div className="flex flex-col text-left gap-4">
+              <h2
+                className={cn(
+                  spaceGrotesk.className,
+                  "text-4xl md:text-6xl", 
+                  "font-semibold", 
+                  "tracking-tight", 
+                  "text-foreground",
+                  "leading-tight",
+                  "max-w-3xl"
+                )}
+              >
+                What is TaQtiQ?
+              </h2>
+              <p className="text-xl leading-relaxed font-normal">
+                TaQtiQ is a London-based software development firm. We focus on driving progress within the technology sector with our innovative approach to problem solving. 
+              </p>
+              <p className="text-xl leading-relaxed font-normal">
+                At TaQtiQ, we want to challenge existing thinking and open new possibilities for Britain and the world through software.
+              </p>
+            </div>
+            
+            <div className="relative w-full h-[350px] md:h-[400px]">
+              <Image 
+                src="/london-skyline.jpg" 
+                alt="London Skyline" 
+                fill
+                quality={90}
+                className="rounded-2xl object-cover"
+                priority
+              />
+            </div>
           </div>
-        </section> 
+        </section>
       </div>
 
       <Footer />
