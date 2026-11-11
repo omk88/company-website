@@ -78,12 +78,16 @@ function toTitleCase(str: string): string {
     'a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 
     'if', 'in', 'nor', 'of', 'on', 'or', 'so', 'the', 'to', 'up', 'yet'
   ]);
-
+  
   return str
-    .toLowerCase()
     .split(' ')
     .map((word, index, wordsArray) => {
       if (!word) return word;
+
+      const protectedMatch = word.match(/^\{\{\{(.+?)\}\}\}(.*)$/);
+      if (protectedMatch) {
+        return protectedMatch[1] + protectedMatch[2];
+      }
 
       const cleanWord = word.replace(/[^a-z0-9-]/gi, "").toLowerCase();
       const punctuation = word.replace(/[a-z0-9-]/gi, "");
@@ -102,13 +106,13 @@ function toTitleCase(str: string): string {
 
       const isFirstWord = index === 0;
       const isLastWord = index === wordsArray.length - 1;
-      const isMinor = minorWords.has(word);
+      const isMinor = minorWords.has(cleanWord);
 
       if (isFirstWord || isLastWord || !isMinor) {
-        return word.charAt(0).toUpperCase() + word.slice(1);
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
       }
 
-      return word;
+      return word.toLowerCase();
     })
     .join(' ');
 }
