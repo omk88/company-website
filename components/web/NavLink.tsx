@@ -3,7 +3,7 @@
 import React, { Suspense, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface NavLinkProps {
   href: string;
@@ -43,17 +43,22 @@ function NavLinkInner({
       onClick={() => setPendingPath(href)}
       className="relative px-3 py-1.5 text-sm font-medium transition-colors text-foreground rounded-lg"
     >
-      {showPill && (
-        <motion.div
-          layoutId="navbar-pill"
-          className="absolute inset-0 bg-neutral-100 dark:bg-neutral-800 rounded-lg -z-10"
-          transition={{
-            type: "spring",
-            stiffness: 380,
-            damping: 30,
-          }}
-        />
-      )}
+      <AnimatePresence>
+        {showPill && (
+          <motion.div
+            layoutId="navbar-pill"
+            className="absolute inset-0 bg-neutral-100 dark:bg-neutral-800 rounded-lg -z-10"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{
+              type: "spring",
+              stiffness: 380,
+              damping: 30,
+            }}
+          />
+        )}
+      </AnimatePresence>
 
       <span className="relative z-10">{children}</span>
     </Link>
