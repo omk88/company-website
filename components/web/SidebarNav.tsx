@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "../ui/sidebar";
 import { useSearchStore, FeedType } from "@/stores/useSearchStore";
-import { LucideIcon, Users2, Globe, Library, UserRoundCheck } from "lucide-react";
+import { LucideIcon, Users2, Globe, Library, UserRoundCheck, GraduationCap } from "lucide-react";
 import { useCurrentUser } from "@/app/ConvexClientProvider";
 
 export interface NavItem {
@@ -19,6 +19,7 @@ const NAV_ITEMS: NavItem[] = [
   { id: "feed", label: "My Feed", icon: UserRoundCheck, requiresAuth: true },
   { id: "team", label: "Team", icon: Users2 },
   { id: "community", label: "Community", icon: Globe },
+  { id: "courses", label: "Courses", icon: GraduationCap },
 ];
 
 interface SidebarNavProps {
