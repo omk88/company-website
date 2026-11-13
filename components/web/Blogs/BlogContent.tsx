@@ -26,6 +26,7 @@ import { MarkdownTable, MarkdownTableBody, MarkdownTableCell, MarkdownTableHead,
 import { BlogLastUpdated } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/BlogLastUpdated";
 import { ShareLinks } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/ShareLinks";
 import { BlogSeriesNavbar } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/SeriesNavbarCard";
+import BlogVideoPlayer from "@/app/(shared-layout)/insights/[blogTitleId]/_components/BlogVideoPlayer";
 
 const lowlight = createLowlight();
 lowlight.register("javascript", js);
@@ -97,15 +98,22 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
       <ViewTracker blogId={blog._id} />
 
       <div className="relative w-full h-[300px] md:h-[400px] mb-2 md:mb-6 rounded-lg overflow-hidden">
-        <Image
-          unoptimized
-          src={blog.imageUrl}
-          alt={blog.title}
-          fill
-          priority
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1920px"
-          className="object-cover"
-        />
+        {!blog.isVideo &&
+          <Image
+            unoptimized
+            src={blog.imageUrl}
+            alt={blog.title}
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1920px"
+            className="object-cover"
+          />
+        }
+
+        {blog.isVideo &&
+          <BlogVideoPlayer videoUrl={blog.videoUrl} />
+        }
+
       </div>
 
       <header className="flex flex-col">

@@ -23,7 +23,6 @@ export default function Home() {
 
       <div className="mx-auto w-full flex-1">
         
-        {/* Hero Section */}
         <section 
           style={{ backgroundColor: 'var(--accent-background)' }} 
           className="w-full flex flex-col justify-between relative z-10 shadow-xs dark:[background-color:var(--accent-dark-background)]"
@@ -82,7 +81,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Global Reach Section */}
         <section 
           style={{ backgroundColor: 'var(--accent-background)' }} 
           className="shadow-xs w-full py-20 md:py-28 flex flex-col items-center dark:[background-color:var(--accent-dark-background)]"

@@ -1236,8 +1236,15 @@ export const getBlogWithAuthorPosts = query({
       .filter((post) => post._id !== blog._id)
       .slice(0, 5);
 
-    const [blogImageUrl, profilePicUrl, defaultProfilePicUrl, authorPostsWithImages] = await Promise.all([
+    const [
+      blogImageUrl, 
+      resolvedVideoUrl, 
+      profilePicUrl, 
+      defaultProfilePicUrl, 
+      authorPostsWithImages
+    ] = await Promise.all([
       blog.storageId ? ctx.storage.getUrl(blog.storageId) : Promise.resolve(null),
+      blog.videoStorageId ? ctx.storage.getUrl(blog.videoStorageId) : Promise.resolve(null),
       authorProfile?.profilePic ? ctx.storage.getUrl(authorProfile.profilePic) : Promise.resolve(null),
       authorProfile?.defaultProfilePic ? ctx.storage.getUrl(authorProfile.defaultProfilePic) : Promise.resolve(null),
       Promise.all(
@@ -1264,6 +1271,7 @@ export const getBlogWithAuthorPosts = query({
       blog: {
         ...blog,
         imageUrl: blogImageUrl ?? "/noImage.png",
+        videoUrl: resolvedVideoUrl ?? blog.videoUrl ?? undefined,
         profilePicUrl,
         defaultProfilePicUrl,
       },
@@ -1561,7 +1569,7 @@ export const regenerateAudio = mutation({
 
     await ctx.scheduler.runAfter(0, internal.tts.generateAudio, {
       blogId: args.blogId,
-      content: blog.content,
+      content: blog.content || "",
       title: blog.title,
       author: blog.displayName ?? blog.username,
       subtitle: blog.subtitle,
