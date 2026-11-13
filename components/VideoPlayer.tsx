@@ -16,6 +16,7 @@ import {
     Minimize, 
 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
+import Link from "next/link";
 
 type PaginatedBlogsResult = FunctionReturnType<typeof api.blogs.getPaginatedPostsByType>;
 export type BlogPostItem = PaginatedBlogsResult["page"][number];
@@ -121,25 +122,33 @@ export default function VideoPlayer({ blog }: VideoPlayerProps) {
     const displayName = blog.displayName;
 
     return (
-        <div className="flex flex-col w-full border border-border/50 rounded-none overflow-hidden bg-background">
-            <div className="px-2 pb-1">
-                <h3 className="leading-tight py-1 text-xl font-bold tracking-tight line-clamp-2 text-foreground break-words">
+        <div className="flex flex-col w-full border border-border/50 rounded-none overflow-hidden bg-background/95">
+            <Link 
+                href={`/insights/aa`}
+                className="group flex flex-col p-2 transition-colors duration-100 hover:bg-muted"
+            >
+                <h3 className="leading-tight py-1 text-xl font-bold tracking-tight line-clamp-2 text-foreground transition-colors duration-100 group-hover:text-blue-600 break-words">
                     {blog.title}
                 </h3>
                 <div className="font-roboto flex items-center gap-1 text-xs uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
                     <ProfileHoverCard authorUsername={username} displayName={displayName || username}>
-                        <span className="cursor-pointer">{displayName || username}</span>
+                        <span 
+                            className="cursor-pointer" 
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            {displayName || username}
+                        </span>
                     </ProfileHoverCard>
                     
                     <span>&middot;</span>
                     
                     <span>{formatSmartDate(blog._creationTime, false)}</span>
                 </div>
-            </div>
+            </Link>
 
             <div 
                 ref={playerContainerRef}
-                className="relative w-full bg-black h-90 group cursor-pointer flex items-center justify-center"
+                className="relative w-full bg-black h-90 cursor-pointer flex items-center justify-center"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
                 onClick={togglePlay}
