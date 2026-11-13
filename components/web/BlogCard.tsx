@@ -370,15 +370,18 @@ export function BlogCard({
       <div className="flex flex-col flex-1 justify-start p-4 min-w-0">
         <div className="min-w-0">
           <div className="font-roboto flex items-center justify-between text-xs uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-            <div>
-              <ProfileHoverCard authorUsername={username} displayName={displayName || username}>
-                <span className="cursor-pointer">{displayName || username}</span>
-              </ProfileHoverCard>
-              {" "} &middot; {formatSmartDate(date, false)}
-            </div>
-            <div className="flex flex-row items-center gap-8">
-              <span>{readTime} min read</span>
-            </div>
+              <div className="flex items-center gap-1">
+                  <ProfileHoverCard authorUsername={username} displayName={displayName || username}>
+                      <span className="cursor-pointer">{displayName || username}</span>
+                  </ProfileHoverCard>
+                  
+                  <span>&middot;</span>
+                  
+                  <span>{formatSmartDate(date, false)}</span>
+              </div>
+              <div className="flex flex-row items-center gap-8">
+                  <span>{readTime} min read</span>
+              </div>
           </div>
         </div>
 

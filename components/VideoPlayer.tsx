@@ -14,8 +14,6 @@ import {
     VolumeX, 
     Maximize, 
     Minimize, 
-    Minimize2,
-    Maximize2
 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 
@@ -54,7 +52,6 @@ export default function VideoPlayer({ blog }: VideoPlayerProps) {
         };
     }, []);
 
-    // Smooth 60fps progress update loop
     useEffect(() => {
         let animationFrameId: number;
 
@@ -120,17 +117,23 @@ export default function VideoPlayer({ blog }: VideoPlayerProps) {
         }
     };
 
+    const username = blog.username;
+    const displayName = blog.displayName;
+
     return (
         <div className="flex flex-col w-full border border-border/50 rounded-none overflow-hidden bg-background">
             <div className="px-2 pb-1">
                 <h3 className="leading-tight py-1 text-xl font-bold tracking-tight line-clamp-2 text-foreground break-words">
                     {blog.title}
                 </h3>
-                <div className="font-roboto flex text-xs uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-                    <ProfileHoverCard authorUsername={blog.username} displayName={blog.displayName || blog.username}>
-                        <span className="cursor-pointer">{blog.displayName || blog.username}</span>
+                <div className="font-roboto flex items-center gap-1 text-xs uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
+                    <ProfileHoverCard authorUsername={username} displayName={displayName || username}>
+                        <span className="cursor-pointer">{displayName || username}</span>
                     </ProfileHoverCard>
-                    {" "} &middot; {formatSmartDate(blog._creationTime, false)}
+                    
+                    <span>&middot;</span>
+                    
+                    <span>{formatSmartDate(blog._creationTime, false)}</span>
                 </div>
             </div>
 
@@ -155,12 +158,10 @@ export default function VideoPlayer({ blog }: VideoPlayerProps) {
                     Your browser does not support the video tag.
                 </video>
 
-                {/* Reddit-Style Single Line Control Bar */}
                 <div 
                     className={`absolute bottom-0 left-0 right-0 px-3 py-3 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex items-center gap-3 transition-opacity duration-200 ${isHovered || !isPlaying ? "opacity-100" : "opacity-0"}`}
                     onClick={(e) => e.stopPropagation()}
                 >
-                    {/* Play/Pause Button */}
                     <button 
                         onClick={togglePlay}
                         className="text-white transition-transform hover:scale-110 focus:outline-none cursor-pointer shrink-0"
@@ -169,7 +170,6 @@ export default function VideoPlayer({ blog }: VideoPlayerProps) {
                         {isPlaying ? <Pause className="w-6 h-6 fill-current" /> : <Play className="w-6 h-6 fill-current" />}
                     </button>
 
-                    {/* Timeline Slider (Solid White Filled Thumb) */}
                     <div className="flex-1">
                         <Slider
                             value={[currentTime]}
@@ -180,7 +180,6 @@ export default function VideoPlayer({ blog }: VideoPlayerProps) {
                         />
                     </div>
 
-                    {/* Timestamps */}
                     <div className="text-xs text-white font-medium shrink-0 whitespace-nowrap select-none px-1">
                         {formatTime(currentTime)} / {formatTime(duration)}
                     </div>

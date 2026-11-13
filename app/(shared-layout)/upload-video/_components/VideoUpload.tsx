@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { useCurrentUser } from "@/app/ConvexClientProvider";
 
 export default function VideoUpload() {
     const generateUploadUrl = useMutation(api.videos.generateUploadUrl);
@@ -18,6 +19,12 @@ export default function VideoUpload() {
     const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
     const [uploading, setUploading] = useState(false);
     const [progressText, setProgressText] = useState("");
+
+    const userData = useCurrentUser();
+
+    const author = userData?.userId || "";
+    const displayName = userData?.profile?.displayName;
+    const username = String(userData?.profile?.username || "");
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -54,6 +61,9 @@ export default function VideoUpload() {
                 title,
                 subtitle,
                 content,
+                author,
+                displayName,
+                username,
                 postType,
                 tags,
                 videoStorageId,
