@@ -329,6 +329,11 @@ conversations: defineTable({
     .index("by_recipient", ["recipientId"])
     .index("by_conversation", ["conversationId"]),
 
+  videos: defineTable({
+    storageId: v.id("_storage"), 
+    name: v.string(),         
+  })
+
 });
 
 export default schema;

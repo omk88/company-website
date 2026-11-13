@@ -33,6 +33,7 @@ import type * as series from "../series.js";
 import type * as settings from "../settings.js";
 import type * as subscribers from "../subscribers.js";
 import type * as tts from "../tts.js";
+import type * as videos from "../videos.js";
 
 import type {
   ApiFromModules,
@@ -66,6 +67,7 @@ declare const fullApi: ApiFromModules<{
   settings: typeof settings;
   subscribers: typeof subscribers;
   tts: typeof tts;
+  videos: typeof videos;
 }>;
 
 /**
