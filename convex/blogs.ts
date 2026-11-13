@@ -866,7 +866,7 @@ export const getPaginatedPostsByType = query({
       );
     }
 
-    const mapToCardDto = (blog: any) => ({
+    const mapToCardDto = async (blog: any) => ({
       _id: blog._id,
       _creationTime: blog._creationTime,
       blogTitleId: blog.blogTitleId,
@@ -880,6 +880,8 @@ export const getPaginatedPostsByType = query({
       commentCount: blog.commentCount,
       readTime: blog.readTime,
       tags: blog.tags,
+      isVideo: blog.isVideo,
+      videoUrl: blog.videoStorageId ? await ctx.storage.getUrl(blog.videoStorageId) : undefined,
     });
 
     const cleanSearchTerm = args.searchTerm?.trim();
@@ -922,7 +924,7 @@ export const getPaginatedPostsByType = query({
 
       return {
         ...searchResults,
-        page: filteredPage.map(mapToCardDto),
+        page: await Promise.all(filteredPage.map(mapToCardDto)),
       };
     }
 
@@ -981,7 +983,7 @@ export const getPaginatedPostsByType = query({
 
       return {
         ...paginatedTagEntries,
-        page: validBlogs.map(mapToCardDto),
+        page: await Promise.all(validBlogs.map(mapToCardDto)),
       };
     }
 
@@ -1023,7 +1025,7 @@ export const getPaginatedPostsByType = query({
 
     return {
       ...paginatedBlogs,
-      page: filteredBlogs.map(mapToCardDto),
+      page: await Promise.all(filteredBlogs.map(mapToCardDto)),
     };
   },
 });

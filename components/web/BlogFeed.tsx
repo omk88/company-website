@@ -4,6 +4,7 @@ import { api } from "@/convex/_generated/api";
 import { usePaginatedQuery } from "convex/react";
 import { useEffect, useRef, useSyncExternalStore } from "react";
 import { BlogCard } from "./BlogCard";
+import VideoPlayer from "@/components/VideoPlayer";
 import { BlogCardSkeleton } from "./LoadingSkeletons/BlogCardSkeleton";
 import { EmptyState } from "./EmptyState";
 import { FileSearchCorner } from "lucide-react";
@@ -133,25 +134,31 @@ function StandardBlogFeed({
         </div>
       ) : (
         <>
-          <ul className="flex flex-col gap-2">
+          <ul className="flex flex-col gap-4">
             {displayResults.map((blog: BlogPost) => (
               <li key={blog._id}>
-                <BlogCard
-                  id={blog._id}
-                  blogTitleId={blog.blogTitleId}
-                  imageUrl={blog.imageUrl}
-                  displayName={blog.displayName}
-                  username={blog.username}
-                  title={blog.title}
-                  subtitle={blog.subtitle}
-                  totalViews={blog.totalViews}
-                  likes={blog.likes}
-                  commentCount={blog.commentCount}
-                  date={blog._creationTime}
-                  readTime={blog.readTime}
-                  tags={blog.tags}
-                  isMobile={isMobile}
-                />
+                {blog.isVideo && blog.videoUrl ? (
+                  <div className="flex flex-col items-center bg-card p-4 rounded-xl border shadow-sm w-full">
+                    <VideoPlayer url={blog.videoUrl} name={blog.title} />
+                  </div>
+                ) : (
+                  <BlogCard
+                    id={blog._id}
+                    blogTitleId={blog.blogTitleId}
+                    imageUrl={blog.imageUrl}
+                    displayName={blog.displayName}
+                    username={blog.username}
+                    title={blog.title}
+                    subtitle={blog.subtitle}
+                    totalViews={blog.totalViews}
+                    likes={blog.likes}
+                    commentCount={blog.commentCount}
+                    date={blog._creationTime}
+                    readTime={blog.readTime}
+                    tags={blog.tags}
+                    isMobile={isMobile}
+                  />
+                )}
               </li>
             ))}
           </ul>
