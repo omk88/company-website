@@ -634,6 +634,7 @@ export const getFeaturedPosts = query({
     let posts = await ctx.db
       .query("blogs")
       .withIndex("by_featured", (q) => q.eq("featured", true))
+      .filter((q) => q.neq(q.field("isVideo"), true))
       .order("desc")
       .collect();
 
@@ -1099,7 +1100,8 @@ export const getTrendingPosts = query({
     const trendingBlogs = await Promise.all(
       topTrendingIds.map(async (id) => {
         const blog = await ctx.db.get(id as Id<"blogs">);
-        if (!blog) return null;
+        
+        if (!blog || blog.isVideo) return null;
 
         return {
           _id: blog._id,

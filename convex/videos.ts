@@ -14,13 +14,17 @@ export const createVideoPost = mutation({
         tags: v.array(v.string()),
         videoStorageId: v.string(),
         thumbnailStorageId: v.string(),
-        thumbnailUrl: v.string(),
         readTime: v.number(),
     },
     handler: async (ctx, args) => {
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) {
             throw new Error("Unauthorized: You must be logged in to upload a video.");
+        }
+
+        const imageUrl = await ctx.storage.getUrl(args.thumbnailStorageId);
+        if (!imageUrl) {
+            throw new Error("Failed to generate thumbnail image URL.");
         }
 
         const now = Date.now();
@@ -32,7 +36,7 @@ export const createVideoPost = mutation({
         return await ctx.db.insert("blogs", {
             blogTitleId,
             storageId: args.thumbnailStorageId,
-            imageUrl: args.thumbnailUrl,       
+            imageUrl,
             author: identity.subject,
             username: identity.nickname || identity.name || "user",
             displayName: identity.name,

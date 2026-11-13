@@ -37,9 +37,8 @@ export default function VideoUpload() {
                 body: thumbnailFile,
             });
             const { storageId: thumbnailStorageId } = await thumbResult.json();
-            const thumbnailUrl = "";
 
-            setProgressText("Uploading video file (this may take a while)...");
+            setProgressText("Uploading video file...");
             const videoPostUrl = await generateUploadUrl();
             const videoResult = await fetch(videoPostUrl, {
                 method: "POST",
@@ -59,8 +58,7 @@ export default function VideoUpload() {
                 tags,
                 videoStorageId,
                 thumbnailStorageId,
-                thumbnailUrl,
-                readTime: 3, 
+                readTime: 3,
             });
 
             console.log("Video post created successfully!");
