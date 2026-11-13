@@ -23,18 +23,22 @@ export default function Home() {
 
       <div className="mx-auto w-full flex-1">
         
-        <section style={{ backgroundColor: 'var(--accent-background)' }} className="dark:bg-neutral-900 w-full flex flex-col justify-between relative z-10 shadow-xs">
+        {/* Hero Section */}
+        <section 
+          style={{ backgroundColor: 'var(--accent-background)' }} 
+          className="w-full flex flex-col justify-between relative z-10 shadow-xs dark:[background-color:var(--accent-dark-background)]"
+        >
           <div className="w-full px-4 sm:px-8 my-auto">
             <div className="w-full overflow-hidden">
               <div className="p-8 sm:p-12 items-center">
                 <div className="flex flex-col items-center text-center gap-4 isolate">
                   <div className="w-full isolate">
-                    <h1 className={cn(spaceGrotesk.className, "text-7xl font-semibold tracking-tight text-foreground leading-[1.15]")}>
+                    <h1 className={cn(spaceGrotesk.className, "text-7xl font-semibold tracking-tight text-foreground dark:text-white leading-[1.15]")}>
                       <TypewriterEffect />
                     </h1>
                   </div>
 
-                  <p style={{ color: 'var(--accent-text-1)' }} className="text-xl leading-relaxed max-w-md font-normal">
+                  <p style={{ color: 'var(--accent-text-1)' }} className="text-xl leading-relaxed max-w-md font-normal dark:text-slate-300">
                     Building software that pushes boundaries. We are where the future happens.
                   </p>
 
@@ -42,9 +46,9 @@ export default function Home() {
                     <Link 
                       href="/solutions" 
                       style={{ backgroundColor: 'var(--accent-primary)' }}
-                      className="group px-4.5 py-2.5 text-white font-medium text-xs sm:text-sm rounded-lg transition-all duration-100 hover:opacity-90 active:scale-[0.98] inline-flex items-center gap-2"
+                      className="group px-4.5 py-2.5 font-medium text-xs sm:text-sm rounded-lg transition-all duration-100 hover:opacity-90 active:scale-[0.98] inline-flex items-center gap-2 text-white"
                     >
-                      <span style={{ color: 'var(--accent-text-2)' }} className='text-teal-50'>See our solutions</span>
+                      <span>See our solutions</span>
                     </Link>
                   </div>
                   <div className="px-8 sm:px-12 mt-4 flex items-center justify-center text-xs text-neutral-500">
@@ -78,7 +82,11 @@ export default function Home() {
           </div>
         </section>
 
-        <section style={{ backgroundColor: 'var(--accent-background)' }} className="shadow-xs dark:bg-neutral-900 w-full py-20 md:py-28 flex flex-col items-center">
+        {/* Global Reach Section */}
+        <section 
+          style={{ backgroundColor: 'var(--accent-background)' }} 
+          className="shadow-xs w-full py-20 md:py-28 flex flex-col items-center dark:[background-color:var(--accent-dark-background)]"
+        >
           <div className="flex flex-col items-center text-center gap-4 px-4">
             <h2
               className={cn(
@@ -87,6 +95,7 @@ export default function Home() {
                 "font-semibold", 
                 "tracking-tight", 
                 "text-foreground",
+                "dark:text-white",
                 "leading-tight",
                 "max-w-3xl"
               )}
@@ -94,7 +103,7 @@ export default function Home() {
               Designed for Global Reach, built for Zero Latency
             </h2>
             
-            <p style={{ color: 'var(--accent-text-1)' }} className="text-xl leading-relaxed max-w-md font-normal">
+            <p style={{ color: 'var(--accent-text-1)' }} className="text-xl leading-relaxed max-w-md font-normal dark:text-slate-300">
               Solutions that are truly boundless.
             </p>
 
@@ -102,9 +111,9 @@ export default function Home() {
               <Link 
                 href="/insights" 
                 style={{ backgroundColor: 'var(--accent-primary)' }}
-                className="group px-4.5 py-2.5 text-white font-medium text-xs sm:text-sm rounded-lg transition-all duration-100 hover:opacity-90 active:scale-[0.98] inline-flex items-center gap-2"
+                className="group px-4.5 py-2.5 font-medium text-xs sm:text-sm rounded-lg transition-all duration-100 hover:opacity-90 active:scale-[0.98] inline-flex items-center gap-2 text-white"
               >
-                <span style={{ color: 'var(--accent-text-2)' }} className='text-teal-50'>Read our insights</span>
+                <span>Read our insights</span>
               </Link>
             </div>
           </div>
@@ -112,7 +121,8 @@ export default function Home() {
           <div className="w-full mt-12">
             <GlobalReachMap />
           </div>
-        </section>     
+        </section>    
+
         <section className='mt-12 mb-12 px-12'>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             <div className="flex flex-col text-left gap-4">
