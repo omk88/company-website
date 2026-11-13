@@ -138,7 +138,7 @@ function StandardBlogFeed({
             {displayResults.map((blog: BlogPost) => (
               <li key={blog._id}>
                 {blog.isVideo && blog.videoUrl ? (
-                  <div className="flex flex-col items-center bg-card p-4 rounded-xl border shadow-sm w-full">
+                  <div className="flex flex-col items-center w-full">
                     <VideoPlayer url={blog.videoUrl} name={blog.title} />
                   </div>
                 ) : (
