@@ -1,6 +1,9 @@
 import { Heading, processHeadings } from "../_utils/headingUtils";
 
-export function extractHeadings(markdown: string): Heading[] {
+export function extractHeadings(markdown: string | undefined): Heading[] {
+
+  if (!markdown) return [];
+
   const headingRegex = /^(#{1,6})\s+(.+)$/gm;
   const rawHeadings: { text: string; level: number }[] = [];
   let match;

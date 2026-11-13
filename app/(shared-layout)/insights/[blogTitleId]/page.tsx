@@ -127,6 +127,7 @@ export default async function BlogPage({ params }: BlogPageProps) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        
         <BlogStoreHydrator blog={blog} />
 
         <div className="hidden md:flex">

@@ -23,7 +23,7 @@ const schema = defineSchema({
       )
     ),
     audioUrl: v.optional(v.string()),
-    content: v.string(),
+    content: v.optional(v.string()),
     displayName: v.optional(v.string()),
     username: v.string(),
     authorAvatarUrl: v.optional(v.string()),

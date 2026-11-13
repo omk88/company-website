@@ -124,7 +124,7 @@ export default function VideoPlayer({ blog }: VideoPlayerProps) {
     return (
         <div className="flex flex-col w-full border border-border/50 rounded-none overflow-hidden bg-background/95">
             <Link 
-                href={`/insights/aa`}
+                href={`/insights/${blog.blogTitleId}`}
                 className="group flex flex-col p-2 transition-colors duration-100 hover:bg-muted"
             >
                 <h3 className="leading-tight py-1 text-xl font-bold tracking-tight line-clamp-2 text-foreground transition-colors duration-100 group-hover:text-blue-600 break-words">

@@ -4,7 +4,7 @@ export interface Draft {
   _id: string;
   title: string;
   subtitle?: string;
-  content: string;
+  content?: string;
   tags?: string[];
   storageId?: string;
   storageIdPng?: string;
@@ -16,7 +16,7 @@ export interface Blog {
   _id: string;
   title: string;
   subtitle?: string;
-  content: string;
+  content?: string;
   author: string;
   tags?: string[];
   storageId?: string;
