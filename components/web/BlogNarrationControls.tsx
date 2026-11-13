@@ -209,7 +209,7 @@ export function BlogNarrationControls({
           aria-label={isPlaying ? "Pause" : "Play"}
         >
           {isPlaying ? (
-            <Pause className="h-4 w-4" />
+            <Pause className="h-4 w-4 fill-current" />
           ) : (
             <Play className="ml-0.5 h-4 w-4 fill-current" />
           )}
