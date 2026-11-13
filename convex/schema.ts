@@ -49,6 +49,10 @@ const schema = defineSchema({
     postType: v.union(v.literal("community"), v.literal("team")),
 
     updatedAt: v.optional(v.number()),
+
+    isVideo: v.optional(v.boolean()),
+    videoStorageId: v.optional(v.string()),
+    videoUrl: v.optional(v.string()),
   })
     .index("by_popular_createdAt", ["isPopular", "createdAt"])
     .index("by_popular_likes", ["isPopular", "likes"])
@@ -328,11 +332,6 @@ conversations: defineTable({
   })
     .index("by_recipient", ["recipientId"])
     .index("by_conversation", ["conversationId"]),
-
-  videos: defineTable({
-    storageId: v.id("_storage"), 
-    name: v.string(),         
-  })
 
 });
 
