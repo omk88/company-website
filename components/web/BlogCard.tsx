@@ -350,6 +350,7 @@ export function BlogCard({
 
   return (
     <div className="group flex flex-col md:flex-row h-auto md:h-[190px] border border-border/50 rounded-none transition-colors duration-100 hover:bg-muted bg-background/95">
+      
       <Link 
         href={`/insights/${blogTitleId}`}
         className="relative aspect-video md:aspect-auto w-full md:w-2/5 md:h-full overflow-hidden bg-muted border-b md:border-b-0 md:border-r border-border/50 shrink-0 block"
@@ -357,7 +358,7 @@ export function BlogCard({
         <div className="relative w-full aspect-[16/9] bg-zinc-100 dark:bg-zinc-800">
           <Image
             unoptimized
-            src={imageUrl}
+            src={imageUrl} 
             alt={title}
             fill
             className="object-cover"

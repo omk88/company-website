@@ -139,7 +139,7 @@ function StandardBlogFeed({
               <li key={blog._id}>
                 {blog.isVideo && blog.videoUrl ? (
                   <div className="flex flex-col items-center w-full">
-                    <VideoPlayer url={blog.videoUrl} name={blog.title} />
+                    <VideoPlayer blog={blog} />
                   </div>
                 ) : (
                   <BlogCard
