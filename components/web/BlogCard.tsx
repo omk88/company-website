@@ -24,7 +24,7 @@ interface BlogCardProps {
   likes: number;
   commentCount: number;
   date: number;
-  readTime: number;
+  readTime: number | undefined;
   tags: Array<string>;
   variant?: "default" | "compact";
   isMobile?: boolean;
