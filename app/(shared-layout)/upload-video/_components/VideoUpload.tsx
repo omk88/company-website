@@ -17,6 +17,7 @@ import { useVideoStore } from "@/stores/useVideoStore";
 import { toTitleCase } from "@/components/web/BlogPostForm";
 import { Separator } from "@/components/ui/separator";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { Button } from "@/components/ui/button";
 
 export interface VideoFormValues {
     title: string;
@@ -691,15 +692,18 @@ export default function VideoPostForm() {
                                         </div>
                                     )}
                                 />
-
-                                <button
-                                    type="submit"
-                                    disabled={isLoading}
-                                    className="w-full h-10 mt-2 bg-primary text-primary-foreground font-medium rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50"
-                                >
-                                    {isLoading ? "Publishing..." : "Publish video post"}
-                                </button>
-
+                                <div className="hidden md:flex ml-auto">
+                                    <Button
+                                        type="submit"
+                                        disabled={isLoading}
+                                        className={cn(
+                                            "inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-neutral-900 text-neutral-50 hover:bg-neutral-900/90 dark:bg-neutral-50 dark:text-neutral-900 dark:hover:bg-neutral-50/90 p-2 w-full sm:w-auto cursor-pointer",
+                                            isLoading && "cursor-not-allowed opacity-70"
+                                        )}
+                                    >
+                                        {isLoading ? "Publishing..." : "Publish video post"}
+                                    </Button>
+                                </div>
                             </div>
                         </form>
                     </div>
