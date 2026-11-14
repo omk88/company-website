@@ -26,12 +26,14 @@ export function MobileProfileSwitchBar({ preloadedProfile }: MobileProfileSwitch
     const bookmarkCount = profileData.bookmarkCount;
     const articleCount = profileData.articleCount;
     const seriesCount = 0;
+    const videoCount = 0;
     const commentCount = profileData.commentCount;
     const followerCount = profileData.profile?.followerCount ?? 0;
     const followingCount = profileData.profile?.followingCount ?? 0;
 
     const counts: Record<ProfileMetricType, number> = {
         insights: articleCount,
+        videos: videoCount,
         series: seriesCount,
         comments: commentCount,
         bookmarks: bookmarkCount,
