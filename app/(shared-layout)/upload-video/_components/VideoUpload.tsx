@@ -119,7 +119,7 @@ export const LivePostPreview = memo(function LivePostPreview({
 
         <div className="flex flex-col gap-4">
           <h1 className="text-2xl font-bold tracking-tight text-neutral-950 dark:text-neutral-50 line-clamp-3">
-            {formattedTitle || "Video Title Preview"}
+            {formattedTitle || ""}
           </h1>
           {description && (
             <p className="text-lg text-neutral-600 dark:text-neutral-400 font-medium">
@@ -701,7 +701,7 @@ export default function VideoPostForm() {
                                             isLoading && "cursor-not-allowed opacity-70"
                                         )}
                                     >
-                                        {isLoading ? "Publishing..." : "Publish video post"}
+                                        {isLoading ? "Publishing..." : "Publish Video Post"}
                                     </Button>
                                 </div>
                             </div>
