@@ -129,6 +129,7 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
             displayName={blog.displayName}
             date={blog._creationTime}
             readTime={blog.readTime}
+            isVideo={blog.isVideo || false}
           />
 
           <BlogLastUpdated date={blog.updatedAt} />

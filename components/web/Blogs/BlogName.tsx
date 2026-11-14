@@ -10,44 +10,49 @@ interface BlogNameProps {
     displayName: string | undefined;
     date: number;
     readTime: number;
+    isVideo: boolean;
 }
 
-export function BlogName({ avatarSrc, username, displayName, date, readTime }: BlogNameProps) {
+export function BlogName({ avatarSrc, username, displayName, date, readTime, isVideo }: BlogNameProps) {
 
     const isDesktop = useMediaQuery("(min-width: 768px)");
     const authorName = displayName || username;
 
     if (isDesktop) {
         return (
-            <div className="flex flex-row justify-between gap-1.5 items-center w-full">
-                <div className="relative w-5 h-5 rounded-full overflow-hidden shrink-0">
-                    <Image
-                        src={avatarSrc}
-                        alt={`${authorName}'s avatar`}
-                        fill
-                        sizes="20px"
-                        className="object-cover"
-                    />
+            <div className="flex flex-row justify-between items-center w-full">
+                <div className="flex flex-row items-center gap-1.5">
+                    <div className="relative w-5 h-5 rounded-full overflow-hidden shrink-0">
+                        <Image
+                            src={avatarSrc}
+                            alt={`${authorName}'s avatar`}
+                            fill
+                            sizes="20px"
+                            className="object-cover"
+                        />
+                    </div>
+                    <ProfileHoverCard authorUsername={username} displayName={displayName}>
+                        <span className="cursor-pointer">
+                            {authorName}
+                        </span>
+                    </ProfileHoverCard>
+
+                    <span>&middot;</span>
+
+                    <time dateTime={new Date(date).toISOString()}>
+                        {new Date(date).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                        })}
+                    </time>
                 </div>
-                <ProfileHoverCard authorUsername={username} displayName={displayName}>
-                    <span className="cursor-pointer">
-                        {authorName}
+
+                {!isVideo && (
+                    <span className="text-sm text-zinc-500 font-medium">
+                        {readTime} min read
                     </span>
-                </ProfileHoverCard>
-
-                <span>&middot;</span>
-
-                <time dateTime={new Date(date).toISOString()}>
-                    {new Date(date).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                    })}
-                </time>
-
-                <span className="text-sm text-zinc-500 font-medium ml-auto">
-                    {readTime} min read
-                </span>
+                )}
             </div>
         )
     } else {
@@ -78,9 +83,12 @@ export function BlogName({ avatarSrc, username, displayName, date, readTime }: B
                         })}
                     </time>
                 </div>
-                <span className="text-lg">
-                    {readTime} min read
-                </span>
+
+                {!isVideo && (
+                    <span className="text-lg text-zinc-500 font-medium">
+                        {readTime} min read
+                    </span>
+                )}
             </div>
         )
     }
