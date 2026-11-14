@@ -45,7 +45,7 @@ const schema = defineSchema({
 
     hotScore: v.number(),
     controversialScore: v.number(), 
-    readTime: v.number(),
+    readTime: v.optional(v.number()),
     postType: v.union(v.literal("community"), v.literal("team")),
 
     updatedAt: v.optional(v.number()),

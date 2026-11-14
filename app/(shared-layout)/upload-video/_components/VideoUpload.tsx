@@ -1,138 +1,492 @@
 "use client";
 
-import { useState } from "react";
-import { useMutation } from "convex/react";
+import { useEffect, useRef, useState } from "react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useCurrentUser } from "@/app/ConvexClientProvider";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Controller, useForm } from "react-hook-form";
+import { cn } from "@/lib/utils";
+import { AlertCircle, Film, Paperclip, X } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { toast } from "sonner";
+import imageCompression from "browser-image-compression";
+import { useGuardedMutation } from "@/hooks/useGuardedMutation";
+import { useRouter } from "next/navigation";
+import { useVideoStore } from "@/stores/useVideoStore";
 
-export default function VideoUpload() {
-    const generateUploadUrl = useMutation(api.videos.generateUploadUrl);
-    const createVideoPost = useMutation(api.videos.createVideoPost);
+export interface VideoFormValues {
+    title: string;
+    description: string;
+    thumbnailStorageId: string | null;
+    videoStorageId: string | null;
+    tags?: string[];  
+}
 
-    const [title, setTitle] = useState("");
-    const [subtitle, setSubtitle] = useState("");
-    const [content, setContent] = useState("");
-    const [postType, setPostType] = useState<"community" | "team">("community");
-    const [tagInput, setTagInput] = useState("");
-    
-    const [videoFile, setVideoFile] = useState<File | null>(null);
-    const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
-    const [uploading, setUploading] = useState(false);
-    const [progressText, setProgressText] = useState("");
+export default function VideoPostForm() {
+    const router = useRouter();
+    const [isLoading, setIsLoading] = useState(false);
+
+    const [selectedThumbnail, setSelectedThumbnail] = useState<File | null>(null);
+    const [thumbnailPreviewUrl, setThumbnailPreviewUrl] = useState<string | null>(null);
+    const thumbnailInputRef = useRef<HTMLInputElement>(null);
+
+    const [selectedVideo, setSelectedVideo] = useState<File | null>(null);
+    const videoInputRef = useRef<HTMLInputElement>(null);
 
     const userData = useCurrentUser();
+
+    const selectedVideoPost = useVideoStore((state) => state.selectedVideoPost);
+    const setSelectedVideoPost = useVideoStore((state) => state.setSelectedVideoPost);
+    const activeDraft = useVideoStore((state) => state.activeDraft);
+    const clearStore = useVideoStore((state) => state.clearStore);
 
     const author = userData?.userId || "";
     const displayName = userData?.profile?.displayName;
     const username = String(userData?.profile?.username || "");
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!videoFile || !thumbnailFile) {
-            alert("Please select both a video file and a thumbnail image.");
-            return;
+    const postType = userData?.email?.endsWith("@taqtiq.tech") ? "team" : "community";
+
+    const createVideoPost = useGuardedMutation(api.videos.createVideoPost);
+    const generateUploadUrl = useMutation(api.videos.generateUploadUrl);
+
+    const { control, handleSubmit, watch, formState: { errors }, reset, setValue } = useForm<VideoFormValues>({
+        defaultValues: { title: "", description: "", thumbnailStorageId: null, videoStorageId: null }
+    });
+
+    const currentThumbnailStorageId = watch("thumbnailStorageId") || selectedVideoPost?.thumbnailStorageId || activeDraft?.thumbnailStorageId || null;
+    const resolvedThumbnailUrl = useQuery(
+        api.videos.getStorageUrl,
+        currentThumbnailStorageId ? { storageId: currentThumbnailStorageId } : "skip"
+    );
+
+    useEffect(() => {
+        if (selectedThumbnail) return;
+        if (resolvedThumbnailUrl) {
+            setThumbnailPreviewUrl(resolvedThumbnailUrl);
+        } else if (!currentThumbnailStorageId) {
+            setThumbnailPreviewUrl(null);
         }
+    }, [resolvedThumbnailUrl, selectedThumbnail, currentThumbnailStorageId]);
 
-        try {
-            setUploading(true);
+    const errorCount = Object.keys(errors).length;
+    const hasErrors = errorCount > 0;
 
-            setProgressText("Uploading thumbnail...");
-            const thumbPostUrl = await generateUploadUrl();
-            const thumbResult = await fetch(thumbPostUrl, {
-                method: "POST",
-                headers: { "Content-Type": thumbnailFile.type },
-                body: thumbnailFile,
+    useEffect(() => {
+        if (selectedVideoPost) {
+            reset({
+                title: selectedVideoPost.title,
+                description: selectedVideoPost.description || "",
+                thumbnailStorageId: selectedVideoPost.thumbnailStorageId || null,
+                videoStorageId: selectedVideoPost.videoStorageId || null,
             });
-            const { storageId: thumbnailStorageId } = await thumbResult.json();
-
-            setProgressText("Uploading video file...");
-            const videoPostUrl = await generateUploadUrl();
-            const videoResult = await fetch(videoPostUrl, {
-                method: "POST",
-                headers: { "Content-Type": videoFile.type },
-                body: videoFile,
+            setThumbnailPreviewUrl(selectedVideoPost.thumbnailUrl || null);
+            setSelectedThumbnail(null);
+            setSelectedVideo(null);
+        } else if (activeDraft) {
+            reset({
+                title: activeDraft.title || "",
+                description: activeDraft.description || "",
+                thumbnailStorageId: activeDraft.thumbnailStorageId || null,
+                videoStorageId: activeDraft.videoStorageId || null,
             });
-            const { storageId: videoStorageId } = await videoResult.json();
+            setThumbnailPreviewUrl(activeDraft.thumbnailUrl || null);
+            setSelectedThumbnail(null);
+            setSelectedVideo(null);
+        } else {
+            reset({ title: "", description: "", thumbnailStorageId: null, videoStorageId: null });
+            clearThumbnail();
+            clearVideo();
+        }
+    }, [selectedVideoPost, activeDraft, reset]);
 
-            setProgressText("Saving post...");
-            const tags = tagInput.split(",").map((t) => t.trim()).filter(Boolean);
-
-            await createVideoPost({
-                title,
-                subtitle,
-                content,
-                author,
-                displayName,
-                username,
-                postType,
-                tags,
-                videoStorageId,
-                thumbnailStorageId,
-                readTime: 3,
-            });
-
-            console.log("Video post created successfully!");
-            setTitle("");
-            setSubtitle("");
-            setContent("");
-            setVideoFile(null);
-            setThumbnailFile(null);
-        } catch (error) {
-            console.error("Upload failed:", error);
-            alert("Upload failed. Check console for details.");
-        } finally {
-            setUploading(false);
-            setProgressText("");
+    const clearThumbnail = () => {
+        setSelectedThumbnail(null);
+        setThumbnailPreviewUrl(null);
+        if (thumbnailInputRef.current) {
+            thumbnailInputRef.current.value = "";
         }
     };
 
+    const clearVideo = () => {
+        setSelectedVideo(null);
+        if (videoInputRef.current) {
+            videoInputRef.current.value = "";
+        }
+    };
+
+    const onSubmit = async (data: VideoFormValues) => {
+        if (!userData?.userId) {
+            toast.error("User session not found. Please log in.");
+            return;
+        }
+
+        const hasExistingThumbnail = Boolean(selectedVideoPost?.thumbnailUrl || activeDraft?.thumbnailUrl || data.thumbnailStorageId);
+        if (!selectedThumbnail && !hasExistingThumbnail) {
+            toast.error("Please upload a video thumbnail.");
+            return;
+        }
+
+        const hasExistingVideo = Boolean(selectedVideoPost?.videoStorageId || activeDraft?.videoStorageId || data.videoStorageId);
+        if (!selectedVideo && !hasExistingVideo) {
+            toast.error("Please upload a video file.");
+            return;
+        }
+
+        setIsLoading(true);
+
+        try {
+            let thumbnailStorageId = data.thumbnailStorageId || selectedVideoPost?.thumbnailStorageId || activeDraft?.thumbnailStorageId || "";
+            let videoStorageId = data.videoStorageId || selectedVideoPost?.videoStorageId || activeDraft?.videoStorageId || "";
+
+            if (selectedThumbnail) {
+                const compressedThumbnail = (await imageCompression(selectedThumbnail, {
+                    maxSizeMB: 1.0,
+                    maxWidthOrHeight: 1920,
+                    useWebWorker: true,
+                    fileType: "image/webp" as const,
+                    initialQuality: 0.85,
+                })) as File;
+
+                const uploadUrl = await generateUploadUrl();
+                const res = await fetch(uploadUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": compressedThumbnail.type },
+                    body: compressedThumbnail,
+                });
+                if (!res.ok) throw new Error("Failed to upload thumbnail.");
+                const resJson = await res.json();
+                thumbnailStorageId = resJson.storageId;
+            }
+
+            if (selectedVideo) {
+                const uploadUrl = await generateUploadUrl();
+                const res = await fetch(uploadUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": selectedVideo.type },
+                    body: selectedVideo,
+                });
+                if (!res.ok) throw new Error("Failed to upload video file.");
+                const resJson = await res.json();
+                videoStorageId = resJson.storageId;
+            }
+
+            const result = await createVideoPost({
+                title: data.title,
+                subtitle: data.description,
+                author,
+                displayName,
+                username,
+                authorAvatarUrl: userData.profile?.profilePicUrl || undefined,
+                postType,
+                tags: [],
+                thumbnailStorageId,
+                videoStorageId,
+            });
+
+            if (result === undefined) return;
+
+            toast.success(
+                selectedVideoPost?._id
+                    ? "Video post updated successfully!"
+                    : "Video post published successfully!"
+            );
+
+            clearThumbnail();
+            clearVideo();
+            reset();
+            clearStore();
+
+            router.push("/videos");
+            router.refresh();
+
+        } catch (error) {
+            console.error(error);
+            toast.error(error instanceof Error ? error.message : "Process interrupted.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+    
     return (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full max-w-lg">
-            <input
-                type="text"
-                placeholder="Video Title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                required
-                className="border p-2 rounded-lg dark:bg-gray-800"
-            />
-            <input
-                type="text"
-                placeholder="Description"
-                value={subtitle}
-                onChange={(e) => setSubtitle(e.target.value)}
-                className="border p-2 rounded-lg dark:bg-gray-800"
-            />
+        <div className="w-full min-h-full md:h-[calc(100dvh-4rem)] md:overflow-hidden">
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] items-stretch h-full">
+                <ScrollArea className="w-full h-full sm:px-6">
+                    <div
+                        className={cn(
+                            "relative w-full rounded-md md:my-4 md:border p-4 my-auto transition-colors",
+                            hasErrors ? "border-destructive" : "border-border"
+                        )}
+                    >
+                        <form id="video-post-form" onSubmit={handleSubmit(onSubmit)}>
+                            <div className="flex flex-col gap-y-4">
+                                
+                                <Controller
+                                    name="videoStorageId"
+                                    control={control}
+                                    rules={{
+                                        validate: (value) => {
+                                            const hasExisting = Boolean(selectedVideoPost?.videoStorageId || value);
+                                            if (hasExisting) return true;
+                                            return "A video file is required";
+                                        },
+                                    }}
+                                    render={({ field, fieldState }) => {
+                                        const isInvalid = fieldState.invalid;
+                                        const errorMessage = fieldState.error?.message;
+                                        const hasExistingVideo = Boolean(selectedVideoPost?.videoStorageId);
 
-            <div className="flex gap-4">
-                <label className="flex flex-col gap-1 text-sm font-medium">
-                    Cover Thumbnail Image:
-                    <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => setThumbnailFile(e.target.files?.[0] || null)}
-                        required
-                    />
-                </label>
+                                        return (
+                                            <div className="w-full">
+                                                <input
+                                                    id="video-file-upload"
+                                                    ref={videoInputRef}
+                                                    type="file"
+                                                    accept="video/*"
+                                                    disabled={isLoading}
+                                                    className="hidden"
+                                                    onChange={async (e) => {
+                                                        if (e.target.files && e.target.files[0]) {
+                                                            const file = e.target.files[0];
+                                                            setSelectedVideo(file);
+                                                            field.onChange(file.name); 
+                                                        }
+                                                    }}
+                                                />
 
-                <label className="flex flex-col gap-1 text-sm font-medium">
-                    Video File:
-                    <input
-                        type="file"
-                        accept="video/mp4,video/webm,video/quicktime,video/x-msvideo,video/x-matroska"
-                        onChange={(e) => setVideoFile(e.target.files?.[0] || null)}
-                        required
-                    />
-                </label>
+                                                <div className="relative flex items-center w-full">
+                                                    <label
+                                                        htmlFor="video-file-upload"
+                                                        className={cn(
+                                                            "group flex items-center justify-between w-full h-10 pl-2.5 pr-8 rounded-md border-2 md:border md:p-2 p-5 border-input bg-background text-lg md:text-xs cursor-pointer hover:bg-accent/50 transition-all select-none relative",
+                                                            isInvalid && "border-destructive",
+                                                            isLoading && "opacity-50 cursor-not-allowed pointer-events-none"
+                                                        )}
+                                                    >
+                                                        <span className="flex flex-row items-center gap-1.5 text-muted-foreground group-hover:text-foreground transition-colors truncate max-w-[75%]">
+                                                            <Film className="size-5 md:size-3.5 shrink-0 stroke-[1.5]" />
+                                                            <span className="truncate">
+                                                                {selectedVideo
+                                                                    ? selectedVideo.name
+                                                                    : hasExistingVideo
+                                                                    ? "Change video file..."
+                                                                    : "Upload video file..."}
+                                                            </span>
+                                                        </span>
+
+                                                        {selectedVideo && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={(e) => {
+                                                                    e.preventDefault();
+                                                                    e.stopPropagation();
+                                                                    clearVideo();
+                                                                    field.onChange(null);
+                                                                }}
+                                                                disabled={isLoading}
+                                                                className={cn(
+                                                                    "text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted shrink-0 transition-colors relative z-10 cursor-pointer absolute",
+                                                                    errorMessage ? "right-7" : "right-2"
+                                                                )}
+                                                                title="Remove video"
+                                                            >
+                                                                <X className="size-4.5 md:size-3.5 stroke-[2]" />
+                                                            </button>
+                                                        )}
+                                                    </label>
+
+                                                    {errorMessage && (
+                                                        <TooltipProvider>
+                                                            <Tooltip delayDuration={100}>
+                                                                <TooltipTrigger asChild>
+                                                                    <div className="absolute right-2 flex items-center justify-center text-destructive cursor-help z-10">
+                                                                        <AlertCircle className="h-4 w-4" />
+                                                                    </div>
+                                                                </TooltipTrigger>
+                                                                <TooltipContent side="top" variant="destructive">
+                                                                    <p>{errorMessage}</p>
+                                                                </TooltipContent>
+                                                            </Tooltip>
+                                                        </TooltipProvider>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        );
+                                    }}
+                                />
+
+                                <Controller
+                                    name="thumbnailStorageId"
+                                    control={control}
+                                    rules={{
+                                        validate: (value) => {
+                                            const hasExisting = Boolean(selectedVideoPost?.thumbnailUrl || value);
+                                            if (value || hasExisting) return true;
+                                            return "A thumbnail image is required";
+                                        },
+                                    }}
+                                    render={({ field, fieldState }) => {
+                                        const isInvalid = fieldState.invalid;
+                                        const errorMessage = fieldState.error?.message;
+                                        const hasExistingThumbnail = Boolean(selectedVideoPost?.thumbnailUrl);
+
+                                        return (
+                                            <div className="w-full">
+                                                <input
+                                                    id="thumbnail-upload"
+                                                    ref={thumbnailInputRef}
+                                                    type="file"
+                                                    accept="image/*"
+                                                    disabled={isLoading}
+                                                    className="hidden"
+                                                    onChange={async (e) => {
+                                                        if (e.target.files && e.target.files[0]) {
+                                                            const file = e.target.files[0];
+                                                            setSelectedThumbnail(file);
+                                                            setThumbnailPreviewUrl(URL.createObjectURL(file));
+                                                            field.onChange(file.name);
+                                                        }
+                                                    }}
+                                                />
+
+                                                <div className="relative flex items-center w-full">
+                                                    <label
+                                                        htmlFor="thumbnail-upload"
+                                                        className={cn(
+                                                            "group flex items-center justify-between w-full h-10 pl-2.5 pr-8 rounded-md border-2 md:border md:p-2 p-5 border-input bg-background text-lg md:text-xs cursor-pointer hover:bg-accent/50 transition-all select-none relative",
+                                                            isInvalid && "border-destructive",
+                                                            isLoading && "opacity-50 cursor-not-allowed pointer-events-none"
+                                                        )}
+                                                    >
+                                                        <span className="flex flex-row items-center gap-1.5 text-muted-foreground group-hover:text-foreground transition-colors truncate max-w-[75%]">
+                                                            <Paperclip className="size-5 md:size-3.5 shrink-0 stroke-[1.5]" />
+                                                            <span className="truncate">
+                                                                {selectedThumbnail
+                                                                    ? selectedThumbnail.name
+                                                                    : hasExistingThumbnail
+                                                                    ? "Change thumbnail..."
+                                                                    : "Upload thumbnail image..."}
+                                                            </span>
+                                                        </span>
+
+                                                        {thumbnailPreviewUrl && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={(e) => {
+                                                                    e.preventDefault();
+                                                                    e.stopPropagation();
+                                                                    clearThumbnail();
+                                                                    field.onChange(null);
+                                                                }}
+                                                                disabled={isLoading}
+                                                                className={cn(
+                                                                    "text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted shrink-0 transition-colors relative z-10 cursor-pointer absolute",
+                                                                    errorMessage ? "right-7" : "right-2"
+                                                                )}
+                                                                title="Remove thumbnail"
+                                                            >
+                                                                <X className="size-4.5 md:size-3.5 stroke-[2]" />
+                                                            </button>
+                                                        )}
+                                                    </label>
+
+                                                    {errorMessage && (
+                                                        <TooltipProvider>
+                                                            <Tooltip delayDuration={100}>
+                                                                <TooltipTrigger asChild>
+                                                                    <div className="absolute right-2 flex items-center justify-center text-destructive cursor-help z-10">
+                                                                        <AlertCircle className="h-4 w-4" />
+                                                                    </div>
+                                                                </TooltipTrigger>
+                                                                <TooltipContent side="top" variant="destructive">
+                                                                    <p>{errorMessage}</p>
+                                                                </TooltipContent>
+                                                            </Tooltip>
+                                                        </TooltipProvider>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        );
+                                    }}
+                                />
+
+                                <Controller
+                                    name="title"
+                                    control={control}
+                                    rules={{ 
+                                        required: "A video title is required", 
+                                        minLength: { value: 3, message: "Title must be at least 3 characters" } 
+                                    }}
+                                    render={({ field, fieldState }) => (
+                                        <div className="relative flex items-center w-full">
+                                            <div
+                                                className={cn(
+                                                    "relative flex items-center w-full h-12 md:h-9 rounded-md border-2 md:border border-input bg-background overflow-hidden transition-all",
+                                                    fieldState.invalid && "border-destructive",
+                                                    isLoading && "opacity-50 pointer-events-none"
+                                                )}
+                                            >
+                                                <input
+                                                    placeholder="Video Title"
+                                                    type="text"
+                                                    disabled={isLoading}
+                                                    className="w-full h-full bg-transparent pl-2.5 pr-10 text-lg md:text-xs focus:outline-none"
+                                                    {...field}
+                                                />
+                                                {field.value && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => field.onChange("")}
+                                                        className={cn(
+                                                            "absolute text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted cursor-pointer",
+                                                            fieldState.invalid ? "right-7" : "right-2"
+                                                        )}
+                                                    >
+                                                        <X className="size-4 md:size-3.5" />
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+                                />
+
+                                <Controller
+                                    name="description"
+                                    control={control}
+                                    rules={{ 
+                                        required: "A description is required", 
+                                        minLength: { value: 10, message: "Description must be at least 10 characters" } 
+                                    }}
+                                    render={({ field, fieldState }) => (
+                                        <div className={cn(
+                                            "relative flex flex-col w-full rounded-md border-2 md:border border-input bg-background overflow-hidden",
+                                            fieldState.invalid && "border-destructive",
+                                            isLoading && "opacity-50 pointer-events-none"
+                                        )}>
+                                            <textarea
+                                                placeholder="Video Description"
+                                                rows={3}
+                                                disabled={isLoading}
+                                                className="w-full bg-transparent p-3 pr-10 text-lg md:text-xs focus:outline-none resize-y min-h-[60px]"
+                                                {...field}
+                                            />
+                                        </div>
+                                    )}
+                                />
+
+                                <button
+                                    type="submit"
+                                    disabled={isLoading}
+                                    className="w-full h-10 mt-2 bg-primary text-primary-foreground font-medium rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50"
+                                >
+                                    {isLoading ? "Publishing..." : "Publish video post"}
+                                </button>
+
+                            </div>
+                        </form>
+                    </div>
+                </ScrollArea>
             </div>
-
-            <button
-                type="submit"
-                disabled={uploading}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
-            >
-                {uploading ? progressText : "Publish Video Post"}
-            </button>
-        </form>
+        </div>
     );
 }
