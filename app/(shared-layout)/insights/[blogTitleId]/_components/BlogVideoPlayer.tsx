@@ -104,9 +104,12 @@ export default function BlogVideoPlayer({ videoUrl }: BlogVideoPlayerProps) {
         }
     };
 
-    function formatTime(currentTime: number): import("react").ReactNode {
-        throw new Error("Function not implemented.");
-    }
+    const formatTime = (timeInSeconds: number) => {
+        if (isNaN(timeInSeconds)) return "0:00";
+        const minutes = Math.floor(timeInSeconds / 60);
+        const seconds = Math.floor(timeInSeconds % 60);
+        return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+    };
 
     return (
         <div className="flex flex-col w-full border border-border/50 rounded-none overflow-hidden bg-background/95">
@@ -154,9 +157,9 @@ export default function BlogVideoPlayer({ videoUrl }: BlogVideoPlayerProps) {
                         />
                     </div>
 
-                    {/*<div className="text-xs text-white font-medium shrink-0 whitespace-nowrap select-none px-1">
+                    <div className="text-xs text-white font-medium shrink-0 whitespace-nowrap select-none px-1">
                         {formatTime(currentTime)} / {formatTime(duration)}
-                    </div>*/}
+                    </div>
 
                     <button 
                         onClick={toggleMute}

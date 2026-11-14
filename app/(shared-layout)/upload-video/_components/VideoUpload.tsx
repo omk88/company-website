@@ -98,15 +98,9 @@ export default function VideoUpload() {
             />
             <input
                 type="text"
-                placeholder="Subtitle"
+                placeholder="Description"
                 value={subtitle}
                 onChange={(e) => setSubtitle(e.target.value)}
-                className="border p-2 rounded-lg dark:bg-gray-800"
-            />
-            <textarea
-                placeholder="Description / Content"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
                 className="border p-2 rounded-lg dark:bg-gray-800"
             />
 

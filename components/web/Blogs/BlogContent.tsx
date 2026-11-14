@@ -97,24 +97,25 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
     <article className="p-2">
       <ViewTracker blogId={blog._id} />
 
-      <div className="relative w-full h-[300px] md:h-[400px] mb-2 md:mb-6 rounded-lg overflow-hidden">
-        {!blog.isVideo &&
-          <Image
-            unoptimized
-            src={blog.imageUrl}
-            alt={blog.title}
-            fill
-            priority
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1920px"
-            className="object-cover"
-          />
-        }
+      {!blog.isVideo &&
+        <div className="relative w-full h-[300px] md:h-[400px] rounded-lg overflow-hidden">
+            <Image
+              unoptimized
+              src={blog.imageUrl}
+              alt={blog.title}
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1920px"
+              className="object-cover"
+            />
+        </div>
+      }
 
-        {blog.isVideo &&
+      {blog.isVideo &&
+        <div className="relative w-full h-[300px] md:h-[400px] overflow-hidden">
           <BlogVideoPlayer videoUrl={blog.videoUrl} />
-        }
-
-      </div>
+        </div>
+      }
 
       <header className="flex flex-col">
         <h1 className="text-4xl font-bold tracking-tight text-neutral-950 dark:text-neutral-50">
