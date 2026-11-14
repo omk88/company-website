@@ -27,7 +27,7 @@ export function ProfileVideos({ profile }: ProfileVideosProps) {
 
   const { results, status, loadMore, isLoading } = usePaginatedQuery(
     api.blogs.getPaginatedPostsByAuthor,
-    userId ? { author: userId, onlyVideos: true } : "skip",
+    userId ? { author: userId, isVideo: true } : "skip",
     { initialNumItems: 7 }
   );
 

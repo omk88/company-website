@@ -28,6 +28,7 @@ export default async function Profile({ params }: ProfileRouteProps) {
   const preloadedBlogs = userId
     ? await preloadAuthQuery(api.blogs.getPaginatedPostsByAuthor, {
         author: userId,
+        isVideo: false,
         paginationOpts: { numItems: 6, cursor: null },
       })
     : null;

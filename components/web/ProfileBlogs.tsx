@@ -30,7 +30,7 @@ export function ProfileBlogs({ profile, preloadedData }: ProfileBlogsProps) {
 
   const { results, status, loadMore, isLoading } = usePaginatedQuery(
     api.blogs.getPaginatedPostsByAuthor,
-    userId ? { author: userId } : "skip",
+    userId ? { author: userId, isVideo: false } : "skip",
     { initialNumItems: 7 }
   );
 
