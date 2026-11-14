@@ -71,7 +71,7 @@ const SPECIAL_TERMS: Record<string, string> = {
   "object-oriented": "Object-Oriented"
 };
 
-function toTitleCase(str: string): string {
+export function toTitleCase(str: string): string {
   if (!str) return "";
   
   const minorWords = new Set([
