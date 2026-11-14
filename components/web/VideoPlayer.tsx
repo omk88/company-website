@@ -3,7 +3,7 @@
 import { useRef, useState, useEffect } from "react";
 import { api } from "@/convex/_generated/api";
 import { FunctionReturnType } from "convex/server";
-import { formatSmartDate, ProfileHoverCard } from "./web/ProfileHoverCard";
+import { formatSmartDate, ProfileHoverCard } from "./ProfileHoverCard";
 import { 
     Eye, 
     ThumbsUp, 

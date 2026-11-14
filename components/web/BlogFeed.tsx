@@ -4,7 +4,7 @@ import { api } from "@/convex/_generated/api";
 import { usePaginatedQuery } from "convex/react";
 import { useEffect, useRef, useSyncExternalStore } from "react";
 import { BlogCard } from "./BlogCard";
-import VideoPlayer from "@/components/VideoPlayer";
+import VideoPlayer from "@/components/web/VideoPlayer";
 import { BlogCardSkeleton } from "./LoadingSkeletons/BlogCardSkeleton";
 import { EmptyState } from "./EmptyState";
 import { FileSearchCorner } from "lucide-react";
