@@ -775,13 +775,19 @@ export const getPaginatedPostsByAuthor = query({
   args: {
     author: v.string(),
     paginationOpts: paginationOptsValidator,
+    onlyVideos: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
-    const paginatedBlogs = await ctx.db
+    let baseQuery = ctx.db
       .query("blogs")
       .withIndex("by_author", (q) => q.eq("author", args.author))
-      .order("desc")
-      .paginate(args.paginationOpts);
+      .order("desc");
+
+    if (args.onlyVideos) {
+      baseQuery = baseQuery.filter((q) => q.eq(q.field("isVideo"), true));
+    }
+
+    const paginatedBlogs = await baseQuery.paginate(args.paginationOpts);
 
     const projectedPage = paginatedBlogs.page.map((blog) => ({
       _id: blog._id,

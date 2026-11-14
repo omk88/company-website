@@ -74,6 +74,12 @@ export function ProfileContent({
         </div>
       )}
 
+      {(visitedTabs.has("videos") || selectedMetric === "videos") && (
+        <div className={selectedMetric === "insights" ? "flex flex-col flex-1 w-full h-full" : "hidden"}>
+          <ProfileBlogsWrapper profile={profileData} preloadedBlogs={preloadedBlogs} />
+        </div>
+      )}
+
       {(visitedTabs.has("series") || selectedMetric === "series") && (
         <div className={selectedMetric === "series" ? "flex flex-col flex-1 w-full h-full" : "hidden"}>
           <ProfileArticleSeries profile={profileData} />
