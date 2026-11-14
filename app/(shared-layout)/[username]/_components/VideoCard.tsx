@@ -1,12 +1,13 @@
 "use client";
 
 import { formatSmartDate } from "@/components/web/ProfileHoverCard";
-import { Doc } from "@/convex/_generated/dataModel";
+import { api } from "@/convex/_generated/api";
+import { FunctionReturnType } from "convex/server";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
-type Video = Doc<"blogs">;
+type Video = FunctionReturnType<typeof api.blogs.getPaginatedPostsByAuthor>["page"][number];
 
 interface VideoCardProps {
   video: Video;

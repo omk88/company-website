@@ -803,6 +803,7 @@ export const getPaginatedPostsByAuthor = query({
       commentCount: blog.commentCount,
       readTime: blog.readTime,
       tags: blog.tags,
+      isVideo: blog.isVideo,
     }));
 
     return {

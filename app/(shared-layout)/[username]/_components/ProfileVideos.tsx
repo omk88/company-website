@@ -3,8 +3,6 @@
 import { api } from "@/convex/_generated/api";
 import { usePaginatedQuery } from "convex/react";
 import { useEffect, useRef, useState } from "react";
-import SeriesCard from "./SeriesCard";
-import { Doc } from "@/convex/_generated/dataModel";
 import { FunctionReturnType } from "convex/server";
 import { CompactSeriesCardSkeleton } from "@/components/web/LoadingSkeletons/CompactSeriesCardSkeleton";
 import { EmptyState } from "@/components/web/EmptyState";
@@ -18,10 +16,9 @@ type ProfileData = FunctionReturnType<typeof api.profiles.getProfileByUsername>;
 
 interface ProfileVideosProps {
   profile: ProfileData;
-  preloadedData?: any;
 }
 
-export function ProfileVideos({ profile, preloadedData }: ProfileVideosProps) {
+export function ProfileVideos({ profile }: ProfileVideosProps) {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const userId = profile?.profile?.userId;
 
@@ -36,22 +33,6 @@ export function ProfileVideos({ profile, preloadedData }: ProfileVideosProps) {
 
   const isFirstLoad = status === "LoadingFirstPage";
   const canLoadMore = status === "CanLoadMore";
-
-  const lastResultsRef = useRef<Doc<"blogs">[]>([]);
-  if (results.length > 0) {
-    lastResultsRef.current = results as Doc<"blogs">[];
-  }
-
-  const preloadedItems = Array.isArray(preloadedData)
-    ? preloadedData
-    : preloadedData?.page ?? [];
-
-  const displayResults =
-    results.length > 0
-      ? (results as Doc<"blogs">[])
-      : isFirstLoad && preloadedItems.length > 0
-      ? (preloadedItems as Doc<"blogs">[])
-      : lastResultsRef.current;
 
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
@@ -77,7 +58,7 @@ export function ProfileVideos({ profile, preloadedData }: ProfileVideosProps) {
     <div className="flex flex-col flex-1 h-full min-h-0 w-full p-2">
       <div className="w-full mx-auto flex flex-col flex-1 h-full min-h-0">
         
-        {isFirstLoad && displayResults.length === 0 ? (
+        {isFirstLoad && results.length === 0 ? (
           <ul className="flex flex-col gap-2">
             {[1, 2, 3].map((i) => (
               <li key={i}>
@@ -85,7 +66,7 @@ export function ProfileVideos({ profile, preloadedData }: ProfileVideosProps) {
               </li>
             ))}
           </ul>
-        ) : displayResults.length === 0 ? (
+        ) : results.length === 0 ? (
           <div className="flex flex-1 h-full w-full items-center">
             <EmptyState
               icon={List}
@@ -108,7 +89,7 @@ export function ProfileVideos({ profile, preloadedData }: ProfileVideosProps) {
         ) : (
           <>
             <ul className="flex flex-col gap-2">
-              {displayResults.map((video, index) => (
+              {results.map((video, index) => (
                 <li key={video._id}>
                   <VideoCard
                     video={video}

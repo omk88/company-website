@@ -11,6 +11,7 @@ import { api } from "@/convex/_generated/api";
 import { useProfileStore } from "@/stores/useProfileStore";
 import { useEffect } from "react";
 import { ProfileArticleSeries } from "@/app/(shared-layout)/[username]/_components/ProfileArticleSeries";
+import { ProfileVideos } from "@/app/(shared-layout)/[username]/_components/ProfileVideos";
 
 interface ProfileContentProps {
   preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
@@ -75,8 +76,8 @@ export function ProfileContent({
       )}
 
       {(visitedTabs.has("videos") || selectedMetric === "videos") && (
-        <div className={selectedMetric === "insights" ? "flex flex-col flex-1 w-full h-full" : "hidden"}>
-          <ProfileBlogsWrapper profile={profileData} preloadedBlogs={preloadedBlogs} />
+        <div className={selectedMetric === "videos" ? "flex flex-col flex-1 w-full h-full" : "hidden"}>
+          <ProfileVideos profile={profileData} />
         </div>
       )}
 
