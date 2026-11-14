@@ -9,7 +9,7 @@ interface BlogNameProps {
     username: string;
     displayName: string | undefined;
     date: number;
-    readTime: number;
+    readTime: number | undefined;
     isVideo: boolean;
 }
 
