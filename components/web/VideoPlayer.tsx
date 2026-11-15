@@ -122,10 +122,10 @@ export default function VideoPlayer({ blog }: VideoPlayerProps) {
     const displayName = blog.displayName;
 
     return (
-        <div className="flex flex-col w-full border border-border/50 rounded-none overflow-hidden bg-background/95">
+        <div className="group flex flex-col w-full border border-border/50 rounded-none overflow-hidden bg-background/95 transition-colors duration-100 hover:bg-muted">
             <Link 
                 href={`/insights/${blog.blogTitleId}`}
-                className="group flex flex-col p-2 transition-colors duration-100 hover:bg-muted"
+                className="flex flex-col p-2"
             >
                 <h3 className="leading-tight py-1 text-xl font-bold tracking-tight line-clamp-2 text-foreground transition-colors duration-100 group-hover:text-blue-600 break-words">
                     {blog.title}
@@ -215,7 +215,10 @@ export default function VideoPlayer({ blog }: VideoPlayerProps) {
                 </div>
             </div>
 
-            <div className="p-2 flex font-sans font-semibold items-center justify-between text-sm tracking-tight select-none w-full mt-auto">
+            <Link 
+                href={`/insights/${blog.blogTitleId}`}
+                className="p-2 flex font-sans font-semibold items-center justify-between text-sm tracking-tight select-none w-full mt-auto"
+            >
                 <div className="flex items-center">
                     <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
                         <Eye className="w-4 h-4 stroke-[2.3] shrink-0" />
@@ -230,7 +233,7 @@ export default function VideoPlayer({ blog }: VideoPlayerProps) {
                         <span>{blog.commentCount}</span>
                     </div>
                 </div>
-            </div>
+            </Link>
         </div>
     );
 }
