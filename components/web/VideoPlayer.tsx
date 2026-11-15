@@ -35,6 +35,7 @@ const formatTime = (timeInSeconds: number) => {
 export default function VideoPlayer({ blog }: VideoPlayerProps) {
     const videoRef = useRef<HTMLVideoElement>(null);
     const playerContainerRef = useRef<HTMLDivElement>(null);
+    const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const [isPlaying, setIsPlaying] = useState(true);
     const [isMuted, setIsMuted] = useState(true);
@@ -72,6 +73,14 @@ export default function VideoPlayer({ blog }: VideoPlayerProps) {
         };
     }, [isPlaying]);
 
+    useEffect(() => {
+        return () => {
+            if (clickTimeoutRef.current) {
+                clearTimeout(clickTimeoutRef.current);
+            }
+        };
+    }, []);
+
     const togglePlay = () => {
         if (videoRef.current) {
             if (isPlaying) {
@@ -99,6 +108,19 @@ export default function VideoPlayer({ blog }: VideoPlayerProps) {
             });
         } else {
             document.exitFullscreen();
+        }
+    };
+
+    const handleContainerClick = () => {
+        if (clickTimeoutRef.current) {
+            clearTimeout(clickTimeoutRef.current);
+            clickTimeoutRef.current = null;
+            toggleFullscreen();
+        } else {
+            clickTimeoutRef.current = setTimeout(() => {
+                clickTimeoutRef.current = null;
+                togglePlay();
+            }, 250);
         }
     };
 
@@ -151,7 +173,7 @@ export default function VideoPlayer({ blog }: VideoPlayerProps) {
                 className="relative w-full bg-black h-90 cursor-pointer flex items-center justify-center"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
-                onClick={togglePlay}
+                onClick={handleContainerClick}
             >
                 <video
                     ref={videoRef}

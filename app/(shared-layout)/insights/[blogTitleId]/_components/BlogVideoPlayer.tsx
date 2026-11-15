@@ -2,9 +2,6 @@
 
 import { useRef, useState, useEffect } from "react";
 import { 
-    Eye, 
-    ThumbsUp, 
-    MessageSquare, 
     Play, 
     Pause, 
     Volume2, 
@@ -21,9 +18,10 @@ interface BlogVideoPlayerProps {
 export default function BlogVideoPlayer({ videoUrl }: BlogVideoPlayerProps) {
     const videoRef = useRef<HTMLVideoElement>(null);
     const playerContainerRef = useRef<HTMLDivElement>(null);
+    const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const [isPlaying, setIsPlaying] = useState(true);
-    const [isMuted, setIsMuted] = useState(true);
+    const [isMuted, setIsMuted] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
     const [isHovered, setIsHovered] = useState(false);
@@ -58,6 +56,14 @@ export default function BlogVideoPlayer({ videoUrl }: BlogVideoPlayerProps) {
         };
     }, [isPlaying]);
 
+    useEffect(() => {
+        return () => {
+            if (clickTimeoutRef.current) {
+                clearTimeout(clickTimeoutRef.current);
+            }
+        };
+    }, []);
+
     const togglePlay = () => {
         if (videoRef.current) {
             if (isPlaying) {
@@ -71,8 +77,9 @@ export default function BlogVideoPlayer({ videoUrl }: BlogVideoPlayerProps) {
 
     const toggleMute = () => {
         if (videoRef.current) {
-            videoRef.current.muted = !isMuted;
-            setIsMuted(!isMuted);
+            const newMutedState = !isMuted;
+            videoRef.current.muted = newMutedState;
+            setIsMuted(newMutedState);
         }
     };
 
@@ -88,11 +95,24 @@ export default function BlogVideoPlayer({ videoUrl }: BlogVideoPlayerProps) {
         }
     };
 
+    const handleContainerClick = () => {
+        if (clickTimeoutRef.current) {
+            clearTimeout(clickTimeoutRef.current);
+            clickTimeoutRef.current = null;
+            toggleFullscreen();
+        } else {
+            clickTimeoutRef.current = setTimeout(() => {
+                clickTimeoutRef.current = null;
+                togglePlay();
+            }, 250);
+        }
+    };
+
     const handleLoadedMetadata = () => {
         if (videoRef.current) {
             setDuration(videoRef.current.duration);
-            videoRef.current.muted = true;
-            setIsMuted(true);
+            videoRef.current.muted = false;
+            setIsMuted(false);
         }
     };
 
@@ -113,19 +133,17 @@ export default function BlogVideoPlayer({ videoUrl }: BlogVideoPlayerProps) {
 
     return (
         <div className="flex flex-col w-full border border-border/50 rounded-none overflow-hidden bg-background/95">
-
             <div 
                 ref={playerContainerRef}
                 className="relative w-full bg-black h-90 cursor-pointer flex items-center justify-center"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
-                onClick={togglePlay}
+                onClick={handleContainerClick}
             >
                 <video
                     ref={videoRef}
                     autoPlay
-                    muted
-                    loop
+                    muted={isMuted}
                     playsInline
                     preload="metadata"
                     onLoadedMetadata={handleLoadedMetadata}
