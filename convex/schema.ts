@@ -203,9 +203,16 @@ const schema = defineSchema({
     banViolations: v.optional(v.array(v.string())),
     bannedAt: v.optional(v.number()),
     bannedUntil: v.optional(v.union(v.number(), v.null())),
+
+    stripeAccountId: v.optional(v.string()),          
+    stripeChargesEnabled: v.optional(v.boolean()),  
+    stripePayoutsEnabled: v.optional(v.boolean()),   
+    stripeDetailsSubmitted: v.optional(v.boolean()),
+
   })
     .index("by_userId", ["userId"])
-    .index("by_username", ["username"]),
+    .index("by_username", ["username"])
+    .index("by_stripeAccountId", ["stripeAccountId"]),
 
   series: defineTable({
     title: v.string(),

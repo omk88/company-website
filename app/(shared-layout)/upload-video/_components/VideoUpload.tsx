@@ -370,7 +370,7 @@ export default function VideoPostForm() {
             reset();
             clearStore();
 
-            router.push("/videos");
+            router.push("/insights");
             router.refresh();
 
         } catch (error) {
