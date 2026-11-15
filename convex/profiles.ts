@@ -101,6 +101,7 @@ export const getProfileByUsername = query({
         profile: null,
         bookmarkCount: 0,
         articleCount: 0,
+        videoCount: 0,
         seriesCount: 0,
         commentCount: 0,
         viewerStatus: { isFollowing: false, isBell: false, isSelf: false },
@@ -133,9 +134,8 @@ export const getProfileByUsername = query({
           .query("comments")
           .withIndex("by_authorId", (q) => q.eq("authorId", profile.userId))
           .collect(),
-          
         profile.profilePic ? ctx.storage.getUrl(profile.profilePic) : null,
-        ctx.storage.getUrl(profile.defaultProfilePic),
+        profile.defaultProfilePic ? ctx.storage.getUrl(profile.defaultProfilePic) : null,
       ]);
 
     const isSelf = currentProfile?.userId === profile.userId;
@@ -149,6 +149,9 @@ export const getProfileByUsername = query({
             )
             .unique()
         : null;
+
+    const articleBlogs = blogs.filter((blog) => !blog.isVideo);
+    const videoBlogs = blogs.filter((blog) => blog.isVideo === true);
 
     return {
       profilePicture: picStorageUrl,
@@ -164,7 +167,8 @@ export const getProfileByUsername = query({
         socials: profile.socials,
       },
       bookmarkCount: bookmarks.length,
-      articleCount: blogs.length,
+      articleCount: articleBlogs.length,
+      videoCount: videoBlogs.length, 
       seriesCount: seriesList.length,
       commentCount: comments.length,
       viewerStatus: {
