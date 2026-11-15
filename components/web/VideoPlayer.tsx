@@ -17,6 +17,9 @@ import {
 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import Link from "next/link";
+import { Badge } from "../ui/badge";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "../ui/hover-card";
 
 type PaginatedBlogsResult = FunctionReturnType<typeof api.blogs.getPaginatedPostsByType>;
 export type BlogPostItem = PaginatedBlogsResult["page"][number];
@@ -147,9 +150,9 @@ export default function VideoPlayer({ blog }: VideoPlayerProps) {
         <div className="group flex flex-col w-full border border-border/50 rounded-none overflow-hidden bg-background/95 transition-colors duration-100 hover:bg-muted">
             <Link 
                 href={`/insights/${blog.blogTitleId}`}
-                className="flex flex-col p-2"
+                className="flex flex-col py-2 px-4"
             >
-                <h3 className="leading-tight py-1 text-xl font-bold tracking-tight line-clamp-2 text-foreground transition-colors duration-100 group-hover:text-blue-600 break-words">
+                <h3 className="leading-tight text-xl font-bold tracking-tight line-clamp-2 text-foreground transition-colors duration-100 group-hover:text-blue-600 break-words">
                     {blog.title}
                 </h3>
                 <div className="font-roboto flex items-center gap-1 text-xs uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
@@ -237,10 +240,7 @@ export default function VideoPlayer({ blog }: VideoPlayerProps) {
                 </div>
             </div>
 
-            <Link 
-                href={`/insights/${blog.blogTitleId}`}
-                className="p-2 flex font-sans font-semibold items-center justify-between text-sm tracking-tight select-none w-full mt-auto"
-            >
+            <div className="flex font-sans font-semibold items-center justify-between text-sm tracking-tight select-none w-full py-2 px-4">
                 <div className="flex items-center">
                     <div className="flex items-center gap-1.5 min-w-[3rem] justify-start">
                         <Eye className="w-4 h-4 stroke-[2.3] shrink-0" />
@@ -255,7 +255,57 @@ export default function VideoPlayer({ blog }: VideoPlayerProps) {
                         <span>{blog.commentCount}</span>
                     </div>
                 </div>
-            </Link>
+
+                <div className="flex items-center gap-2 shrink-0 max-w-[55%] justify-end">
+                    {blog.tags && blog.tags.length > 0 ? (
+                        <>
+                            <div className="flex flex-row gap-1 items-center justify-end">
+                                {blog.tags.slice(0, 4).map((tag: string) => (
+                                    <Badge 
+                                        key={tag} 
+                                        variant="outline" 
+                                        className="font-sans text-[10px] px-1.5 py-0.5 whitespace-nowrap border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                                    >
+                                        <span className="capitalize">{tag}</span>
+                                    </Badge>
+                                ))}
+                            </div>
+                            
+                            {blog.tags.length > 4 && (
+                                <HoverCard openDelay={100} closeDelay={100}>
+                                    <HoverCardTrigger asChild>
+                                        <Badge 
+                                            variant="outline" 
+                                            className="font-mono text-[10px] px-1.5 py-0.5 whitespace-nowrap border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 cursor-help hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors shrink-0"
+                                        >
+                                            +{blog.tags.length - 4}
+                                        </Badge>
+                                    </HoverCardTrigger>
+                                    
+                                    <HoverCardContent side="top" align="end" className="w-auto max-w-[220px] p-2.5">
+                                        <div className="space-y-1.5">
+                                            <h4 className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">More Topics</h4>
+                                            <div className="flex flex-wrap gap-1 max-h-[120px] overflow-y-auto">
+                                                {blog.tags.slice(4).map((tag: string) => (
+                                                    <Badge 
+                                                        key={tag} 
+                                                        variant="outline" 
+                                                        className="font-mono text-[10px] px-1.5 py-0.5 whitespace-nowrap border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300"
+                                                    >
+                                                        <span className="capitalize">{tag}</span>
+                                                    </Badge>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </HoverCardContent>
+                                </HoverCard>
+                            )}
+                        </>
+                    ) : (
+                        null
+                    )}
+                </div>
+            </div>
         </div>
     );
 }

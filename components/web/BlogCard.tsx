@@ -456,12 +456,7 @@ export function BlogCard({
                 )}
               </>
             ) : (
-              <Badge 
-                variant="outline" 
-                className="font-mono text-[10px] px-1.5 py-0.5 whitespace-nowrap border-zinc-200 dark:border-zinc-800 text-zinc-500"
-              >
-                General
-              </Badge>
+              null
             )}
           </div>
         </div>

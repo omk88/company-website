@@ -134,7 +134,7 @@ function StandardBlogFeed({
         </div>
       ) : (
         <>
-          <ul className="flex flex-col gap-4">
+          <ul className="flex flex-col gap-2">
             {displayResults.map((blog: BlogPost) => (
               <li key={blog._id}>
                 {blog.isVideo && blog.videoUrl ? (

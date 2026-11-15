@@ -7,7 +7,7 @@ import { useCurrentUser } from "@/app/ConvexClientProvider";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Control, Controller, useForm, useWatch } from "react-hook-form";
 import { cn } from "@/lib/utils";
-import { AlertCircle, Film, Paperclip, X, Image, Loader2 } from "lucide-react";
+import { AlertCircle, Film, Paperclip, X, Image, Loader2, ChevronDown } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import imageCompression from "browser-image-compression";
@@ -18,6 +18,11 @@ import { toTitleCase } from "@/components/web/BlogPostForm";
 import { Separator } from "@/components/ui/separator";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { Button } from "@/components/ui/button";
+import { Field } from "@/components/ui/field";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { TAGS } from "@/app/constants/tags";
 
 export interface VideoFormValues {
     title: string;
@@ -347,7 +352,7 @@ export default function VideoPostForm() {
                 username,
                 authorAvatarUrl: userData.profile?.profilePicUrl || undefined,
                 postType,
-                tags: [],
+                tags: data.tags || [],
                 thumbnailStorageId,
                 videoStorageId,
             });
@@ -596,7 +601,6 @@ export default function VideoPostForm() {
                                                             isLoading && "opacity-50 cursor-not-allowed pointer-events-none"
                                                         )}
                                                     >
-                                                        {/* Label UI elements, preview buttons, etc. */}
                                                         <span className="flex flex-row items-center gap-1.5 text-muted-foreground group-hover:text-foreground transition-colors truncate max-w-[75%]">
                                                             <Paperclip className="size-5 md:size-3.5 shrink-0 stroke-[1.5]" />
                                                             <span className="truncate">
@@ -609,7 +613,6 @@ export default function VideoPostForm() {
                                                         </span>
                                                     </label>
 
-                                                    {/* Error tooltips and remove buttons... */}
                                                 </div>
                                             </div>
                                         );
@@ -679,6 +682,116 @@ export default function VideoPostForm() {
                                         </div>
                                     )}
                                 />
+
+                                <Controller
+                                    name="tags"
+                                    control={control}
+                                    rules={{
+                                        validate: (value) =>
+                                        value && value.length > 0 ? true : "Please select at least one tag",
+                                    }}
+                                    render={({ field, fieldState }) => {
+                                        const value = field.value || [];
+                                        const isInvalid = fieldState.invalid;
+                                        const errorMessage = fieldState.error?.message;
+
+                                        const toggleTag = (tag: string) => {
+                                        const newValue = value.includes(tag)
+                                            ? value.filter((t) => t !== tag)
+                                            : [...value, tag];
+                                        field.onChange(newValue);
+                                        };
+
+                                        return (
+                                            <Field>
+                                                <Popover>
+                                                    <PopoverTrigger asChild disabled={isLoading}>
+                                                        <div
+                                                            className={cn(
+                                                                "flex h-12 md:h-8 w-full flex-wrap gap-1 rounded-md border-2 md:border border-input bg-background px-2.5 py-1 text-sm md:text-xs cursor-pointer items-center justify-between relative transition-all",
+                                                                !isInvalid &&
+                                                                "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-transparent",
+                                                                isInvalid &&
+                                                                "border-destructive focus-within:ring-2 focus-within:ring-destructive focus-within:ring-offset-2 focus-within:border-transparent"
+                                                                )}
+                                                            >
+                                                            {value.length === 0 ? (
+                                                                <span className="text-muted-foreground text-lg md:text-xs">Tags...</span>
+                                                            ) : (
+                                                                <div className="flex flex-wrap gap-1 pr-14">
+                                                                    {value.map((tag) => (
+                                                                        <Badge
+                                                                            key={tag}
+                                                                            variant="secondary"
+                                                                            className="text-base md:text-[11px] px-1.5 py-0 h-7 md:h-5 font-normal capitalize"
+                                                                        >
+                                                                            {tag}
+                                                                        </Badge>
+                                                                    ))}
+                                                                </div>
+                                                            )}
+
+                                                            <div className="flex items-center space-x-1 absolute right-2.5 top-1/2 -translate-y-1/2 shrink-0">
+                                                                {value.length > 0 && (
+                                                                    <button
+                                                                        type="button"
+                                                                        disabled={isLoading}
+                                                                        onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        field.onChange([]);
+                                                                        }}
+                                                                        className="text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted cursor-pointer transition-colors"
+                                                                        title="Clear tags"
+                                                                    >
+                                                                        <X className="size-4.5 md:size-3 stroke-[2]" />
+                                                                    </button>
+                                                                )}
+
+                                                                <ChevronDown className="text-muted-foreground size-4.5 md:size-3.5 stroke-[2]" />
+
+                                                                {errorMessage && (
+                                                                    <TooltipProvider>
+                                                                        <Tooltip delayDuration={100}>
+                                                                            <TooltipTrigger asChild>
+                                                                                <div className="flex items-center justify-center text-destructive cursor-help">
+                                                                                    <AlertCircle className="h-3.5 w-3.5" />
+                                                                                </div>
+                                                                            </TooltipTrigger>
+                                                                            <TooltipContent side="top" variant="destructive">
+                                                                                <p>{errorMessage}</p>
+                                                                            </TooltipContent>
+                                                                        </Tooltip>
+                                                                    </TooltipProvider>
+                                                                )}
+
+                                                            </div>
+                                                        </div>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent className="w-fit p-2" align="start">
+                                                        <div className="space-y-1">
+                                                            {TAGS.map((tag) => (
+                                                                <div
+                                                                key={tag}
+                                                                className="flex items-center space-x-2 p-1.5 hover:bg-muted rounded-md cursor-pointer"
+                                                                onClick={() => toggleTag(tag)}
+                                                                >
+                                                                <Checkbox
+                                                                    checked={value.includes(tag)}
+                                                                    onCheckedChange={() => toggleTag(tag)}
+                                                                />
+                                                                <span className="text-xs font-medium select-none cursor-pointer capitalize">
+                                                                    {tag}
+                                                                </span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </PopoverContent>
+                                                </Popover>
+                                            </Field>
+                                        );
+                                    }}
+                                />
+                                
                                 <div className="hidden md:flex ml-auto">
                                     <Button
                                         type="submit"
