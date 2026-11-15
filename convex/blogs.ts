@@ -641,6 +641,7 @@ export const getFeaturedPosts = query({
     if (posts.length === 0) {
       posts = await ctx.db
         .query("blogs")
+        .filter((q) => q.neq(q.field("isVideo"), true))
         .order("desc")
         .take(3);
     }
