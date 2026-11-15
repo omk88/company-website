@@ -650,3 +650,27 @@ export const getPaginatedFollowingByProfile = query({
     };
   },
 });
+
+export const saveStripeAccountId = mutation({
+  args: {
+    userId: v.string(),
+    stripeAccountId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_userId", (q) => q.eq("userId", args.userId))
+      .unique();
+
+    if (!profile) {
+      throw new Error("Profile not found for this user.");
+    }
+
+    await ctx.db.patch(profile._id, {
+      stripeAccountId: args.stripeAccountId,
+      stripeDetailsSubmitted: false,
+      stripeChargesEnabled: false,
+      stripePayoutsEnabled: false,
+    });
+  },
+});

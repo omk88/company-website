@@ -12,6 +12,7 @@ import { Switch } from "../ui/switch";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { cn } from "@/lib/utils";
+import ConnectBankAccountButton from "@/app/(shared-layout)/[username]/_components/ConnectBankAccountButton";
 
 const profileSettingsFormSchema = z.object({
   emailNotifications: z.boolean(),
@@ -128,16 +129,9 @@ function ProfileSettingsDialog({ userId, children }: ProfileSettingsDialogProps)
                         </Field>
                     </form>
                 </FormProvider>
-                <div className="hidden md:flex">
-                    <Button
-                        type="submit"
-                        className={cn(
-                            "inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-neutral-900 text-neutral-50 hover:bg-neutral-900/90 dark:bg-neutral-50 dark:text-neutral-900 dark:hover:bg-neutral-50/90 p-2 w-full sm:w-auto cursor-pointer"
-                        )}
-                    >
-                        Connect Bank Account
-                    </Button>
-                </div>
+
+                <ConnectBankAccountButton />
+
                 <DialogFooter className="border-t bg-background gap-2 sm:gap-2">
                     <DialogClose asChild>
                         <Button className="cursor-pointer" type="button" variant="outline">Cancel</Button>
