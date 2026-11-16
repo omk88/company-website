@@ -11,10 +11,11 @@ export default function ConnectBankAccountButton() {
 
     const userId = currentUser?.userId || "";
     const userEmail = currentUser?.email || "";
+    const userUsername = currentUser?.profile?.username || "";
 
     return (
         <div className="hidden md:flex">
-            <form action={() => onboardInstructor(userId, userEmail)}>
+            <form action={() => onboardInstructor(userId, userEmail, userUsername)}>
                 <Button
                     type="submit"
                     className={cn(

@@ -5,7 +5,7 @@ import { api } from "@/convex/_generated/api";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 
-export async function onboardInstructor(userId: string) {
+export async function onboardInstructor(userId: string, userEmail: string, userUsername: string) {
   const origin = (await headers()).get("origin") || "http://localhost:3000";
   const secretKey = process.env.STRIPE_SECRET_KEY!;
 
@@ -23,8 +23,8 @@ export async function onboardInstructor(userId: string) {
       },
       body: JSON.stringify({
 
-        contact_email: "test@example.com",
-        display_name: "test1",
+        contact_email: userEmail,
+        display_name: userUsername,
 
         dashboard: "full",
         
