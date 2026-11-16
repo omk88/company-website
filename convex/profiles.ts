@@ -674,3 +674,28 @@ export const saveStripeAccountId = mutation({
     });
   },
 });
+
+export const updateStripeStatus = mutation({
+  args: {
+    userId: v.string(),
+    stripeChargesEnabled: v.boolean(),
+    stripePayoutsEnabled: v.boolean(),
+    stripeDetailsSubmitted: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_userId", (q) => q.eq("userId", args.userId))
+      .unique();
+
+    if (!profile) {
+      throw new Error(`Profile not found for userId: ${args.userId}`);
+    }
+
+    await ctx.db.patch(profile._id, {
+      stripeChargesEnabled: args.stripeChargesEnabled,
+      stripePayoutsEnabled: args.stripePayoutsEnabled,
+      stripeDetailsSubmitted: args.stripeDetailsSubmitted,
+    });
+  },
+});

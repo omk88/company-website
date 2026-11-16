@@ -98,7 +98,7 @@ export async function onboardInstructor(
         use_case: {
           type: "account_onboarding",
           account_onboarding: {
-            return_url: `${origin}/${userUsername}`,
+            return_url: `${origin}/${userUsername}?stripe_return=true`,
             refresh_url: `${origin}/${userUsername}`,
           },
         },
@@ -124,4 +124,47 @@ export async function onboardInstructor(
     console.error("An unexpected error occurred during onboarding:", error);
     throw error;
   }
+}
+
+export async function syncStripeAccountStatus(userId: string, stripeAccountId: string) {
+  const secretKey = process.env.STRIPE_SECRET_KEY!;
+  if (!secretKey || !stripeAccountId) return null;
+
+  const res = await fetch(
+    `https://api.stripe.com/v2/core/accounts/${stripeAccountId}?include[]=configuration.merchant&include[]=requirements`,
+    {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${secretKey}`,
+        "Stripe-Version": "2026-10-28.endive",
+      },
+      cache: "no-store",
+    }
+  );
+
+  if (!res.ok) {
+    console.error("Failed to fetch Stripe v2 account:", await res.text());
+    return null;
+  }
+
+  const account = await res.json();
+
+  const cardPaymentsStatus =
+    account?.configuration?.merchant?.capabilities?.card_payments?.status;
+  const currentlyDue =
+    account?.requirements?.summary?.minimum_deadline?.status === "currently_due" ||
+    (account?.requirements?.entries?.length ?? 0) > 0;
+
+  const chargesEnabled = cardPaymentsStatus === "active";
+  const payoutsEnabled = cardPaymentsStatus === "active";
+  const detailsSubmitted = !currentlyDue;
+
+  await fetchMutation(api.profiles.updateStripeStatus, {
+    userId,
+    stripeChargesEnabled: chargesEnabled,
+    stripePayoutsEnabled: payoutsEnabled,
+    stripeDetailsSubmitted: detailsSubmitted,
+  });
+
+  return { chargesEnabled, payoutsEnabled, detailsSubmitted };
 }
