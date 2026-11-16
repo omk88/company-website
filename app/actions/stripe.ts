@@ -73,7 +73,7 @@ export async function onboardInstructor(userId: string, userEmail: string, userU
       method: "POST",
       headers: {
         "Authorization": `Bearer ${secretKey}`,
-        "Content-Type": "application/json",
+        "Content-Type": "application/json", 
         "Stripe-Version": "2026-10-28.endive",
       },
       body: JSON.stringify({
