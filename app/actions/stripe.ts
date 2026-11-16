@@ -130,8 +130,12 @@ export async function syncStripeAccountStatus(userId: string, stripeAccountId: s
   const secretKey = process.env.STRIPE_SECRET_KEY!;
   if (!secretKey || !stripeAccountId) return null;
 
+  const params = new URLSearchParams();
+  params.append("include[]", "configuration.merchant");
+  params.append("include[]", "requirements");
+
   const res = await fetch(
-    `https://api.stripe.com/v2/core/accounts/${stripeAccountId}?include[]=configuration.merchant&include[]=requirements`,
+    `https://api.stripe.com/v2/core/accounts/${stripeAccountId}?${params.toString()}`,
     {
       method: "GET",
       headers: {
@@ -142,22 +146,27 @@ export async function syncStripeAccountStatus(userId: string, stripeAccountId: s
     }
   );
 
+  const rawText = await res.text();
   if (!res.ok) {
-    console.error("Failed to fetch Stripe v2 account:", await res.text());
+    console.error("Stripe v2 Fetch Error:", rawText);
     return null;
   }
 
-  const account = await res.json();
+  const account = JSON.parse(rawText);
+  console.log("STRIPE V2 ACCOUNT STATUS:", JSON.stringify(account, null, 2));
 
   const cardPaymentsStatus =
     account?.configuration?.merchant?.capabilities?.card_payments?.status;
-  const currentlyDue =
-    account?.requirements?.summary?.minimum_deadline?.status === "currently_due" ||
-    (account?.requirements?.entries?.length ?? 0) > 0;
+
+  const hasDueRequirements = (account?.requirements?.entries ?? []).some(
+    (entry: any) =>
+      entry.minimum_deadline?.status === "currently_due" ||
+      entry.minimum_deadline?.status === "past_due"
+  );
 
   const chargesEnabled = cardPaymentsStatus === "active";
   const payoutsEnabled = cardPaymentsStatus === "active";
-  const detailsSubmitted = !currentlyDue;
+  const detailsSubmitted = !hasDueRequirements;
 
   await fetchMutation(api.profiles.updateStripeStatus, {
     userId,
