@@ -61,14 +61,6 @@ export async function onboardInstructor(userId: string, userEmail: string, userU
 
     const responseText = await accountRes.text();
 
-    if (!accountRes.ok) {
-      console.error("========================================");
-      console.error("RAW STRIPE V2 ACCOUNT CREATION ERROR:");
-      console.error(responseText);
-      console.error("========================================");
-      throw new Error(`Stripe v2 Account Creation Failed: ${responseText}`);
-    }
-
     const accountData = JSON.parse(responseText);
     const accountId = accountData.id;
 
@@ -89,22 +81,14 @@ export async function onboardInstructor(userId: string, userEmail: string, userU
         use_case: {
           type: "account_onboarding",
           account_onboarding: {
-            return_url: `${origin}/settings/connect?success=true`,
-            refresh_url: `${origin}/settings/connect?refresh=true`,
+            return_url: `${origin}/${userUsername}`,
+            refresh_url: `${origin}/${userUsername}`,
           },
         },
       }),
     });
 
     const linkResponseText = await linkRes.text();
-
-    if (!linkRes.ok) {
-      console.error("========================================");
-      console.error("RAW STRIPE V2 ACCOUNT LINK ERROR:");
-      console.error(linkResponseText);
-      console.error("========================================");
-      throw new Error(`Stripe v2 Account Link Failed: ${linkResponseText}`);
-    }
 
     const linkData = JSON.parse(linkResponseText);
 
