@@ -75,7 +75,7 @@ export async function onboardInstructor(userId: string, userEmail: string, userU
         "Authorization": `Bearer ${secretKey}`,
         "Content-Type": "application/json", 
         "Stripe-Version": "2026-10-28.endive",
-      },
+      }, 
       body: JSON.stringify({
         account: accountId,
         use_case: {
