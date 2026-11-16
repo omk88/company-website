@@ -699,3 +699,31 @@ export const updateStripeStatus = mutation({
     });
   },
 });
+
+export const updateStripeStatusByAccountId = mutation({
+  args: {
+    stripeAccountId: v.string(),
+    stripeChargesEnabled: v.boolean(),
+    stripePayoutsEnabled: v.boolean(),
+    stripeDetailsSubmitted: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_stripeAccountId", (q) =>
+        q.eq("stripeAccountId", args.stripeAccountId)
+      )
+      .unique();
+
+    if (!profile) {
+      console.warn(`No profile found for stripeAccountId: ${args.stripeAccountId}`);
+      return;
+    }
+
+    await ctx.db.patch(profile._id, {
+      stripeChargesEnabled: args.stripeChargesEnabled,
+      stripePayoutsEnabled: args.stripePayoutsEnabled,
+      stripeDetailsSubmitted: args.stripeDetailsSubmitted,
+    });
+  },
+});
