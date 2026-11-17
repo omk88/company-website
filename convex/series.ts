@@ -1,5 +1,5 @@
 import { paginationOptsValidator } from "convex/server";
-import { mutation, query } from "./_generated/server";
+import { internalQuery, mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
 export const getSeriesById = query({
@@ -590,5 +590,42 @@ export const getFirstArticleInSeries = query({
 
     const blog = await ctx.db.get(firstItem.articleId);
     return blog ? blog.blogTitleId : null;
+  },
+});
+
+export const getCheckoutDetails = internalQuery({
+  args: {
+    seriesId: v.id("series"),
+    buyerUserId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const series = await ctx.db.get(args.seriesId);
+    if (!series) return null;
+
+    const existingPurchase = await ctx.db
+      .query("purchases")
+      .withIndex("by_user_and_series", (q) =>
+        q.eq("userId", args.buyerUserId).eq("seriesId", args.seriesId)
+      )
+      .unique();
+
+    const authorProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_userId", (q) => q.eq("userId", series.authorId))
+      .unique();
+
+    return {
+      title: series.title,
+      description: series.description,
+      price: series.price ?? 0,
+      currency: series.currency ?? "USD",
+      slug: series.slug,
+      authorId: series.authorId,
+      authorUsername: authorProfile?.username ?? "user",
+      authorStripeAccountId: authorProfile?.stripeAccountId,
+      chargesEnabled: authorProfile?.stripeChargesEnabled ?? false,
+      alreadyPurchased: !!existingPurchase,
+      imageUrl: series.coverImage ? await ctx.storage.getUrl(series.coverImage) : null,
+    };
   },
 });

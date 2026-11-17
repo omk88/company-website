@@ -343,6 +343,19 @@ conversations: defineTable({
     .index("by_recipient", ["recipientId"])
     .index("by_conversation", ["conversationId"]),
 
+
+  purchases: defineTable({
+    userId: v.string(),          
+    seriesId: v.id("series"),    
+    authorId: v.string(),        
+    amountPaid: v.number(),      
+    currency: v.string(),
+    stripeSessionId: v.string(),
+    status: v.union(v.literal("pending"), v.literal("completed")),
+  })
+    .index("by_user_and_series", ["userId", "seriesId"])
+    .index("by_stripeSessionId", ["stripeSessionId"]),
+
 });
 
 export default schema;

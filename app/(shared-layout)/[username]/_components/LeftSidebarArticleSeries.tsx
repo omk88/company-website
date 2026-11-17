@@ -6,7 +6,7 @@ import {
   SidebarGroup, 
   SidebarFooter 
 } from "@/components/ui/sidebar";
-import { useQuery } from "convex/react";
+import { useAction, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Clock, DollarSign } from "lucide-react";
 import Image from "next/image";
@@ -16,6 +16,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { useCurrentUser } from "@/app/ConvexClientProvider";
 import Link from "next/link";
+import { useState } from "react";
 
 interface LeftSidebarArticleSeriesProps {
   slug: string;
@@ -65,17 +66,17 @@ function formatReadTime(totalMinutes: number): string {
 export function LeftSidebarArticleSeries({ slug }: LeftSidebarArticleSeriesProps) {
   const seriesData = useQuery(api.series.getSeriesBySlug, { slug });
 
+  const createCheckout = useAction(api.stripe.createCourseCheckoutSession);
+  const [isLoading, setIsLoading] = useState(false);
+
   const imageUrl = useQuery(
     api.series.getImageUrl,
     seriesData?.coverImage ? { storageId: seriesData.coverImage } : "skip"
   );
 
   const avatarSrc = seriesData?.profile?.profilePicUrl;
-
   const isImageLoading = seriesData?.coverImage && imageUrl === undefined;
-
   const currentUser = useCurrentUser();
-
   const isOwnProfile = Boolean(currentUser?.userId && seriesData?.profile?.userId && currentUser.userId === seriesData?.profile.userId);
 
   if (seriesData === undefined) {
@@ -126,6 +127,20 @@ export function LeftSidebarArticleSeries({ slug }: LeftSidebarArticleSeriesProps
       </Sidebar>
     );
   }
+
+  const seriesId = seriesData._id
+
+  const handlePurchase = async () => {
+    try {
+      setIsLoading(true);
+      const { url } = await createCheckout({ seriesId });
+      window.location.href = url;
+    } catch (error) {
+      console.error("Checkout failed:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <Sidebar 
@@ -206,10 +221,8 @@ export function LeftSidebarArticleSeries({ slug }: LeftSidebarArticleSeriesProps
             }
 
             {!isOwnProfile && seriesData.isCourse && 
-              <Button type="submit" size={"sm"} className="cursor-pointer w-fit rounded-xl mt-2">
-                <Link href={`/`}>
-                  Purchase Course
-                </Link>
+              <Button type="submit" size={"sm"} className="cursor-pointer w-fit rounded-xl mt-2" onClick={handlePurchase} disabled={isLoading}>
+                {isLoading ? "Redirecting to checkout..." : "Purchase Course"}
               </Button>
             }
 
