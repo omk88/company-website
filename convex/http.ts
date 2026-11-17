@@ -8,8 +8,6 @@ const http = httpRouter();
 
 authComponent.registerRoutes(http, createAuth);
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-
 http.route({
   path: "/stripe-webhook",
   method: "POST",
