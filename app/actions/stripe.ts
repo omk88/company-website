@@ -55,6 +55,7 @@ export async function onboardInstructor(
           configuration: {
             merchant: {
               capabilities: {
+                transfers: { requested: true },
                 card_payments: {
                   requested: true,
                 },
