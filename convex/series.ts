@@ -222,6 +222,7 @@ export const getPaginatedSeries = query({
           ...series,
           imageUrl,
           articleCount,
+          totalArticleCount: articleCount,
           firstArticleId,
           totalReadTime, 
           username: authorProfile?.username ?? null,

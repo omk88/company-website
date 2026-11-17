@@ -4,12 +4,12 @@ import { formatSmartDate, ProfileHoverCard } from "@/components/web/ProfileHover
 import { Doc } from "@/convex/_generated/dataModel";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { BookOpenText } from "lucide-react";
+import { BookOpenText, Clock, Library } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { getCurrencySymbol } from "./LeftSidebarArticleSeries";
+import { formatReadTime, getCurrencySymbol } from "./LeftSidebarArticleSeries";
 
 type Series = Doc<"series"> & {
   imageUrl?: string | null;
@@ -138,13 +138,10 @@ export default function SeriesCard({ series, isCompact = false }: ProfileArticle
                   
                   <span>{formatSmartDate(series._creationTime, false)}</span>
               </div>
-              <div className="flex flex-row items-center gap-8">
-                  <span>{totalReadTime} min read</span>
-              </div>
           </div>
         </div>
 
-        <Link href={`/${username}/insights/${series.slug}`} className="space-y-2 py-1 block hover:no-underline">
+        <Link href={`/${username}/series/${series.slug}`} className="space-y-2 py-1 block hover:no-underline">
           <h3 className="leading-tight py-1 text-xl font-bold tracking-tight line-clamp-2 text-foreground transition-colors duration-100 group-hover:text-blue-600 break-words">
             {series.title}
           </h3>
@@ -159,6 +156,22 @@ export default function SeriesCard({ series, isCompact = false }: ProfileArticle
               <Badge variant={"outline"} className="py-1 px-2.5 text-green-600 dark:text-green-300">
                 <span>{getCurrencySymbol(series.currency)}{series.price}</span>
               </Badge>
+            </div>
+            <div className="flex flex-row gap-1.5">
+              <div className="flex items-center ml-auto">
+                <Badge variant={"outline"} className="gap-1.5 py-1 px-2.5 text-zinc-600 dark:text-zinc-300">
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>{formatReadTime(totalReadTime)}</span>
+                </Badge>
+              </div>
+              <div className="flex items-center ml-auto">
+                <Badge variant={"outline"} className="gap-1.5 py-1 px-2.5 text-zinc-600 dark:text-zinc-300">
+                  <Library className="w-3.5 h-3.5" />
+                  <span>
+                    {series.articleCount} {series.articleCount === 1 ? "Article" : "Articles"}
+                  </span>
+                </Badge>
+              </div>
             </div>
           </div>
         }

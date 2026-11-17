@@ -37,7 +37,7 @@ export function getCurrencySymbol(currencyCode: string, locale: string = "en-US"
   }
 }
 
-function formatReadTime(totalMinutes: number): string {
+export function formatReadTime(totalMinutes: number): string {
   if (!totalMinutes || totalMinutes <= 0) return "0 min read";
 
   if (totalMinutes < 60) {
