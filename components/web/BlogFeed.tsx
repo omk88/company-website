@@ -4,6 +4,7 @@ import { api } from "@/convex/_generated/api";
 import { usePaginatedQuery } from "convex/react";
 import { useEffect, useRef, useSyncExternalStore } from "react";
 import { BlogCard } from "./BlogCard";
+import SeriesCard from "@/app/(shared-layout)/[username]/_components/SeriesCard";
 import VideoPlayer from "@/components/web/VideoPlayer";
 import { BlogCardSkeleton } from "./LoadingSkeletons/BlogCardSkeleton";
 import { EmptyState } from "./EmptyState";
@@ -13,8 +14,11 @@ import { FunctionReturnType } from "convex/server";
 type PaginatedBlogsResult = FunctionReturnType<typeof api.blogs.getPaginatedPostsByType>;
 type BlogPost = PaginatedBlogsResult["page"][number];
 
+type PaginatedSeriesResult = FunctionReturnType<typeof api.series.getPaginatedSeries>;
+type SeriesItem = PaginatedSeriesResult["page"][number];
+
 interface BlogFeedProps {
-  postType?: "community" | "team";
+  postType?: "community" | "team" | "courses";
   myFeed?: boolean;
   searchTerm: string;
   activeTags: string[];
@@ -22,6 +26,10 @@ interface BlogFeedProps {
   isActive: boolean;
   isInitialFeed?: boolean;
   preloadedData?: any; 
+}
+
+interface StandardBlogFeedProps extends Omit<BlogFeedProps, "postType"> {
+  postType?: "community" | "team";
 }
 
 function subscribeToMobileBreakpoint(callback: () => void) {
@@ -39,7 +47,10 @@ function getServerSnapshot() {
 }
 
 export function BlogFeed(props: BlogFeedProps) {
-  return <StandardBlogFeed {...props} />;
+  if (props.postType === "courses") {
+    return <CoursesFeed {...props} />;
+  }
+  return <StandardBlogFeed {...(props as StandardBlogFeedProps)} />;
 }
 
 function StandardBlogFeed({
@@ -51,8 +62,7 @@ function StandardBlogFeed({
   isActive,
   preloadedData,
   isInitialFeed,
-}: BlogFeedProps) {
-
+}: StandardBlogFeedProps) {
   const isMobile = useSyncExternalStore(
     subscribeToMobileBreakpoint,
     getMobileSnapshot,
@@ -159,6 +169,95 @@ function StandardBlogFeed({
                     isMobile={isMobile}
                   />
                 )}
+              </li>
+            ))}
+          </ul>
+
+          <div ref={loadMoreRef} className="w-full" />
+        </>
+      )}
+    </div>
+  );
+}
+
+function CoursesFeed({
+  searchTerm,
+  activeTags,
+  isActive,
+  preloadedData,
+  isInitialFeed,
+}: BlogFeedProps) {
+  const trimmedSearch = searchTerm.trim();
+
+  const { results, status, loadMore } = usePaginatedQuery(
+    api.series.getPaginatedSeries,
+    {},
+    { initialNumItems: 6 }
+  );
+
+  const isFirstLoad = status === "LoadingFirstPage";
+  const hasActiveFilters = trimmedSearch.length > 0 || activeTags.length > 0;
+
+  const canUsePreloadedData =
+    Boolean(isInitialFeed) && 
+    Boolean(preloadedData) && 
+    !hasActiveFilters;
+
+  const preloadedItems = Array.isArray(preloadedData)
+    ? preloadedData
+    : preloadedData?.page ?? [];
+
+  const displayResults =
+    results.length > 0
+      ? results
+      : isFirstLoad && canUsePreloadedData
+      ? preloadedItems
+      : results;
+
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+  const isDone = status === "Exhausted";
+  const isLoadingMore = status === "LoadingMore";
+
+  useEffect(() => {
+    if (!isActive || isDone || isLoadingMore || isFirstLoad) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && status === "CanLoadMore") {
+          loadMore(6);
+        }
+      },
+      { rootMargin: "600px" }
+    );
+
+    if (loadMoreRef.current) observer.observe(loadMoreRef.current);
+    return () => observer.disconnect();
+  }, [isActive, isDone, isLoadingMore, status, loadMore]);
+
+  const isActuallyEmpty = !isFirstLoad && displayResults.length === 0;
+
+  return (
+    <div className="flex flex-col flex-1 h-full min-h-0 w-full">
+      {isFirstLoad && displayResults.length === 0 ? (
+        <ul className="flex flex-col gap-2">
+          {[1, 2, 3].map((i) => (
+            <li key={i} className="h-40 bg-muted/20 animate-pulse rounded-lg" />
+          ))}
+        </ul>
+      ) : isActuallyEmpty ? (
+        <div className="flex flex-col flex-1 h-full min-h-0">
+          <EmptyState icon={FileSearchCorner} size="lg" />
+        </div>
+      ) : (
+        <>
+          <ul className="flex flex-col gap-2">
+            {displayResults.map((series: SeriesItem, index: number) => (
+              <li key={series._id}>
+                <SeriesCard
+                  series={series}
+                  isCompact={false}
+                  index={index}
+                />
               </li>
             ))}
           </ul>

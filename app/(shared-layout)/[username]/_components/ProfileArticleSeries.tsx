@@ -112,6 +112,7 @@ export function ProfileArticleSeries({ profile, preloadedData }: ProfileArticleS
                   <SeriesCard
                     series={series}
                     index={index}
+                    isCompact={true}
                   />
                 </li>
               ))}

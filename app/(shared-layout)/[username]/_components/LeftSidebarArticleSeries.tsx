@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { Clock } from "lucide-react";
+import { Clock, DollarSign } from "lucide-react";
 import Image from "next/image";
 import { formatSmartDate, ProfileHoverCard } from "@/components/web/ProfileHoverCard";
 import { Badge } from "@/components/ui/badge";
@@ -169,15 +169,33 @@ export function LeftSidebarArticleSeries({ slug }: LeftSidebarArticleSeriesProps
 
             <div className="flex items-center">
               <Badge variant={"outline"} className="gap-1.5 py-1 px-2.5 text-zinc-600 dark:text-zinc-300">
-                <Clock className="w-3.5 h-3.5 text-zinc-400" />
+                <Clock className="w-3.5 h-3.5" />
                 <span>{formatReadTime(seriesData.totalReadTime)}</span>
               </Badge>
             </div>
+
+            {seriesData.price &&
+              <div className="flex items-center">
+                <Badge variant={"outline"} className="gap-1.5 py-1 px-2.5 text-green-600 dark:text-green-300">
+                  <DollarSign className="w-3.5 h-3.5" />
+                  <span>{seriesData.price}</span>
+                  <span>{seriesData.currency}</span>
+                </Badge>
+              </div>
+            }
 
             {isOwnProfile &&
               <Button type="submit" size={"sm"} className="cursor-pointer w-fit rounded-xl mt-2">
                 <Link href={`/create-article-series?id=${seriesData._id}`}>
                   Edit Series
+                </Link>
+              </Button>
+            }
+
+            {!isOwnProfile && seriesData.isCourse && 
+              <Button type="submit" size={"sm"} className="cursor-pointer w-fit rounded-xl mt-2">
+                <Link href={`/`}>
+                  Purchase Course
                 </Link>
               </Button>
             }

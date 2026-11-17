@@ -161,6 +161,82 @@ export const getPaginatedSeriesByAuthor = query({
   },
 });
 
+export const getPaginatedSeries = query({
+  args: {
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, args) => {
+    const paginatedSeries = await ctx.db
+      .query("series")
+      .order("desc")
+      .paginate(args.paginationOpts);
+
+    const enrichedPage = await Promise.all(
+      paginatedSeries.page.map(async (series) => {
+        const [seriesItems, authorProfile] = await Promise.all([
+          ctx.db
+            .query("seriesItems")
+            .withIndex("by_series_and_order", (q) => q.eq("seriesId", series._id))
+            .collect(),
+          ctx.db
+            .query("profiles")
+            .withIndex("by_userId", (q) => q.eq("userId", series.authorId))
+            .unique(),
+        ]);
+
+        const articleCount = seriesItems.length;
+
+        let storageIdToFetch = series.coverImage;
+        let firstArticleId: string | null = null;
+        let totalReadTime = 0;
+
+        if (articleCount > 0) {
+          seriesItems.sort((a, b) => a.order - b.order);
+
+          const blogs = await Promise.all(
+            seriesItems.map((item) => ctx.db.get(item.articleId))
+          );
+
+          for (let i = 0; i < blogs.length; i++) {
+            const blog = blogs[i];
+            if (blog) {
+              if (typeof blog.readTime === "number") {
+                totalReadTime += blog.readTime;
+              }
+
+              if (i === 0) {
+                firstArticleId = blog.blogTitleId || null;
+                if (!storageIdToFetch) {
+                  storageIdToFetch = blog.storageId;
+                }
+              }
+            }
+          }
+        }
+
+        const imageUrl = storageIdToFetch 
+          ? await ctx.storage.getUrl(storageIdToFetch) 
+          : null;
+
+        return {
+          ...series,
+          imageUrl,
+          articleCount,
+          firstArticleId,
+          totalReadTime, 
+          username: authorProfile?.username ?? null,
+          displayName: authorProfile?.displayName ?? null,
+        };
+      })
+    );
+
+    return {
+      ...paginatedSeries,
+      page: enrichedPage,
+    };
+  },
+});
+
 export const createSeriesWithItems = mutation({
   args: {
     title: v.string(),

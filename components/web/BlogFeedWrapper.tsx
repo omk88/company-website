@@ -6,11 +6,12 @@ import { useSearchStore, FeedType } from "@/stores/useSearchStore";
 import { Preloaded, usePreloadedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 
-const FEEDS: { id: FeedType; dbPostType?: "community" | "team"; myFeed?: boolean }[] = [
+const FEEDS: { id: FeedType; dbPostType?: "community" | "team" | "courses"; myFeed?: boolean }[] = [
   { id: "all" },
   { id: "feed", myFeed: true },
   { id: "team", dbPostType: "team" },
   { id: "community", dbPostType: "community" },
+  { id: "courses", dbPostType: "courses" },
 ];
 
 export function BlogFeedWrapper({ preloadedData }: { preloadedData: Preloaded<typeof api.blogs.getPaginatedPostsByType> }) {
