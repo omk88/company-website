@@ -35,6 +35,9 @@ export const updateSeriesWithItems = mutation({
     description: v.optional(v.string()),
     coverImage: v.optional(v.string()),
     coverImagePng: v.optional(v.string()),
+    isCourse: v.optional(v.boolean()),
+    price: v.optional(v.number()),
+    currency: v.optional(v.string()),
     articleIds: v.array(v.id("blogs")),
   },
   handler: async (ctx, args) => {
@@ -54,6 +57,9 @@ export const updateSeriesWithItems = mutation({
       description: args.description,
       coverImage: args.coverImage,
       coverImagePng: args.coverImagePng,
+      isCourse: args.isCourse,
+      price: args.price,
+      currency: args.currency,
     });
 
     const existingItems = await ctx.db
@@ -162,6 +168,9 @@ export const createSeriesWithItems = mutation({
     description: v.optional(v.string()),
     coverImage: v.optional(v.string()),
     coverImagePng: v.optional(v.string()),
+    isCourse: v.optional(v.boolean()),
+    price: v.optional(v.number()),
+    currency: v.optional(v.string()),
     articleIds: v.array(v.id("blogs")),
   },
   handler: async (ctx, args) => {
@@ -176,6 +185,9 @@ export const createSeriesWithItems = mutation({
       description: args.description,
       coverImage: args.coverImage,
       coverImagePng: args.coverImagePng,
+      isCourse: args.isCourse,
+      price: args.price,
+      currency: args.currency,
       authorId: userId,
     });
 

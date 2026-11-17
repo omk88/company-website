@@ -14,6 +14,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Clock, ImagePlus, Loader2, X } from "lucide-react";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
@@ -28,6 +37,14 @@ interface LeftSidebarProps {
   existingData?: any;
 }
 
+const CURRENCIES = [
+  { code: "usd", label: "USD ($)" },
+  { code: "eur", label: "EUR (€)" },
+  { code: "gbp", label: "GBP (£)" },
+  { code: "cad", label: "CAD ($)" },
+  { code: "aud", label: "AUD ($)" },
+];
+
 export function LeftSidebarCreateArticleSeries({ isEditing, seriesId, existingData }: LeftSidebarProps) {
   const router = useRouter();
   const currentUser = useCurrentUser();
@@ -41,6 +58,11 @@ export function LeftSidebarCreateArticleSeries({ isEditing, seriesId, existingDa
 
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  
+  const [isCourse, setIsCourse] = useState<boolean>(existingData?.isCourse ?? false);
+  const [price, setPrice] = useState<string>(existingData?.price ? String(existingData.price) : "");
+  const [currency, setCurrency] = useState<string>(existingData?.currency || "usd");
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -144,6 +166,11 @@ export function LeftSidebarCreateArticleSeries({ isEditing, seriesId, existingDa
     e.preventDefault();
     if (!seriesTitle.trim()) return;
 
+    if (isCourse && (!price || parseFloat(price) <= 0)) {
+      setError("Please provide a valid price for the course.");
+      return;
+    }
+
     setIsSubmitting(true);
     setError(null);
 
@@ -165,6 +192,7 @@ export function LeftSidebarCreateArticleSeries({ isEditing, seriesId, existingDa
       }
 
       const slug = seriesTitle.toLowerCase().trim().replace(/[^\w\s-]/g, "").replace(/[\s_-]+/g, "-");
+      const parsedPrice = isCourse && price ? parseFloat(price) : undefined;
 
       if (isEditing && seriesId) {
         await updateSeriesWithItems({
@@ -175,6 +203,9 @@ export function LeftSidebarCreateArticleSeries({ isEditing, seriesId, existingDa
           coverImage: coverImageStorageId,
           coverImagePng: coverImagePngStorageId,
           articleIds: stagedBlogIds,
+          isCourse,
+          price: parsedPrice,
+          currency: isCourse ? currency : undefined,
         });
         router.push(`${currentUser?.username}/series/${slug}`);
       } else {
@@ -185,8 +216,11 @@ export function LeftSidebarCreateArticleSeries({ isEditing, seriesId, existingDa
           coverImage: coverImageStorageId,
           coverImagePng: coverImagePngStorageId,
           articleIds: stagedBlogIds,
+          isCourse,
+          price: parsedPrice,
+          currency: isCourse ? currency : undefined,
         });
-        router.push(`/series/${newSlug}`);
+        router.push(`${currentUser?.username}/series/${newSlug}`);
       }
     } catch (err: any) {
       setError(err.message || "Failed to save series.");
@@ -209,74 +243,129 @@ export function LeftSidebarCreateArticleSeries({ isEditing, seriesId, existingDa
   return (
     <Sidebar className="flex flex-col !top-16 !z-40 border-r" bgClass="bg-background/95" collapsible="icon">
       <SidebarContent className="!p-0 w-full">
-        <SidebarGroup className="pt-3 !px-2 w-full">
-          <form onSubmit={handleSubmit} className="flex flex-col gap-3 w-full">
-            <div className="relative p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 flex flex-col gap-3">
-              
-              <div className="relative w-full h-48 overflow-hidden rounded-lg">
-                {imagePreview ? (
-                  <div className="relative w-full h-full rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800">
-                    <Image src={imagePreview} alt="Cover preview" fill className="object-cover" />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="cursor-pointer text-zinc-400 hover:text-red-500 absolute top-2 right-2 h-6 w-6 rounded-full z-10"
-                      onClick={handleRemoveImage}
+        <ScrollArea dir="rtl" className="h-[calc(100vh-4rem)] w-full [&>div>div]:!block">
+          <div dir="ltr" className="text-left">
+            <SidebarGroup className="pt-3 !px-2 w-full">
+              <form onSubmit={handleSubmit} className="flex flex-col gap-3 w-full pb-6">
+                <div className="relative p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 flex flex-col gap-3">
+                  
+                  <div className="relative w-full h-48 overflow-hidden rounded-lg">
+                    {imagePreview ? (
+                      <div className="relative w-full h-full rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800">
+                        <Image src={imagePreview} alt="Cover preview" fill className="object-cover" />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="cursor-pointer text-zinc-400 hover:text-red-500 absolute top-2 right-2 h-6 w-6 rounded-full z-10"
+                          onClick={handleRemoveImage}
+                          disabled={isSubmitting}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <div onClick={() => fileInputRef.current?.click()} className="w-full h-full border-2 border-dashed border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 rounded-lg p-4 flex flex-col items-center justify-center gap-1.5 cursor-pointer bg-background/50 text-center">
+                        <ImagePlus className="h-8 w-8 text-zinc-400" />
+                        <p className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Click to upload cover image</p>
+                      </div>
+                    )}
+                    <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageChange} disabled={isSubmitting} />
+                  </div>
+
+                  <div className="flex flex-row gap-2 items-center">
+                    {profilePic && (
+                      <div className="h-6 w-6 border border-border rounded-full overflow-hidden bg-muted shrink-0">
+                        <img src={profilePic} alt="profile" className="h-full w-full object-cover" />
+                      </div>
+                    )}
+                    <ProfileHoverCard displayName={currentUser?.profile?.displayName} authorUsername={currentUser?.profile?.username || ""}>
+                      <span className="text-sm truncate leading-tight cursor-pointer">{authorName}</span>
+                    </ProfileHoverCard>
+                    <span className="capitalize font-semibold text-xs text-zinc-400 ml-auto">{currentDate}</span>
+                  </div>
+
+                  <div className="flex flex-col gap-3">
+                    <div className="grid gap-1.5">
+                      <Label htmlFor="title" className="text-xs font-semibold">Title</Label>
+                      <Input id="title" placeholder="Next.js 16 Masterclass" value={seriesTitle} onChange={(e) => setSeriesTitle(e.target.value)} disabled={isSubmitting} required />
+                    </div>
+                    <div className="grid gap-1.5">
+                      <Label htmlFor="description" className="text-xs font-semibold">Description (Optional)</Label>
+                      <Textarea id="description" placeholder="What will readers learn?" value={description} onChange={(e) => setDescription(e.target.value)} disabled={isSubmitting} rows={3} className="resize-none" />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-2 pt-1">
+                    <Checkbox
+                      id="isCourseToggle"
+                      checked={isCourse}
+                      onCheckedChange={(checked) => setIsCourse(checked === true)}
                       disabled={isSubmitting}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
+                    />
+                    <Label htmlFor="isCourseToggle" className="text-xs font-semibold cursor-pointer">
+                      Mark as Paid Course
+                    </Label>
                   </div>
-                ) : (
-                  <div onClick={() => fileInputRef.current?.click()} className="w-full h-full border-2 border-dashed border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 rounded-lg p-4 flex flex-col items-center justify-center gap-1.5 cursor-pointer bg-background/50 text-center">
-                    <ImagePlus className="h-8 w-8 text-zinc-400" />
-                    <p className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Click to upload cover image</p>
-                  </div>
-                )}
-                <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageChange} disabled={isSubmitting} />
-              </div>
 
-              <div className="flex flex-row gap-2 items-center">
-                {profilePic && (
-                  <div className="h-6 w-6 border border-border rounded-full overflow-hidden bg-muted shrink-0">
-                    <img src={profilePic} alt="profile" className="h-full w-full object-cover" />
-                  </div>
-                )}
-                <ProfileHoverCard displayName={currentUser?.profile?.displayName} authorUsername={currentUser?.profile?.username || ""}>
-                  <span className="text-sm truncate leading-tight cursor-pointer">{authorName}</span>
-                </ProfileHoverCard>
-                <span className="capitalize font-semibold text-xs text-zinc-400 ml-auto">{currentDate}</span>
-              </div>
+                  {isCourse && (
+                    <div className="flex flex-col gap-3 p-3 rounded-lg bg-background/80 border border-border animate-in fade-in-50 duration-200">
+                      <div className="grid grid-cols-3 gap-2">
+                        <div className="col-span-2 grid gap-1.5">
+                          <Label htmlFor="price" className="text-xs font-semibold">Price</Label>
+                          <Input
+                            id="price"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            placeholder="29.99"
+                            value={price}
+                            onChange={(e) => setPrice(e.target.value)}
+                            disabled={isSubmitting}
+                            required={isCourse}
+                          />
+                        </div>
+                        <div className="grid gap-1.5">
+                          <Label htmlFor="currency" className="text-xs font-semibold">Currency</Label>
+                          <Select value={currency} onValueChange={setCurrency} disabled={isSubmitting}>
+                            <SelectTrigger id="currency" className="h-9">
+                              <SelectValue placeholder="Currency" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {CURRENCIES.map((c) => (
+                                <SelectItem key={c.code} value={c.code}>
+                                  {c.code.toUpperCase()}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      <p className="text-[11px] text-muted-foreground">
+                        Users will be prompted to purchase via Stripe before accessing this course content.
+                      </p>
+                    </div>
+                  )}
 
-              <div className="flex flex-col gap-3">
-                <div className="grid gap-1.5">
-                  <Label htmlFor="title" className="text-xs font-semibold">Title</Label>
-                  <Input id="title" placeholder="Next.js 16 Masterclass" value={seriesTitle} onChange={(e) => setSeriesTitle(e.target.value)} disabled={isSubmitting} required />
+                  <div className="flex items-center">
+                    <Badge variant={"outline"} className="gap-1.5 py-1 px-2.5 text-zinc-600 dark:text-zinc-300">
+                      <Clock className="w-3.5 h-3.5 text-zinc-400" />
+                      <span>{formatReadTime(totalReadMinutes)}</span>
+                    </Badge>
+                  </div>
+
+                  {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+
+                  <Button type="submit" size={"sm"} disabled={isSubmitting || !seriesTitle.trim()} className="cursor-pointer rounded-xl w-fit mt-2">
+                    {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {isEditing ? "Save Changes" : "Create Series"}
+                  </Button>
+
                 </div>
-                <div className="grid gap-1.5">
-                  <Label htmlFor="description" className="text-xs font-semibold">Description (Optional)</Label>
-                  <Textarea id="description" placeholder="What will readers learn?" value={description} onChange={(e) => setDescription(e.target.value)} disabled={isSubmitting} rows={3} className="resize-none" />
-                </div>
-              </div>
-
-              <div className="flex items-center">
-                <Badge variant={"outline"} className="gap-1.5 py-1 px-2.5 text-zinc-600 dark:text-zinc-300">
-                  <Clock className="w-3.5 h-3.5 text-zinc-400" />
-                  <span>{formatReadTime(totalReadMinutes)}</span>
-                </Badge>
-              </div>
-
-              {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
-
-              <Button type="submit" size={"sm"} disabled={isSubmitting || !seriesTitle.trim()} className="cursor-pointer rounded-xl w-fit mt-2">
-                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isEditing ? "Save Changes" : "Create Series"}
-              </Button>
-
-            </div>
-          </form>
-        </SidebarGroup>
+              </form>
+            </SidebarGroup>
+          </div>
+        </ScrollArea>
       </SidebarContent>
       <SidebarFooter className="hidden" />
     </Sidebar>
