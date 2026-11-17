@@ -58,9 +58,15 @@ export async function POST(req: Request) {
   ]);
 
   if (relevantEventTypes.has(event.type)) {
-    let stripeAccountId: string | undefined = event?.related_object?.id;
+    let stripeAccountId: string | undefined = undefined;
 
-    if (!stripeAccountId || !stripeAccountId.startsWith("acct_")) {
+    if (event?.related_object?.id?.startsWith("acct_")) {
+      stripeAccountId = event.related_object.id;
+    }
+    else if (typeof event?.context === "string" && event.context.startsWith("acct_")) {
+      stripeAccountId = event.context;
+    }
+    else {
       try {
         const fullEventRes = await fetch(
           `https://api.stripe.com/v2/core/events/${event.id}`,
@@ -78,9 +84,8 @@ export async function POST(req: Request) {
           const fullEvent = await fullEventRes.json();
           stripeAccountId =
             fullEvent?.data?.account_id ||
-            fullEvent?.related_object?.id;
-        } else {
-          console.error("Failed to fetch full Stripe v2 event:", await fullEventRes.text());
+            (fullEvent?.related_object?.id?.startsWith("acct_") ? fullEvent.related_object.id : undefined) ||
+            (typeof fullEvent?.context === "string" && fullEvent.context.startsWith("acct_") ? fullEvent.context : undefined);
         }
       } catch (err) {
         console.error("Error fetching full Stripe v2 event:", err);
@@ -88,11 +93,7 @@ export async function POST(req: Request) {
     }
 
     if (!stripeAccountId || !stripeAccountId.startsWith("acct_")) {
-      console.warn("Could not resolve an acct_ ID from Stripe event:", {
-        eventId: event.id,
-        type: event.type,
-        relatedObject: event?.related_object,
-      });
+      console.log(`Skipping event ${event.type} (${event.id}) - no direct account ID found.`);
       return NextResponse.json({ received: true });
     }
 
