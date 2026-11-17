@@ -54,6 +54,7 @@ export async function POST(req: Request) {
     "v2.core.account[configuration.merchant].capability_status_updated",
     "v2.core.account[requirements].updated",
     "v2.core.account.updated",
+    "v2.core.account_link.returned",
   ]);
 
   if (relevantEventTypes.has(event.type)) {
