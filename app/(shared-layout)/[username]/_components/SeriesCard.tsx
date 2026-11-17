@@ -153,13 +153,15 @@ export default function SeriesCard({ series, isCompact = false }: ProfileArticle
           </p>
         </Link>
 
-          {series.price && series.currency &&
+        {series.price && series.currency &&
+          <div className="flex font-sans font-semibold items-center justify-between text-sm tracking-tight select-none w-full mt-auto">
             <div className="flex items-center">
               <Badge variant={"outline"} className="py-1 px-2.5 text-green-600 dark:text-green-300">
                 <span>{getCurrencySymbol(series.currency)}{series.price}</span>
               </Badge>
             </div>
-          }
+          </div>
+        }
       </div>
     </div>
   );
