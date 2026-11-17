@@ -8,6 +8,8 @@ import { BookOpenText } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { getCurrencySymbol } from "./LeftSidebarArticleSeries";
 
 type Series = Doc<"series"> & {
   imageUrl?: string | null;
@@ -150,6 +152,14 @@ export default function SeriesCard({ series, isCompact = false }: ProfileArticle
             {series.description}
           </p>
         </Link>
+
+          {series.price && series.currency &&
+            <div className="flex items-center">
+              <Badge variant={"outline"} className="py-1 px-2.5 text-green-600 dark:text-green-300">
+                <span>{getCurrencySymbol(series.currency)}{series.price}</span>
+              </Badge>
+            </div>
+          }
       </div>
     </div>
   );

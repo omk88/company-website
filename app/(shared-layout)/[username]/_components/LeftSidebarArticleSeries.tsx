@@ -21,6 +21,21 @@ interface LeftSidebarArticleSeriesProps {
   slug: string;
 }
 
+export function getCurrencySymbol(currencyCode: string, locale: string = "en-US"): string {
+  try {
+    return (
+      new Intl.NumberFormat(locale, {
+        style: "currency",
+        currency: currencyCode,
+      })
+        .formatToParts(0)
+        .find((part) => part.type === "currency")?.value || currencyCode
+    );
+  } catch (e) {
+    return currencyCode;
+  }
+}
+
 function formatReadTime(totalMinutes: number): string {
   if (!totalMinutes || totalMinutes <= 0) return "0 min read";
 
@@ -174,12 +189,10 @@ export function LeftSidebarArticleSeries({ slug }: LeftSidebarArticleSeriesProps
               </Badge>
             </div>
 
-            {seriesData.price &&
+            {seriesData.price && seriesData.currency &&
               <div className="flex items-center">
-                <Badge variant={"outline"} className="gap-1.5 py-1 px-2.5 text-green-600 dark:text-green-300">
-                  <DollarSign className="w-3.5 h-3.5" />
-                  <span>{seriesData.price}</span>
-                  <span>{seriesData.currency}</span>
+                <Badge variant={"outline"} className="py-1 px-2.5 text-green-600 dark:text-green-300">
+                  <span>{getCurrencySymbol(seriesData.currency)}{seriesData.price}</span>
                 </Badge>
               </div>
             }
