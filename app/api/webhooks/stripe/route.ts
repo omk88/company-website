@@ -98,12 +98,13 @@ export async function POST(req: Request) {
     }
 
     try {
-      const params = new URLSearchParams();
-      params.append("include[]", "configuration.merchant");
-      params.append("include[]", "requirements");
+      const queryParams = new URLSearchParams({
+        "include[0]": "configuration.merchant",
+        "include[1]": "requirements",
+      });
 
       const accountRes = await fetch(
-        `https://api.stripe.com/v2/core/accounts/${stripeAccountId}?${params.toString()}`,
+        `https://api.stripe.com/v2/core/accounts/${stripeAccountId}?${queryParams.toString()}`,
         {
           method: "GET",
           headers: {
