@@ -328,7 +328,7 @@ export function LeftSidebarCreateArticleSeries({ isEditing, seriesId, existingDa
                         <div className="grid gap-1.5">
                           <Label htmlFor="currency" className="text-xs font-semibold">Currency</Label>
                           <Select value={currency} onValueChange={setCurrency} disabled={isSubmitting}>
-                            <SelectTrigger id="currency" className="h-9">
+                            <SelectTrigger id="currency" className="h-9 cursor-pointer">
                               <SelectValue placeholder="Currency" />
                             </SelectTrigger>
                             <SelectContent>
