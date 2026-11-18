@@ -333,7 +333,7 @@ export function LeftSidebarCreateArticleSeries({ isEditing, seriesId, existingDa
                             </SelectTrigger>
                             <SelectContent>
                               {CURRENCIES.map((c) => (
-                                <SelectItem key={c.code} value={c.code}>
+                                <SelectItem key={c.code} value={c.code} className="cursor-pointer">
                                   {c.code.toUpperCase()}
                                 </SelectItem>
                               ))}
