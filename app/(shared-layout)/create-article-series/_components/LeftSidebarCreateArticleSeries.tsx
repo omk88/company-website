@@ -58,9 +58,18 @@ export function LeftSidebarCreateArticleSeries({ isEditing, seriesId, existingDa
 
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  
-  const [isCourse, setIsCourse] = useState<boolean>(existingData?.isCourse ?? false);
-  const [price, setPrice] = useState<string>(existingData?.price ? String(existingData.price) : "");
+
+  const initialIsCourse = existingData?.isCourse ?? false;
+  const initialIsFree =
+    existingData?.isFree ?? (initialIsCourse && (!existingData?.price || existingData.price <= 0));
+
+  const [isCourse, setIsCourse] = useState<boolean>(initialIsCourse);
+  const [isFreeCourse, setIsFreeCourse] = useState<boolean>(Boolean(initialIsFree));
+  const [price, setPrice] = useState<string>(
+    !initialIsFree && existingData?.price && existingData.price > 0
+      ? String(existingData.price)
+      : ""
+  );
   const [currency, setCurrency] = useState<string>(existingData?.currency || "usd");
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -78,6 +87,21 @@ export function LeftSidebarCreateArticleSeries({ isEditing, seriesId, existingDa
       setImagePreview(getImageUrl);
     }
   }, [getImageUrl, imagePreview, selectedImage]);
+
+  const handleCourseToggle = (checked: boolean) => {
+    setIsCourse(checked);
+    if (!checked) {
+      setIsFreeCourse(false);
+    }
+  };
+
+  const handleFreeCourseToggle = (checked: boolean) => {
+    setIsFreeCourse(checked);
+    setError(null);
+    if (checked) {
+      setPrice("");
+    }
+  };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -166,8 +190,10 @@ export function LeftSidebarCreateArticleSeries({ isEditing, seriesId, existingDa
     e.preventDefault();
     if (!seriesTitle.trim()) return;
 
-    if (isCourse && (!price || parseFloat(price) <= 0)) {
-      setError("Please provide a valid price for the course.");
+    const numericPrice = price ? parseFloat(price) : NaN;
+
+    if (isCourse && !isFreeCourse && (Number.isNaN(numericPrice) || numericPrice <= 0)) {
+      setError("Please provide a valid price for a paid course, or mark it as free.");
       return;
     }
 
@@ -192,7 +218,10 @@ export function LeftSidebarCreateArticleSeries({ isEditing, seriesId, existingDa
       }
 
       const slug = seriesTitle.toLowerCase().trim().replace(/[^\w\s-]/g, "").replace(/[\s_-]+/g, "-");
-      const parsedPrice = isCourse && price ? parseFloat(price) : undefined;
+      const parsedPrice =
+        isCourse && !isFreeCourse && !Number.isNaN(numericPrice) && numericPrice > 0
+          ? numericPrice
+          : undefined;
 
       if (isEditing && seriesId) {
         await updateSeriesWithItems({
@@ -204,8 +233,9 @@ export function LeftSidebarCreateArticleSeries({ isEditing, seriesId, existingDa
           coverImagePng: coverImagePngStorageId,
           articleIds: stagedBlogIds,
           isCourse,
+          isFree: isCourse ? isFreeCourse : false,
           price: parsedPrice,
-          currency: isCourse ? currency : undefined,
+          currency: isCourse && !isFreeCourse ? currency : undefined,
         });
         router.push(`${currentUser?.username}/series/${slug}`);
       } else {
@@ -217,8 +247,9 @@ export function LeftSidebarCreateArticleSeries({ isEditing, seriesId, existingDa
           coverImagePng: coverImagePngStorageId,
           articleIds: stagedBlogIds,
           isCourse,
+          isFree: isCourse ? isFreeCourse : false,
           price: parsedPrice,
-          currency: isCourse ? currency : undefined,
+          currency: isCourse && !isFreeCourse ? currency : undefined,
         });
         router.push(`${currentUser?.username}/series/${newSlug}`);
       }
@@ -300,50 +331,70 @@ export function LeftSidebarCreateArticleSeries({ isEditing, seriesId, existingDa
                     <Checkbox
                       id="isCourseToggle"
                       checked={isCourse}
-                      onCheckedChange={(checked) => setIsCourse(checked === true)}
+                      onCheckedChange={(checked) => handleCourseToggle(checked === true)}
                       disabled={isSubmitting}
                     />
                     <Label htmlFor="isCourseToggle" className="text-xs font-semibold cursor-pointer">
-                      Mark as Paid Course
+                      Mark as Course
                     </Label>
                   </div>
 
                   {isCourse && (
                     <div className="flex flex-col gap-3 p-3 rounded-lg bg-background/80 border border-border animate-in fade-in-50 duration-200">
-                      <div className="grid grid-cols-3 gap-2">
-                        <div className="col-span-2 grid gap-1.5">
-                          <Label htmlFor="price" className="text-xs font-semibold">Price</Label>
-                          <Input
-                            id="price"
-                            type="number"
-                            step="0.01"
-                            min="0"
-                            placeholder="29.99"
-                            value={price}
-                            onChange={(e) => setPrice(e.target.value)}
-                            disabled={isSubmitting}
-                            required={isCourse}
-                          />
-                        </div>
-                        <div className="grid gap-1.5">
-                          <Label htmlFor="currency" className="text-xs font-semibold">Currency</Label>
-                          <Select value={currency} onValueChange={setCurrency} disabled={isSubmitting}>
-                            <SelectTrigger id="currency" className="h-9 cursor-pointer">
-                              <SelectValue placeholder="Currency" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {CURRENCIES.map((c) => (
-                                <SelectItem key={c.code} value={c.code} className="cursor-pointer">
-                                  {c.code.toUpperCase()}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="isFreeCourseToggle"
+                          checked={isFreeCourse}
+                          onCheckedChange={(checked) => handleFreeCourseToggle(checked === true)}
+                          disabled={isSubmitting}
+                        />
+                        <Label htmlFor="isFreeCourseToggle" className="text-xs font-semibold cursor-pointer">
+                          Free Course
+                        </Label>
                       </div>
-                      <p className="text-[11px] text-muted-foreground">
-                        Users will be prompted to purchase via Stripe before accessing this course content.
-                      </p>
+
+                      {!isFreeCourse ? (
+                        <>
+                          <div className="grid grid-cols-3 gap-2">
+                            <div className="col-span-2 grid gap-1.5">
+                              <Label htmlFor="price" className="text-xs font-semibold">Price</Label>
+                              <Input
+                                id="price"
+                                type="number"
+                                step="0.01"
+                                min="0.01"
+                                placeholder="29.99"
+                                value={price}
+                                onChange={(e) => setPrice(e.target.value)}
+                                disabled={isSubmitting}
+                                required={isCourse && !isFreeCourse}
+                              />
+                            </div>
+                            <div className="grid gap-1.5">
+                              <Label htmlFor="currency" className="text-xs font-semibold">Currency</Label>
+                              <Select value={currency} onValueChange={setCurrency} disabled={isSubmitting}>
+                                <SelectTrigger id="currency" className="h-9 cursor-pointer">
+                                  <SelectValue placeholder="Currency" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {CURRENCIES.map((c) => (
+                                    <SelectItem key={c.code} value={c.code} className="cursor-pointer">
+                                      {c.code.toUpperCase()}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                          <p className="text-[11px] text-muted-foreground">
+                            Users will be prompted to purchase via Stripe before accessing this course content.
+                          </p>
+                        </>
+                      ) : (
+                        <p className="text-[11px] text-muted-foreground">
+                          Students can enroll in this course for free without Stripe checkout.
+                        </p>
+                      )}
                     </div>
                   )}
 

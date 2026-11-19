@@ -38,6 +38,7 @@ export const updateSeriesWithItems = mutation({
     isCourse: v.optional(v.boolean()),
     price: v.optional(v.number()),
     currency: v.optional(v.string()),
+    isFree: v.optional(v.boolean()),
     articleIds: v.array(v.id("blogs")),
   },
   handler: async (ctx, args) => {
@@ -60,6 +61,7 @@ export const updateSeriesWithItems = mutation({
       isCourse: args.isCourse,
       price: args.price,
       currency: args.currency,
+      isFree: args.isFree,
     });
 
     const existingItems = await ctx.db
@@ -248,6 +250,7 @@ export const createSeriesWithItems = mutation({
     isCourse: v.optional(v.boolean()),
     price: v.optional(v.number()),
     currency: v.optional(v.string()),
+    isFree: v.optional(v.boolean()),
     articleIds: v.array(v.id("blogs")),
   },
   handler: async (ctx, args) => {
@@ -265,6 +268,7 @@ export const createSeriesWithItems = mutation({
       isCourse: args.isCourse,
       price: args.price,
       currency: args.currency,
+      isFree: args.isFree,
       authorId: userId,
     });
 
