@@ -8,7 +8,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { FaInstagram, FaLinkedin, FaGithub, FaYoutube } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
-import Link from "next/link";
+import Link from "next/link"; 
 import { cn } from "cn";
 import { Badge } from "@/components/ui/badge";
 import { EditProfileButton } from "@/components/web/EditProfileButton";
