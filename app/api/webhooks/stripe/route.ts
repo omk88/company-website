@@ -121,31 +121,15 @@ export async function POST(req: Request) {
         session.payment_status === "paid" ||
         session.payment_status === "no_payment_required";
 
-      if (isPaidOrFreePromo && seriesId && buyerUserId && authorId && session?.id) {
-
-        await fetchMutation(api.purchases.recordCompletedPurchaseFromWebhook, {
-          webhookSecret: process.env.CONVEX_WEBHOOK_SECRET!,
-          seriesId: seriesId as Id<"series">,
-          userId: buyerUserId,
-          authorId,
-          amountPaid: typeof session.amount_total === "number" ? session.amount_total : 0,
-          currency: session.currency || "usd",
-          stripeSessionId: session.id,
-        });
-
-        console.log(`Recorded completed purchase for session ${session.id}:`, {
-          seriesId,
-          buyerUserId,
-          authorId,
-        });
-      } else {
-        console.warn("Skipping checkout.session.completed due to missing fields or unpaid status:", {
-          eventId: event.id,
-          sessionId: session?.id,
-          paymentStatus: session?.payment_status,
-          metadata: session?.metadata,
-        });
-      }
+      await fetchMutation(api.purchases.recordCompletedPurchaseFromWebhook, {
+        webhookSecret: process.env.CONVEX_WEBHOOK_SECRET!,
+        seriesId: seriesId as Id<"series">,
+        userId: buyerUserId,
+        authorId,
+        amountPaid: typeof session.amount_total === "number" ? session.amount_total : 0,
+        currency: session.currency || "usd",
+        stripeSessionId: session.id,
+      });
 
       return NextResponse.json({ received: true });
     } catch (err) {
