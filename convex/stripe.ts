@@ -4,6 +4,7 @@ import { action } from "./_generated/server";
 import { v } from "convex/values";
 import Stripe from "stripe";
 import { internal } from "./_generated/api";
+import { useCurrentUser } from "@/app/ConvexClientProvider";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -12,12 +13,15 @@ export const createCourseCheckoutSession = action({
     seriesId: v.id("series"),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("You must be logged in to purchase a course.");
+
+    const currentUser = useCurrentUser();
+    const currentUserId = currentUser?.userId;
+
+    if (!currentUserId) return;
 
     const checkoutData = await ctx.runQuery(internal.series.getCheckoutDetails, {
       seriesId: args.seriesId,
-      buyerUserId: identity.subject,
+      buyerUserId: currentUserId,
     });
 
     if (!checkoutData) throw new Error("Course not found.");
@@ -51,7 +55,7 @@ export const createCourseCheckoutSession = action({
       },
       metadata: {
         seriesId: args.seriesId,
-        buyerUserId: identity.subject,
+        buyerUserId: currentUserId,
         authorId: checkoutData.authorId,
       },
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/${checkoutData.authorUsername}/series/${checkoutData.slug}`,
