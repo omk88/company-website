@@ -149,7 +149,6 @@ export default function SeriesCard({ series, isCompact = false }: ProfileArticle
             {series.description}
           </p>
         </Link>
-
          
           <div className="flex font-sans font-semibold items-center justify-between text-sm tracking-tight select-none w-full mt-auto">
             {series.price && series.currency && !series.isFree &&

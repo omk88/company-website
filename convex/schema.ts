@@ -344,7 +344,6 @@ conversations: defineTable({
     .index("by_recipient", ["recipientId"])
     .index("by_conversation", ["conversationId"]),
 
-
   purchases: defineTable({
     userId: v.string(),          
     seriesId: v.id("series"),    
