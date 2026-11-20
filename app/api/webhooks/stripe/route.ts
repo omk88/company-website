@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { fetchMutation } from "convex/nextjs";
+import { ConvexHttpClient } from "convex/browser";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 
@@ -30,6 +31,17 @@ function verifyStripeSignature(payload: string, sigHeader: string, secret: strin
     Buffer.from(signature, "hex"),
     Buffer.from(expectedSignature, "hex")
   );
+}
+
+function getConvexAdminClient() {
+  const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
+  const deployKey = process.env.CONVEX_DEPLOY_KEY;
+  if (!convexUrl || !deployKey) {
+    throw new Error("Missing NEXT_PUBLIC_CONVEX_URL or CONVEX_DEPLOY_KEY");
+  }
+  const client = new ConvexHttpClient(convexUrl);
+  (client as any).setAdminAuth(deployKey);
+  return client;
 }
 
 async function resolveCheckoutSession(event: any, secretKey: string) {
