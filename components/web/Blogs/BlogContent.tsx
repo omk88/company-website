@@ -86,9 +86,11 @@ interface ExtendedBlog extends Doc<"blogs"> {
 interface BlogContentProps {
   blog: ExtendedBlog;
   preloadedComments: Preloaded<typeof api.comments.getCommentsByBlog>;
+  isPartOfPaidCourse: boolean;
+  canAccessPaidCourse: boolean;
 }
 
-export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
+export function BlogContent({ blog, preloadedComments, isPartOfPaidCourse, canAccessPaidCourse }: BlogContentProps) {
   const avatarSrc = blog.profilePicUrl || blog.defaultProfilePicUrl || "/noImage.png";
 
   const headings = extractHeadings(blog.content);
@@ -154,50 +156,52 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
 
       <TableOfContents headings={headings} />
 
-      <section className="prose prose-neutral dark:prose-invert max-w-none text-lg leading-relaxed w-full min-w-0 [&_p]:break-words">
-        <ReactMarkdown
-          remarkPlugins={[remarkGfm, remarkMetaAsData]}
-          rehypePlugins={[
-            rehypeSlug,
-            rehypeConditionalAutolink,
-          ]}
-          components={{
-            pre: CodeBlock,
-            table: MarkdownTable,
-            thead: MarkdownTableHeader,
-            tbody: MarkdownTableBody,
-            tr: MarkdownTableRow,
-            th: MarkdownTableHead,
-            td: MarkdownTableCell,
-            code({ node, className, children, ...props }: any) {
-              const isInline =
-                !node?.parent || node?.parent?.tagName !== "pre";
+      {!isPartOfPaidCourse || canAccessPaidCourse &&
+        <section className="prose prose-neutral dark:prose-invert max-w-none text-lg leading-relaxed w-full min-w-0 [&_p]:break-words">
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm, remarkMetaAsData]}
+            rehypePlugins={[
+              rehypeSlug,
+              rehypeConditionalAutolink,
+            ]}
+            components={{
+              pre: CodeBlock,
+              table: MarkdownTable,
+              thead: MarkdownTableHeader,
+              tbody: MarkdownTableBody,
+              tr: MarkdownTableRow,
+              th: MarkdownTableHead,
+              td: MarkdownTableCell,
+              code({ node, className, children, ...props }: any) {
+                const isInline =
+                  !node?.parent || node?.parent?.tagName !== "pre";
 
-              if (isInline) {
+                if (isInline) {
+                  return (
+                    <code
+                      className="px-1.5 py-0.5 rounded-md bg-neutral-900 border border-neutral-800 text-neutral-200 font-mono text-sm font-normal before:content-none after:content-none"
+                      {...props}
+                    >
+                      {children}
+                    </code>
+                  );
+                }
+
                 return (
-                  <code
-                    className="px-1.5 py-0.5 rounded-md bg-neutral-900 border border-neutral-800 text-neutral-200 font-mono text-sm font-normal before:content-none after:content-none"
-                    {...props}
-                  >
+                  <code className={className} {...props}>
                     {children}
                   </code>
                 );
-              }
-
-              return (
-                <code className={className} {...props}>
-                  {children}
-                </code>
-              );
-            },
-            img({ src, alt, ...props }) {
-              return <BlogImage src={src} alt={alt} {...props} />;
-            },
-          }}
-        >
-          {blog.content}
-        </ReactMarkdown>
-      </section>
+              },
+              img({ src, alt, ...props }) {
+                return <BlogImage src={src} alt={alt} {...props} />;
+              },
+            }}
+          >
+            {blog.content}
+          </ReactMarkdown>
+        </section>
+      }
 
       <BlogCTA />
       <Separator className="my-10" />

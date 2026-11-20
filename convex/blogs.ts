@@ -1191,7 +1191,8 @@ export const getBlogWithAuthorPosts = query({
     if (!blog) return null;
 
     const identity = await ctx.auth.getUserIdentity();
-    const userId = identity ? (identity.subject as Id<"profiles">) : null;
+    const authUserId = identity?.subject ?? null;
+    const profileUserId = identity ? (identity.subject as Id<"profiles">) : null;
 
     const [
       authorProfile,
@@ -1200,6 +1201,7 @@ export const getBlogWithAuthorPosts = query({
       userReactionsList,
       featured,
       bookmark,
+      linkedSeriesItems,
     ] = await Promise.all([
       ctx.db
         .query("profiles")
@@ -1212,53 +1214,94 @@ export const getBlogWithAuthorPosts = query({
         .order("desc")
         .take(6),
 
-      userId
+      profileUserId
         ? ctx.db
             .query("blogVotes")
             .withIndex("by_user_and_blog", (q) =>
-              q.eq("userId", userId).eq("blogId", blog._id)
+              q.eq("userId", profileUserId).eq("blogId", blog._id)
             )
             .unique()
         : Promise.resolve(null),
 
-      userId
+      profileUserId
         ? ctx.db
             .query("blogReactions")
             .withIndex("by_user_blog_and_type", (q) =>
-              q.eq("userId", userId).eq("blogId", blog._id)
+              q.eq("userId", profileUserId).eq("blogId", blog._id)
             )
             .collect()
         : Promise.resolve([]),
 
-      userId
+      profileUserId
         ? ctx.db
             .query("featuredBlogs")
             .withIndex("by_user_and_blog", (q) =>
-              q.eq("userId", userId).eq("blogId", blog._id)
+              q.eq("userId", profileUserId).eq("blogId", blog._id)
             )
             .unique()
         : Promise.resolve(null),
 
-      userId
+      profileUserId
         ? ctx.db
             .query("bookmarks")
             .withIndex("by_user_and_blog", (q) =>
-              q.eq("userId", userId).eq("blogId", blog._id)
+              q.eq("userId", profileUserId).eq("blogId", blog._id)
             )
             .unique()
         : Promise.resolve(null),
+
+      ctx.db
+        .query("seriesItems")
+        .withIndex("by_article", (q) => q.eq("articleId", blog._id))
+        .collect(),
     ]);
+
+    const seriesDocs = (
+      await Promise.all(linkedSeriesItems.map((item) => ctx.db.get(item.seriesId)))
+    ).filter((s): s is NonNullable<typeof s> => s !== null);
+
+    const paidCourses = seriesDocs.filter(
+      (s) =>
+        s.isCourse === true &&
+        s.isFree !== true &&
+        typeof s.price === "number" &&
+        s.price > 0
+    );
+
+    const isPartOfPaidCourse = paidCourses.length > 0;
+
+    let hasPaidForCourse = false;
+    if (isPartOfPaidCourse && authUserId) {
+      const checks = await Promise.all(
+        paidCourses.map(async (course) => {
+          if (course.authorId === authUserId) return true;
+
+          const purchase = await ctx.db
+            .query("purchases")
+            .withIndex("by_user_and_series", (q) =>
+              q.eq("userId", authUserId).eq("seriesId", course._id)
+            )
+            .first();
+
+          return Boolean(purchase);
+        })
+      );
+
+      hasPaidForCourse = checks.some(Boolean);
+    }
+    
+    const canAccessPaidCourse = isPartOfPaidCourse && hasPaidForCourse;
 
     const filteredAuthorPosts = rawAuthorPosts
       .filter((post) => post._id !== blog._id)
       .slice(0, 5);
 
     const [
-      blogImageUrl, 
-      resolvedVideoUrl, 
-      profilePicUrl, 
-      defaultProfilePicUrl, 
-      authorPostsWithImages
+      blogImageUrl,
+      resolvedVideoUrl,
+      profilePicUrl,
+      defaultProfilePicUrl,
+      authorPostsWithImages,
     ] = await Promise.all([
       blog.storageId ? ctx.storage.getUrl(blog.storageId) : Promise.resolve(null),
       blog.videoStorageId ? ctx.storage.getUrl(blog.videoStorageId) : Promise.resolve(null),
@@ -1292,6 +1335,8 @@ export const getBlogWithAuthorPosts = query({
         profilePicUrl,
         defaultProfilePicUrl,
       },
+      isPartOfPaidCourse,
+      canAccessPaidCourse,
       authorPosts: authorPostsWithImages,
       interactionState: {
         voteState: {
