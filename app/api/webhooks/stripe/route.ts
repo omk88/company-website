@@ -33,61 +33,44 @@ function verifyStripeSignature(payload: string, sigHeader: string, secret: strin
   );
 }
 
-function getConvexAdminClient() {
-  const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
-  const deployKey = process.env.CONVEX_DEPLOY_KEY;
-  if (!convexUrl || !deployKey) {
-    throw new Error("Missing NEXT_PUBLIC_CONVEX_URL or CONVEX_DEPLOY_KEY");
-  }
-  const client = new ConvexHttpClient(convexUrl);
-  (client as any).setAdminAuth(deployKey);
-  return client;
-}
-
 async function resolveCheckoutSession(event: any, secretKey: string) {
-  let session = event?.data?.object;
+  const sessionId =
+    (typeof event?.related_object?.id === "string" && event.related_object.id.startsWith("cs_")
+      ? event.related_object.id
+      : null) ||
+    (typeof event?.data?.object?.id === "string" && event.data.object.id.startsWith("cs_")
+      ? event.data.object.id
+      : null) ||
+    (typeof event?.data?.id === "string" && event.data.id.startsWith("cs_")
+      ? event.data.id
+      : null);
 
-  if (!session?.metadata || !session?.id) {
-    try {
-      const eventRes = await fetch(`https://api.stripe.com/v1/events/${event.id}`, {
+  if (sessionId) {
+    const sessionRes = await fetch(
+      `https://api.stripe.com/v1/checkout/sessions/${sessionId}`,
+      {
         method: "GET",
         headers: {
           Authorization: `Bearer ${secretKey}`,
         },
         cache: "no-store",
-      });
-
-      if (eventRes.ok) {
-        const fullEvent = await eventRes.json();
-        session = fullEvent?.data?.object ?? session;
       }
-    } catch (err) {
-      console.error("Failed to fetch full Stripe checkout event:", err);
+    );
+
+    if (sessionRes.ok) {
+      return await sessionRes.json();
     }
+
+    console.error("Failed to fetch Stripe checkout session:", sessionId, await sessionRes.text());
+    return null;
   }
 
-  if (typeof session?.id === "string" && session.id.startsWith("cs_") && !session?.metadata) {
-    try {
-      const sessionRes = await fetch(
-        `https://api.stripe.com/v1/checkout/sessions/${session.id}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${secretKey}`,
-          },
-          cache: "no-store",
-        }
-      );
-
-      if (sessionRes.ok) {
-        session = await sessionRes.json();
-      }
-    } catch (err) {
-      console.error("Failed to retrieve Stripe Checkout Session:", err);
-    }
-  }
-
-  return session;
+  console.warn("No cs_ session ID found on event payload:", {
+    eventId: event?.id,
+    relatedObject: event?.related_object,
+    data: event?.data,
+  });
+  return null;
 }
 
 export async function POST(req: Request) {
