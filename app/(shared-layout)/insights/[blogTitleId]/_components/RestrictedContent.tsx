@@ -158,8 +158,8 @@ export function RestrictedContent({
                 src={coverImageSrc}
                 alt={primarySeries?.title || "Course cover"}
                 fill
-                sizes="(max-width: 640px) 100vw, 256px"
                 className="object-cover"
+                sizes="300px"
               />
             </div>
 
