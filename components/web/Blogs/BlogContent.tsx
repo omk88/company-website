@@ -156,7 +156,7 @@ export function BlogContent({ blog, preloadedComments, isPartOfPaidCourse, canAc
 
       <TableOfContents headings={headings} />
 
-      {!isPartOfPaidCourse || canAccessPaidCourse &&
+      {(!isPartOfPaidCourse) || (isPartOfPaidCourse && canAccessPaidCourse) &&
         <section className="prose prose-neutral dark:prose-invert max-w-none text-lg leading-relaxed w-full min-w-0 [&_p]:break-words">
           <ReactMarkdown
             remarkPlugins={[remarkGfm, remarkMetaAsData]}
