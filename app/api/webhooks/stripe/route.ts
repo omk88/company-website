@@ -114,7 +114,11 @@ export async function POST(req: Request) {
   ) {
     try {
       const session = await resolveCheckoutSession(event, secretKey);
-      console.error("RESOLVED CHECKOUT SESSION:", JSON.stringify(session, null, 2));
+
+      console.error("RESOLVED CHECKOUT SESSION:", JSON.stringify(session, null, 2)); // undefined
+      console.error("EVENT:", event);
+      console.error("SECRETKEY:", secretKey);
+
       const { seriesId, buyerUserId, authorId } = session?.metadata || {};
 
       await fetchMutation(api.purchases.recordCompletedPurchaseFromWebhook, {
