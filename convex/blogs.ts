@@ -1289,8 +1289,9 @@ export const getBlogWithAuthorPosts = query({
 
       hasPaidForCourse = checks.some(Boolean);
     }
-    
+
     const canAccessPaidCourse = isPartOfPaidCourse && hasPaidForCourse;
+    const canViewContent = !isPartOfPaidCourse || hasPaidForCourse;
 
     const filteredAuthorPosts = rawAuthorPosts
       .filter((post) => post._id !== blog._id)
@@ -1330,13 +1331,16 @@ export const getBlogWithAuthorPosts = query({
     return {
       blog: {
         ...blog,
+        content: canViewContent ? blog.content : undefined,
+        videoUrl: canViewContent ? (resolvedVideoUrl ?? blog.videoUrl ?? undefined) : undefined,
+        audioUrl: canViewContent ? blog.audioUrl : undefined,
         imageUrl: blogImageUrl ?? "/noImage.png",
-        videoUrl: resolvedVideoUrl ?? blog.videoUrl ?? undefined,
         profilePicUrl,
         defaultProfilePicUrl,
       },
       isPartOfPaidCourse,
       canAccessPaidCourse,
+      canViewContent,
       authorPosts: authorPostsWithImages,
       interactionState: {
         voteState: {

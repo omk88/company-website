@@ -136,7 +136,7 @@ export default async function BlogPage({ params }: BlogPageProps) {
 
         <main className="flex-1 min-w-0 md:px-0 px-1 pt-13.5 md:pt-16 pb-16">
           <div className="max-w-3xl mx-auto">
-            <BlogContent blog={blog} preloadedComments={preloadedComments} isPartOfPaidCourse={blogData.isPartOfPaidCourse} canAccessPaidCourse={blogData.canAccessPaidCourse} />
+            <BlogContent blog={blog} preloadedComments={preloadedComments} isPartOfPaidCourse={blogData.isPartOfPaidCourse} canAccessPaidCourse={blogData.canAccessPaidCourse} canViewContent={blogData.canViewContent} />
           </div>
         </main>
 

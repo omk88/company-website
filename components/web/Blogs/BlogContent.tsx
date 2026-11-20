@@ -22,7 +22,14 @@ import { extractHeadings } from "@/app/(shared-layout)/insights/[blogTitleId]/_u
 import { TableOfContents } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/TableOfContents";
 import rehypeSlug from "rehype-slug";
 import { BlogImage } from "../BlogImage";
-import { MarkdownTable, MarkdownTableBody, MarkdownTableCell, MarkdownTableHead, MarkdownTableHeader, MarkdownTableRow } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/MarkdownTable";
+import {
+  MarkdownTable,
+  MarkdownTableBody,
+  MarkdownTableCell,
+  MarkdownTableHead,
+  MarkdownTableHeader,
+  MarkdownTableRow,
+} from "@/app/(shared-layout)/insights/[blogTitleId]/_components/MarkdownTable";
 import { BlogLastUpdated } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/BlogLastUpdated";
 import { ShareLinks } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/ShareLinks";
 import { BlogSeriesNavbar } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/SeriesNavbarCard";
@@ -77,7 +84,10 @@ function rehypeConditionalAutolink() {
   };
 }
 
-interface ExtendedBlog extends Doc<"blogs"> {
+interface ExtendedBlog extends Omit<Doc<"blogs">, "content" | "videoUrl" | "audioUrl"> {
+  content?: string;
+  videoUrl?: string;
+  audioUrl?: string;
   imageUrl: string;
   profilePicUrl: string | null;
   defaultProfilePicUrl: string | null;
@@ -88,36 +98,42 @@ interface BlogContentProps {
   preloadedComments: Preloaded<typeof api.comments.getCommentsByBlog>;
   isPartOfPaidCourse: boolean;
   canAccessPaidCourse: boolean;
+  canViewContent: boolean;
 }
 
-export function BlogContent({ blog, preloadedComments, isPartOfPaidCourse, canAccessPaidCourse }: BlogContentProps) {
+export function BlogContent({
+  blog,
+  preloadedComments,
+  isPartOfPaidCourse,
+  canAccessPaidCourse,
+  canViewContent,
+}: BlogContentProps) {
   const avatarSrc = blog.profilePicUrl || blog.defaultProfilePicUrl || "/noImage.png";
-
-  const headings = extractHeadings(blog.content);
+  const headings = extractHeadings(canViewContent ? blog.content : "");
 
   return (
     <article className="p-2">
       <ViewTracker blogId={blog._id} />
 
-      {!blog.isVideo &&
+      {!blog.isVideo && (
         <div className="relative w-full h-[300px] md:h-[400px] rounded-lg overflow-hidden">
-            <Image
-              unoptimized
-              src={blog.imageUrl}
-              alt={blog.title}
-              fill
-              priority
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1920px"
-              className="object-cover"
-            />
+          <Image
+            unoptimized
+            src={blog.imageUrl}
+            alt={blog.title}
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1920px"
+            className="object-cover"
+          />
         </div>
-      }
+      )}
 
-      {blog.isVideo &&
+      {blog.isVideo && canViewContent && blog.videoUrl && (
         <div className="relative w-full h-[300px] md:h-[400px] overflow-hidden">
           <BlogVideoPlayer videoUrl={blog.videoUrl} />
         </div>
-      }
+      )}
 
       <header className="flex flex-col">
         <h1 className="text-4xl font-bold tracking-tight text-neutral-950 dark:text-neutral-50">
@@ -138,7 +154,7 @@ export function BlogContent({ blog, preloadedComments, isPartOfPaidCourse, canAc
         </div>
 
         <div className="mb-4">
-          <BlogEmojiReactions initialBlog={blog} />
+          <BlogEmojiReactions initialBlog={blog as Doc<"blogs">} />
         </div>
 
         <div className="flex flex-col gap-4">
@@ -146,24 +162,26 @@ export function BlogContent({ blog, preloadedComments, isPartOfPaidCourse, canAc
           <p className="text-lg text-neutral-600 dark:text-neutral-400 font-medium">
             {blog.subtitle}
           </p>
-          <AudioPlayer audioUrl={blog.audioUrl} title={blog.title} chapters={blog.chapters} />
+          {canViewContent && (
+            <AudioPlayer
+              audioUrl={blog.audioUrl}
+              title={blog.title}
+              chapters={blog.chapters}
+            />
+          )}
           <ShareLinks />
         </div>
-
       </header>
 
       <Separator className="mt-8" />
 
-      <TableOfContents headings={headings} />
+      {canViewContent && <TableOfContents headings={headings} />}
 
-      {(!isPartOfPaidCourse) || (isPartOfPaidCourse && canAccessPaidCourse) &&
+      {canViewContent && blog.content ? (
         <section className="prose prose-neutral dark:prose-invert max-w-none text-lg leading-relaxed w-full min-w-0 [&_p]:break-words">
           <ReactMarkdown
             remarkPlugins={[remarkGfm, remarkMetaAsData]}
-            rehypePlugins={[
-              rehypeSlug,
-              rehypeConditionalAutolink,
-            ]}
+            rehypePlugins={[rehypeSlug, rehypeConditionalAutolink]}
             components={{
               pre: CodeBlock,
               table: MarkdownTable,
@@ -173,8 +191,7 @@ export function BlogContent({ blog, preloadedComments, isPartOfPaidCourse, canAc
               th: MarkdownTableHead,
               td: MarkdownTableCell,
               code({ node, className, children, ...props }: any) {
-                const isInline =
-                  !node?.parent || node?.parent?.tagName !== "pre";
+                const isInline = !node?.parent || node?.parent?.tagName !== "pre";
 
                 if (isInline) {
                   return (
@@ -201,7 +218,18 @@ export function BlogContent({ blog, preloadedComments, isPartOfPaidCourse, canAc
             {blog.content}
           </ReactMarkdown>
         </section>
-      }
+      ) : (
+        isPartOfPaidCourse && (
+          <section className="my-8 rounded-xl border border-neutral-800 bg-neutral-900/60 p-6 text-center">
+            <h2 className="text-xl font-semibold text-neutral-100">
+              This lesson is part of a paid course
+            </h2>
+            <p className="mt-2 text-sm text-neutral-400">
+              Purchase the course to unlock the full lesson content and media.
+            </p>
+          </section>
+        )
+      )}
 
       <BlogCTA />
       <Separator className="my-10" />
