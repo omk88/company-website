@@ -96,20 +96,16 @@ interface ExtendedBlog extends Omit<Doc<"blogs">, "content" | "videoUrl" | "audi
 interface BlogContentProps {
   blog: ExtendedBlog;
   preloadedComments: Preloaded<typeof api.comments.getCommentsByBlog>;
-  isPartOfPaidCourse: boolean;
-  canAccessPaidCourse: boolean;
-  canViewContent: boolean;
+  userCanAccessBlog: boolean;
 }
 
 export function BlogContent({
   blog,
   preloadedComments,
-  isPartOfPaidCourse,
-  canAccessPaidCourse,
-  canViewContent,
+  userCanAccessBlog,
 }: BlogContentProps) {
   const avatarSrc = blog.profilePicUrl || blog.defaultProfilePicUrl || "/noImage.png";
-  const headings = extractHeadings(canViewContent ? blog.content : "");
+  const headings = extractHeadings(userCanAccessBlog ? blog.content : "");
 
   return (
     <article className="p-2">
@@ -129,7 +125,7 @@ export function BlogContent({
         </div>
       )}
 
-      {blog.isVideo && canViewContent && blog.videoUrl && (
+      {blog.isVideo && userCanAccessBlog && blog.videoUrl && (
         <div className="relative w-full h-[300px] md:h-[400px] overflow-hidden">
           <BlogVideoPlayer videoUrl={blog.videoUrl} />
         </div>
@@ -162,7 +158,7 @@ export function BlogContent({
           <p className="text-lg text-neutral-600 dark:text-neutral-400 font-medium">
             {blog.subtitle}
           </p>
-          {canViewContent && (
+          {userCanAccessBlog && (
             <AudioPlayer
               audioUrl={blog.audioUrl}
               title={blog.title}
@@ -175,9 +171,9 @@ export function BlogContent({
 
       <Separator className="mt-8" />
 
-      {canViewContent && <TableOfContents headings={headings} />}
+      {userCanAccessBlog && <TableOfContents headings={headings} />}
 
-      {canViewContent && blog.content ? (
+      {userCanAccessBlog && blog.content ? (
         <section className="prose prose-neutral dark:prose-invert max-w-none text-lg leading-relaxed w-full min-w-0 [&_p]:break-words">
           <ReactMarkdown
             remarkPlugins={[remarkGfm, remarkMetaAsData]}
@@ -219,7 +215,7 @@ export function BlogContent({
           </ReactMarkdown>
         </section>
       ) : (
-        isPartOfPaidCourse && (
+        !userCanAccessBlog && (
           <section className="my-8 rounded-xl border border-neutral-800 bg-neutral-900/60 p-6 text-center">
             <h2 className="text-xl font-semibold text-neutral-100">
               This lesson is part of a paid course

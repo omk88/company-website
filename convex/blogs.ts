@@ -1256,42 +1256,47 @@ export const getBlogWithAuthorPosts = query({
         .collect(),
     ]);
 
-    const seriesDocs = (
-      await Promise.all(linkedSeriesItems.map((item) => ctx.db.get(item.seriesId)))
-    ).filter((s): s is NonNullable<typeof s> => s !== null);
+    // Default to true when the blog is not in any seriesItems
+    let userCanAccessBlog = true;
 
-    const paidCourses = seriesDocs.filter(
-      (s) =>
-        s.isCourse === true &&
-        s.isFree !== true &&
-        typeof s.price === "number" &&
-        s.price > 0
-    );
+    if (linkedSeriesItems.length > 0) {
+      const seriesDocs = (
+        await Promise.all(linkedSeriesItems.map((item) => ctx.db.get(item.seriesId)))
+      ).filter((s): s is NonNullable<typeof s> => s !== null);
 
-    const isPartOfPaidCourse = paidCourses.length > 0;
+      const paidCourses = seriesDocs.filter((series) => {
+        const isCourse = series.isCourse === true;
+        const price = series.price ?? 0;
+        const isPaid = isCourse && price > 0;
 
-    let hasPaidForCourse = false;
-    if (isPartOfPaidCourse && authUserId) {
-      const checks = await Promise.all(
-        paidCourses.map(async (course) => {
-          if (course.authorId === authUserId) return true;
+        // If (isCourse == false or undefined) and (price == 0 or undefined), it's not a paid course
+        return isPaid;
+      });
 
-          const purchase = await ctx.db
-            .query("purchases")
-            .withIndex("by_user_and_series", (q) =>
-              q.eq("userId", authUserId).eq("seriesId", course._id)
-            )
-            .first();
+      if (paidCourses.length > 0) {
+        if (!authUserId) {
+          userCanAccessBlog = false;
+        } else {
+          const accessChecks = await Promise.all(
+            paidCourses.map(async (course) => {
+              if (course.authorId === authUserId) return true;
 
-          return Boolean(purchase);
-        })
-      );
+              const purchase = await ctx.db
+                .query("purchases")
+                .withIndex("by_user_and_series", (q) =>
+                  q.eq("userId", authUserId).eq("seriesId", course._id)
+                )
+                .first();
 
-      hasPaidForCourse = checks.some(Boolean);
+              return Boolean(purchase);
+            })
+          );
+
+          // True only if the user has purchased at least one paid course containing this blog
+          userCanAccessBlog = accessChecks.some(Boolean);
+        }
+      }
     }
-
-    const canAccessPaidCourse = isPartOfPaidCourse && hasPaidForCourse;
-    const canViewContent = !isPartOfPaidCourse || hasPaidForCourse;
 
     const filteredAuthorPosts = rawAuthorPosts
       .filter((post) => post._id !== blog._id)
@@ -1331,16 +1336,14 @@ export const getBlogWithAuthorPosts = query({
     return {
       blog: {
         ...blog,
-        content: canViewContent ? blog.content : undefined,
-        videoUrl: canViewContent ? (resolvedVideoUrl ?? blog.videoUrl ?? undefined) : undefined,
-        audioUrl: canViewContent ? blog.audioUrl : undefined,
+        content: userCanAccessBlog ? blog.content : undefined,
+        videoUrl: userCanAccessBlog ? (resolvedVideoUrl ?? blog.videoUrl ?? undefined) : undefined,
+        audioUrl: userCanAccessBlog ? blog.audioUrl : undefined,
         imageUrl: blogImageUrl ?? "/noImage.png",
         profilePicUrl,
         defaultProfilePicUrl,
       },
-      isPartOfPaidCourse,
-      canAccessPaidCourse,
-      canViewContent,
+      userCanAccessBlog,
       authorPosts: authorPostsWithImages,
       interactionState: {
         voteState: {
