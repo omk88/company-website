@@ -114,12 +114,8 @@ export async function POST(req: Request) {
   ) {
     try {
       const session = await resolveCheckoutSession(event, secretKey);
+      console.error("RESOLVED CHECKOUT SESSION:", JSON.stringify(session, null, 2));
       const { seriesId, buyerUserId, authorId } = session?.metadata || {};
-
-      const isPaidOrFreePromo =
-        !session?.payment_status ||
-        session.payment_status === "paid" ||
-        session.payment_status === "no_payment_required";
 
       await fetchMutation(api.purchases.recordCompletedPurchaseFromWebhook, {
         webhookSecret: process.env.CONVEX_WEBHOOK_SECRET!,
