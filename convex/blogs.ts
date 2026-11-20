@@ -1172,6 +1172,64 @@ export const getBlogById = query({
   }
 });
 
+export const getBlogAccessState = query({
+  args: { blogId: v.id("blogs") },
+  handler: async (ctx, args) => {
+    const blog = await ctx.db.get(args.blogId);
+    if (!blog) {
+      return { userCanAccessBlog: false, isPartOfPaidCourse: false };
+    }
+
+    const linkedSeriesItems = await ctx.db
+      .query("seriesItems")
+      .withIndex("by_article", (q) => q.eq("articleId", blog._id))
+      .collect();
+
+    if (linkedSeriesItems.length === 0) {
+      return { userCanAccessBlog: true, isPartOfPaidCourse: false };
+    }
+
+    const seriesDocs = (
+      await Promise.all(linkedSeriesItems.map((item) => ctx.db.get(item.seriesId)))
+    ).filter((s): s is NonNullable<typeof s> => s !== null);
+
+    const paidCourses = seriesDocs.filter(
+      (s) => s.isCourse === true && (s.price ?? 0) > 0
+    );
+
+    if (paidCourses.length === 0) {
+      return { userCanAccessBlog: true, isPartOfPaidCourse: false };
+    }
+
+    const identity = await ctx.auth.getUserIdentity();
+    const authUserId = identity?.subject ?? null;
+
+    if (!authUserId) {
+      return { userCanAccessBlog: false, isPartOfPaidCourse: true };
+    }
+
+    const checks = await Promise.all(
+      paidCourses.map(async (course) => {
+        if (course.authorId === authUserId) return true;
+
+        const purchase = await ctx.db
+          .query("purchases")
+          .withIndex("by_user_and_series", (q) =>
+            q.eq("userId", authUserId).eq("seriesId", course._id)
+          )
+          .first();
+
+        return Boolean(purchase);
+      })
+    );
+
+    return {
+      userCanAccessBlog: checks.some(Boolean),
+      isPartOfPaidCourse: true,
+    };
+  },
+});
+
 export const getBlogWithAuthorPosts = query({
   args: { blogTitleId: v.string() },
   handler: async (ctx, args) => {
@@ -1191,7 +1249,6 @@ export const getBlogWithAuthorPosts = query({
     if (!blog) return null;
 
     const identity = await ctx.auth.getUserIdentity();
-    const authUserId = identity?.subject ?? null;
     const profileUserId = identity ? (identity.subject as Id<"profiles">) : null;
 
     const [
@@ -1201,7 +1258,6 @@ export const getBlogWithAuthorPosts = query({
       userReactionsList,
       featured,
       bookmark,
-      linkedSeriesItems,
     ] = await Promise.all([
       ctx.db
         .query("profiles")
@@ -1249,54 +1305,7 @@ export const getBlogWithAuthorPosts = query({
             )
             .unique()
         : Promise.resolve(null),
-
-      ctx.db
-        .query("seriesItems")
-        .withIndex("by_article", (q) => q.eq("articleId", blog._id))
-        .collect(),
     ]);
-
-    // Default to true when the blog is not in any seriesItems
-    let userCanAccessBlog = true;
-
-    if (linkedSeriesItems.length > 0) {
-      const seriesDocs = (
-        await Promise.all(linkedSeriesItems.map((item) => ctx.db.get(item.seriesId)))
-      ).filter((s): s is NonNullable<typeof s> => s !== null);
-
-      const paidCourses = seriesDocs.filter((series) => {
-        const isCourse = series.isCourse === true;
-        const price = series.price ?? 0;
-        const isPaid = isCourse && price > 0;
-
-        // If (isCourse == false or undefined) and (price == 0 or undefined), it's not a paid course
-        return isPaid;
-      });
-
-      if (paidCourses.length > 0) {
-        if (!authUserId) {
-          userCanAccessBlog = false;
-        } else {
-          const accessChecks = await Promise.all(
-            paidCourses.map(async (course) => {
-              if (course.authorId === authUserId) return true;
-
-              const purchase = await ctx.db
-                .query("purchases")
-                .withIndex("by_user_and_series", (q) =>
-                  q.eq("userId", authUserId).eq("seriesId", course._id)
-                )
-                .first();
-
-              return Boolean(purchase);
-            })
-          );
-
-          // True only if the user has purchased at least one paid course containing this blog
-          userCanAccessBlog = accessChecks.some(Boolean);
-        }
-      }
-    }
 
     const filteredAuthorPosts = rawAuthorPosts
       .filter((post) => post._id !== blog._id)
@@ -1336,14 +1345,11 @@ export const getBlogWithAuthorPosts = query({
     return {
       blog: {
         ...blog,
-        content: userCanAccessBlog ? blog.content : undefined,
-        videoUrl: userCanAccessBlog ? (resolvedVideoUrl ?? blog.videoUrl ?? undefined) : undefined,
-        audioUrl: userCanAccessBlog ? blog.audioUrl : undefined,
         imageUrl: blogImageUrl ?? "/noImage.png",
+        videoUrl: resolvedVideoUrl ?? blog.videoUrl ?? undefined,
         profilePicUrl,
         defaultProfilePicUrl,
       },
-      userCanAccessBlog,
       authorPosts: authorPostsWithImages,
       interactionState: {
         voteState: {
