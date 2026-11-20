@@ -1313,11 +1313,28 @@ export const getBlogWithAuthorPosts = query({
         .collect(),
     ]);
 
-    const seriesDocs = (
-      await Promise.all(linkedSeriesItems.map((item) => ctx.db.get(item.seriesId)))
+    const seriesWithCounts = (
+      await Promise.all(
+        linkedSeriesItems.map(async (item) => {
+          const [seriesDoc, allItemsInSeries] = await Promise.all([
+            ctx.db.get(item.seriesId),
+            ctx.db
+              .query("seriesItems")
+              .withIndex("by_series_and_order", (q) => q.eq("seriesId", item.seriesId))
+              .collect(),
+          ]);
+
+          if (!seriesDoc) return null;
+
+          return {
+            ...seriesDoc,
+            articleCount: allItemsInSeries.length,
+          };
+        })
+      )
     ).filter((s): s is NonNullable<typeof s> => s !== null);
 
-    const primarySeries = seriesDocs[0] ?? null;
+    const primarySeries = seriesWithCounts[0] ?? null;
 
     const filteredAuthorPosts = rawAuthorPosts
       .filter((post) => post._id !== blog._id)
@@ -1363,7 +1380,8 @@ export const getBlogWithAuthorPosts = query({
         defaultProfilePicUrl,
       },
       series: primarySeries,
-      seriesList: seriesDocs,
+      seriesArticleCount: primarySeries?.articleCount ?? 0,
+      seriesList: seriesWithCounts,
       authorPosts: authorPostsWithImages,
       interactionState: {
         voteState: {

@@ -20,18 +20,26 @@ interface ExtendedBlog extends Doc<"blogs"> {
   defaultProfilePicUrl: string | null;
 }
 
+type SeriesWithArticleCount = Doc<"series"> & {
+  articleCount?: number;
+};
+
 interface BlogContentProps {
   blog: ExtendedBlog;
-  primarySeries: Doc<"series"> | null;
+  primarySeries: SeriesWithArticleCount | null;
+  seriesArticleCount?: number;
   preloadedComments: Preloaded<typeof api.comments.getCommentsByBlog>;
 }
 
 export function BlogContent({
   blog,
   primarySeries,
+  seriesArticleCount,
   preloadedComments,
 }: BlogContentProps) {
   const avatarSrc = blog.profilePicUrl || blog.defaultProfilePicUrl || "/noImage.png";
+  const resolvedSeriesCount =
+    seriesArticleCount ?? primarySeries?.articleCount ?? 0;
 
   return (
     <article className="p-2">
@@ -91,6 +99,7 @@ export function BlogContent({
             chapters={blog.chapters}
             content={blog.content}
             primarySeries={primarySeries}
+            primarySeriesCount={resolvedSeriesCount}
           />
         </div>
       </header>

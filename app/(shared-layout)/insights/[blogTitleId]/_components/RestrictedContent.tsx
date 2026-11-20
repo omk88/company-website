@@ -28,7 +28,7 @@ import {
 } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/MarkdownTable";
 import BlogVideoPlayer from "@/app/(shared-layout)/insights/[blogTitleId]/_components/BlogVideoPlayer";
 import { Badge } from "@/components/ui/badge";
-import { Film, Library } from "lucide-react";
+import { Library } from "lucide-react";
 import Image from "next/image";
 import { getCurrencySymbol } from "@/app/(shared-layout)/[username]/_components/LeftSidebarArticleSeries";
 
@@ -81,6 +81,10 @@ function rehypeConditionalAutolink() {
   };
 }
 
+type SeriesWithArticleCount = Doc<"series"> & {
+  articleCount?: number;
+};
+
 interface RestrictedContentProps {
   blogId: Id<"blogs">;
   title: string;
@@ -89,7 +93,8 @@ interface RestrictedContentProps {
   audioUrl?: string;
   chapters?: Doc<"blogs">["chapters"];
   content?: string;
-  primarySeries: Doc<"series"> | null;
+  primarySeries: SeriesWithArticleCount | null;
+  primarySeriesCount?: number;
 }
 
 export function RestrictedContent({
@@ -101,11 +106,14 @@ export function RestrictedContent({
   chapters,
   content,
   primarySeries,
+  primarySeriesCount,
 }: RestrictedContentProps) {
   const accessState = useQuery(api.blogs.getBlogAccessState, { blogId });
   const series = useQuery(api.series.getSeriesForBlog, { blogId });
 
   const userCanAccessBlog = accessState?.userCanAccessBlog ?? Boolean(content);
+  const articleCount =
+    primarySeriesCount ?? primarySeries?.articleCount ?? 0;
 
   const headings = extractHeadings(userCanAccessBlog ? content : "");
 
@@ -141,7 +149,7 @@ export function RestrictedContent({
             <div className="relative aspect-video w-full shrink-0 overflow-hidden bg-neutral-900 sm:aspect-auto sm:w-56 md:w-64">
               <Image
                 src="/comp1.png"
-                alt="Mastering Full-Stack Architecture"
+                alt={primarySeries?.title || "Course cover"}
                 fill
                 sizes="(max-width: 640px) 100vw, 256px"
                 className="object-cover"
@@ -155,15 +163,7 @@ export function RestrictedContent({
                     <Badge variant={"outline"} className="gap-1.5 py-1 px-2.5 text-neutral-400">
                       <Library className="w-3.5 h-3.5" />
                       <span>
-                        {7} {"Articles"}
-                      </span>
-                    </Badge>
-                  </div>
-                  <div className="flex items-center">
-                    <Badge variant={"outline"} className="gap-1.5 py-1 px-2.5 text-neutral-400">
-                      <Film className="w-3.5 h-3.5" />
-                      <span>
-                        {4} {"Videos"}
+                        {articleCount} {articleCount === 1 ? "Article" : "Articles"}
                       </span>
                     </Badge>
                   </div>
