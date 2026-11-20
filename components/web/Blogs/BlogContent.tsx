@@ -11,7 +11,9 @@ import { BlogName } from "./BlogName";
 import { BlogLastUpdated } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/BlogLastUpdated";
 import { ShareLinks } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/ShareLinks";
 import { BlogSeriesNavbar } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/SeriesNavbarCard";
-import { GatedLessonContent } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/GatedLessonContent";
+import { RestrictedContent } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/RestrictedContent";
+import { Badge } from "@/components/ui/badge";
+import { Clock, Film, Library } from "lucide-react";
 
 interface ExtendedBlog extends Doc<"blogs"> {
   imageUrl: string;
@@ -76,8 +78,8 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
           </p>
 
           <ShareLinks />
-          
-          <GatedLessonContent
+
+          <RestrictedContent
             blogId={blog._id}
             title={blog.title}
             isVideo={blog.isVideo}
@@ -95,6 +97,7 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
       <section id="comments">
         <CommentSection preloadedComments={preloadedComments} />
       </section>
+
     </article>
   );
 }

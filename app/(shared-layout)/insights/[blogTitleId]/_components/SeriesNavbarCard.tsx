@@ -4,9 +4,8 @@ import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Doc } from "@/convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Layers, List } from "lucide-react";
+import { ChevronLeft, ChevronRight, List } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { SeriesHoverCard } from "./SeriesHoverCard";
 
 interface BlogSeriesNavbarProps {
@@ -15,7 +14,6 @@ interface BlogSeriesNavbarProps {
 
 export function BlogSeriesNavbar({ blogId }: BlogSeriesNavbarProps) {
   const seriesList = useQuery(api.series.getSeriesForBlog, { blogId });
-  const pathname = usePathname();
 
   if (!seriesList || seriesList.length === 0) return null;
 

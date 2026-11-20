@@ -27,6 +27,9 @@ import {
   MarkdownTableRow,
 } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/MarkdownTable";
 import BlogVideoPlayer from "@/app/(shared-layout)/insights/[blogTitleId]/_components/BlogVideoPlayer";
+import { Badge } from "@/components/ui/badge";
+import { Film, Library } from "lucide-react";
+import Image from "next/image";
 
 const lowlight = createLowlight();
 lowlight.register("javascript", js);
@@ -77,7 +80,7 @@ function rehypeConditionalAutolink() {
   };
 }
 
-interface GatedLessonContentProps {
+interface RestrictedContentProps {
   blogId: Id<"blogs">;
   title: string;
   isVideo?: boolean;
@@ -87,7 +90,7 @@ interface GatedLessonContentProps {
   content?: string;
 }
 
-export function GatedLessonContent({
+export function RestrictedContent({
   blogId,
   title,
   isVideo,
@@ -95,7 +98,7 @@ export function GatedLessonContent({
   audioUrl,
   chapters,
   content,
-}: GatedLessonContentProps) {
+}: RestrictedContentProps) {
   const accessState = useQuery(api.blogs.getBlogAccessState, { blogId });
 
   const userCanAccessBlog = accessState?.userCanAccessBlog ?? Boolean(content);
@@ -105,15 +108,103 @@ export function GatedLessonContent({
 
   if (!userCanAccessBlog) {
     return (
-      <section className="my-8 rounded-xl border border-neutral-800 bg-neutral-900/60 p-6 text-center">
-        <h2 className="text-xl font-semibold text-neutral-100">
-          {isPartOfPaidCourse
-            ? "This lesson is part of a paid course"
-            : "This content is currently locked"}
-        </h2>
-        <p className="mt-2 text-sm text-neutral-400">
-          Purchase the course to unlock the full lesson content and media.
-        </p>
+      <section className="my-10 overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-900/60 shadow-2xl backdrop-blur-sm">
+        <div className="border-b border-neutral-800/80 bg-neutral-900/90 px-6 py-6 text-center sm:px-8">
+          <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full border border-green-500/20 bg-green-500/10 text-green-400">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="h-5 w-5"
+            >
+              <path
+                fillRule="evenodd"
+                d="M12 1.5a5.25 5.25 0 0 0-5.25 5.25v3a3 3 0 0 0-3 3v6.75a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3v-6.75a3 3 0 0 0-3-3v-3c0-2.9-2.35-5.25-5.25-5.25Zm3.75 8.25v-3a3.75 3.75 0 1 0-7.5 0v3h7.5Z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </div>
+
+          <h2 className="text-lg font-semibold tracking-tight text-neutral-100 sm:text-xl">
+            This article is part of a paid series
+          </h2>
+          <p className="mx-auto mt-1.5 max-w-md text-sm text-neutral-400">
+            Purchase the full course to unlock this article.
+          </p>
+        </div>
+
+        <div className="p-6 sm:p-8">
+          <div className="group flex flex-col overflow-hidden rounded-xl border border-neutral-800 bg-neutral-950/70 transition-colors hover:border-neutral-700 sm:flex-row">
+            <div className="relative aspect-video w-full shrink-0 overflow-hidden bg-neutral-900 sm:aspect-auto sm:w-56 md:w-64">
+              <Image
+                src="/comp1.png"
+                alt="Mastering Full-Stack Architecture"
+                fill
+                sizes="(max-width: 640px) 100vw, 256px"
+                className="object-cover"
+              />
+            </div>
+
+            <div className="flex flex-1 flex-col justify-between p-5 sm:p-6">
+              <div>
+                <div className="ml-auto flex flex-row gap-1.5">
+                  <div className="flex items-center">
+                    <Badge variant={"outline"} className="gap-1.5 py-1 px-2.5 text-neutral-400">
+                      <Library className="w-3.5 h-3.5" />
+                      <span>
+                        {7} {"Articles"}
+                      </span>
+                    </Badge>
+                  </div>
+                  <div className="flex items-center">
+                    <Badge variant={"outline"} className="gap-1.5 py-1 px-2.5 text-neutral-400">
+                      <Film className="w-3.5 h-3.5" />
+                      <span>
+                        {4} {"Videos"}
+                      </span>
+                    </Badge>
+                  </div>
+                </div>
+
+                <h3 className="mt-2 text-lg font-bold text-neutral-100">
+                  Mastering Full-Stack Architecture
+                </h3>
+
+                <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-neutral-400">
+                  Learn how to design, build, and deploy scalable web applications
+                  from scratch with real-world production patterns.
+                </p>
+              </div>
+
+              <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-neutral-800/80 pt-4">
+                <div className="text-sm text-neutral-400">
+                  Full Lifetime Access:{" "}
+                  <span className="text-base font-semibold text-green-600 dark:text-green-300">
+                    $49
+                  </span>
+                </div>
+
+                <div
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-green-600 dark:bg-green-300 px-4 py-2 text-sm font-semibold text-green-50 transition hover:bg-green-900 hover:text-green-200 cursor-pointer"
+                >
+                  Purchase Series
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    className="h-4 w-4"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M3 10a.75.75 0 0 1 .75-.75h10.638L10.23 5.29a.75.75 0 1 1 1.04-1.08l5.5 5.25a.75.75 0 0 1 0 1.08l-5.5 5.25a.75.75 0 1 1-1.04-1.08l4.158-3.96H3.75A.75.75 0 0 1 3 10Z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
     );
   }
