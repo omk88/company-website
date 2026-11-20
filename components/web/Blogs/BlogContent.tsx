@@ -70,22 +70,24 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
 
         <div className="flex flex-col gap-4">
           <BlogSeriesNavbar blogId={blog._id} />
+          
           <p className="text-lg text-neutral-600 dark:text-neutral-400 font-medium">
             {blog.subtitle}
           </p>
+
           <ShareLinks />
+          
+          <GatedLessonContent
+            blogId={blog._id}
+            title={blog.title}
+            isVideo={blog.isVideo}
+            videoUrl={blog.videoUrl}
+            audioUrl={blog.audioUrl}
+            chapters={blog.chapters}
+            content={blog.content}
+          />
         </div>
       </header>
-
-      <GatedLessonContent
-        blogId={blog._id}
-        title={blog.title}
-        isVideo={blog.isVideo}
-        videoUrl={blog.videoUrl}
-        audioUrl={blog.audioUrl}
-        chapters={blog.chapters}
-        content={blog.content}
-      />
 
       <BlogCTA />
       <Separator className="my-10" />
