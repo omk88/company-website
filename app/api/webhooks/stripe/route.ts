@@ -76,9 +76,10 @@ async function resolveCheckoutSession(event: any, secretKey: string) {
 export async function POST(req: Request) {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   const secretKey = process.env.STRIPE_SECRET_KEY;
+  const convexWebhookSecret = process.env.CONVEX_WEBHOOK_SECRET;
 
-  if (!webhookSecret || !secretKey) {
-    console.error("Missing STRIPE_WEBHOOK_SECRET or STRIPE_SECRET_KEY");
+  if (!webhookSecret || !secretKey || !convexWebhookSecret) {
+    console.error("Missing required webhook environment variables");
     return NextResponse.json({ error: "Server misconfigured" }, { status: 500 });
   }
 
@@ -90,30 +91,61 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
-  const event = JSON.parse(rawBody);
+  let event: any;
+  try {
+    event = JSON.parse(rawBody);
+  } catch (err) {
+    console.error("Failed to parse Stripe webhook payload:", err);
+    return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
+  }
 
-  if (event.type === "checkout.session.completed" ||
-      event.type === "v1.checkout.session.completed"
+  if (
+    event.type === "checkout.session.completed" ||
+    event.type === "v1.checkout.session.completed"
   ) {
     try {
       const session = await resolveCheckoutSession(event, secretKey);
 
-      console.error("RESOLVED CHECKOUT SESSION:", JSON.stringify(session, null, 2)); // undefined
-      console.error("EVENT:", event);
-      console.error("SECRETKEY:", secretKey);
+      if (!session || typeof session.id !== "string") {
+        console.warn("Could not resolve checkout session for event:", event.id);
+        return NextResponse.json({ received: true });
+      }
 
-      const { seriesId, buyerUserId, authorId } = session?.metadata || {};
+      const { seriesId, buyerUserId, authorId } = session.metadata || {};
+      const isCompleteAndPaid =
+        session.status === "complete" &&
+        (!session.payment_status ||
+          session.payment_status === "paid" ||
+          session.payment_status === "no_payment_required");
+
+      if (!isCompleteAndPaid) {
+        console.warn("Checkout session not complete/paid yet, skipping:", {
+          sessionId: session.id,
+          status: session.status,
+          paymentStatus: session.payment_status,
+        });
+        return NextResponse.json({ received: true });
+      }
+
+      if (!seriesId || !buyerUserId || !authorId) {
+        console.warn("Missing required metadata on checkout session:", {
+          sessionId: session.id,
+          metadata: session.metadata,
+        });
+        return NextResponse.json({ received: true });
+      }
 
       await fetchMutation(api.purchases.recordCompletedPurchaseFromWebhook, {
-        webhookSecret: process.env.CONVEX_WEBHOOK_SECRET!,
+        webhookSecret: convexWebhookSecret,
         seriesId: seriesId as Id<"series">,
         userId: buyerUserId,
         authorId,
         amountPaid: typeof session.amount_total === "number" ? session.amount_total : 0,
-        currency: session.currency || "usd",
+        currency: session.currency || "gbp",
         stripeSessionId: session.id,
       });
 
+      console.log("Recorded completed purchase for session:", session.id);
       return NextResponse.json({ received: true });
     } catch (err) {
       console.error("Error processing checkout.session.completed:", err);
