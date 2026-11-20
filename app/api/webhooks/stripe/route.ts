@@ -109,7 +109,9 @@ export async function POST(req: Request) {
 
   const event = JSON.parse(rawBody);
 
-  if (event.type === "checkout.session.completed") {
+  if (event.type === "checkout.session.completed" ||
+      event.type === "v1.checkout.session.completed"
+  ) {
     try {
       const session = await resolveCheckoutSession(event, secretKey);
       const { seriesId, buyerUserId, authorId } = session?.metadata || {};
