@@ -178,3 +178,4 @@ export async function syncStripeAccountStatus(userId: string, stripeAccountId: s
 
   return { chargesEnabled, payoutsEnabled, detailsSubmitted };
 }
+

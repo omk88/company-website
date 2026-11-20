@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Settings } from "lucide-react";
 import { Button } from "../ui/button";
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
@@ -11,7 +11,6 @@ import { Field, FieldLabel } from "../ui/field";
 import { Switch } from "../ui/switch";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { cn } from "@/lib/utils";
 import ConnectBankAccountButton from "@/app/(shared-layout)/[username]/_components/ConnectBankAccountButton";
 
 const profileSettingsFormSchema = z.object({
