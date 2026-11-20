@@ -30,6 +30,7 @@ import BlogVideoPlayer from "@/app/(shared-layout)/insights/[blogTitleId]/_compo
 import { Badge } from "@/components/ui/badge";
 import { Film, Library } from "lucide-react";
 import Image from "next/image";
+import { getCurrencySymbol } from "@/app/(shared-layout)/[username]/_components/LeftSidebarArticleSeries";
 
 const lowlight = createLowlight();
 lowlight.register("javascript", js);
@@ -88,6 +89,7 @@ interface RestrictedContentProps {
   audioUrl?: string;
   chapters?: Doc<"blogs">["chapters"];
   content?: string;
+  primarySeries: Doc<"series"> | null;
 }
 
 export function RestrictedContent({
@@ -98,11 +100,12 @@ export function RestrictedContent({
   audioUrl,
   chapters,
   content,
+  primarySeries,
 }: RestrictedContentProps) {
   const accessState = useQuery(api.blogs.getBlogAccessState, { blogId });
+  const series = useQuery(api.series.getSeriesForBlog, { blogId });
 
   const userCanAccessBlog = accessState?.userCanAccessBlog ?? Boolean(content);
-  const isPartOfPaidCourse = accessState?.isPartOfPaidCourse ?? false;
 
   const headings = extractHeadings(userCanAccessBlog ? content : "");
 
@@ -167,12 +170,11 @@ export function RestrictedContent({
                 </div>
 
                 <h3 className="mt-2 text-lg font-bold text-neutral-100">
-                  Mastering Full-Stack Architecture
+                  {primarySeries?.title}
                 </h3>
 
                 <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-neutral-400">
-                  Learn how to design, build, and deploy scalable web applications
-                  from scratch with real-world production patterns.
+                  {primarySeries?.description}
                 </p>
               </div>
 
@@ -180,7 +182,7 @@ export function RestrictedContent({
                 <div className="text-sm text-neutral-400">
                   Full Lifetime Access:{" "}
                   <span className="text-base font-semibold text-green-600 dark:text-green-300">
-                    $49
+                    <span>{getCurrencySymbol(primarySeries?.currency || "")}{primarySeries?.price}</span>
                   </span>
                 </div>
 

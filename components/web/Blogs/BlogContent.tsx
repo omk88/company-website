@@ -12,8 +12,6 @@ import { BlogLastUpdated } from "@/app/(shared-layout)/insights/[blogTitleId]/_c
 import { ShareLinks } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/ShareLinks";
 import { BlogSeriesNavbar } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/SeriesNavbarCard";
 import { RestrictedContent } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/RestrictedContent";
-import { Badge } from "@/components/ui/badge";
-import { Clock, Film, Library } from "lucide-react";
 
 interface ExtendedBlog extends Doc<"blogs"> {
   imageUrl: string;
@@ -24,10 +22,15 @@ interface ExtendedBlog extends Doc<"blogs"> {
 
 interface BlogContentProps {
   blog: ExtendedBlog;
+  primarySeries: Doc<"series"> | null;
   preloadedComments: Preloaded<typeof api.comments.getCommentsByBlog>;
 }
 
-export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
+export function BlogContent({
+  blog,
+  primarySeries,
+  preloadedComments,
+}: BlogContentProps) {
   const avatarSrc = blog.profilePicUrl || blog.defaultProfilePicUrl || "/noImage.png";
 
   return (
@@ -72,7 +75,7 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
 
         <div className="flex flex-col gap-4">
           <BlogSeriesNavbar blogId={blog._id} />
-          
+
           <p className="text-lg text-neutral-600 dark:text-neutral-400 font-medium">
             {blog.subtitle}
           </p>
@@ -87,6 +90,7 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
             audioUrl={blog.audioUrl}
             chapters={blog.chapters}
             content={blog.content}
+            primarySeries={primarySeries}
           />
         </div>
       </header>
@@ -97,7 +101,6 @@ export function BlogContent({ blog, preloadedComments }: BlogContentProps) {
       <section id="comments">
         <CommentSection preloadedComments={preloadedComments} />
       </section>
-
     </article>
   );
 }

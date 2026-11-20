@@ -87,7 +87,7 @@ export default async function BlogPage({ params }: BlogPageProps) {
     );
   }
 
-  const { blog, authorPosts, interactionState } = blogData;
+  const { blog, series, authorPosts, interactionState } = blogData;
 
   if (blog.blogTitleId && blogTitleId !== blog.blogTitleId) {
     redirect(`/insights/${blog.blogTitleId}`, RedirectType.replace);
@@ -127,7 +127,7 @@ export default async function BlogPage({ params }: BlogPageProps) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        
+
         <BlogStoreHydrator blog={blog} />
 
         <div className="hidden md:flex">
@@ -136,7 +136,11 @@ export default async function BlogPage({ params }: BlogPageProps) {
 
         <main className="flex-1 min-w-0 md:px-0 px-1 pt-13.5 md:pt-16 pb-16">
           <div className="max-w-3xl mx-auto">
-            <BlogContent blog={blog} preloadedComments={preloadedComments} />
+            <BlogContent
+              blog={blog}
+              primarySeries={series ?? null}
+              preloadedComments={preloadedComments}
+            />
           </div>
         </main>
 

@@ -1258,6 +1258,7 @@ export const getBlogWithAuthorPosts = query({
       userReactionsList,
       featured,
       bookmark,
+      linkedSeriesItems,
     ] = await Promise.all([
       ctx.db
         .query("profiles")
@@ -1305,7 +1306,18 @@ export const getBlogWithAuthorPosts = query({
             )
             .unique()
         : Promise.resolve(null),
+
+      ctx.db
+        .query("seriesItems")
+        .withIndex("by_article", (q) => q.eq("articleId", blog._id))
+        .collect(),
     ]);
+
+    const seriesDocs = (
+      await Promise.all(linkedSeriesItems.map((item) => ctx.db.get(item.seriesId)))
+    ).filter((s): s is NonNullable<typeof s> => s !== null);
+
+    const primarySeries = seriesDocs[0] ?? null;
 
     const filteredAuthorPosts = rawAuthorPosts
       .filter((post) => post._id !== blog._id)
@@ -1350,6 +1362,8 @@ export const getBlogWithAuthorPosts = query({
         profilePicUrl,
         defaultProfilePicUrl,
       },
+      series: primarySeries,
+      seriesList: seriesDocs,
       authorPosts: authorPostsWithImages,
       interactionState: {
         voteState: {
