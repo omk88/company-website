@@ -106,16 +106,10 @@ export function BlogContent({
             primarySeries={primarySeries}
             primarySeriesCount={resolvedSeriesCount}
             seriesCoverImageUrl={resolvedCoverImageUrl}
+            preloadedComments={preloadedComments}
           />
         </div>
       </header>
-
-      <BlogCTA />
-      <Separator className="my-10" />
-
-      <section id="comments">
-        <CommentSection preloadedComments={preloadedComments} />
-      </section>
     </article>
   );
 }

@@ -9,7 +9,7 @@ import "highlight.js/styles/github-dark.css";
 import { visit } from "unist-util-visit";
 import rehypeSlug from "rehype-slug";
 
-import { useQuery } from "convex/react";
+import { Preloaded, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Doc, Id } from "@/convex/_generated/dataModel";
 import { Separator } from "@/components/ui/separator";
@@ -32,6 +32,8 @@ import { Library } from "lucide-react";
 import Image from "next/image";
 import { getCurrencySymbol } from "@/app/(shared-layout)/[username]/_components/LeftSidebarArticleSeries";
 import PurchaseCourseButton from "./PurchaseCourseButton";
+import { BlogCTA } from "@/components/web/BlogCTA";
+import { CommentSection } from "@/components/web/CommentSection";
 
 const lowlight = createLowlight();
 lowlight.register("javascript", js);
@@ -98,6 +100,7 @@ interface RestrictedContentProps {
   primarySeries: SeriesWithDetails | null;
   primarySeriesCount?: number;
   seriesCoverImageUrl?: string | null;
+  preloadedComments: Preloaded<typeof api.comments.getCommentsByBlog>;
 }
 
 export function RestrictedContent({
@@ -111,6 +114,7 @@ export function RestrictedContent({
   primarySeries,
   primarySeriesCount,
   seriesCoverImageUrl,
+  preloadedComments,
 }: RestrictedContentProps) {
   const accessState = useQuery(api.blogs.getBlogAccessState, { blogId });
   const series = useQuery(api.series.getSeriesForBlog, { blogId });
@@ -260,6 +264,13 @@ export function RestrictedContent({
           >
             {content}
           </ReactMarkdown>
+
+          <BlogCTA />
+          <Separator className="my-10" />
+
+          <section id="comments">
+            <CommentSection preloadedComments={preloadedComments} />
+          </section>
         </section>
       )}
     </>
