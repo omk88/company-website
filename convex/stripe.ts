@@ -13,15 +13,12 @@ export const createCourseCheckoutSession = action({
     seriesId: v.id("series"),
   },
   handler: async (ctx, args) => {
-
     const currentUser = useCurrentUser();
-    const currentUserId = currentUser?.userId;
-
-    if (!currentUserId) return;
+    if (!currentUser) throw new Error("You must be logged in to purchase a course.");
 
     const checkoutData = await ctx.runQuery(internal.series.getCheckoutDetails, {
       seriesId: args.seriesId,
-      buyerUserId: currentUserId,
+      buyerUserId: currentUser.userId,
     });
 
     if (!checkoutData) throw new Error("Course not found.");
@@ -55,7 +52,7 @@ export const createCourseCheckoutSession = action({
       },
       metadata: {
         seriesId: args.seriesId,
-        buyerUserId: currentUserId,
+        buyerUserId: currentUser.userId,
         authorId: checkoutData.authorId,
       },
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/${checkoutData.authorUsername}/series/${checkoutData.slug}`,
