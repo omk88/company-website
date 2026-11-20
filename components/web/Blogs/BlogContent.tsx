@@ -20,14 +20,16 @@ interface ExtendedBlog extends Doc<"blogs"> {
   defaultProfilePicUrl: string | null;
 }
 
-type SeriesWithArticleCount = Doc<"series"> & {
+export type SeriesWithDetails = Doc<"series"> & {
   articleCount?: number;
+  coverImageUrl?: string | null;
 };
 
 interface BlogContentProps {
   blog: ExtendedBlog;
-  primarySeries: SeriesWithArticleCount | null;
+  primarySeries: SeriesWithDetails | null;
   seriesArticleCount?: number;
+  seriesCoverImageUrl?: string | null;
   preloadedComments: Preloaded<typeof api.comments.getCommentsByBlog>;
 }
 
@@ -35,11 +37,14 @@ export function BlogContent({
   blog,
   primarySeries,
   seriesArticleCount,
+  seriesCoverImageUrl,
   preloadedComments,
 }: BlogContentProps) {
   const avatarSrc = blog.profilePicUrl || blog.defaultProfilePicUrl || "/noImage.png";
   const resolvedSeriesCount =
     seriesArticleCount ?? primarySeries?.articleCount ?? 0;
+  const resolvedCoverImageUrl =
+    seriesCoverImageUrl ?? primarySeries?.coverImageUrl ?? null;
 
   return (
     <article className="p-2">
@@ -100,6 +105,7 @@ export function BlogContent({
             content={blog.content}
             primarySeries={primarySeries}
             primarySeriesCount={resolvedSeriesCount}
+            seriesCoverImageUrl={resolvedCoverImageUrl}
           />
         </div>
       </header>

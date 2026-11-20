@@ -81,8 +81,9 @@ function rehypeConditionalAutolink() {
   };
 }
 
-type SeriesWithArticleCount = Doc<"series"> & {
+type SeriesWithDetails = Doc<"series"> & {
   articleCount?: number;
+  coverImageUrl?: string | null;
 };
 
 interface RestrictedContentProps {
@@ -93,8 +94,9 @@ interface RestrictedContentProps {
   audioUrl?: string;
   chapters?: Doc<"blogs">["chapters"];
   content?: string;
-  primarySeries: SeriesWithArticleCount | null;
+  primarySeries: SeriesWithDetails | null;
   primarySeriesCount?: number;
+  seriesCoverImageUrl?: string | null;
 }
 
 export function RestrictedContent({
@@ -107,6 +109,7 @@ export function RestrictedContent({
   content,
   primarySeries,
   primarySeriesCount,
+  seriesCoverImageUrl,
 }: RestrictedContentProps) {
   const accessState = useQuery(api.blogs.getBlogAccessState, { blogId });
   const series = useQuery(api.series.getSeriesForBlog, { blogId });
@@ -114,6 +117,8 @@ export function RestrictedContent({
   const userCanAccessBlog = accessState?.userCanAccessBlog ?? Boolean(content);
   const articleCount =
     primarySeriesCount ?? primarySeries?.articleCount ?? 0;
+  const coverImageSrc =
+    seriesCoverImageUrl ?? primarySeries?.coverImageUrl ?? "/noImage.png";
 
   const headings = extractHeadings(userCanAccessBlog ? content : "");
 
@@ -148,7 +153,8 @@ export function RestrictedContent({
           <div className="group flex flex-col overflow-hidden rounded-xl border border-neutral-800 bg-neutral-950/70 transition-colors hover:border-neutral-700 sm:flex-row">
             <div className="relative aspect-video w-full shrink-0 overflow-hidden bg-neutral-900 sm:aspect-auto sm:w-56 md:w-64">
               <Image
-                src="/comp1.png"
+                unoptimized
+                src={coverImageSrc}
                 alt={primarySeries?.title || "Course cover"}
                 fill
                 sizes="(max-width: 640px) 100vw, 256px"

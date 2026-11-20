@@ -1326,8 +1326,27 @@ export const getBlogWithAuthorPosts = query({
 
           if (!seriesDoc) return null;
 
+          let coverImageUrl: string | null = null;
+          if (seriesDoc.coverImage) {
+            if (
+              seriesDoc.coverImage.startsWith("http") ||
+              seriesDoc.coverImage.startsWith("/")
+            ) {
+              coverImageUrl = seriesDoc.coverImage;
+            } else {
+              try {
+                coverImageUrl = await ctx.storage.getUrl(
+                  seriesDoc.coverImage as Id<"_storage">
+                );
+              } catch {
+                coverImageUrl = null;
+              }
+            }
+          }
+
           return {
             ...seriesDoc,
+            coverImageUrl,
             articleCount: allItemsInSeries.length,
           };
         })
@@ -1380,6 +1399,7 @@ export const getBlogWithAuthorPosts = query({
         defaultProfilePicUrl,
       },
       series: primarySeries,
+      seriesCoverImageUrl: primarySeries?.coverImageUrl ?? null,
       seriesArticleCount: primarySeries?.articleCount ?? 0,
       seriesList: seriesWithCounts,
       authorPosts: authorPostsWithImages,
