@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { fetchMutation } from "convex/nextjs";
 import { ConvexHttpClient } from "convex/browser";
-import { api, internal } from "@/convex/_generated/api";
+import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 
 function verifyStripeSignature(payload: string, sigHeader: string, secret: string): boolean {

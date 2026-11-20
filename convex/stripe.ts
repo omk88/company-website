@@ -54,8 +54,8 @@ export const createCourseCheckoutSession = action({
         buyerUserId: identity.subject,
         authorId: checkoutData.authorId,
       },
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/${checkoutData.authorUsername}/insights/${checkoutData.slug}?purchase=success`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/${checkoutData.authorUsername}/insights/${checkoutData.slug}?purchase=cancelled`,
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/${checkoutData.authorUsername}/series/${checkoutData.slug}`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/${checkoutData.authorUsername}/series/${checkoutData.slug}`,
     });
 
     if (!session.url) {

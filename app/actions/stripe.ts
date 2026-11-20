@@ -99,7 +99,7 @@ export async function onboardInstructor(
         use_case: {
           type: "account_onboarding",
           account_onboarding: {
-            return_url: `${origin}/${userUsername}?stripe_return=true`,
+            return_url: `${origin}/${userUsername}`,
             refresh_url: `${origin}/${userUsername}`,
           },
         },
