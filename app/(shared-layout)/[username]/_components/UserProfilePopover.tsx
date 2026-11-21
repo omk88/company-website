@@ -5,7 +5,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { buttonVariants } from "@/components/ui/button";
-import { ArrowUpRight, Plus, Inbox, LogOut, ListPlus, Film } from "lucide-react";
+import { ArrowUpRight, Plus, Inbox, LogOut, ListPlus, Film, FolderHeart, BookMarked } from "lucide-react";
 
 interface UserProfilePopoverProps {
   openProfile: boolean;
@@ -139,6 +139,15 @@ export function UserProfilePopover({
           >
             <Inbox className="size-5 md:size-4 stroke-[2.5] md:stroke-2 text-foreground transition-all shrink-0" />
             <span className="md:text-sm text-base text-foreground">Inbox</span>
+          </Link>
+
+          <Link
+            href="/library"
+            onClick={closePopover}
+            className="flex items-center text-zinc-600 dark:text-zinc-400 gap-2.5 px-2.5 py-2 text-xs rounded-md hover:bg-accent hover:text-accent-foreground transition-colors duration-100 cursor-pointer"
+          >
+            <BookMarked className="size-5 md:size-4 stroke-[2.5] md:stroke-2 text-foreground transition-all shrink-0" />
+            <span className="md:text-sm text-base text-foreground">My Library</span>
           </Link>
 
           <button
