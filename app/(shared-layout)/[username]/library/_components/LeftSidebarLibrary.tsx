@@ -29,7 +29,7 @@ const NAV_ITEMS = [
 export function LeftSidebarLibrary({ preloadedProfile }: LeftSidebarLibraryProps) {
   const profileData = usePreloadedQuery(preloadedProfile);
 
-  const coursesCount = profileData.bookmarkCount;
+  const coursesCount = profileData.purchasedCoursesCount || 0;
 
   const counts: Record<LibraryMetricType, number> = {
     courses: coursesCount,
