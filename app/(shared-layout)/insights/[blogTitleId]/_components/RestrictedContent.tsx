@@ -30,6 +30,7 @@ import BlogVideoPlayer from "@/app/(shared-layout)/insights/[blogTitleId]/_compo
 import { Badge } from "@/components/ui/badge";
 import { Library } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { getCurrencySymbol } from "@/app/(shared-layout)/[username]/_components/LeftSidebarArticleSeries";
 import PurchaseCourseButton from "./PurchaseCourseButton";
 import { BlogCTA } from "@/components/web/BlogCTA";
@@ -87,6 +88,7 @@ function rehypeConditionalAutolink() {
 type SeriesWithDetails = Doc<"series"> & {
   articleCount?: number;
   coverImageUrl?: string | null;
+  username?: string | null;
 };
 
 interface RestrictedContentProps {
@@ -116,6 +118,7 @@ export function RestrictedContent({
   seriesCoverImageUrl,
   preloadedComments,
 }: RestrictedContentProps) {
+  const router = useRouter();
   const accessState = useQuery(api.blogs.getBlogAccessState, { blogId });
   const series = useQuery(api.series.getSeriesForBlog, { blogId });
 
@@ -124,6 +127,24 @@ export function RestrictedContent({
     primarySeriesCount ?? primarySeries?.articleCount ?? 0;
   const coverImageSrc =
     seriesCoverImageUrl ?? primarySeries?.coverImageUrl ?? "/noImage.png";
+
+  const seriesData = Array.isArray(series) ? series[0] : series;
+  const seriesUsername =
+    (seriesData as { username?: string | null } | null)?.username ??
+    primarySeries?.username ??
+    "";
+  const seriesSlug = primarySeries?.slug ?? seriesData?.slug;
+  const seriesHref = seriesSlug
+    ? seriesUsername
+      ? `/${seriesUsername}/series/${seriesSlug}`
+      : `/series/${seriesSlug}`
+    : null;
+
+  const handleCardClick = () => {
+    if (seriesHref) {
+      router.push(seriesHref);
+    }
+  };
 
   const headings = extractHeadings(userCanAccessBlog ? content : "");
 
@@ -155,7 +176,18 @@ export function RestrictedContent({
         </div>
 
         <div className="p-6 sm:p-8">
-          <div className="group flex flex-col overflow-hidden rounded-xl border border-neutral-800 bg-neutral-950/70 transition-colors hover:border-neutral-700 sm:flex-row">
+          <div
+            onClick={handleCardClick}
+            role={seriesHref ? "link" : undefined}
+            tabIndex={seriesHref ? 0 : undefined}
+            onKeyDown={(e) => {
+              if (seriesHref && (e.key === "Enter" || e.key === " ")) {
+                e.preventDefault();
+                handleCardClick();
+              }
+            }}
+            className="group flex cursor-pointer flex-col overflow-hidden rounded-xl border border-neutral-800 bg-neutral-950/70 transition-colors duration-100 hover:border-neutral-700 hover:bg-neutral-900 sm:flex-row"
+          >
             <div className="relative aspect-video w-full shrink-0 overflow-hidden bg-neutral-900 sm:aspect-auto sm:w-56 md:w-64">
               <Image
                 unoptimized
@@ -180,7 +212,7 @@ export function RestrictedContent({
                   </div>
                 </div>
 
-                <h3 className="mt-2 text-lg font-bold text-neutral-100">
+                <h3 className="mt-2 text-lg font-bold text-neutral-100 transition-colors duration-100 group-hover:text-blue-600">
                   {primarySeries?.title}
                 </h3>
 
@@ -197,7 +229,9 @@ export function RestrictedContent({
                   </span>
                 </div>
 
-                <PurchaseCourseButton seriesId={primarySeries?._id}  />
+                <div onClick={(e) => e.stopPropagation()}>
+                  <PurchaseCourseButton seriesId={primarySeries?._id} />
+                </div>
               </div>
             </div>
           </div>
