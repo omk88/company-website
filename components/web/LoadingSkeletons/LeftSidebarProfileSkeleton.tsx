@@ -4,7 +4,13 @@ import { Sidebar, SidebarContent, SidebarGroup, SidebarMenu, SidebarMenuItem } f
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 
-export function LeftSidebarProfileSkeleton() {
+interface LeftSidebarProfileSkeletonProps {
+  count?: number;
+}
+
+export function LeftSidebarProfileSkeleton({ count = 5 }: LeftSidebarProfileSkeletonProps) {
+  const safeCount = Math.max(0, count);
+
   return (
     <aside 
       className="shrink-0"
@@ -19,7 +25,7 @@ export function LeftSidebarProfileSkeleton() {
           <SidebarGroup className="pt-3 !px-2 w-full">
             
             <SidebarMenu className="w-full flex flex-col gap-0.5">
-              {[...Array(5)].map((_, i) => (
+              {Array.from({ length: safeCount }).map((_, i) => (
                 <SidebarMenuItem key={i} className="w-full">
                   <div className="flex items-center gap-2.5 px-2.5 py-2 w-full rounded-lg">
                     <Skeleton className="h-4 w-4 shrink-0 rounded" />

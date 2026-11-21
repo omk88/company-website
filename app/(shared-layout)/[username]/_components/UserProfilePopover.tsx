@@ -56,7 +56,7 @@ export function UserProfilePopover({
         className="w-80 p-1.5 rounded-xl border border-border bg-popover"
       >
         <Link
-          href={`/${profileUsername || ""}`}
+          href={`/${profileUsername}`}
           onClick={closePopover}
           className="group flex items-center justify-between p-2.5 rounded-xl hover:bg-accent hover:text-accent-foreground transition-colors duration-100 cursor-pointer"
         >
@@ -142,7 +142,7 @@ export function UserProfilePopover({
           </Link>
 
           <Link
-            href="/library"
+            href={`/${profileUsername}/library`}
             onClick={closePopover}
             className="flex items-center text-zinc-600 dark:text-zinc-400 gap-2.5 px-2.5 py-2 text-xs rounded-md hover:bg-accent hover:text-accent-foreground transition-colors duration-100 cursor-pointer"
           >

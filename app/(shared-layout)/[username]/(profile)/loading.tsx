@@ -6,7 +6,7 @@ import { RightSidebarProfileSkeleton } from "@/components/web/LoadingSkeletons/R
 export default function ProfileLoading() {
   return (
     <SidebarProvider>
-      <LeftSidebarProfileSkeleton />
+      <LeftSidebarProfileSkeleton count={7} />
 
       <div className="flex-1 flex flex-row min-w-0 w-full min-h-screen pt-16">
         <section className="flex-1 min-w-0 flex flex-col h-full p-2">

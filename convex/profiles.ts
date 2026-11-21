@@ -87,6 +87,7 @@ export const removeProfilePic = mutation({
 export const getProfileByUsername = query({
   args: {
     username: v.string(),
+    getPurchasedCourses: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     const profile = await ctx.db
@@ -104,39 +105,56 @@ export const getProfileByUsername = query({
         videoCount: 0,
         seriesCount: 0,
         commentCount: 0,
+        purchasedCoursesCount: null,
         viewerStatus: { isFollowing: false, isBell: false, isSelf: false },
       };
     }
 
     const identity = await ctx.auth.getUserIdentity();
 
-    const [currentProfile, bookmarks, blogs, seriesList, comments, picStorageUrl, defaultPicStorageUrl] =
-      await Promise.all([
-        identity
-          ? ctx.db
-              .query("profiles")
-              .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
-              .unique()
-          : null,
-        ctx.db
-          .query("bookmarks")
-          .withIndex("by_user", (q) => q.eq("userId", profile.userId))
-          .collect(),
-        ctx.db
-          .query("blogs")
-          .withIndex("by_author", (q) => q.eq("author", profile.userId))
-          .collect(),
-        ctx.db
-          .query("series")
-          .withIndex("by_authorId", (q) => q.eq("authorId", profile.userId))
-          .collect(),
-        ctx.db
-          .query("comments")
-          .withIndex("by_authorId", (q) => q.eq("authorId", profile.userId))
-          .collect(),
-        profile.profilePic ? ctx.storage.getUrl(profile.profilePic) : null,
-        profile.defaultProfilePic ? ctx.storage.getUrl(profile.defaultProfilePic) : null,
-      ]);
+    const shouldFetchPurchases = Boolean(args.getPurchasedCourses && identity);
+
+    const [
+      currentProfile,
+      bookmarks,
+      blogs,
+      seriesList,
+      comments,
+      picStorageUrl,
+      defaultPicStorageUrl,
+      purchases,
+    ] = await Promise.all([
+      identity
+        ? ctx.db
+            .query("profiles")
+            .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
+            .unique()
+        : null,
+      ctx.db
+        .query("bookmarks")
+        .withIndex("by_user", (q) => q.eq("userId", profile.userId))
+        .collect(),
+      ctx.db
+        .query("blogs")
+        .withIndex("by_author", (q) => q.eq("author", profile.userId))
+        .collect(),
+      ctx.db
+        .query("series")
+        .withIndex("by_authorId", (q) => q.eq("authorId", profile.userId))
+        .collect(),
+      ctx.db
+        .query("comments")
+        .withIndex("by_authorId", (q) => q.eq("authorId", profile.userId))
+        .collect(),
+      profile.profilePic ? ctx.storage.getUrl(profile.profilePic) : null,
+      profile.defaultProfilePic ? ctx.storage.getUrl(profile.defaultProfilePic) : null,
+      shouldFetchPurchases
+        ? ctx.db
+            .query("purchases")
+            .withIndex("by_user_and_series", (q) => q.eq("userId", identity!.subject))
+            .collect()
+        : null,
+    ]);
 
     const isSelf = currentProfile?.userId === profile.userId;
 
@@ -168,9 +186,10 @@ export const getProfileByUsername = query({
       },
       bookmarkCount: bookmarks.length,
       articleCount: articleBlogs.length,
-      videoCount: videoBlogs.length, 
+      videoCount: videoBlogs.length,
       seriesCount: seriesList.length,
       commentCount: comments.length,
+      purchasedCoursesCount: purchases ? purchases.length : null,
       viewerStatus: {
         isFollowing: Boolean(followRecord),
         isBell: followRecord?.isBell ?? false,
