@@ -8,6 +8,7 @@ import { FunctionReturnType } from "convex/server";
 import { EmptyState } from "./EmptyState";
 import { ProfileCardSkeleton } from "./ProfileFollows";
 import { UserRoundCheck } from "lucide-react";
+import { getGradientDataUrl } from "@/data/themes";
 
 type ProfileData = FunctionReturnType<typeof api.profiles.getProfileByUsername>;
 type CurrentUserData = FunctionReturnType<typeof api.auth.getCurrentUser>;
@@ -100,8 +101,19 @@ export function ProfileFollowing({ profile, currentUser, preloadedData }: Profil
                 const item = rawItem as unknown as FollowingItem;
                 if (!item?.profile) return null;
 
-                const { profile: targetProfile, profilePicture, defaultProfilePicture, isFollowing, isBell, followedAt } = item;
-                
+                const {
+                  profile: targetProfile,
+                  profilePicture,
+                  isFollowing,
+                  isBell,
+                  followedAt,
+                } = item;
+
+                const fallbackGradientUrl = getGradientDataUrl(
+                  targetProfile.themeName ?? item.themeName ?? "",
+                  targetProfile.avatarVariant ?? item.avatarVariant ?? 0
+                );
+
                 const isSelf = Boolean(currentUserId && targetProfile.userId === currentUserId);
 
                 return (
@@ -111,7 +123,7 @@ export function ProfileFollowing({ profile, currentUser, preloadedData }: Profil
                       displayName={targetProfile.displayName ?? targetProfile.username}
                       username={targetProfile.username}
                       profilePicture={profilePicture}
-                      defaultProfilePicture={defaultProfilePicture}
+                      defaultProfilePicture={fallbackGradientUrl}
                       isFollowing={isFollowing}
                       isBell={isBell}
                       isSelf={isSelf}
