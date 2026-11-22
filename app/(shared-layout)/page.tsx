@@ -11,6 +11,7 @@ import { FaXTwitter } from 'react-icons/fa6';
 import { AiOutlineInstagram } from 'react-icons/ai';
 import { RxLinkedinLogo } from 'react-icons/rx';
 import Image from "next/image";
+import { ThemeColorPicker } from '@/components/web/ThemeColourPicker';
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
@@ -157,6 +158,10 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        <div className="fixed bottom-6 right-6 z-200">
+          <ThemeColorPicker size={30} />
+        </div>
       </div>
 
       <Footer />
