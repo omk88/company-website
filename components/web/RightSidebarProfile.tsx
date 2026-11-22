@@ -32,6 +32,7 @@ import { Badge } from "../ui/badge";
 import { ScrollArea } from "../ui/scroll-area";
 import MessageButton from "./MessageButton";
 import { BanUserButton } from "./BanUserButton";
+import { getGradientDataUrl } from "@/data/themes";
 
 interface RightSidebarProfileProps {
   preloadedProfile: Preloaded<typeof api.profiles.getProfileByUsername>;
@@ -72,9 +73,12 @@ export function RightSidebarProfile({ preloadedProfile, preloadedCurrentUser }: 
 
   const profile = profileData.profile;
   const avatarSrc = profileData.profilePicture;
-  const defaultAvatarSrc = profileData.defaultProfilePicture;
+  const fallbackGradientAvatar = getGradientDataUrl(
+      profile?.themeName ?? "",
+      profile?.avatarVariant ?? 0
+  );
 
-  const displayAvatar = avatarSrc || defaultAvatarSrc;
+  const displayAvatar = avatarSrc || fallbackGradientAvatar;
 
   const isFollowing = profileData.viewerStatus.isFollowing;
   const isBell = profileData.viewerStatus.isBell;
@@ -113,7 +117,7 @@ export function RightSidebarProfile({ preloadedProfile, preloadedCurrentUser }: 
                 <EditProfileButton
                   profile={profile}
                   avatarSrc={avatarSrc || ""}
-                  defaultAvatarSrc={defaultAvatarSrc || ""}
+                  defaultAvatarSrc={fallbackGradientAvatar || ""}
                 />
               </div>
             )}
