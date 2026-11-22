@@ -5,6 +5,7 @@ import { connection } from "next/server";
 import { LeftSidebarLibrary } from "./_components/LeftSidebarLibrary";
 import { LibraryContent } from "./_components/LibraryContent";
 import { fetchQuery } from "convex/nextjs";
+import { RightSidebarLibrary } from "./_components/RightSidebarLibrary";
 
 interface LibraryRouteProps {
   params: Promise<{ username: string }>;
@@ -53,7 +54,7 @@ export default async function Library({ params }: LibraryRouteProps) {
                         style={{ "--sidebar-width": "24rem" } as React.CSSProperties} 
                         className="hidden md:block w-[24rem] shrink-0 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto"
                     >
-
+                        <RightSidebarLibrary />
                     </aside>
                 </div>
             </SidebarProvider>
