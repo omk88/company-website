@@ -13,6 +13,7 @@ import { cn } from "cn";
 import { Badge } from "@/components/ui/badge";
 import { EditProfileButton } from "@/components/web/EditProfileButton";
 import { ProfileSettingsButton } from "@/components/web/ProfileSettingsButton";
+import { getGradientDataUrl, userThemes } from "@/data/themes";
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   month: "short",
@@ -52,21 +53,24 @@ export function MobileProfileSection({ preloadedProfile, preloadedCurrentUser }:
   const currentUser = usePreloadedQuery(preloadedCurrentUser);
 
   const profile = profileData.profile;
-  const avatarSrc = profileData.profilePicture;
-  const defaultAvatarSrc = profileData.defaultProfilePicture;
 
-  const displayAvatar = avatarSrc || defaultAvatarSrc;
-
-  const isFollowing = profileData.viewerStatus.isFollowing;
-  const isBell = profileData.viewerStatus.isBell;
-  const isSelf = profileData.viewerStatus.isSelf;
-  
   if (!profile) {
     return <div className="p-4 text-gray-500">Profile not found</div>;
   }
 
+  const avatarSrc = profileData.profilePicture;
+  const fallbackGradientAvatar = getGradientDataUrl(
+    profile.themeName ?? userThemes[0].name,
+    profile.avatarVariant ?? 0
+  );
+  const displayAvatar = avatarSrc || fallbackGradientAvatar;
+
+  const isFollowing = profileData.viewerStatus.isFollowing;
+  const isBell = profileData.viewerStatus.isBell;
+  const isSelf = profileData.viewerStatus.isSelf;
+
   const { displayName } = profile;
-  const isOwnProfile = Boolean(currentUser?.userId && profile?.userId && currentUser.userId === profile.userId);
+  const isOwnProfile = Boolean(currentUser?.userId && profile.userId && currentUser.userId === profile.userId);
 
   const primarySocial = profile.socials?.find((s) => s.isPrimary) ?? profile.socials?.[0];
   const additionalSocials = profile.socials?.filter((s) => s !== primarySocial) ?? [];
@@ -86,25 +90,21 @@ export function MobileProfileSection({ preloadedProfile, preloadedCurrentUser }:
           <EditProfileButton
             profile={profile}
             avatarSrc={avatarSrc || ""}
-            defaultAvatarSrc={defaultAvatarSrc || ""}
+            defaultAvatarSrc={fallbackGradientAvatar}
           />
         </div>
       )}
       <div className="flex flex-row items-center gap-2 w-full">
         <div className="relative h-16 w-16 shrink-0 rounded-full overflow-hidden border-2 border-muted bg-muted">
-          {displayAvatar ? (
-            <Image
-              src={displayAvatar}
-              alt={`${displayName || profile.username}'s avatar`}
-              fill
-              sizes="80px"
-              priority
-              className="object-cover rounded-full"
-              unoptimized
-            />
-          ) : (
-            <div className="h-full w-full bg-zinc-200" />
-          )}
+          <Image
+            src={displayAvatar}
+            alt={`${displayName || profile.username}'s avatar`}
+            fill
+            sizes="80px"
+            priority
+            className="object-cover rounded-full"
+            unoptimized
+          />
         </div>
 
         <div className="flex flex-row justify-between w-full">
