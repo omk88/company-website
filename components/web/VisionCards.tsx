@@ -1,6 +1,6 @@
 "use client";
 
-import { Wrench, Zap } from "lucide-react";
+import { Lightbulb, Wrench, Zap } from "lucide-react";
 
 export default function RedesignedVisionCards() {
   return (
@@ -55,7 +55,7 @@ export default function RedesignedVisionCards() {
           }}
           className="relative w-fit z-10 p-2 rounded-md group-hover:scale-105 transition-transform duration-200 shrink-0"
         >
-          <Zap className="w-8 h-8 stroke-[1.75]" />
+          <Lightbulb className="w-8 h-8 stroke-[1.75]" />
         </div>
         
         <h3 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 leading-snug">
