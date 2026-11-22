@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 import { query } from "./_generated/server";
 import { paginationOptsValidator } from "convex/server";
-import { Doc } from "./_generated/dataModel";
+import { Doc, Id } from "./_generated/dataModel";
 
 
 export const getPaginatedPurchasesByAuthor = query({
@@ -24,9 +24,29 @@ export const getPaginatedPurchasesByAuthor = query({
       (series): series is Doc<"series"> => series !== null
     );
 
+    const enrichedSeries = await Promise.all(
+      validSeries.map(async (series) => {
+        const [imageUrl, articles] = await Promise.all([
+          series.coverImage
+            ? ctx.storage.getUrl(series.coverImage as Id<"_storage">)
+            : Promise.resolve(null),
+          ctx.db
+            .query("seriesItems")
+            .withIndex("by_series_and_order", (q) => q.eq("seriesId", series._id))
+            .collect(),
+        ]);
+
+        return {
+          ...series,
+          imageUrl,
+          articleCount: articles.length,
+        }
+      })
+    )
+
     return {
       ...paginatedPurchases,
-      page: validSeries,
+      page: enrichedSeries,
     }
   },
 });
