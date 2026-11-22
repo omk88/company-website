@@ -9,6 +9,7 @@ import { ReactNode } from "react";
 import Link from "next/link";
 import { FollowButton } from "./FollowButton";
 import MessageButton from "./MessageButton";
+import { getGradientDataUrl } from "@/data/themes";
 
 interface ProfileHoverCardProps {
     displayName: string | undefined;
@@ -61,7 +62,10 @@ export function ProfileHoverCard({ displayName, authorUsername, children, align 
 
     const profile = profileData?.profile;
     const avatarSrc = profileData?.profilePicture;
-    const defaultAvatarSrc = profileData?.defaultProfilePicture;
+    const fallbackGradientAvatar = getGradientDataUrl(
+        profile?.themeName ?? "",
+        profile?.avatarVariant ?? 0
+    );
 
     const profileUsername = profileData?.profile?.username;
 
@@ -82,7 +86,7 @@ export function ProfileHoverCard({ displayName, authorUsername, children, align 
                             <div className="flex items-center gap-3 min-w-0">
                                 <div className="h-10 w-10 border border-border rounded-full overflow-hidden bg-muted shrink-0">
                                     <img
-                                        src={avatarSrc || defaultAvatarSrc || ""}
+                                        src={avatarSrc || fallbackGradientAvatar}
                                         alt="profile"
                                         className="h-full w-full object-cover"
                                         decoding="async" 
