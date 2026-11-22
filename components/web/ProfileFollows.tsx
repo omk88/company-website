@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { UserRoundCheck, UsersRound } from "lucide-react";
 import { FunctionReturnType } from "convex/server";
 import { EmptyState } from "./EmptyState";
+import { getGradientDataUrl } from "@/data/themes";
 
 type ProfileData = FunctionReturnType<typeof api.profiles.getProfileByUsername>;
 type CurrentUserData = FunctionReturnType<typeof api.auth.getCurrentUser>;
@@ -76,7 +77,8 @@ function FollowersList({
 }: {
   targetUserId: string | undefined;
   currentUserId?: string;
-}) {  const { results, status } = usePaginatedQuery(
+}) {
+  const { results, status } = usePaginatedQuery(
     api.profiles.getPaginatedFollowersByProfile,
     targetUserId ? { userId: targetUserId } : "skip",
     { initialNumItems: 10 }
@@ -98,8 +100,13 @@ function FollowersList({
         const item = rawItem as unknown as FollowerItem;
         if (!item?.profile) return null;
 
-        const { profile, profilePicture, defaultProfilePicture, isFollowing, isBell, followedAt } = item;
-        
+        const { profile, profilePicture, isFollowing, isBell, followedAt } = item;
+
+        const fallbackGradientUrl = getGradientDataUrl(
+          profile.themeName ?? item.themeName ?? "",
+          profile.avatarVariant ?? item.avatarVariant ?? 0
+        );
+
         const isSelf = Boolean(currentUserId && profile.userId === currentUserId);
 
         return (
@@ -109,7 +116,7 @@ function FollowersList({
               displayName={profile.displayName ?? profile.username}
               username={profile.username}
               profilePicture={profilePicture}
-              defaultProfilePicture={defaultProfilePicture}
+              defaultProfilePicture={fallbackGradientUrl}
               isFollowing={isFollowing}
               isBell={isBell}
               isSelf={isSelf}
@@ -151,8 +158,13 @@ function FollowingList({
         const item = rawItem as unknown as FollowingItem;
         if (!item?.profile) return null;
 
-        const { profile, profilePicture, defaultProfilePicture, isFollowing, isBell, followedAt } = item;
-        
+        const { profile, profilePicture, isFollowing, isBell, followedAt } = item;
+
+        const fallbackGradientUrl = getGradientDataUrl(
+          profile.themeName ?? item.themeName ?? "",
+          profile.avatarVariant ?? item.avatarVariant ?? 0
+        );
+
         const isSelf = Boolean(currentUserId && profile.userId === currentUserId);
 
         return (
@@ -162,7 +174,7 @@ function FollowingList({
               displayName={profile.displayName ?? profile.username}
               username={profile.username}
               profilePicture={profilePicture}
-              defaultProfilePicture={defaultProfilePicture}
+              defaultProfilePicture={fallbackGradientUrl}
               isFollowing={isFollowing}
               isBell={isBell}
               isSelf={isSelf}
