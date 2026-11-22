@@ -11,6 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useSearchStore } from "@/stores/useSearchStore";
 import { useMessageStore } from "@/stores/useMessageStore";
+import { getGradientDataUrl } from "@/data/themes";
 
 interface FollowersPopoverProps {
   userId: string | undefined;
@@ -25,29 +26,41 @@ export function SearchFollowers({ userId, onSelectUser }: FollowersPopoverProps)
   const { activeConversationId, setActiveConversation } = useMessageStore();
 
   const startConversation = useMutation(api.messaging.getOrCreateAndStartConversation);
-  
+
+  const resolveFollowerAvatar = (follower: {
+    profilePicUrl?: string | null;
+    themeName?: string | null;
+    avatarVariant?: number | null;
+  }) => {
+    return (
+      follower.profilePicUrl ||
+      getGradientDataUrl(follower.themeName ?? "", follower.avatarVariant ?? 0)
+    );
+  };
+
   const handleFollowerClick = async (follower: {
     userId: string;
     username: string;
     displayName?: string;
     profilePicUrl?: string | null;
-    defaultProfilePic?: string | null;
+    themeName?: string | null;
+    avatarVariant?: number | null;
   }) => {
     try {
-            const conversationId = await startConversation({
-            participantId: follower.userId,
-        });
+      const conversationId = await startConversation({
+        participantId: follower.userId,
+      });
 
-        if (conversationId) {
-            setActiveConversation(conversationId, {
-                userId: follower.userId,
-                username: follower.username,
-                displayName: follower.displayName || follower.username,
-                avatarUrl: follower.profilePicUrl || follower.defaultProfilePic || null,
-            });
-        }
+      if (conversationId) {
+        setActiveConversation(conversationId, {
+          userId: follower.userId,
+          username: follower.username,
+          displayName: follower.displayName || follower.username,
+          avatarUrl: resolveFollowerAvatar(follower),
+        });
+      }
     } catch (error) {
-        console.error("Failed to start conversation:", error);
+      console.error("Failed to start conversation:", error);
     }
   };
 
@@ -119,11 +132,11 @@ export function SearchFollowers({ userId, onSelectUser }: FollowersPopoverProps)
         </div>
       </PopoverTrigger>
 
-    <PopoverContent
+      <PopoverContent
         align="start"
         className="w-[var(--radix-popover-trigger-width)] p-0 shadow-lg"
         onOpenAutoFocus={(e) => e.preventDefault()}
-    >
+      >
         <ScrollArea className="max-h-64 w-full" onScroll={handleScroll}>
           <div className="p-2 space-y-1">
             {status === "LoadingFirstPage" ? (
@@ -136,30 +149,34 @@ export function SearchFollowers({ userId, onSelectUser }: FollowersPopoverProps)
                 No followers found.
               </div>
             ) : (
-              results.map((follower) => (
-                <div
-                  key={follower._id}
-                  onClick={() => {
-                    if (onSelectUser) onSelectUser(follower);
-                    handleFollowerClick(follower);
-                    setOpen(false);
-                  }}
-                  className="flex items-center gap-3 p-2 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800/60 cursor-pointer transition-colors"
-                >
-                  <Avatar className="h-8 w-8 shrink-0">
-                    <AvatarImage src={follower.profilePicUrl || follower.defaultProfilePic || ""} />
-                    <AvatarFallback>{follower.username?.[0]?.toUpperCase() ?? "?"}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex flex-col min-w-0 flex-1">
-                    <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">
-                      {follower.displayName || follower.username}
-                    </span>
-                    <span className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
-                      @{follower.username}
-                    </span>
+              results.map((follower) => {
+                const avatarSrc = resolveFollowerAvatar(follower);
+
+                return (
+                  <div
+                    key={follower._id}
+                    onClick={() => {
+                      if (onSelectUser) onSelectUser(follower);
+                      handleFollowerClick(follower);
+                      setOpen(false);
+                    }}
+                    className="flex items-center gap-3 p-2 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800/60 cursor-pointer transition-colors"
+                  >
+                    <Avatar className="h-8 w-8 shrink-0">
+                      <AvatarImage src={avatarSrc} />
+                      <AvatarFallback>{follower.username?.[0]?.toUpperCase() ?? "?"}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col min-w-0 flex-1">
+                      <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">
+                        {follower.displayName || follower.username}
+                      </span>
+                      <span className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
+                        @{follower.username}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
 
             {status === "LoadingMore" && (
