@@ -254,8 +254,6 @@ export function RestrictedContent({
         </div>
       )}
 
-      <Separator className="mt-8" />
-
       <TableOfContents headings={headings} />
 
       {content && (

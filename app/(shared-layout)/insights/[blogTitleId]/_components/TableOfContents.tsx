@@ -80,7 +80,7 @@ export function TableOfContents({ headings }: TOCProps) {
   return (
     <div
       ref={dropdownRef}
-      className="sticky top-12 md:top-16 z-40 w-full h-12 mb-8 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 transform-gpu touch-pan-y"
+      className="sticky top-12 md:top-16 z-40 w-full h-12 mb-8 border-b border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 transform-gpu touch-pan-y"
     >
       <div className="relative max-w-none px-2 h-full">
         <button
