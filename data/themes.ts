@@ -85,3 +85,27 @@ export const userThemes = [
 export const THEME_MAP = Object.fromEntries(
   userThemes.map((t) => [t.name, t])
 );
+
+export const VARIANT_ANGLES = [15, 75, 135, 210, 300] as const;
+
+export function buildGradientSvg(
+  colors: readonly [string, string],
+  angle: number
+): string {
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+    <defs>
+      <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%" gradientTransform="rotate(${angle})">
+        <stop offset="0%" stop-color="${colors[0]}" />
+        <stop offset="100%" stop-color="${colors[1]}" />
+      </linearGradient>
+    </defs>
+    <rect width="200" height="200" fill="url(#grad)" />
+  </svg>`;
+}
+
+export function getGradientDataUrl(themeName: string, variantIndex: number): string {
+  const theme = THEME_MAP[themeName] ?? userThemes[0];
+  const safeIndex = ((variantIndex % VARIANT_ANGLES.length) + VARIANT_ANGLES.length) % VARIANT_ANGLES.length;
+  const svg = buildGradientSvg(theme.gradient, VARIANT_ANGLES[safeIndex]);
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}

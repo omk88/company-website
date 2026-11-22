@@ -9,7 +9,8 @@ export const initialiseProfile = mutation({
     email: v.string(),
     displayName: v.optional(v.string()),
     profilePic: v.optional(v.id("_storage")),
-    defaultProfilePic: v.id("_storage"),
+    themeName: v.string(),
+    avatarVariant: v.number(),
   },
   handler: async (ctx, args) => {
     const existingProfile = await ctx.db
@@ -20,9 +21,9 @@ export const initialiseProfile = mutation({
     if (existingProfile) return existingProfile;
 
     const emailPrefix = args.email.split("@")[0];
-    
+
     let baseUsername = emailPrefix.replace(/[^a-zA-Z0-9_.]/g, "");
-    if (!baseUsername) baseUsername = "user"; 
+    if (!baseUsername) baseUsername = "user";
 
     let finalUsername = baseUsername;
     let isUnique = false;
@@ -47,7 +48,8 @@ export const initialiseProfile = mutation({
       username: finalUsername,
       displayName: args.displayName,
       profilePic: args.profilePic,
-      defaultProfilePic: args.defaultProfilePic,
+      themeName: args.themeName,
+      avatarVariant: args.avatarVariant,
       totalLikes: 0,
       followerCount: 0,
       followingCount: 0,
@@ -98,7 +100,6 @@ export const getProfileByUsername = query({
     if (!profile) {
       return {
         profilePicture: null,
-        defaultProfilePicture: null,
         profile: null,
         bookmarkCount: 0,
         articleCount: 0,
@@ -121,7 +122,6 @@ export const getProfileByUsername = query({
       seriesList,
       comments,
       picStorageUrl,
-      defaultPicStorageUrl,
       purchases,
     ] = await Promise.all([
       identity
@@ -147,7 +147,6 @@ export const getProfileByUsername = query({
         .withIndex("by_authorId", (q) => q.eq("authorId", profile.userId))
         .collect(),
       profile.profilePic ? ctx.storage.getUrl(profile.profilePic) : null,
-      profile.defaultProfilePic ? ctx.storage.getUrl(profile.defaultProfilePic) : null,
       shouldFetchPurchases
         ? ctx.db
             .query("purchases")
@@ -173,9 +172,10 @@ export const getProfileByUsername = query({
 
     return {
       profilePicture: picStorageUrl,
-      defaultProfilePicture: defaultPicStorageUrl,
       profile: {
         ...profile,
+        themeName: profile.themeName,
+        avatarVariant: profile.avatarVariant,
         displayName: profile.displayName,
         location: profile.location,
         locationCountryCode: profile.locationCountryCode,
@@ -202,7 +202,7 @@ export const getProfileByUsername = query({
 export const getProfileFollowers = query({
   args: {
     userId: v.string(),
-    search: v.optional(v.string()), 
+    search: v.optional(v.string()),
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
@@ -231,9 +231,6 @@ export const getProfileFollowers = query({
         const picUrl = followerProfile.profilePic
           ? await ctx.storage.getUrl(followerProfile.profilePic)
           : null;
-        const defaultPicUrl = followerProfile.defaultProfilePic
-          ? await ctx.storage.getUrl(followerProfile.defaultProfilePic)
-          : null;
 
         return {
           _id: followerProfile._id,
@@ -241,7 +238,8 @@ export const getProfileFollowers = query({
           username: followerProfile.username,
           displayName: followerProfile.displayName,
           profilePicUrl: picUrl,
-          defaultProfilePic: defaultPicUrl,
+          themeName: followerProfile.themeName,
+          avatarVariant: followerProfile.avatarVariant,
         };
       })
     );
@@ -332,11 +330,12 @@ export const createProfile = mutation({
 
 export const updateProfile = mutation({
   args: {
-    id: v.id("profiles"), 
+    id: v.id("profiles"),
     username: v.optional(v.string()),
     displayName: v.optional(v.string()),
     profilePic: v.optional(v.id("_storage")),
-    defaultProfilePic: v.optional(v.id("_storage")),
+    themeName: v.optional(v.string()),
+    avatarVariant: v.optional(v.number()),
     location: v.optional(v.string()),
     locationCountryCode: v.optional(v.string()),
     bio: v.optional(v.string()),
@@ -392,15 +391,9 @@ export const updateProfile = mutation({
       return { publicImageUrl: publicUrl };
     }
 
-    if (!args.profilePic && existingUser.defaultProfilePic) {
-      const defaultUrl = await ctx.storage.getUrl(existingUser.defaultProfilePic);
-      return { publicImageUrl: defaultUrl };
-    }
-
     return { existingUser: existingUser._id, publicImageUrl: null };
   },
 });
-
 export const toggleFollow = mutation({
   args: { targetUserId: v.string() },
   handler: async (ctx, args) => {
@@ -581,14 +574,12 @@ export const getPaginatedFollowersByProfile = query({
         const profilePicture = profile.profilePic
           ? await ctx.storage.getUrl(profile.profilePic)
           : null;
-        const defaultProfilePicture = profile.defaultProfilePic
-          ? await ctx.storage.getUrl(profile.defaultProfilePic)
-          : null;
 
         return {
           profile,
           profilePicture,
-          defaultProfilePicture,
+          themeName: profile.themeName,
+          avatarVariant: profile.avatarVariant,
           isFollowing,
           isBell,
           followedAt: followDoc._creationTime,
@@ -648,14 +639,12 @@ export const getPaginatedFollowingByProfile = query({
         const profilePicture = profile.profilePic
           ? await ctx.storage.getUrl(profile.profilePic)
           : null;
-        const defaultProfilePicture = profile.defaultProfilePic
-          ? await ctx.storage.getUrl(profile.defaultProfilePic)
-          : null;
 
         return {
           profile,
           profilePicture,
-          defaultProfilePicture,
+          themeName: profile.themeName,
+          avatarVariant: profile.avatarVariant,
           isFollowing,
           isBell,
           followedAt: followDoc._creationTime,
@@ -744,5 +733,44 @@ export const updateStripeStatusByAccountId = mutation({
       stripePayoutsEnabled: args.stripePayoutsEnabled,
       stripeDetailsSubmitted: args.stripeDetailsSubmitted,
     });
+  },
+});
+
+const VARIANT_COUNT = 5;
+
+export const updateProfileTheme = mutation({
+  args: {
+    themeName: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Unauthenticated");
+    }
+
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
+      .unique();
+
+    if (!profile) {
+      throw new Error("Profile not found");
+    }
+
+    const currentVariant = profile.avatarVariant ?? 0;
+    let nextVariant = Math.floor(Math.random() * VARIANT_COUNT);
+    if (VARIANT_COUNT > 1 && nextVariant === currentVariant) {
+      nextVariant = (nextVariant + 1) % VARIANT_COUNT;
+    }
+
+    await ctx.db.patch(profile._id, {
+      themeName: args.themeName,
+      avatarVariant: nextVariant,
+    });
+
+    return {
+      themeName: args.themeName,
+      avatarVariant: nextVariant,
+    };
   },
 });

@@ -168,7 +168,12 @@ const schema = defineSchema({
     username: v.string(),
     displayName: v.optional(v.string()),
     profilePic: v.optional(v.id("_storage")),
-    defaultProfilePic: v.id("_storage"),
+
+    defaultProfilePic: v.optional(v.id("_storage")),
+
+    themeName: v.optional(v.string()),
+    avatarVariant: v.optional(v.number()),
+
     location: v.optional(v.string()),
     locationCountryCode: v.optional(v.string()),
     bio: v.optional(v.string()),
