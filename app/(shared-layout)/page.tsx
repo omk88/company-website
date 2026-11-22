@@ -12,6 +12,7 @@ import { AiOutlineInstagram } from 'react-icons/ai';
 import { RxLinkedinLogo } from 'react-icons/rx';
 import Image from "next/image";
 import { ThemeColorPicker } from '@/components/web/ThemeColourPicker';
+import { ThemePickerWidget } from './_components/ThemePickerWidget';
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
@@ -160,7 +161,7 @@ export default function Home() {
         </section>
 
         <div className="fixed bottom-6 right-6 z-200">
-          <ThemeColorPicker size={30} />
+          <ThemePickerWidget />
         </div>
       </div>
 
