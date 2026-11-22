@@ -36,6 +36,7 @@ import CommentLikesNotificationCard from "./CommentLikesNotificationCard";
 import { AnimatePresence, motion } from "framer-motion";
 import MessageNotificationCard from "./MessageNotificationCard";
 import { UserProfilePopover } from "@/app/(shared-layout)/[username]/_components/UserProfilePopover";
+import { getGradientDataUrl } from "@/data/themes";
 
 interface NavbarAuthClientProps {
   initialIsAuth: boolean;
@@ -43,6 +44,8 @@ interface NavbarAuthClientProps {
   initialProfile?: {
     username?: string;
     displayName?: string;
+    themeName?: string | null;
+    avatarVariant?: number | null;
   } | null;
 }
 
@@ -56,7 +59,8 @@ type BlogNotification = {
   authorUsername: string;
   authorDisplayName?: string;
   profilePic?: string | null;
-  defaultProfilePic?: string | null;
+  themeName?: string | null;
+  avatarVariant?: number | null;
   isUnread?: boolean;
 };
 
@@ -70,7 +74,8 @@ type BlogLikesNotification = {
   authorUsername: string;
   authorDisplayName?: string;
   profilePic?: string | null;
-  defaultProfilePic?: string | null;
+  themeName?: string | null;
+  avatarVariant?: number | null;
   isUnread?: boolean;
 };
 
@@ -85,7 +90,8 @@ type CommentLikesNotification = {
   authorUsername: string;
   authorDisplayName?: string;
   profilePic?: string | null;
-  defaultProfilePic?: string | null;
+  themeName?: string | null;
+  avatarVariant?: number | null;
   isUnread?: boolean;
 };
 
@@ -100,7 +106,8 @@ type CommentNotification = {
   authorUsername: string;
   authorDisplayName?: string;
   profilePic?: string | null;
-  defaultProfilePic?: string | null;
+  themeName?: string | null;
+  avatarVariant?: number | null;
   isUnread?: boolean;
 };
 
@@ -110,13 +117,14 @@ type FollowNotification = {
   username: string;
   displayName: string;
   profilePicUrl?: string | null;
-  defaultProfilePicUrl?: string | null;
+  themeName?: string | null;
+  avatarVariant?: number | null;
   createdAt: number;
   isUnread?: boolean;
   viewerStatus?: {
-      isFollowing: boolean;
-      isBell: boolean;
-      isSelf: boolean;
+    isFollowing: boolean;
+    isBell: boolean;
+    isSelf: boolean;
   };
 };
 
@@ -131,7 +139,8 @@ type ReactionNotification = {
   authorUsername: string;
   authorDisplayName?: string;
   profilePic?: string | null;
-  defaultProfilePic?: string | null;
+  themeName?: string | null;
+  avatarVariant?: number | null;
   isUnread?: boolean;
 };
 
@@ -146,14 +155,15 @@ type MessageNotification = {
   authorUsername: string;
   authorDisplayName?: string;
   profilePic?: string | null;
-  defaultProfilePic?: string | null;
+  themeName?: string | null;
+  avatarVariant?: number | null;
   isUnread?: boolean;
 };
 
-type NotificationItem = 
-  | BlogNotification 
-  | CommentNotification 
-  | FollowNotification 
+type NotificationItem =
+  | BlogNotification
+  | CommentNotification
+  | FollowNotification
   | CommentLikesNotification
   | ReactionNotification
   | BlogLikesNotification
@@ -248,7 +258,10 @@ export function NavbarAuthClient({
   const profileUsername = activeProfile?.username;
   const profileDisplayName = activeProfile?.displayName || profileUsername;
 
-  const defaultAvatarUrl = "/default.svg";
+  const gradientAvatarUrl = getGradientDataUrl(
+    activeProfile?.themeName ?? "",
+    activeProfile?.avatarVariant ?? 0
+  );
 
   const clientSessionImage =
     session?.user?.image && !session.user.image.includes("googleusercontent.com")
@@ -256,8 +269,8 @@ export function NavbarAuthClient({
       : null;
 
   const avatarSrc = isMounted
-    ? userData?.profile?.profilePicUrl || clientSessionImage || initialImage || defaultAvatarUrl
-    : initialImage || defaultAvatarUrl;
+    ? userData?.profile?.profilePicUrl || clientSessionImage || initialImage || gradientAvatarUrl
+    : initialImage || gradientAvatarUrl;
 
   const markNotificationsAsRead = useMutation(api.notifications.markNotificationsAsRead);
 
@@ -288,16 +301,20 @@ export function NavbarAuthClient({
 
       let authorId = "unknown";
       let authorName = "Author";
-      let authorAvatar = "/default.svg";
+      let authorAvatar = getGradientDataUrl("", 0);
 
       if (item.notificationType === "follow") {
         authorId = item.username || "unknown";
         authorName = item.displayName || item.username || "User";
-        authorAvatar = item.profilePicUrl || item.defaultProfilePicUrl || "/default.svg";
+        authorAvatar =
+          item.profilePicUrl ||
+          getGradientDataUrl(item.themeName ?? "", item.avatarVariant ?? 0);
       } else {
         authorId = item.author || "unknown";
         authorName = item.authorUsername?.trim() || "Author";
-        authorAvatar = item.profilePic || item.defaultProfilePic || "/default.svg";
+        authorAvatar =
+          item.profilePic ||
+          getGradientDataUrl(item.themeName ?? "", item.avatarVariant ?? 0);
       }
 
       const isUnread = Boolean(item.isUnread);
@@ -346,7 +363,7 @@ export function NavbarAuthClient({
       }
     } else {
       if (userId && hadUnreadOnOpen.current) {
-        setIsOptimisticallyRead(true); 
+        setIsOptimisticallyRead(true);
         markNotificationsAsRead({ userId });
         hadUnreadOnOpen.current = false;
       }
@@ -507,7 +524,10 @@ export function NavbarAuthClient({
                                       username={item.username}
                                       displayName={item.displayName}
                                       profilePicUrl={item.profilePicUrl ?? ""}
-                                      defaultProfilePicUrl={item.defaultProfilePicUrl ?? ""}
+                                      defaultProfilePicUrl={getGradientDataUrl(
+                                        item.themeName ?? "",
+                                        item.avatarVariant ?? 0
+                                      )}
                                       createdAt={item.createdAt}
                                       isUnread={item.isUnread}    
                                       initialIsFollowing={item.viewerStatus?.isFollowing}
