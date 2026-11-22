@@ -25,7 +25,7 @@ export function ThemePickerWidget() {
       <ThemeColorPicker
         selectedTheme={currentTheme}
         onSelectTheme={handleSelectTheme}
-        size={30}
+        size={22}
       />
     </div>
   );
