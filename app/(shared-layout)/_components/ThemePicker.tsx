@@ -1,13 +1,31 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { userThemes } from '@/data/themes';
+import { useMutation } from 'convex/react';
+import { api } from '@/convex/_generated/api';
+import { useCurrentUser } from '@/app/ConvexClientProvider';
+import { userThemes, THEME_MAP } from '@/data/themes';
 
 type Theme = typeof userThemes[number];
 
 export default function ThemePicker() {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState<Theme>(userThemes[0]);
+  const [hasInitializedFromProfile, setHasInitializedFromProfile] = useState(false);
+
+  const currentUserData = useCurrentUser();
+  const profile = currentUserData?.profile;
+  const updateProfileTheme = useMutation(api.profiles.updateProfileTheme);
+
+  useEffect(() => {
+    if (!hasInitializedFromProfile && profile?.themeName) {
+      const matchedTheme = THEME_MAP[profile.themeName];
+      if (matchedTheme) {
+        setSelectedTheme(matchedTheme);
+      }
+      setHasInitializedFromProfile(true);
+    }
+  }, [hasInitializedFromProfile, profile?.themeName]);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -16,6 +34,21 @@ export default function ThemePicker() {
     root.style.setProperty('--accent-text-1', selectedTheme.text[0]);
     root.style.setProperty('--accent-text-2', selectedTheme.text[1]);
   }, [selectedTheme]);
+
+  const handleSelectTheme = async (theme: Theme) => {
+    setSelectedTheme(theme);
+    setIsOpen(false);
+
+    document.cookie = `taqtiq_theme_name=${encodeURIComponent(theme.name)}; path=/; max-age=31536000; SameSite=Lax`;
+
+    if (profile?.userId) {
+      try {
+        await updateProfileTheme({ themeName: theme.name });
+      } catch (error) {
+        console.error('Failed to update profile theme:', error);
+      }
+    }
+  };
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
@@ -26,10 +59,8 @@ export default function ThemePicker() {
             return (
               <button
                 key={theme.name}
-                onClick={() => {
-                  setSelectedTheme(theme);
-                  setIsOpen(false);
-                }}
+                type="button"
+                onClick={() => handleSelectTheme(theme)}
                 className={`flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-all ${
                   isSelected
                     ? 'bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 font-semibold'
@@ -50,6 +81,7 @@ export default function ThemePicker() {
       )}
 
       <button
+        type="button"
         onClick={() => setIsOpen((prev) => !prev)}
         aria-label="Select Color Theme"
         className="w-12 h-12 rounded-full shadow-lg border-2 border-white dark:border-neutral-800 transition-transform hover:scale-105 active:scale-95 flex items-center justify-center relative cursor-pointer"
