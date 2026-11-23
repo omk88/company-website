@@ -259,18 +259,11 @@ export function NavbarAuthClient({
   const profileDisplayName = activeProfile?.displayName || profileUsername;
 
   const gradientAvatarUrl = getGradientDataUrl(
-    activeProfile?.themeName ?? "",
-    activeProfile?.avatarVariant ?? 0
+    userData?.profile?.themeName ?? "",
+    userData?.profile?.avatarVariant ?? 0
   );
 
-  const clientSessionImage =
-    session?.user?.image && !session.user.image.includes("googleusercontent.com")
-      ? session.user.image
-      : null;
-
-  const avatarSrc = isMounted
-    ? userData?.profile?.profilePicUrl || clientSessionImage || initialImage || gradientAvatarUrl
-    : initialImage || gradientAvatarUrl;
+  const avatarSrc = userData?.profile?.profilePicUrl || gradientAvatarUrl;
 
   const markNotificationsAsRead = useMutation(api.notifications.markNotificationsAsRead);
 
