@@ -231,15 +231,15 @@ export function LeftSidebarArticleSeries({ slug }: LeftSidebarArticleSeriesProps
                       </div>
                     )}
 
-                    <div>
-                      <div className="flex items-center ml-auto">
+                    <div className="flex items-center ml-auto">
+                      <div className="flex items-center">
                         <Badge variant="outline" className="gap-1.5 py-1 px-2.5 text-zinc-600 dark:text-zinc-300">
                           <Clock className="w-3.5 h-3.5" />
                           <span>{formatReadTime(seriesData.totalReadTime)}</span>
                         </Badge>
                       </div>
 
-                      <div className="flex items-center ml-auto">
+                      <div className="flex items-center">
                         <Badge variant="outline" className="gap-1.5 py-1 px-2.5 text-zinc-600 dark:text-zinc-300">
                           <Library className="w-3.5 h-3.5" />
                           <span>{seriesData.articlesCount} {seriesData.articlesCount === 1 ? 'article' : 'articles'}</span>
