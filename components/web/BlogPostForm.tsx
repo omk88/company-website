@@ -117,11 +117,36 @@ export function toTitleCase(str: string): string {
     .join(' ');
 }
 
+export const CAROUSEL_TOKEN_REGEX = /^CAROUSELBLOCKTOKEN(\d+)END$/;
+
+export function extractCarouselMarkdown(markdown: string) {
+  const carouselBlocks: string[] = [];
+  const regex =
+    /(^|\r?\n):::carousel[^\S\r\n]*\r?\n([\s\S]*?)\r?\n:::[ \t]*(?=\r?\n|$)/gi;
+
+  const markdownWithTokens = markdown.replace(
+    regex,
+    (fullMatch, leadingNewline: string) => {
+      const block = fullMatch.slice(leadingNewline.length).trim();
+      const idx = carouselBlocks.length;
+      carouselBlocks.push(block);
+      return `${leadingNewline}\n\nCAROUSELBLOCKTOKEN${idx}END\n\n`;
+    }
+  );
+
+  return { markdownWithTokens, carouselBlocks };
+}
+
 export const MemoizedMarkdown = memo(function MemoizedMarkdown({
   content,
 }: {
   content: string;
 }) {
+  const { markdownWithTokens, carouselBlocks } = useMemo(
+    () => extractCarouselMarkdown(content),
+    [content]
+  );
+
   return (
     <div className="prose prose-neutral dark:prose-invert max-w-none text-base leading-relaxed text-neutral-800 dark:text-neutral-200 w-full min-w-0 [&_p]:break-words">
       <ReactMarkdown
@@ -155,12 +180,32 @@ export const MemoizedMarkdown = memo(function MemoizedMarkdown({
               </code>
             );
           },
+          p({ children, ...props }) {
+            const rawText =
+              typeof children === "string"
+                ? children.trim()
+                : Array.isArray(children) &&
+                    children.length === 1 &&
+                    typeof children[0] === "string"
+                  ? children[0].trim()
+                  : "";
+
+            const match = rawText.match(CAROUSEL_TOKEN_REGEX);
+            if (match) {
+              const block = carouselBlocks[Number(match[1])];
+              if (block) {
+                return <BlogImage carouselBlock={block} />;
+              }
+            }
+
+            return <p {...props}>{children}</p>;
+          },
           img({ src, alt, ...props }) {
             return <BlogImage src={src} alt={alt} {...props} />;
           },
         }}
       >
-        {content}
+        {markdownWithTokens}
       </ReactMarkdown>
     </div>
   );

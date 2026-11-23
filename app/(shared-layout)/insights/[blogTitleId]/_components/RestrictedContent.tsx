@@ -35,6 +35,8 @@ import { getCurrencySymbol } from "@/app/(shared-layout)/[username]/_components/
 import PurchaseCourseButton from "./PurchaseCourseButton";
 import { BlogCTA } from "@/components/web/BlogCTA";
 import { CommentSection } from "@/components/web/CommentSection";
+import { useMemo } from "react";
+import { CAROUSEL_TOKEN_REGEX, extractCarouselMarkdown } from "@/components/web/BlogPostForm";
 
 const lowlight = createLowlight();
 lowlight.register("javascript", js);
@@ -147,6 +149,11 @@ export function RestrictedContent({
   };
 
   const headings = extractHeadings(userCanAccessBlog ? content : "");
+
+  const { markdownWithTokens, carouselBlocks } = useMemo(
+    () => extractCarouselMarkdown(content || ""),
+    [content]
+  );
 
   if (!userCanAccessBlog) {
     return (
@@ -289,12 +296,32 @@ export function RestrictedContent({
                   </code>
                 );
               },
+              p({ children, ...props }) {
+                const rawText =
+                  typeof children === "string"
+                    ? children.trim()
+                    : Array.isArray(children) &&
+                        children.length === 1 &&
+                        typeof children[0] === "string"
+                      ? children[0].trim()
+                      : "";
+
+                const match = rawText.match(CAROUSEL_TOKEN_REGEX);
+                if (match) {
+                  const block = carouselBlocks[Number(match[1])];
+                  if (block) {
+                    return <BlogImage carouselBlock={block} />;
+                  }
+                }
+
+                return <p {...props}>{children}</p>;
+              },
               img({ src, alt, ...props }) {
                 return <BlogImage src={src} alt={alt} {...props} />;
               },
             }}
           >
-            {content}
+            {markdownWithTokens}
           </ReactMarkdown>
 
           <BlogCTA />
