@@ -5,12 +5,13 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { buttonVariants } from "@/components/ui/button";
-import { ArrowUpRight, Plus, Inbox, LogOut, ListPlus, Film, FolderHeart, BookMarked } from "lucide-react";
+import { ArrowUpRight, Plus, Inbox, LogOut, ListPlus, Film, BookMarked } from "lucide-react";
 
 interface UserProfilePopoverProps {
   openProfile: boolean;
   setOpenProfile: (open: boolean) => void;
   avatarSrc: string;
+  isAvatarLoading?: boolean;
   profileUsername?: string;
   profileDisplayName?: string;
   activeProfile: any;
@@ -21,6 +22,7 @@ export function UserProfilePopover({
   openProfile,
   setOpenProfile,
   avatarSrc,
+  isAvatarLoading = false,
   profileUsername,
   profileDisplayName,
   activeProfile,
@@ -38,16 +40,20 @@ export function UserProfilePopover({
             size: "icon",
           })} cursor-pointer h-9 w-9 rounded-lg shrink-0 flex items-center justify-center`}
         >
-          <div className="size-6 md:size-5 rounded-full overflow-hidden border border-border bg-muted shrink-0 flex items-center justify-center">
-            <img
-              src={avatarSrc}
-              alt={profileUsername || "User Profile"}
-              loading="eager"
-              decoding="sync"
-              suppressHydrationWarning
-              className="h-full w-full object-cover"
-            />
-          </div>
+          {isAvatarLoading ? (
+            <Skeleton className="size-6 md:size-5 rounded-full shrink-0" />
+          ) : (
+            <div className="size-6 md:size-5 rounded-full overflow-hidden border border-border bg-muted shrink-0 flex items-center justify-center">
+              <img
+                src={avatarSrc}
+                alt={profileUsername || "User Profile"}
+                loading="eager"
+                decoding="sync"
+                suppressHydrationWarning
+                className="h-full w-full object-cover"
+              />
+            </div>
+          )}
         </button>
       </PopoverTrigger>
 
@@ -61,14 +67,18 @@ export function UserProfilePopover({
           className="group flex items-center justify-between p-2.5 rounded-xl hover:bg-accent hover:text-accent-foreground transition-colors duration-100 cursor-pointer"
         >
           <div className="flex items-center gap-3 min-w-0">
-            <div className="h-10 w-10 border border-border rounded-full overflow-hidden bg-muted shrink-0">
-              <img
-                src={avatarSrc}
-                alt="profile"
-                className="h-full w-full object-cover"
-                decoding="async"
-              />
-            </div>
+            {isAvatarLoading ? (
+              <Skeleton className="h-10 w-10 rounded-full shrink-0" />
+            ) : (
+              <div className="h-10 w-10 border border-border rounded-full overflow-hidden bg-muted shrink-0">
+                <img
+                  src={avatarSrc}
+                  alt="profile"
+                  className="h-full w-full object-cover"
+                  decoding="async"
+                />
+              </div>
+            )}
             <div className="flex flex-col min-w-0">
               {activeProfile ? (
                 <>
