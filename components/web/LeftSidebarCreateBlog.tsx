@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, FolderBookmark, Trash2, ChevronLeft, FileImage } from "lucide-react";
 import { Sidebar, SidebarHeader, SidebarFooter, SidebarContent } from "../ui/sidebar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button, buttonVariants } from "../ui/button";
 import { cn } from "@/lib/utils";
 import { useBlogStore } from "@/stores/useBlogStore";
@@ -54,14 +55,13 @@ export function LeftSidebarCreateBlog({ onSelectDraft }: LeftSidebarCreateBlogPr
 
   return (
     <aside className="w-full md:w-[3.5rem] h-14 md:h-full shrink-0 relative z-40">
-      <Sidebar 
-        bgClass="bg-white dark:bg-zinc-950" 
-        showBorder={true} 
+      <Sidebar
+        bgClass="bg-white dark:bg-zinc-950"
+        showBorder={true}
         className="!top-0 md:!top-16 !z-40 !w-full md:!w-[3.5rem] !h-14 md:!h-full"
       >
         <div className="flex flex-col md:flex-row h-full w-full relative">
           <div className="w-full md:w-[3.5rem] h-14 md:h-full shrink-0 flex flex-row md:flex-col items-center justify-between md:justify-start border-b md:border-b-0 md:border-r border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 z-10 px-3 md:px-0">
-            
             <SidebarHeader className="flex items-center justify-center p-0 md:p-2">
               <Link
                 className={cn(
@@ -81,8 +81,8 @@ export function LeftSidebarCreateBlog({ onSelectDraft }: LeftSidebarCreateBlogPr
                 className={cn(
                   buttonVariants({ variant: "ghost", size: "icon" }),
                   "cursor-pointer h-10 w-10 md:h-11 md:w-11 rounded-full transition-colors",
-                  isOpen 
-                    ? "bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100" 
+                  isOpen
+                    ? "bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100"
                     : "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 dark:hover:text-zinc-100 dark:hover:bg-zinc-800"
                 )}
                 title="Toggle Drafts"
@@ -102,73 +102,78 @@ export function LeftSidebarCreateBlog({ onSelectDraft }: LeftSidebarCreateBlogPr
                 exit={{ x: "-100%", opacity: 0 }}
                 transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
                 className={cn(
-                  "absolute bg-white dark:bg-zinc-950 shadow-xl z-0 p-3 flex flex-col",
+                  "absolute bg-white dark:bg-zinc-950 shadow-xl z-0 pt-3 px-3 pb-2 flex flex-col",
                   "top-0 bottom-0 left-[3.5rem] w-[16rem] h-full border-r border-zinc-200 dark:border-zinc-800"
                 )}
               >
-                <div className="flex items-center justify-between mb-4 pb-2 border-b border-zinc-200 dark:border-zinc-800">
-                  <span className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">Saved Drafts</span>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="cursor-pointer h-6 w-6 text-zinc-500 hover:text-zinc-900" 
+                <div className="flex items-center justify-between mb-3 pb-2 border-b border-zinc-200 dark:border-zinc-800 shrink-0">
+                  <span className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">
+                    Saved Drafts
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="cursor-pointer h-6 w-6 text-zinc-500 hover:text-zinc-900"
                     onClick={() => setIsOpen(false)}
                   >
                     <ChevronLeft className="h-4 w-4 md:rotate-0 rotate-90" />
                   </Button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto space-y-2 max-h-[45vh] md:max-h-none">
-                  {drafts === undefined && (
-                    <p className="text-xs text-zinc-400 p-2">Loading drafts…</p>
-                  )}
+                <ScrollArea className="flex-1 min-h-0 w-full pr-1">
+                  <div className="space-y-2 pb-6">
+                    {drafts === undefined && (
+                      <p className="text-xs text-zinc-400 p-2">Loading drafts…</p>
+                    )}
 
-                  {drafts?.length === 0 && (
-                    <p className="text-xs text-zinc-400 p-2">No saved drafts found</p>
-                  )}
+                    {drafts?.length === 0 && (
+                      <p className="text-xs text-zinc-400 p-2">No saved drafts found</p>
+                    )}
 
-                  {drafts?.map((draft) => (
-                    <div
-                      key={draft._id}
-                      onClick={() => {
-                        setActiveDraft(draft);
-                        setIsOpen(false);
-                      }}
-                      className="group flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 border-transparent cursor-pointer transition-all"
-                    >
-                      <div className="flex items-center gap-4 overflow-hidden">
-                        <div className="h-8 w-8 border border-border rounded-full overflow-hidden shrink-0 flex items-center justify-center">
-                          {draft.imageUrl ? (
-                            <img
-                              src={draft.imageUrl}
-                              alt={draft.title || "Cover Image"}
-                              className="h-full w-full object-cover"
-                              decoding="async"
-                            />
-                          ) : (
-                            <FileImage className="h-4 w-4 text-muted-foreground stroke-[2]" />
-                          )}
-                        </div>
-                        <div className="truncate">
-                          <p className="text-xs font-medium text-zinc-800 dark:text-zinc-200 truncate">
-                            {draft.title.trim() || "Untitled Post"}
-                          </p>
-                          <p className="text-[10px] text-zinc-400">
-                            Edited {formatTimeAgo(draft.updatedAt)}
-                          </p>
-                        </div>
-                      </div>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        onClick={(e) => handleDelete(e, draft._id)}
-                        className="cursor-pointer ml-4 h-6 w-6 md:opacity-0 md:group-hover:opacity-100 opacity-100 text-zinc-400 hover:text-red-500 transition-opacity shrink-0"
+                    {drafts?.map((draft) => (
+                      <div
+                        key={draft._id}
+                        onClick={() => {
+                          setActiveDraft(draft);
+                          onSelectDraft?.(draft);
+                          setIsOpen(false);
+                        }}
+                        className="group flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 border-transparent cursor-pointer transition-all"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
+                        <div className="flex items-center gap-4 overflow-hidden">
+                          <div className="h-8 w-8 border border-border rounded-full overflow-hidden shrink-0 flex items-center justify-center">
+                            {draft.imageUrl ? (
+                              <img
+                                src={draft.imageUrl}
+                                alt={draft.title || "Cover Image"}
+                                className="h-full w-full object-cover"
+                                decoding="async"
+                              />
+                            ) : (
+                              <FileImage className="h-4 w-4 text-muted-foreground stroke-[2]" />
+                            )}
+                          </div>
+                          <div className="truncate">
+                            <p className="text-xs font-medium text-zinc-800 dark:text-zinc-200 truncate">
+                              {draft.title.trim() || "Untitled Post"}
+                            </p>
+                            <p className="text-[10px] text-zinc-400">
+                              Edited {formatTimeAgo(draft.updatedAt)}
+                            </p>
+                          </div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={(e) => handleDelete(e, draft._id)}
+                          className="cursor-pointer ml-4 h-6 w-6 md:opacity-0 md:group-hover:opacity-100 opacity-100 text-zinc-400 hover:text-red-500 transition-opacity shrink-0"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
               </motion.div>
             )}
           </AnimatePresence>
