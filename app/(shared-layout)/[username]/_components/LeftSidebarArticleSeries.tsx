@@ -9,7 +9,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAction, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { Clock } from "lucide-react";
+import { Clock, Library } from "lucide-react";
 import Image from "next/image";
 import { formatSmartDate, ProfileHoverCard } from "@/components/web/ProfileHoverCard";
 import { Badge } from "@/components/ui/badge";
@@ -143,6 +143,7 @@ export function LeftSidebarArticleSeries({ slug }: LeftSidebarArticleSeriesProps
   }
 
   const seriesId = seriesData._id;
+  
 
   const handlePurchase = async () => {
     try {
@@ -218,23 +219,32 @@ export function LeftSidebarArticleSeries({ slug }: LeftSidebarArticleSeriesProps
                     )}
                   </div>
 
-                  <div className="flex items-center">
-                    <Badge variant="outline" className="gap-1.5 py-1 px-2.5 text-zinc-600 dark:text-zinc-300">
-                      <Clock className="w-3.5 h-3.5" />
-                      <span>{formatReadTime(seriesData.totalReadTime)}</span>
-                    </Badge>
-                  </div>
+                  <div className="flex flex-row">
+                    {seriesData.price && seriesData.currency && (
+                      <div className="flex items-center">
+                        <Badge variant="outline" className="py-1 px-2.5 text-green-600 dark:text-green-300">
+                          <span>
+                            {getCurrencySymbol(seriesData.currency)}
+                            {seriesData.price}
+                          </span>
+                        </Badge>
+                      </div>
+                    )}
 
-                  {seriesData.price && seriesData.currency && (
-                    <div className="flex items-center">
-                      <Badge variant="outline" className="py-1 px-2.5 text-green-600 dark:text-green-300">
-                        <span>
-                          {getCurrencySymbol(seriesData.currency)}
-                          {seriesData.price}
-                        </span>
+                    <div className="flex items-center ml-auto">
+                      <Badge variant="outline" className="gap-1.5 py-1 px-2.5 text-zinc-600 dark:text-zinc-300">
+                        <Clock className="w-3.5 h-3.5" />
+                        <span>{formatReadTime(seriesData.totalReadTime)}</span>
                       </Badge>
                     </div>
-                  )}
+
+                    <div className="flex items-center ml-auto">
+                      <Badge variant="outline" className="gap-1.5 py-1 px-2.5 text-zinc-600 dark:text-zinc-300">
+                        <Library className="w-3.5 h-3.5" />
+                        <span>{seriesData.articlesCount} {seriesData.articlesCount === 1 ? 'article' : 'articles'}</span>
+                      </Badge>
+                    </div>
+                  </div>
 
                   {isOwnProfile && (
                     <Button type="button" size="sm" className="cursor-pointer w-fit rounded-xl mt-2" asChild>

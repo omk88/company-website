@@ -494,6 +494,7 @@ export const getSeriesBySlug = query({
     );
 
     const validBlogs = blogs.filter(Boolean);
+    const articlesCount = validBlogs.length;
     const totalReadTime = validBlogs.reduce((acc, blog) => acc + (blog?.readTime ?? 0), 0);
 
     return {
@@ -508,6 +509,7 @@ export const getSeriesBySlug = query({
           }
         : null,
       blogs: validBlogs,
+      articlesCount,
       totalReadTime,
     };
   },
