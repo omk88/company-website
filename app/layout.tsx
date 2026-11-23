@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono, Lexend, Poppins, Roboto } from "next/font/google"; 
+import { Inter, JetBrains_Mono, Lexend, Poppins, Roboto } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "next-themes";
@@ -34,9 +35,9 @@ const jetBrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: {
     default: "TaQtiQ | Software that pushes boundaries.",
-    template: "%s | TaQtiQ",               
+    template: "%s | TaQtiQ",
   },
-  description: "Description"
+  description: "Description",
 };
 
 export default function RootLayout({
@@ -46,14 +47,32 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className="scroll-smooth scroll-pt-16">
-      <head>
-        <script
+      <body
+        className={`${inter.variable} ${poppins.variable} ${jetBrainsMono.variable} ${roboto.variable} font-sans flex flex-col bg-background text-foreground`}
+      >
+        <Script id="gtm-init" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            window.dataLayer.push({
+              'gtm.start': new Date().getTime(),
+              event: 'gtm.js'
+            });
+          `}
+        </Script>
+        <Script
+          id="gtm-script"
+          src="https://www.googletagmanager.com/gtm.js?id=GTM-NFR9W95N"
+          strategy="afterInteractive"
+        />
+
+        <Script
+          id="adsense-script"
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5236028024537102"
           crossOrigin="anonymous"
+          strategy="afterInteractive"
         />
-      </head>
-      <body className={`${inter.variable} ${poppins.variable} ${jetBrainsMono.variable} ${roboto.variable} font-sans flex flex-col bg-background text-foreground`}>
+
         <ThemeInitialiser />
         <ThemeProvider
           attribute="class"
@@ -63,9 +82,7 @@ export default function RootLayout({
         >
           <main>
             <ConvexClientProvider>
-              <BanProvider>
-                {children}
-              </BanProvider>
+              <BanProvider>{children}</BanProvider>
             </ConvexClientProvider>
           </main>
           <Toaster />
