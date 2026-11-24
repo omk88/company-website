@@ -58,7 +58,7 @@ export function LeftSidebarCreateBlog({ onSelectDraft }: LeftSidebarCreateBlogPr
       <Sidebar
         bgClass="bg-white dark:bg-zinc-950"
         showBorder={true}
-        className="!top-0 md:!top-16 !z-40 !w-full md:!w-[3.5rem] !h-14 md:!h-full"
+        className="!top-0 md:!top-16 !z-40 !w-full md:!w-[3.5rem] !h-14 md:!h-[calc(100dvh-4rem)]"
       >
         <div className="flex flex-col md:flex-row h-full w-full relative">
           <div className="w-full md:w-[3.5rem] h-14 md:h-full shrink-0 flex flex-row md:flex-col items-center justify-between md:justify-start border-b md:border-b-0 md:border-r border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 z-10 px-3 md:px-0">
@@ -102,8 +102,8 @@ export function LeftSidebarCreateBlog({ onSelectDraft }: LeftSidebarCreateBlogPr
                 exit={{ x: "-100%", opacity: 0 }}
                 transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
                 className={cn(
-                  "absolute bg-white dark:bg-zinc-950 shadow-xl z-0 pt-3 px-3 pb-2 flex flex-col",
-                  "top-0 bottom-0 left-[3.5rem] w-[16rem] h-full border-r border-zinc-200 dark:border-zinc-800"
+                  "absolute bg-white dark:bg-zinc-950 shadow-xl z-0 pt-3 px-3 pb-4 flex flex-col",
+                  "top-0 bottom-0 left-[3.5rem] w-[18rem] h-full border-r border-zinc-200 dark:border-zinc-800"
                 )}
               >
                 <div className="flex items-center justify-between mb-3 pb-2 border-b border-zinc-200 dark:border-zinc-800 shrink-0">
@@ -120,8 +120,8 @@ export function LeftSidebarCreateBlog({ onSelectDraft }: LeftSidebarCreateBlogPr
                   </Button>
                 </div>
 
-                <ScrollArea className="flex-1 min-h-0 w-full pr-1">
-                  <div className="space-y-2 pb-6">
+                <ScrollArea className="flex-1 min-h-0 w-full pr-4">
+                  <div className="space-y-2 pb-8">
                     {drafts === undefined && (
                       <p className="text-xs text-zinc-400 p-2">Loading drafts…</p>
                     )}
