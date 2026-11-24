@@ -8,7 +8,7 @@ import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
 import { Id } from "@/convex/_generated/dataModel";
 import { useParams } from "next/navigation";
-import { Preloaded, useMutation, usePreloadedQuery } from "convex/react";
+import { Preloaded, usePreloadedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import z from "zod";
 import { toast } from "sonner";
@@ -66,11 +66,13 @@ export function CommentSection(props: { preloadedComments: Preloaded<typeof api.
 
   return (
     <div className="space-y-4 md:space-y-8 my-4 md:my-8">
-      <div className="flex items-center gap-2 text-zinc-900 dark:text-zinc-100">
+      <div
+        className="flex items-center gap-2.5 px-2.5 py-2 text-zinc-900 dark:text-zinc-100"
+      >
         <MessageSquare className="size-6 md:size-5" />
-        <h2 className="text-2xl md:text-xl font-bold tracking-tight">
+        <span className="text-2xl md:text-xl font-bold tracking-tight">
           Comments ({data.length})
-        </h2>
+        </span>
       </div>
 
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
