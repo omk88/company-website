@@ -102,8 +102,8 @@ export function LeftSidebarCreateBlog({ onSelectDraft }: LeftSidebarCreateBlogPr
                 exit={{ x: "-100%", opacity: 0 }}
                 transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
                 className={cn(
-                  "absolute bg-white dark:bg-zinc-950 shadow-xl z-0 pt-3 px-3 pb-4 flex flex-col",
-                  "top-0 bottom-0 left-[3.5rem] w-[18rem] h-full border-r border-zinc-200 dark:border-zinc-800"
+                  "absolute bg-white dark:bg-zinc-950 shadow-xl z-0 pt-3 px-3 pb-4 flex flex-col overflow-hidden",
+                  "top-0 bottom-0 left-[3.5rem] w-[16rem] h-full border-r border-zinc-200 dark:border-zinc-800"
                 )}
               >
                 <div className="flex items-center justify-between mb-3 pb-2 border-b border-zinc-200 dark:border-zinc-800 shrink-0">
@@ -120,8 +120,8 @@ export function LeftSidebarCreateBlog({ onSelectDraft }: LeftSidebarCreateBlogPr
                   </Button>
                 </div>
 
-                <ScrollArea className="flex-1 min-h-0 w-full pr-4">
-                  <div className="space-y-2 pb-8">
+                <ScrollArea className="flex-1 min-h-0 w-full max-w-full overflow-hidden pr-2 [&>div>div]:!block [&>div>div]:!min-w-0 [&>div>div]:!max-w-full">
+                  <div className="space-y-2 pr-4 pb-8 w-full min-w-0 max-w-full">
                     {drafts === undefined && (
                       <p className="text-xs text-zinc-400 p-2">Loading drafts…</p>
                     )}
@@ -138,9 +138,9 @@ export function LeftSidebarCreateBlog({ onSelectDraft }: LeftSidebarCreateBlogPr
                           onSelectDraft?.(draft);
                           setIsOpen(false);
                         }}
-                        className="group flex items-center justify-between p-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 border-transparent cursor-pointer transition-all"
+                        className="group flex items-center justify-between w-full min-w-0 max-w-full p-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 border-transparent cursor-pointer transition-all"
                       >
-                        <div className="flex items-center gap-4 overflow-hidden">
+                        <div className="flex items-center gap-3 min-w-0 flex-1">
                           <div className="h-8 w-8 border border-border rounded-full overflow-hidden shrink-0 flex items-center justify-center">
                             {draft.imageUrl ? (
                               <img
@@ -153,11 +153,11 @@ export function LeftSidebarCreateBlog({ onSelectDraft }: LeftSidebarCreateBlogPr
                               <FileImage className="h-4 w-4 text-muted-foreground stroke-[2]" />
                             )}
                           </div>
-                          <div className="truncate">
+                          <div className="min-w-0 flex-1">
                             <p className="text-xs font-medium text-zinc-800 dark:text-zinc-200 truncate">
                               {draft.title.trim() || "Untitled Post"}
                             </p>
-                            <p className="text-[10px] text-zinc-400">
+                            <p className="text-[10px] text-zinc-400 truncate">
                               Edited {formatTimeAgo(draft.updatedAt)}
                             </p>
                           </div>
@@ -166,7 +166,7 @@ export function LeftSidebarCreateBlog({ onSelectDraft }: LeftSidebarCreateBlogPr
                           variant="ghost"
                           size="icon"
                           onClick={(e) => handleDelete(e, draft._id)}
-                          className="cursor-pointer ml-4 h-6 w-6 md:opacity-0 md:group-hover:opacity-100 opacity-100 text-zinc-400 hover:text-red-500 transition-opacity shrink-0"
+                          className="cursor-pointer ml-2 h-6 w-6 md:opacity-0 md:group-hover:opacity-100 opacity-100 text-zinc-400 hover:text-red-500 transition-opacity shrink-0"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </Button>
