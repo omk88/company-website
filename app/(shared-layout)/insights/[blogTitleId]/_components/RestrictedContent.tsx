@@ -37,6 +37,7 @@ import { BlogCTA } from "@/components/web/BlogCTA";
 import { CommentSection } from "@/components/web/CommentSection";
 import { useMemo } from "react";
 import { CAROUSEL_TOKEN_REGEX, extractCarouselMarkdown } from "@/components/web/BlogPostForm";
+import { SeriesBottomNav } from "./SeriesBottomNav";
 
 const lowlight = createLowlight();
 lowlight.register("javascript", js);
@@ -323,6 +324,8 @@ export function RestrictedContent({
           >
             {markdownWithTokens}
           </ReactMarkdown>
+
+          <SeriesBottomNav blogId={blogId} />
 
           <BlogCTA />
           <Separator className="my-10" />
