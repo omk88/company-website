@@ -18,6 +18,8 @@ import { Button } from "@/components/ui/button";
 import { useCurrentUser } from "@/app/ConvexClientProvider";
 import Link from "next/link";
 import { useState } from "react";
+import { toast } from "sonner";
+import router from "next/router";
 
 interface LeftSidebarArticleSeriesProps {
   slug: string;
@@ -146,6 +148,17 @@ export function LeftSidebarArticleSeries({ slug }: LeftSidebarArticleSeriesProps
   
 
   const handlePurchase = async () => {
+
+    if (!currentUser) {
+        toast.error("You must be logged in to purchase a course.", {
+            action: {
+                label: "Sign in",
+                onClick: () => router.push("/sign-in"),
+            },
+        });
+        return;
+    }
+
     try {
       setIsLoading(true);
       const { url } = await createCheckout({ seriesId });
