@@ -250,12 +250,6 @@ export function RestrictedContent({
 
   return (
     <>
-      {isVideo && videoUrl && (
-        <div className="relative w-full h-[300px] md:h-[400px] overflow-hidden mb-6">
-          <BlogVideoPlayer videoUrl={videoUrl} />
-        </div>
-      )}
-
       {audioUrl && (
         <div className="mb-4">
           <AudioPlayer audioUrl={audioUrl} title={title} chapters={chapters} />

@@ -12,6 +12,7 @@ import { BlogLastUpdated } from "@/app/(shared-layout)/insights/[blogTitleId]/_c
 import { ShareLinks } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/ShareLinks";
 import { BlogSeriesNavbar } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/SeriesNavbarCard";
 import { RestrictedContent } from "@/app/(shared-layout)/insights/[blogTitleId]/_components/RestrictedContent";
+import BlogVideoPlayer from "@/app/(shared-layout)/insights/[blogTitleId]/_components/BlogVideoPlayer";
 
 interface ExtendedBlog extends Doc<"blogs"> {
   imageUrl: string;
@@ -51,7 +52,7 @@ export function BlogContent({
       <ViewTracker blogId={blog._id} />
 
       {!blog.isVideo && (
-        <div className="relative w-full h-[300px] md:h-[400px] rounded-lg overflow-hidden">
+        <div className="relative w-full h-[300px] md:h-[400px] rounded-lg overflow-hidden mb-4">
           <Image
             unoptimized
             src={blog.imageUrl}
@@ -61,6 +62,12 @@ export function BlogContent({
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1920px"
             className="object-cover"
           />
+        </div>
+      )}
+
+      {blog.isVideo && blog.videoUrl && (
+        <div className="relative w-full h-[300px] md:h-[400px] overflow-hidden">
+          <BlogVideoPlayer videoUrl={blog.videoUrl} />
         </div>
       )}
 
