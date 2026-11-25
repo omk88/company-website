@@ -12,21 +12,21 @@ export const metadata: Metadata = {
 
 export default function About() {
   return (
-    <div style={{ backgroundColor: 'var(--accent-background)' }} className="pt-16 w-full relative min-h-screen text-foreground antialiased isolate flex flex-col overflow-x-hidden">
+    <div style={{ backgroundColor: 'var(--accent-bg-active)' }} className="pt-16 w-full relative min-h-screen text-foreground antialiased isolate flex flex-col overflow-x-hidden">
       <div className="w-full flex-1 flex flex-col">
 
         <section className="max-w-6xl mx-auto w-full px-4 sm:px-8 py-16 md:py-20 flex flex-col items-center justify-center text-center">
           <div className="flex flex-col items-center justify-center gap-4">
             <HeroTitle />
             
-            <p style={{ color: 'var(--accent-text-1)' }} className="text-xl font-light max-w-lg">
+            <p style={{ color: 'var(--accent-text-1-active)' }} className="text-xl font-light max-w-lg">
               TaQtiQ is a dedicated team of software engineers and IT professionals delivering innovative digital solutions. 
             </p>
 
             <div className="flex flex-wrap items-center gap-3 pt-1 isolate">
               <Link 
                 href="/careers" 
-                style={{ backgroundColor: 'var(--accent-primary)' }}
+                style={{ backgroundColor: 'var(--accent-dark-primary)' }}
                 className="group px-4.5 py-2.5 text-white font-medium text-xs sm:text-sm rounded-lg transition-all duration-100 hover:opacity-90 active:scale-[0.98] inline-flex items-center gap-2"
               >
                 <span style={{ color: 'var(--accent-text-2)' }}>View careers</span>

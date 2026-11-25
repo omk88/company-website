@@ -79,6 +79,12 @@
 :root {
   color-scheme: light dark;
 
+  --accent-bg-active: var(--accent-background);
+  --accent-text-1-active: var(--accent-text-1);
+  --accent-text-2-active: var(--accent-text-2);
+
+  --accent-primary-active: var(--accent-primary);
+
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -115,6 +121,12 @@
 
 .dark {
   color-scheme: dark;
+
+  --accent-bg-active: var(--accent-dark-background);
+  --accent-text-1-active: var(--accent-dark-text-1);
+  --accent-text-2-active: var(--accent-dark-text-2);
+
+  --accent-primary-active: var(--accent-dark-primary);
 
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);

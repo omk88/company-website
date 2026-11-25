@@ -1,7 +1,8 @@
 export const userThemes = [
   { 
     name: 'electric-blue', 
-    primary: '#3b82f6', 
+    primary: '#3b82f6',
+    darkPrimary: '#1d4ed8',
     gradient: ['#60a5fa', '#2563eb'], 
     background: '#dbeafe',       
     darkBackground: '#090d16',    
@@ -10,7 +11,8 @@ export const userThemes = [
   },
   { 
     name: 'cyan', 
-    primary: '#06b6d4', 
+    primary: '#06b6d4',
+    darkPrimary: '#0e7490',
     gradient: ['#22d3ee', '#0891b2'], 
     background: '#cffafe', 
     darkBackground: '#08131a',     
@@ -19,7 +21,8 @@ export const userThemes = [
   },       
   { 
     name: 'indigo', 
-    primary: '#4f46e5', 
+    primary: '#4f46e5',
+    darkPrimary: '#3730a3',
     gradient: ['#6366f1', '#4338ca'], 
     background: '#e0e7ff', 
     darkBackground: '#0e0e1b',     
@@ -28,7 +31,8 @@ export const userThemes = [
   },      
   { 
     name: 'cyber-purple', 
-    primary: '#8b5cf6', 
+    primary: '#8b5cf6',
+    darkPrimary: '#6d28d9',
     gradient: ['#a78bfa', '#7c3aed'], 
     background: '#f3e8ff', 
     darkBackground: '#130d1d',     
@@ -37,7 +41,8 @@ export const userThemes = [
   },
   { 
     name: 'teal', 
-    primary: '#0d9488', 
+    primary: '#0d9488',
+    darkPrimary: '#0f766e',
     gradient: ['#14b8a6', '#0f766e'], 
     background: '#ccfbf1', 
     darkBackground: '#061513',     
@@ -46,7 +51,8 @@ export const userThemes = [
   },   
   { 
     name: 'vibrant-orange', 
-    primary: '#f97316', 
+    primary: '#f97316',
+    darkPrimary: '#c2410c',
     gradient: ['#fb923c', '#c2410c'], 
     background: '#ffedd5', 
     darkBackground: '#160d08',      
@@ -55,7 +61,8 @@ export const userThemes = [
   },
   { 
     name: 'amber-gold', 
-    primary: '#f59e0b', 
+    primary: '#f59e0b',
+    darkPrimary: '#b45309',
     gradient: ['#fbbf24', '#b45309'], 
     background: '#fef3c7', 
     darkBackground: '#161107',     
@@ -64,7 +71,8 @@ export const userThemes = [
   },
   { 
     name: 'crimson-red', 
-    primary: '#dc2626', 
+    primary: '#dc2626',
+    darkPrimary: '#991b1b',
     gradient: ['#ef4444', '#b91c1c'], 
     background: '#fee2e2', 
     darkBackground: '#160808',      
@@ -73,7 +81,8 @@ export const userThemes = [
   },
   { 
     name: 'sunset-rose', 
-    primary: '#e11d48', 
+    primary: '#e11d48',
+    darkPrimary: '#9f1239',
     gradient: ['#fb7185', '#be123c'], 
     background: '#ffe4e6', 
     darkBackground: '#16080a',     

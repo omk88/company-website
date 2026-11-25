@@ -25,27 +25,27 @@ export default function Home() {
       <div className="mx-auto w-full flex-1">
         
         <section 
-          style={{ backgroundColor: 'var(--accent-background)' }} 
-          className="w-full flex flex-col justify-between relative z-10 shadow-xs dark:[background-color:var(--accent-dark-background)]"
+          style={{ backgroundColor: 'var(--accent-bg-active)' }} 
+          className="w-full flex flex-col justify-between relative z-10 shadow-xs"
         >
           <div className="w-full px-4 sm:px-8 my-auto">
             <div className="w-full overflow-hidden">
               <div className="p-8 sm:p-12 items-center">
                 <div className="flex flex-col items-center text-center gap-4 isolate">
                   <div className="w-full isolate">
-                    <h1 className={cn(spaceGrotesk.className, "text-7xl font-semibold tracking-tight text-foreground dark:text-white leading-[1.15]")}>
+                    <h1 className={cn(spaceGrotesk.className, "text-7xl font-semibold tracking-tight leading-[1.15]")}>
                       <TypewriterEffect />
                     </h1>
                   </div>
 
-                  <p style={{ color: 'var(--accent-text-1)' }} className="text-xl leading-relaxed max-w-md font-normal dark:text-slate-300">
+                  <p style={{ color: 'var(--accent-text-1-active)' }} className="text-xl leading-relaxed max-w-md font-normal">
                     Building software that pushes boundaries. We are where the future happens.
                   </p>
 
                   <div className="flex flex-wrap items-center gap-3 pt-1 isolate">
                     <Link 
                       href="/solutions" 
-                      style={{ backgroundColor: 'var(--accent-primary)' }}
+                      style={{ backgroundColor: 'var(--accent-primary-active)' }}
                       className="group px-4.5 py-2.5 font-medium text-xs sm:text-sm rounded-lg transition-all duration-100 hover:opacity-90 active:scale-[0.98] inline-flex items-center gap-2 text-white"
                     >
                       <span>See our solutions</span>
@@ -83,8 +83,8 @@ export default function Home() {
         </section>
 
         <section 
-          style={{ backgroundColor: 'var(--accent-background)' }} 
-          className="shadow-xs w-full py-20 md:py-28 flex flex-col items-center dark:[background-color:var(--accent-dark-background)]"
+          style={{ backgroundColor: 'var(--accent-bg-active)' }} 
+          className="shadow-xs w-full py-20 md:py-28 flex flex-col items-center"
         >
           <div className="flex flex-col items-center text-center gap-4 px-4">
             <h2
@@ -102,14 +102,14 @@ export default function Home() {
               Designed for Global Reach, built for Zero Latency
             </h2>
             
-            <p style={{ color: 'var(--accent-text-1)' }} className="text-xl leading-relaxed max-w-md font-normal dark:text-slate-300">
+            <p style={{ color: 'var(--accent-text-1-active)' }} className="text-xl leading-relaxed max-w-md font-normal">
               Solutions that are truly boundless.
             </p>
 
             <div className="flex flex-wrap items-center gap-3 pt-1 isolate">
               <Link 
                 href="/insights" 
-                style={{ backgroundColor: 'var(--accent-primary)' }}
+                style={{ backgroundColor: 'var(--accent-primary-active)' }}
                 className="group px-4.5 py-2.5 font-medium text-xs sm:text-sm rounded-lg transition-all duration-100 hover:opacity-90 active:scale-[0.98] inline-flex items-center gap-2 text-white"
               >
                 <span>Read our insights</span>

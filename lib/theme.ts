@@ -22,12 +22,15 @@ export function applyThemeVariables(theme: UserTheme): void {
 
   const root = document.documentElement;
   root.style.setProperty('--accent-primary', theme.primary);
+  root.style.setProperty('--accent-dark-primary', theme.darkPrimary);
   root.style.setProperty('--accent-grad-1', theme.gradient[0]);
   root.style.setProperty('--accent-grad-2', theme.gradient[1]);
   root.style.setProperty('--accent-background', theme.background);
   root.style.setProperty('--accent-dark-background', theme.darkBackground);
   root.style.setProperty('--accent-text-1', theme.text[0]);
   root.style.setProperty('--accent-text-2', theme.text[1]);
+  root.style.setProperty('--accent-dark-text-1', theme.darkText[0]);
+  root.style.setProperty('--accent-dark-text-2', theme.darkText[1]);
 }
 
 export function persistTheme(theme: UserTheme): void {
