@@ -26,7 +26,7 @@ export function SeriesBottomNav({ blogId }: SeriesBottomNavProps) {
     <div className="flex flex-col gap-3 w-full">
       <div className="flex items-center justify-between gap-2 pt-2 border-t border-zinc-200/60 dark:border-zinc-800">
         {prev ? (
-          <Button variant="outline" size="sm" asChild className="h-8 text-xs gap-1">
+          <Button variant="outline" size="sm" asChild className="h-8 text-xs gap-1 no-underline hover:no-underline">
             <Link href={`/insights/${prev.blogTitleId}`}> 
               <ChevronLeft className="w-3.5 h-3.5" />
               <span className="truncate max-w-[120px] sm:max-w-[200px]">{prev.title}</span>
@@ -35,7 +35,7 @@ export function SeriesBottomNav({ blogId }: SeriesBottomNavProps) {
         ) : <div />}
 
         {next ? (
-          <Button variant="outline" size="sm" asChild className="h-8 text-xs gap-1 ml-auto">
+          <Button variant="outline" size="sm" asChild className="h-8 text-xs gap-1 ml-auto no-underline hover:no-underline">
             <Link href={`/insights/${next.blogTitleId}`}>
               <span className="truncate max-w-[120px] sm:max-w-[200px]">{next.title}</span>
               <ChevronRight className="w-3.5 h-3.5" />
