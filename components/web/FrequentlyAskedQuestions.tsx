@@ -22,8 +22,6 @@ import {
   Search,
   X,
   Frown,
-  MessageSquare,
-  Bot,
   LucideIcon,
   Lock,
 } from "lucide-react";
@@ -34,11 +32,6 @@ interface FAQItem {
   question: string;
   answer: React.ReactNode;
   icon: LucideIcon;
-}
-
-interface UnifiedFAQCardProps {
-  onMessageClick?: () => void;
-  onChatbotClick?: () => void;
 }
 
 const allFaqs: FAQItem[] = [
@@ -116,7 +109,7 @@ const allFaqs: FAQItem[] = [
   },
 ];
 
-export default function UnifiedFAQCard({ onMessageClick, onChatbotClick }: UnifiedFAQCardProps) {
+export default function UnifiedFAQCard() {
   const [activeTab, setActiveTab] = useState("pricing");
   const [showAll, setShowAll] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -262,30 +255,6 @@ export default function UnifiedFAQCard({ onMessageClick, onChatbotClick }: Unifi
                 </p>
               </div>
 
-              <div className="flex flex-wrap items-center justify-center gap-2 mt-1">
-                {onMessageClick && (
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={onMessageClick}
-                    className="gap-2 h-9 text-xs font-medium cursor-pointer"
-                  >
-                    <MessageSquare className="w-3.5 h-3.5" />
-                    Send a Message
-                  </Button>
-                )}
-                {onChatbotClick && (
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={onChatbotClick}
-                    className="gap-2 h-9 text-xs font-medium cursor-pointer"
-                  >
-                    <Bot className="w-3.5 h-3.5" />
-                    Ask Assistant
-                  </Button>
-                )}
-              </div>
             </div>
           )}
         </TabsContent>

@@ -128,11 +128,9 @@ const schema = defineSchema({
     .index("by_email", ["email"]),
 
   contactMessages: defineTable({
-    name: v.string(),
     email: v.string(),
     subject: v.string(),
     message: v.string(),
-    createdAt: v.number(),
   }),
 
   profileSettings: defineTable({

@@ -2,17 +2,21 @@
 
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { HelpCircle, Mail, LucideIcon } from "lucide-react";
+import { HelpCircle, Mail, LucideIcon, Loader2 } from "lucide-react";
+import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "../ui/sheet";
+import { useState } from "react";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { toast } from "sonner";
+import { Field, FieldGroup, FieldLabel } from "../ui/field";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 
 interface CardData {
   id: string;
   icon: LucideIcon;
   title: string;
   description: string;
-}
-
-interface ContactCardsProps {
-  onMessageClick?: () => void;
 }
 
 const cardsData: CardData[] = [
@@ -54,17 +58,43 @@ const itemVariants = {
   },
 };
 
-export default function ContactCards({
-  onMessageClick,
-}: ContactCardsProps) {
+export default function ContactCards(){
+  
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [isPending, setIsPending] = useState(false);
+  const submitContact = useMutation(api.contact.sendMessage);
+
   const handleCardClick = (id: string) => {
-    if (id === "contact" && onMessageClick) {
-      onMessageClick();
+    if (id === "contact") {
+      setIsSheetOpen(true);
     }
     if (id === "faq") {
       document
         .getElementById("faq-section")
         ?.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setIsPending(true);
+
+    const formData = new FormData(event.currentTarget);
+    const data = {
+      email: formData.get("email") as string,
+      subject: formData.get("subject") as string,
+      message: formData.get("message") as string,
+    };
+
+    try {
+      await submitContact(data);
+      toast.success("Message sent! We will get back to you shortly.");
+      (event.target as HTMLFormElement).reset();
+      setIsSheetOpen(false);
+    } catch (error) {
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setIsPending(false);
     }
   };
 
@@ -116,6 +146,67 @@ export default function ContactCards({
           );
         })}
       </motion.div>
+
+      <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+        <SheetContent
+          side="right"
+          className="w-full sm:max-w-md bg-card flex flex-col h-full gap-0 overflow-hidden"
+        >
+          <form onSubmit={handleSubmit} className="flex flex-col h-full w-full">
+            <SheetHeader className="text-left shrink-0 p-6 pb-0 space-y-1">
+              <SheetTitle className="text-lg font-semibold tracking-tight text-foreground font-sans leading-none">
+                Send us a Message
+              </SheetTitle>
+              <SheetDescription className="text-sm text-muted-foreground font-sans leading-snug tracking-normal">
+                Fill out the form fields below and we will get back to you shortly.
+              </SheetDescription>
+            </SheetHeader>
+
+            <div className="p-6 flex-1 w-full overflow-y-auto">
+              <FieldGroup className="gap-y-4">
+                <Field>
+                  <FieldLabel>Email</FieldLabel>
+                  <Input required name="email" placeholder="john@doe.com" type="email" />
+                </Field>
+
+                <Field>
+                  <FieldLabel>Subject</FieldLabel>
+                  <Input required name="subject" placeholder="How can we help?" type="text" />
+                </Field>
+
+                <Field>
+                  <FieldLabel>Message</FieldLabel>
+                  <textarea
+                    required
+                    name="message"
+                    rows={4}
+                    placeholder="Leave your message here..."
+                    className="flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-xs transition-colors placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm resize-none"
+                  />
+                </Field>
+              </FieldGroup>
+            </div>
+
+            <SheetFooter className="shrink-0 p-6 pt-4 flex flex-col gap-2 sm:flex-col mt-auto">
+              <Button type="submit" className="cursor-pointer w-full font-medium" disabled={isPending}>
+                {isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Sending
+                  </>
+                ) : (
+                  "Send Message"
+                )}
+              </Button>
+              <SheetClose asChild>
+                <Button variant="outline" className="cursor-pointer w-full font-medium" type="button">
+                  Close
+                </Button>
+              </SheetClose>
+            </SheetFooter>
+          </form>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
