@@ -505,6 +505,7 @@ export default function BlogPostForm() {
         }
 
         const hasExistingImage = Boolean(selectedBlog?.imageUrl || activeDraft?.imageUrl);
+
         if (!selectedImage && !hasExistingImage) {
             toast.error("Please upload a cover image from your computer.");
             return;
@@ -520,9 +521,13 @@ export default function BlogPostForm() {
             const formattedTitle = toTitleCase(data.title);
 
             if (selectedImage) {
-                let fileToUpload = selectedImage;
+                const isSvg = 
+                    selectedImage.type === "image/svg+xml" ||
+                    selectedImage.name.toLowerCase().endsWith(".svg");
 
-                if (selectedImage.type !== "image/svg+xml" && !selectedImage.name.endsWith(".svg")) {
+                let fileToUpload: File = selectedImage;
+
+                if (!isSvg) {
                     const options = {
                         maxSizeMB: 1.0,
                         maxWidthOrHeight: 1920,
@@ -545,12 +550,15 @@ export default function BlogPostForm() {
                 const resJson1 = await result1.json();
                 storageId = resJson1.storageId;
 
-                const pngFile = await convertImageToPngFile(selectedImage);
+                const pngFile: File = isSvg
+                    ? await convertImageToPngFile(selectedImage)
+                    : selectedImage;
+
                 const uploadUrl2 = await generateUploadUrl();
 
                 const result2 = await fetch(uploadUrl2, {
                     method: "POST",
-                    headers: { "Content-Type": "image/png" },
+                    headers: { "Content-Type": pngFile.type || "image/png" },
                     body: pngFile,
                 });
 
