@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Loader2, Plus, FolderPlus } from "lucide-react";
-import { CreateSeriesDialog } from "./CreateSeriesDialog";
 
 interface AddToSeriesDialogProps {
   open: boolean;
@@ -137,14 +136,6 @@ export function AddToSeriesDialog({
           </div>
         </DialogContent>
       </Dialog>
-
-      <CreateSeriesDialog
-        open={isCreateModalOpen}
-        onOpenChange={setIsCreateModalOpen}
-        onSuccess={(newSeriesId) => {
-          handleAdd(newSeriesId);
-        }}
-      />
     </>
   );
 }
