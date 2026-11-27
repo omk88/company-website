@@ -183,7 +183,7 @@ export function CreateSeriesDialog({
         title: title.trim(),
         slug,
         description: description.trim(),
-        coverImage: coverImageStorageId,
+        coverImage: coverImageStorageId || "",
         coverImagePng: coverImagePngStorageId,
       });
 
