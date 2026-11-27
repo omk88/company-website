@@ -14,7 +14,6 @@ import { useMemo } from "react";
 import { getGradientDataUrl } from "@/data/themes";
 import { FunctionReturnType } from "convex/server";
 import { api } from "@/convex/_generated/api";
-import { serializeUseCacheCacheStore } from "next/dist/server/resume-data-cache/cache-store";
 
 interface LeftSidebarArticleSeriesProps {
   series: FunctionReturnType<typeof api.series.getSeriesBySlug>;
