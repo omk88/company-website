@@ -94,7 +94,7 @@ export function RightSidebarArticleSeries({ series }: RightSidebarArticleSeriesP
       <SidebarContent className="!p-0 h-full overflow-hidden">
         <ScrollArea className="h-full w-full">
           <div className="w-[20rem] max-w-full overflow-hidden box-border">
-            <SidebarGroup className="pt-4 !px-3 w-full flex flex-col gap-2 overflow-hidden">
+            <SidebarGroup className="pt-4 !px-3 w-full flex flex-col gap-2 overflow-hidden mb-6">
 
               {series &&
                 <>
@@ -212,7 +212,6 @@ export function RightSidebarArticleSeries({ series }: RightSidebarArticleSeriesP
                       })}
                     </div>
                   }
-
                 </>
               }
 
