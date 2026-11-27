@@ -121,7 +121,7 @@ export function RightSidebarArticleSeries({ series }: RightSidebarArticleSeriesP
                     </div>
                   </div>
 
-                  {series?.isCourse && !series.isFree && (series.price && series.price > 0) &&
+                  {series?.isCourse && (series.price && series.price > 0) &&
                     <div className="flex flex-col gap-5 pb-6 max-w-full overflow-hidden">
                       <div className="flex border-b py-2 border-zinc-200/60 dark:border-zinc-800 overflow-hidden max-w-full items-center gap-1.5 text-xs font-semibold text-zinc-400 uppercase tracking-wider">
                         <Package className="w-3.5 h-3.5" />
