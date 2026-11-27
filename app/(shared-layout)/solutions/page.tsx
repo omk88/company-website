@@ -19,12 +19,7 @@ export default function Solutions() {
               "flex flex-col gap-2 w-full",
               "text-neutral-600 dark:text-neutral-400"
             )}
-          >
-            <div className="inline-flex w-fit items-center gap-1.5 px-3.5 py-1 rounded-full bg-white dark:bg-neutral-900 border border-gray-200/80 dark:border-neutral-800 shadow-sm text-sm font-medium text-foreground">
-              <Clock className="w-4 h-4 text-foreground" />
-              <span>Waiting List</span>
-            </div>
-            
+          >            
             <h1
               className={cn(
                 "text-2xl sm:text-3xl md:text-4xl", 
