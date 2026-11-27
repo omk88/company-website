@@ -76,10 +76,14 @@ export default async function ArticleSeriesPage({ params }: ArticleSeriesPagePro
     const { slug, username } = await params;
     const series = await getSeriesData(slug);
 
+    const hasPurchaseBar = Boolean(
+        series?.isCourse && !series.isFree && series.price && series.price > 0
+    );
+
     const baseUrl = process.env.NODE_ENV === "development"
         ? "http://localhost:3000"
         : (process.env.NEXT_PUBLIC_SITE_URL || "https://www.taqtiq.tech");
-    
+
     const jsonLd = {
         "@context": "https://schema.org",
         "@type": "CollectionPage",
@@ -89,7 +93,7 @@ export default async function ArticleSeriesPage({ params }: ArticleSeriesPagePro
     };
 
     return (
-        <div className="min-h-screen w-full">
+        <div className={`min-h-screen w-full ${hasPurchaseBar ? "pb-24" : ""}`}>
             {series && (
                 <script
                     type="application/ld+json"
@@ -97,7 +101,7 @@ export default async function ArticleSeriesPage({ params }: ArticleSeriesPagePro
                 />
             )}
             <SidebarProvider className="w-full min-h-screen">
-                <aside 
+                <aside
                     className="hidden md:block shrink-0 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto"
                     style={{ "--sidebar-width": "24rem" } as React.CSSProperties}
                 >
@@ -105,19 +109,20 @@ export default async function ArticleSeriesPage({ params }: ArticleSeriesPagePro
                 </aside>
 
                 <div className="w-full md:flex-1 md:flex md:flex-row md:min-w-0 md:pt-16">
-                    <SeriesItems slug={slug} />
-                    
-                    <aside 
-                        style={{ "--sidebar-width": "20rem" } as React.CSSProperties} 
+                    <div className="flex-1 min-w-0">
+                        <SeriesItems slug={slug} />
+                    </div>
+
+                    <aside
+                        style={{ "--sidebar-width": "20rem" } as React.CSSProperties}
                         className="hidden md:block w-[20rem] shrink-0 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto"
                     >
                         <RightSidebarArticleSeries series={series} />
                     </aside>
                 </div>
             </SidebarProvider>
-            {series?.isCourse && !series.isFree && (series.price && series.price > 0) &&
-                <PurchaseSeriesBar series={series} />
-            }
+
+            {hasPurchaseBar && <PurchaseSeriesBar series={series} />}
         </div>
     );
 }
