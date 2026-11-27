@@ -69,18 +69,20 @@ export function TableOfContents({ headings }: TOCProps) {
     setIsOpen(false);
     setActiveId(id);
 
-    window.history.pushState(null, "", `#${id}`);
+    window.history.replaceState(null, "", `#${id}`);
 
-    const targetElement = document.getElementById(id);
-    if (targetElement) {
-      targetElement.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
+    requestAnimationFrame(() => {
+      const targetElement = document.getElementById(id);
+      if (targetElement) {
+        targetElement.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    });
   };
 
   return (
     <div
       ref={dropdownRef}
-      className="sticky top-12 md:top-16 z-40 w-full h-12 mb-8 border-b border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 transform-gpu touch-pan-y"
+      className="sticky top-12 md:top-16 z-40 w-full h-12 mb-8 border-b border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 touch-pan-y"
     >
       <div className="relative max-w-none px-2 h-full">
         <button
