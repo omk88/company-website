@@ -115,7 +115,9 @@ export default async function ArticleSeriesPage({ params }: ArticleSeriesPagePro
                     </aside>
                 </div>
             </SidebarProvider>
-            <PurchaseSeriesBar series={series} />
+            {series?.isCourse && !series.isFree && (series.price && series.price > 0) &&
+                <PurchaseSeriesBar series={series} />
+            }
         </div>
     );
 }
