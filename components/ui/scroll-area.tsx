@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
+import { DirectionProvider } from "@radix-ui/react-direction";
 
 import { cn } from "@/lib/utils";
 
@@ -10,6 +11,7 @@ interface ScrollAreaProps
   onReachBottom?: () => void;
   bottomOffset?: number;
   scrollbarInset?: number;
+  scrollbarSide?: "left" | "right";
   rightOffset?: number;
   thumbColor?: string;
   thumbClassName?: string;
@@ -23,9 +25,11 @@ const ScrollArea = React.forwardRef<
     {
       className,
       children,
+      dir,
       onReachBottom,
       bottomOffset = 50,
       scrollbarInset = 12,
+      scrollbarSide = "right",
       rightOffset = 0,
       thumbColor,
       thumbClassName,
@@ -45,9 +49,10 @@ const ScrollArea = React.forwardRef<
       }
     }, [onReachBottom, bottomOffset]);
 
-    return (
+    const content = (
       <ScrollAreaPrimitive.Root
         ref={ref}
+        dir={dir}
         className={cn("relative overflow-hidden", className)}
         {...props}
       >
@@ -60,12 +65,19 @@ const ScrollArea = React.forwardRef<
         </ScrollAreaPrimitive.Viewport>
         <ScrollBar
           inset={scrollbarInset}
+          side={scrollbarSide}
           rightOffset={rightOffset}
           thumbColor={thumbColor}
           thumbClassName={thumbClassName}
         />
         <ScrollAreaPrimitive.Corner />
       </ScrollAreaPrimitive.Root>
+    );
+
+    return dir ? (
+      <DirectionProvider dir={dir}>{content}</DirectionProvider>
+    ) : (
+      content
     );
   }
 );
@@ -74,7 +86,9 @@ ScrollArea.displayName = ScrollAreaPrimitive.Root.displayName;
 interface ScrollBarProps
   extends React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Scrollbar> {
   inset?: number;
+  side?: "left" | "right";
   rightOffset?: number;
+  leftOffset?: number;  
   thumbColor?: string;
   thumbClassName?: string;
 }
@@ -88,7 +102,9 @@ const ScrollBar = React.forwardRef<
       className,
       orientation = "vertical",
       inset = 0,
+      side = "right",
       rightOffset = 0,
+      leftOffset = 0,
       thumbColor,
       thumbClassName,
       style,
@@ -116,7 +132,11 @@ const ScrollBar = React.forwardRef<
                   width: `calc(100% - ${inset * 2}px)`,
                 }
             : {}),
-          ...(isVertical ? { right: `${rightOffset}px` } : {}),
+          ...(isVertical
+              ? side === "left"
+                ? { left: `${leftOffset}px`, right: "auto" }
+                : { right: `${rightOffset}px`, left: "auto" }
+              : {}),
           ...style,
         }}
         className={cn(

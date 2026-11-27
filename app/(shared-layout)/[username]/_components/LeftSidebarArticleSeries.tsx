@@ -93,31 +93,29 @@ export function LeftSidebarArticleSeries({ slug }: LeftSidebarArticleSeriesProps
         bgClass="bg-background/95" 
         collapsible="icon"
       >
-        <SidebarContent className="!p-0 w-full">
-          <ScrollArea dir="rtl" className="h-[calc(100vh-4rem)] w-full [&>div>div]:!block">
-            <div dir="ltr" className="text-left">
-              <SidebarGroup className="pt-3 !px-2 w-full">
-                <div className="relative p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 flex flex-col gap-3">
-                  <Skeleton className="w-full h-64 rounded-lg" />
+        <SidebarContent className="!p-0 !pl-1 w-full">
+          <ScrollArea scrollbarSide="left" className="pl-2 h-[calc(100vh-4rem)] w-full [&>div>div]:!block">
+            <SidebarGroup className="pt-3 !px-2 w-full">
+              <div className="relative p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 flex flex-col gap-3">
+                <Skeleton className="w-full h-64 rounded-lg" />
 
-                  <div className="flex flex-row gap-2 items-center">
-                    <Skeleton className="h-6 w-6 rounded-full shrink-0" />
-                    <Skeleton className="h-4 w-28 rounded" />
-                    <Skeleton className="h-4 w-12 rounded ml-auto" />
-                  </div>
-
-                  <div className="flex flex-col gap-2 pt-1">
-                    <Skeleton className="h-6 w-4/5 rounded-md" />
-                    <Skeleton className="h-4 w-full rounded-md" />
-                    <Skeleton className="h-4 w-2/3 rounded-md" />
-                  </div>
-
-                  <div className="flex items-center pt-1">
-                    <Skeleton className="h-6 w-24 rounded-full" />
-                  </div>
+                <div className="flex flex-row gap-2 items-center">
+                  <Skeleton className="h-6 w-6 rounded-full shrink-0" />
+                  <Skeleton className="h-4 w-28 rounded" />
+                  <Skeleton className="h-4 w-12 rounded ml-auto" />
                 </div>
-              </SidebarGroup>
-            </div>
+
+                <div className="flex flex-col gap-2 pt-1">
+                  <Skeleton className="h-6 w-4/5 rounded-md" />
+                  <Skeleton className="h-4 w-full rounded-md" />
+                  <Skeleton className="h-4 w-2/3 rounded-md" />
+                </div>
+
+                <div className="flex items-center pt-1">
+                  <Skeleton className="h-6 w-24 rounded-full" />
+                </div>
+              </div>
+            </SidebarGroup>
           </ScrollArea>
         </SidebarContent>
         <SidebarFooter className="hidden" />
@@ -128,15 +126,13 @@ export function LeftSidebarArticleSeries({ slug }: LeftSidebarArticleSeriesProps
   if (seriesData === null) {
     return (
       <Sidebar className="flex flex-col !top-16 !z-40 border-r" bgClass="bg-background/95" collapsible="icon">
-        <SidebarContent className="!p-0 w-full">
-          <ScrollArea dir="rtl" className="h-[calc(100vh-4rem)] w-full [&>div>div]:!block">
-            <div dir="ltr" className="text-left">
-              <SidebarGroup className="pt-3 !px-2 w-full">
-                <div className="relative p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 text-xs text-zinc-500">
-                  Series not found.
-                </div>
-              </SidebarGroup>
-            </div>
+        <SidebarContent className="!p-0 !pl-1 w-full">
+          <ScrollArea scrollbarSide="left" className="pl-2 h-[calc(100vh-4rem)] w-full [&>div>div]:!block">
+            <SidebarGroup className="pt-3 !px-2 w-full">
+              <div className="relative p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 text-xs text-zinc-500">
+                Series not found.
+              </div>
+            </SidebarGroup>
           </ScrollArea>
         </SidebarContent>
         <SidebarFooter className="hidden" />
@@ -146,7 +142,6 @@ export function LeftSidebarArticleSeries({ slug }: LeftSidebarArticleSeriesProps
 
   const seriesId = seriesData._id;
   
-
   const handlePurchase = async () => {
 
     if (!currentUser) {
@@ -176,114 +171,112 @@ export function LeftSidebarArticleSeries({ slug }: LeftSidebarArticleSeriesProps
       bgClass="bg-background/95" 
       collapsible="icon"
     >
-      <SidebarContent className="!p-0 w-full">
-        <ScrollArea dir="rtl" className="h-[calc(100vh-4rem)] w-full [&>div>div]:!block">
-          <div dir="ltr" className="text-left">
-            <SidebarGroup className="pt-3 !px-2 w-full">
-              <div className="flex flex-col gap-3 w-full pb-6">
-                <div className="relative p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 flex flex-col gap-3">
-                  <div className="relative w-full h-64 overflow-hidden rounded-lg">
-                    {isImageLoading ? (
-                      <Skeleton className="w-full h-full rounded-lg" />
-                    ) : imageUrl ? (
-                      <Image
-                        src={imageUrl}
-                        alt={seriesData.title || "Series cover"}
-                        fill
-                        className="object-cover"
-                        sizes="300px"
+      <SidebarContent className="!p-0 !pl-1 w-full">
+        <ScrollArea scrollbarSide="left" className="pl-2 h-[calc(100vh-4rem)] w-full [&>div>div]:!block">
+          <SidebarGroup className="pt-3 !px-2 w-full">
+            <div className="flex flex-col gap-3 w-full pb-6">
+              <div className="relative p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 flex flex-col gap-3">
+                <div className="relative w-full h-64 overflow-hidden rounded-lg">
+                  {isImageLoading ? (
+                    <Skeleton className="w-full h-full rounded-lg" />
+                  ) : imageUrl ? (
+                    <Image
+                      src={imageUrl}
+                      alt={seriesData.title || "Series cover"}
+                      fill
+                      className="object-cover"
+                      sizes="300px"
+                    />
+                  ) : null}
+                </div>
+
+                {avatarSrc && (
+                  <div className="flex flex-row gap-2 items-center">
+                    <div className="h-6 w-6 border border-border rounded-full overflow-hidden bg-muted shrink-0">
+                      <img
+                        src={avatarSrc}
+                        alt="profile"
+                        className="h-full w-full object-cover"
+                        decoding="async"
                       />
-                    ) : null}
-                  </div>
-
-                  {avatarSrc && (
-                    <div className="flex flex-row gap-2 items-center">
-                      <div className="h-6 w-6 border border-border rounded-full overflow-hidden bg-muted shrink-0">
-                        <img
-                          src={avatarSrc}
-                          alt="profile"
-                          className="h-full w-full object-cover"
-                          decoding="async"
-                        />
-                      </div>
-                      <div className="flex flex-col">
-                        <ProfileHoverCard
-                          displayName={seriesData.profile?.displayName}
-                          authorUsername={seriesData.profile?.username || ""}
-                        >
-                          <span className="text-sm truncate leading-tight cursor-pointer">
-                            {seriesData.profile?.displayName || seriesData.profile?.username}
-                          </span>
-                        </ProfileHoverCard>
-                      </div>
-
-                      <time className="capitalize font-semibold text-lg md:text-xs tracking-tight text-zinc-400 mt-0.5 select-none ml-auto">
-                        {formatSmartDate(seriesData._creationTime, false)}
-                      </time>
                     </div>
-                  )}
-
-                  <div className="flex flex-col gap-1">
-                    <span className="font-bold text-lg text-foreground">{seriesData.title}</span>
-                    {seriesData.description && (
-                      <span className="text-base text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                        {seriesData.description}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="flex flex-row">
-                    {seriesData.price && seriesData.currency && (
-                      <div className="flex items-center">
-                        <Badge variant="outline" className="py-1 px-2.5 text-green-600 dark:text-green-300">
-                          <span>
-                            {getCurrencySymbol(seriesData.currency)}
-                            {seriesData.price}
-                          </span>
-                        </Badge>
-                      </div>
-                    )}
-
-                    <div className="flex gap-1.5 items-center ml-auto">
-                      <div className="flex items-center">
-                        <Badge variant="outline" className="gap-1.5 py-1 px-2.5 text-zinc-600 dark:text-zinc-300">
-                          <Clock className="w-3.5 h-3.5" />
-                          <span>{formatReadTime(seriesData.totalReadTime)}</span>
-                        </Badge>
-                      </div>
-
-                      <div className="flex items-center">
-                        <Badge variant="outline" className="gap-1.5 py-1 px-2.5 text-zinc-600 dark:text-zinc-300">
-                          <Library className="w-3.5 h-3.5" />
-                          <span>{seriesData.articlesCount} {seriesData.articlesCount === 1 ? 'article' : 'articles'}</span>
-                        </Badge>
-                      </div>
+                    <div className="flex flex-col">
+                      <ProfileHoverCard
+                        displayName={seriesData.profile?.displayName}
+                        authorUsername={seriesData.profile?.username || ""}
+                      >
+                        <span className="text-sm truncate leading-tight cursor-pointer">
+                          {seriesData.profile?.displayName || seriesData.profile?.username}
+                        </span>
+                      </ProfileHoverCard>
                     </div>
+
+                    <time className="capitalize font-semibold text-lg md:text-xs tracking-tight text-zinc-400 mt-0.5 select-none ml-auto">
+                      {formatSmartDate(seriesData._creationTime, false)}
+                    </time>
                   </div>
+                )}
 
-                  {isOwnProfile && (
-                    <Button type="button" size="sm" className="cursor-pointer w-fit rounded-xl mt-2" asChild>
-                      <Link href={`/create-article-series?id=${seriesData._id}`}>
-                        Edit Series
-                      </Link>
-                    </Button>
-                  )}
-
-                  {!isOwnProfile && seriesData.isCourse && (
-                    <Button
-                      type="button"
-                      size="sm"
-                      className="cursor-pointer w-fit rounded-xl mt-2"
-                      onClick={handlePurchase}
-                      disabled={isLoading}
-                    >
-                      {isLoading ? "Redirecting to checkout..." : "Purchase Course"}
-                    </Button>
+                <div className="flex flex-col gap-1">
+                  <span className="font-bold text-lg text-foreground">{seriesData.title}</span>
+                  {seriesData.description && (
+                    <span className="text-base text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                      {seriesData.description}
+                    </span>
                   )}
                 </div>
+
+                <div className="flex flex-row">
+                  {seriesData.price && seriesData.currency && (
+                    <div className="flex items-center">
+                      <Badge variant="outline" className="py-1 px-2.5 text-green-600 dark:text-green-300">
+                        <span>
+                          {getCurrencySymbol(seriesData.currency)}
+                          {seriesData.price}
+                        </span>
+                      </Badge>
+                    </div>
+                  )}
+
+                  <div className="flex gap-1.5 items-center ml-auto">
+                    <div className="flex items-center">
+                      <Badge variant="outline" className="gap-1.5 py-1 px-2.5 text-zinc-600 dark:text-zinc-300">
+                        <Clock className="w-3.5 h-3.5" />
+                        <span>{formatReadTime(seriesData.totalReadTime)}</span>
+                      </Badge>
+                    </div>
+
+                    <div className="flex items-center">
+                      <Badge variant="outline" className="gap-1.5 py-1 px-2.5 text-zinc-600 dark:text-zinc-300">
+                        <Library className="w-3.5 h-3.5" />
+                        <span>{seriesData.articlesCount} {seriesData.articlesCount === 1 ? 'article' : 'articles'}</span>
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+
+                {isOwnProfile && (
+                  <Button type="button" size="sm" className="cursor-pointer w-fit rounded-xl mt-2" asChild>
+                    <Link href={`/create-article-series?id=${seriesData._id}`}>
+                      Edit Series
+                    </Link>
+                  </Button>
+                )}
+
+                {!isOwnProfile && seriesData.isCourse && (
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="cursor-pointer w-fit rounded-xl mt-2"
+                    onClick={handlePurchase}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Redirecting to checkout..." : "Purchase Course"}
+                  </Button>
+                )}
               </div>
-            </SidebarGroup>
-          </div>
+            </div>
+          </SidebarGroup>
         </ScrollArea>
       </SidebarContent>
       <SidebarFooter className="hidden" />
