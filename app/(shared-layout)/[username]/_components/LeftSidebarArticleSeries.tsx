@@ -134,49 +134,6 @@ export function LeftSidebarArticleSeries({ series }: LeftSidebarArticleSeriesPro
                       </span>
                     )}
                   </div>
-
-                  <div className="flex flex-row items-center">
-                    {series.price && series.currency && (
-                      <div className="flex items-center">
-                        <Badge
-                          variant="outline"
-                          className="py-1 px-2.5 text-green-600 dark:text-green-300"
-                        >
-                          <span>
-                            {getCurrencySymbol(series.currency)}
-                            {series.price}
-                          </span>
-                        </Badge>
-                      </div>
-                    )}
-
-                    <div className="flex gap-1.5 items-center ml-auto">
-                      {series.totalReadTime !== undefined && (
-                        <div className="flex items-center">
-                          <Badge
-                            variant="outline"
-                            className="gap-1.5 py-1 px-2.5 text-zinc-600 dark:text-zinc-300"
-                          >
-                            <Clock className="w-3.5 h-3.5" />
-                            <span>{formatReadTime(series.totalReadTime)}</span>
-                          </Badge>
-                        </div>
-                      )}
-
-                      <div className="flex items-center">
-                        <Badge
-                          variant="outline"
-                          className="gap-1.5 py-1 px-2.5 text-zinc-600 dark:text-zinc-300"
-                        >
-                          <Library className="w-3.5 h-3.5" />
-                          <span>
-                            {series.articlesCount}{" "}
-                            {series.articlesCount === 1 ? "article" : "articles"}
-                          </span>
-                        </Badge>
-                      </div>
-                    </div>
-                  </div>
                 </>
               }
             </div>

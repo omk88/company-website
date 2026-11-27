@@ -6,6 +6,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { LeftSidebarArticleSeries } from "../../_components/LeftSidebarArticleSeries";
 import { RightSidebarArticleSeries } from "../../_components/RightSidebarArticleSeries";
 import { SeriesItems } from "../../_components/SeriesItems";
+import { PurchaseSeriesBar } from "../../_components/PurchaseSeriesBar";
 
 interface ArticleSeriesPageProps {
     params: Promise<{ slug: string; username: string }>;
@@ -114,6 +115,7 @@ export default async function ArticleSeriesPage({ params }: ArticleSeriesPagePro
                     </aside>
                 </div>
             </SidebarProvider>
+            <PurchaseSeriesBar series={series} />
         </div>
     );
 }

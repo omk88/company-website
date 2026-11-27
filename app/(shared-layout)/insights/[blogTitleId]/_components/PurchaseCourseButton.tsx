@@ -31,8 +31,8 @@ export default function PurchaseCourseButton({seriesId}: PurchaseCourseButtonPro
     };
 
     return (
-        <Button onClick={handlePurchase} className="inline-flex items-center justify-center gap-2 rounded-lg bg-green-600 dark:bg-green-300 px-4 py-2 text-sm font-semibold text-green-50 transition hover:bg-green-900 hover:text-green-200 cursor-pointer">
-            Purchase Series
+        <Button onClick={handlePurchase} className="inline-flex items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-green-50 transition hover:bg-green-900 hover:text-green-200 cursor-pointer">
+            Purchase Course
             <ArrowRight className="h-4 w-4" />
         </Button>
     )

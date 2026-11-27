@@ -232,7 +232,7 @@ export function RestrictedContent({
               <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-neutral-800/80 pt-4">
                 <div className="text-sm text-neutral-400">
                   Full Lifetime Access:{" "}
-                  <span className="text-base font-semibold text-green-600 dark:text-green-300">
+                  <span className="text-base font-semibold text-green-600">
                     <span>{getCurrencySymbol(primarySeries?.currency || "")}{primarySeries?.price}</span>
                   </span>
                 </div>
