@@ -25,11 +25,6 @@ export function SeriesHoverCard({
 }: SeriesHoverCardProps) {
     const seriesData = useQuery(api.series.getSeriesBySlug, { slug });
 
-    const imageUrl = useQuery(
-        api.series.getImageUrl,
-        seriesData?.coverImage ? { storageId: seriesData.coverImage } : "skip"
-    );
-
     if (!seriesData) {
         return <>{children}</>;
     }
@@ -46,11 +41,11 @@ export function SeriesHoverCard({
                         className="group flex flex-col p-3 gap-3 hover:bg-accent hover:text-accent-foreground transition-colors duration-100 cursor-pointer w-full"
                     >
                         <div className="relative w-full h-48 overflow-hidden rounded-xl bg-muted">
-                            {imageUrl === undefined ? (
+                            {seriesData.coverImageUrl === undefined ? (
                                 <div className="w-full h-full animate-pulse bg-muted-foreground/20" />
-                            ) : imageUrl ? (
+                            ) : seriesData.coverImageUrl ? (
                                 <Image
-                                    src={imageUrl}
+                                    src={seriesData.coverImageUrl}
                                     alt={seriesData.title || "Series cover"}
                                     fill
                                     className="object-cover"
