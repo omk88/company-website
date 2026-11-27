@@ -59,9 +59,8 @@ export function LeftSidebarCreateArticleSeries({ isEditing, seriesId, existingDa
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-  const initialIsCourse = existingData?.isCourse ?? false;
-  const initialIsFree =
-    existingData?.isFree ?? (initialIsCourse && (!existingData?.price || existingData.price <= 0));
+  const initialIsCourse = existingData?.isCourse;
+  const initialIsFree = existingData?.isFree ?? (initialIsCourse && (!existingData?.price || existingData.price <= 0));
 
   const [isCourse, setIsCourse] = useState<boolean>(initialIsCourse);
   const [isFreeCourse, setIsFreeCourse] = useState<boolean>(Boolean(initialIsFree));
@@ -80,13 +79,6 @@ export function LeftSidebarCreateArticleSeries({ isEditing, seriesId, existingDa
   const createSeriesWithItems = useMutation(api.series.createSeriesWithItems);
   const updateSeriesWithItems = useMutation(api.series.updateSeriesWithItems);
   const generateUploadUrl = useMutation(api.series.generateUploadUrl);
-  const getImageUrl = useQuery(api.series.getImageUrl, existingData?.coverImage ? { storageId: existingData.coverImage } : "skip");
-
-  useEffect(() => {
-    if (getImageUrl && !imagePreview && !selectedImage) {
-      setImagePreview(getImageUrl);
-    }
-  }, [getImageUrl, imagePreview, selectedImage]);
 
   const handleCourseToggle = (checked: boolean) => {
     setIsCourse(checked);
@@ -242,8 +234,8 @@ export function LeftSidebarCreateArticleSeries({ isEditing, seriesId, existingDa
         const newSlug = await createSeriesWithItems({
           title: seriesTitle.trim(),
           slug,
-          description: description.trim() || undefined,
-          coverImage: coverImageStorageId,
+          description: description.trim(),
+          coverImage: coverImageStorageId || "",
           coverImagePng: coverImagePngStorageId,
           articleIds: stagedBlogIds,
           isCourse,

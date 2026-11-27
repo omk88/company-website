@@ -100,7 +100,7 @@ export default async function ArticleSeriesPage({ params }: ArticleSeriesPagePro
                     className="hidden md:block shrink-0 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto"
                     style={{ "--sidebar-width": "24rem" } as React.CSSProperties}
                 >
-                    <LeftSidebarArticleSeries slug={slug} />
+                    <LeftSidebarArticleSeries series={series} />
                 </aside>
 
                 <div className="w-full md:flex-1 md:flex md:flex-row md:min-w-0 md:pt-16">

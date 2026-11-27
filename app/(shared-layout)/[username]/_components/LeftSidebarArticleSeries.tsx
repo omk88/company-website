@@ -1,28 +1,23 @@
 "use client";
 
-import { 
-  Sidebar, 
-  SidebarContent, 
-  SidebarGroup, 
-  SidebarFooter 
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarFooter,
 } from "@/components/ui/sidebar";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { useAction, useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
 import { Clock, Library } from "lucide-react";
 import Image from "next/image";
 import { formatSmartDate, ProfileHoverCard } from "@/components/web/ProfileHoverCard";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
-import { useCurrentUser } from "@/app/ConvexClientProvider";
-import Link from "next/link";
-import { useState } from "react";
-import { toast } from "sonner";
-import router from "next/router";
+import { useMemo } from "react";
+import { getGradientDataUrl } from "@/data/themes";
+import { FunctionReturnType } from "convex/server";
+import { api } from "@/convex/_generated/api";
+import { serializeUseCacheCacheStore } from "next/dist/server/resume-data-cache/cache-store";
 
 interface LeftSidebarArticleSeriesProps {
-  slug: string;
+  series: FunctionReturnType<typeof api.series.getSeriesBySlug>;
 }
 
 export function getCurrencySymbol(currencyCode: string, locale: string = "en-US"): string {
@@ -35,7 +30,7 @@ export function getCurrencySymbol(currencyCode: string, locale: string = "en-US"
         .formatToParts(0)
         .find((part) => part.type === "currency")?.value || currencyCode
     );
-  } catch (e) {
+  } catch {
     return currencyCode;
   }
 }
@@ -66,218 +61,128 @@ export function formatReadTime(totalMinutes: number): string {
   return `${days} day ${remainingHours} hr read`;
 }
 
-export function LeftSidebarArticleSeries({ slug }: LeftSidebarArticleSeriesProps) {
-  const seriesData = useQuery(api.series.getSeriesBySlug, { slug });
+export function LeftSidebarArticleSeries({ series }: LeftSidebarArticleSeriesProps) {
 
-  const createCheckout = useAction(api.stripe.createCourseCheckoutSession);
-  const [isLoading, setIsLoading] = useState(false);
+  const resolvedThemeName = series?.profile?.themeName ?? "";
+  const resolvedAvatarVariant = series?.profile?.avatarVariant ?? 0;
 
-  const imageUrl = useQuery(
-    api.series.getImageUrl,
-    seriesData?.coverImage ? { storageId: seriesData.coverImage } : "skip"
-  );
+  const gradientAvatarUrl = useMemo(() => {
+    return getGradientDataUrl(resolvedThemeName, resolvedAvatarVariant);
+  }, [resolvedThemeName, resolvedAvatarVariant]);
 
-  const avatarSrc = seriesData?.profile?.profilePicUrl;
-  const isImageLoading = seriesData?.coverImage && imageUrl === undefined;
-  const currentUser = useCurrentUser();
-  const isOwnProfile = Boolean(
-    currentUser?.userId &&
-      seriesData?.profile?.userId &&
-      currentUser.userId === seriesData?.profile.userId
-  );
-
-  if (seriesData === undefined) {
-    return (
-      <Sidebar 
-        className="flex flex-col !top-16 !z-40 border-r"
-        bgClass="bg-background/95" 
-        collapsible="icon"
-      >
-        <SidebarContent className="!p-0 !pl-1 w-full">
-          <ScrollArea scrollbarSide="left" className="pl-2 h-[calc(100vh-4rem)] w-full [&>div>div]:!block">
-            <SidebarGroup className="pt-3 !px-2 w-full">
-              <div className="relative p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 flex flex-col gap-3">
-                <Skeleton className="w-full h-64 rounded-lg" />
-
-                <div className="flex flex-row gap-2 items-center">
-                  <Skeleton className="h-6 w-6 rounded-full shrink-0" />
-                  <Skeleton className="h-4 w-28 rounded" />
-                  <Skeleton className="h-4 w-12 rounded ml-auto" />
-                </div>
-
-                <div className="flex flex-col gap-2 pt-1">
-                  <Skeleton className="h-6 w-4/5 rounded-md" />
-                  <Skeleton className="h-4 w-full rounded-md" />
-                  <Skeleton className="h-4 w-2/3 rounded-md" />
-                </div>
-
-                <div className="flex items-center pt-1">
-                  <Skeleton className="h-6 w-24 rounded-full" />
-                </div>
-              </div>
-            </SidebarGroup>
-          </ScrollArea>
-        </SidebarContent>
-        <SidebarFooter className="hidden" />
-      </Sidebar>
-    );
-  }
-
-  if (seriesData === null) {
-    return (
-      <Sidebar className="flex flex-col !top-16 !z-40 border-r" bgClass="bg-background/95" collapsible="icon">
-        <SidebarContent className="!p-0 !pl-1 w-full">
-          <ScrollArea scrollbarSide="left" className="pl-2 h-[calc(100vh-4rem)] w-full [&>div>div]:!block">
-            <SidebarGroup className="pt-3 !px-2 w-full">
-              <div className="relative p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 text-xs text-zinc-500">
-                Series not found.
-              </div>
-            </SidebarGroup>
-          </ScrollArea>
-        </SidebarContent>
-        <SidebarFooter className="hidden" />
-      </Sidebar>
-    );
-  }
-
-  const seriesId = seriesData._id;
-  
-  const handlePurchase = async () => {
-
-    if (!currentUser) {
-        toast.error("You must be logged in to purchase a course.", {
-            action: {
-                label: "Sign in",
-                onClick: () => router.push("/sign-in"),
-            },
-        });
-        return;
-    }
-
-    try {
-      setIsLoading(true);
-      const { url } = await createCheckout({ seriesId });
-      window.location.href = url;
-    } catch (error) {
-      console.error("Checkout failed:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const avatarSrc = series?.profile?.profilePicUrl || gradientAvatarUrl;
 
   return (
-    <Sidebar 
+    <Sidebar
       className="flex flex-col !top-16 !z-40 border-r"
-      bgClass="bg-background/95" 
+      bgClass="bg-background/95"
       collapsible="icon"
     >
-      <SidebarContent className="!p-0 !pl-1 w-full">
-        <ScrollArea scrollbarSide="left" className="pl-2 h-[calc(100vh-4rem)] w-full [&>div>div]:!block">
-          <SidebarGroup className="pt-3 !px-2 w-full">
-            <div className="flex flex-col gap-3 w-full pb-6">
-              <div className="relative p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 flex flex-col gap-3">
-                <div className="relative w-full h-64 overflow-hidden rounded-lg">
-                  {isImageLoading ? (
-                    <Skeleton className="w-full h-full rounded-lg" />
-                  ) : imageUrl ? (
-                    <Image
-                      src={imageUrl}
-                      alt={seriesData.title || "Series cover"}
-                      fill
-                      className="object-cover"
-                      sizes="300px"
-                    />
-                  ) : null}
-                </div>
-
-                {avatarSrc && (
-                  <div className="flex flex-row gap-2 items-center">
-                    <div className="h-6 w-6 border border-border rounded-full overflow-hidden bg-muted shrink-0">
-                      <img
-                        src={avatarSrc}
-                        alt="profile"
-                        className="h-full w-full object-cover"
-                        decoding="async"
+      <SidebarContent className="!p-0 w-full">
+        <SidebarGroup className="pt-3 !px-2 w-full">
+          <div className="flex flex-col gap-3 w-full pb-6">
+            <div className="relative p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 flex flex-col gap-3">
+              {series &&
+                <>
+                  <div className="relative w-full h-64 overflow-hidden rounded-lg">
+                    {series.coverImageUrl &&
+                      <Image
+                        src={series.coverImageUrl}
+                        alt={series.title || "Series cover"}
+                        fill
+                        className="object-cover"
+                        sizes="300px"
                       />
-                    </div>
-                    <div className="flex flex-col">
-                      <ProfileHoverCard
-                        displayName={seriesData.profile?.displayName}
-                        authorUsername={seriesData.profile?.username || ""}
-                      >
-                        <span className="text-sm truncate leading-tight cursor-pointer">
-                          {seriesData.profile?.displayName || seriesData.profile?.username}
-                        </span>
-                      </ProfileHoverCard>
-                    </div>
-
-                    <time className="capitalize font-semibold text-lg md:text-xs tracking-tight text-zinc-400 mt-0.5 select-none ml-auto">
-                      {formatSmartDate(seriesData._creationTime, false)}
-                    </time>
+                    }
                   </div>
-                )}
 
-                <div className="flex flex-col gap-1">
-                  <span className="font-bold text-lg text-foreground">{seriesData.title}</span>
-                  {seriesData.description && (
-                    <span className="text-base text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                      {seriesData.description}
-                    </span>
-                  )}
-                </div>
+                  {avatarSrc && (
+                    <div className="flex flex-row gap-2 items-center">
+                      <div className="h-6 w-6 border border-border rounded-full overflow-hidden bg-muted shrink-0">
+                        <img
+                          src={avatarSrc}
+                          alt="profile"
+                          className="h-full w-full object-cover"
+                          decoding="async"
+                        />
+                      </div>
+                      <div className="flex flex-col">
+                        <ProfileHoverCard
+                          displayName={series.profile?.displayName}
+                          authorUsername={series.profile?.username || ""}
+                        >
+                          <span className="text-sm truncate leading-tight cursor-pointer">
+                            {series.profile?.displayName || series.profile?.username}
+                          </span>
+                        </ProfileHoverCard>
+                      </div>
 
-                <div className="flex flex-row">
-                  {seriesData.price && seriesData.currency && (
-                    <div className="flex items-center">
-                      <Badge variant="outline" className="py-1 px-2.5 text-green-600 dark:text-green-300">
-                        <span>
-                          {getCurrencySymbol(seriesData.currency)}
-                          {seriesData.price}
-                        </span>
-                      </Badge>
+                      <time className="capitalize font-semibold text-lg md:text-xs tracking-tight text-zinc-400 mt-0.5 select-none ml-auto">
+                        {formatSmartDate(series._creationTime, false)}
+                      </time>
                     </div>
                   )}
 
-                  <div className="flex gap-1.5 items-center ml-auto">
-                    <div className="flex items-center">
-                      <Badge variant="outline" className="gap-1.5 py-1 px-2.5 text-zinc-600 dark:text-zinc-300">
-                        <Clock className="w-3.5 h-3.5" />
-                        <span>{formatReadTime(seriesData.totalReadTime)}</span>
-                      </Badge>
-                    </div>
+                  <div className="flex flex-col gap-1">
+                    {series.title && (
+                      <span className="font-bold text-lg text-foreground">
+                        {series.title}
+                      </span>
+                    )}
+                    {series.description && (
+                      <span className="text-base text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                        {series.description}
+                      </span>
+                    )}
+                  </div>
 
-                    <div className="flex items-center">
-                      <Badge variant="outline" className="gap-1.5 py-1 px-2.5 text-zinc-600 dark:text-zinc-300">
-                        <Library className="w-3.5 h-3.5" />
-                        <span>{seriesData.articlesCount} {seriesData.articlesCount === 1 ? 'article' : 'articles'}</span>
-                      </Badge>
+                  <div className="flex flex-row items-center">
+                    {series.price && series.currency && (
+                      <div className="flex items-center">
+                        <Badge
+                          variant="outline"
+                          className="py-1 px-2.5 text-green-600 dark:text-green-300"
+                        >
+                          <span>
+                            {getCurrencySymbol(series.currency)}
+                            {series.price}
+                          </span>
+                        </Badge>
+                      </div>
+                    )}
+
+                    <div className="flex gap-1.5 items-center ml-auto">
+                      {series.totalReadTime !== undefined && (
+                        <div className="flex items-center">
+                          <Badge
+                            variant="outline"
+                            className="gap-1.5 py-1 px-2.5 text-zinc-600 dark:text-zinc-300"
+                          >
+                            <Clock className="w-3.5 h-3.5" />
+                            <span>{formatReadTime(series.totalReadTime)}</span>
+                          </Badge>
+                        </div>
+                      )}
+
+                      <div className="flex items-center">
+                        <Badge
+                          variant="outline"
+                          className="gap-1.5 py-1 px-2.5 text-zinc-600 dark:text-zinc-300"
+                        >
+                          <Library className="w-3.5 h-3.5" />
+                          <span>
+                            {series.articlesCount}{" "}
+                            {series.articlesCount === 1 ? "article" : "articles"}
+                          </span>
+                        </Badge>
+                      </div>
                     </div>
                   </div>
-                </div>
-
-                {isOwnProfile && (
-                  <Button type="button" size="sm" className="cursor-pointer w-fit rounded-xl mt-2" asChild>
-                    <Link href={`/create-article-series?id=${seriesData._id}`}>
-                      Edit Series
-                    </Link>
-                  </Button>
-                )}
-
-                {!isOwnProfile && seriesData.isCourse && (
-                  <Button
-                    type="button"
-                    size="sm"
-                    className="cursor-pointer w-fit rounded-xl mt-2"
-                    onClick={handlePurchase}
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Redirecting to checkout..." : "Purchase Course"}
-                  </Button>
-                )}
-              </div>
+                </>
+              }
             </div>
-          </SidebarGroup>
-        </ScrollArea>
+          </div>
+        </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="hidden" />
     </Sidebar>

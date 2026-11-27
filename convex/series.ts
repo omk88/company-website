@@ -244,10 +244,10 @@ export const createSeriesWithItems = mutation({
   args: {
     title: v.string(),
     slug: v.string(),
-    description: v.optional(v.string()),
-    coverImage: v.optional(v.string()),
+    description: v.string(),
+    coverImage: v.string(),
     coverImagePng: v.optional(v.string()),
-    isCourse: v.optional(v.boolean()),
+    isCourse: v.boolean(),
     price: v.optional(v.number()),
     currency: v.optional(v.string()),
     isFree: v.optional(v.boolean()),
@@ -288,8 +288,8 @@ export const createSeries = mutation({
   args: {
     title: v.string(),
     slug: v.string(),
-    description: v.optional(v.string()),
-    coverImage: v.optional(v.string()),
+    description: v.string(),
+    coverImage: v.string(),
     coverImagePng: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
@@ -317,6 +317,7 @@ export const createSeries = mutation({
       description: args.description,
       coverImage: args.coverImage,
       coverImagePng: args.coverImagePng,
+      isCourse: false,
       authorId: userId,
     });
 
@@ -456,14 +457,11 @@ export const getSeriesBySlug = query({
 
     if (!series) return null;
 
-    let coverImageUrl = null;
-    if (series.coverImage) {
-      coverImageUrl = await ctx.storage.getUrl(series.coverImage as any);
-    }
+    const coverImageUrl = await ctx.storage.getUrl(series.coverImage);
 
     let coverImagePngUrl = null;
     if (series.coverImagePng) {
-      coverImagePngUrl = await ctx.storage.getUrl(series.coverImagePng as any);
+      coverImagePngUrl = await ctx.storage.getUrl(series.coverImagePng);
     }
 
     const profile = await ctx.db
@@ -576,13 +574,6 @@ export const generateUploadUrl = mutation(async (ctx) => {
     throw new Error("Unauthenticated: You must be logged in to upload an image.");
   }
   return await ctx.storage.generateUploadUrl();
-});
-
-export const getImageUrl = query({
-  args: { storageId: v.string() },
-  handler: async (ctx, args) => {
-    return await ctx.storage.getUrl(args.storageId);
-  },
 });
 
 export const getFirstArticleInSeries = query({

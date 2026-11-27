@@ -220,11 +220,11 @@ const schema = defineSchema({
   series: defineTable({
     title: v.string(),
     slug: v.string(),
-    description: v.optional(v.string()),
-    coverImage: v.optional(v.string()),
+    description: v.string(),
+    coverImage: v.string(),
     coverImagePng: v.optional(v.string()),
     authorId: v.string(),
-    isCourse: v.optional(v.boolean()),
+    isCourse: v.boolean(),
     price: v.optional(v.number()),
     currency: v.optional(v.string()),
     isFree: v.optional(v.boolean())

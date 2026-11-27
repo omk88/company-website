@@ -3,6 +3,7 @@ import { Sidebar, SidebarContent, SidebarGroup, SidebarFooter } from "@/componen
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CompactBlogCardSkeleton } from "@/components/web/LoadingSkeletons/CompactBlogCardSkeleton";
+import { LeftSidebarArticleSeriesSkeleton } from "../../_components/LeftSidebarArticleSeriesSkeleton";
 
 export default function SeriesLoading() {
   return (
@@ -12,24 +13,7 @@ export default function SeriesLoading() {
           className="hidden md:block shrink-0 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto"
           style={{ "--sidebar-width": "24rem" } as React.CSSProperties}
         >
-          <Sidebar className="flex flex-col !top-16 !z-40 border-r" bgClass="bg-background/95" collapsible="icon">
-            <SidebarContent className="!p-0 w-full">
-              <SidebarGroup className="pt-3 !px-2 w-full">
-                <div className="relative p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 flex flex-col gap-3">
-                  <Skeleton className="w-full h-64 rounded-lg" />
-                  <div className="flex flex-row gap-2 items-center">
-                    <Skeleton className="h-6 w-6 rounded-full shrink-0" />
-                    <Skeleton className="h-4 w-28 rounded" />
-                    <Skeleton className="h-4 w-12 rounded ml-auto" />
-                  </div>
-                  <div className="flex flex-col gap-2 pt-1">
-                    <Skeleton className="h-6 w-4/5 rounded-md" />
-                    <Skeleton className="h-4 w-full rounded-md" />
-                  </div>
-                </div>
-              </SidebarGroup>
-            </SidebarContent>
-          </Sidebar>
+          <LeftSidebarArticleSeriesSkeleton />
         </aside>
 
         <div className="w-full md:flex-1 md:flex md:flex-row md:min-w-0 md:pt-16">
