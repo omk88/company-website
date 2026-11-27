@@ -10,7 +10,6 @@ import { CompactSeriesCardSkeleton } from "@/components/web/LoadingSkeletons/Com
 import { EmptyState } from "@/components/web/EmptyState";
 import { List } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { CreateSeriesDialog } from "./CreateSeriesDialog";
 import { useCurrentUser } from "@/app/ConvexClientProvider";
 
 type ProfileData = FunctionReturnType<typeof api.profiles.getProfileByUsername>;
@@ -128,11 +127,6 @@ export function ProfileArticleSeries({ profile, preloadedData }: ProfileArticleS
           </>
         )}
       </div>
-
-      <CreateSeriesDialog
-        open={isCreateOpen}
-        onOpenChange={setIsCreateOpen}
-      />
     </div>
   );
 }
