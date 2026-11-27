@@ -27,7 +27,7 @@ export default function About() {
               <Link 
                 href="/careers" 
                 style={{ backgroundColor: 'var(--accent-dark-primary)' }}
-                className="group px-4.5 py-2.5 text-white font-medium text-xs sm:text-sm rounded-lg transition-all duration-100 hover:opacity-90 active:scale-[0.98] inline-flex items-center gap-2"
+                className="group px-4.5 py-2.5 font-medium text-xs sm:text-sm rounded-lg transition-all duration-100 hover:opacity-90 active:scale-[0.98] inline-flex items-center gap-2 text-white"
               >
                 <span style={{ color: 'var(--accent-text-2)' }}>View careers</span>
               </Link>
