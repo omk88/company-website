@@ -68,10 +68,6 @@ export default function ContactPage() {
         <div id="faq-section" className="w-full bg-white dark:bg-zinc-950">
           <div className="max-w-7xl mx-auto px-6 pt-16 pb-24">
             <div className="mb-8 md:mb-6 flex flex-col justify-center md:justify-start gap-2.5 text-foreground">
-              <div className="inline-flex w-fit items-center gap-1.5 px-3.5 py-1 rounded-full bg-white border border-gray-200/80 shadow-sm text-sm font-medium text-foreground">
-                <CircleHelp className="w-4 h-4 text-foreground" />
-                <span>FAQ</span>
-              </div>
               <h3
                 className={cn(
                   "text-2xl sm:text-3xl md:text-4xl", 

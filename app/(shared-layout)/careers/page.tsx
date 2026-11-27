@@ -1,7 +1,6 @@
 import Footer from "@/components/web/Footer";
 import UnifiedCareersTable from "@/components/web/UnifiedCareersTable";
 import { cn } from "@/lib/utils";
-import { Briefcase } from "lucide-react";
 
 export default function Careers() {
     return (
