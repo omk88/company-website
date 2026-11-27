@@ -14,10 +14,6 @@ export default function Careers() {
                             "text-neutral-600 dark:text-neutral-400"
                         )}
                     >
-                        <div className="inline-flex w-fit items-center gap-1.5 px-3.5 py-1 rounded-full bg-white border border-gray-200/80 shadow-sm text-sm font-medium text-foreground">
-                            <Briefcase className="w-4 h-4 text-foreground" />
-                            <span>Careers</span>
-                        </div>
                         <h1
                             className={cn(
                             "text-2xl sm:text-3xl md:text-4xl", 
