@@ -34,32 +34,6 @@ export function getCurrencySymbol(currencyCode: string, locale: string = "en-US"
   }
 }
 
-export function formatReadTime(totalMinutes: number): string {
-  if (!totalMinutes || totalMinutes <= 0) return "0 min read";
-
-  if (totalMinutes < 60) {
-    return `${totalMinutes} min read`;
-  }
-
-  const hours = Math.floor(totalMinutes / 60);
-  const remainingMinutes = totalMinutes % 60;
-
-  if (hours < 24) {
-    if (remainingMinutes === 0) {
-      return `${hours} hr read`;
-    }
-    return `${hours} hr ${remainingMinutes} min read`;
-  }
-
-  const days = Math.floor(hours / 24);
-  const remainingHours = hours % 24;
-
-  if (remainingHours === 0) {
-    return `${days} day read`;
-  }
-  return `${days} day ${remainingHours} hr read`;
-}
-
 export function LeftSidebarArticleSeries({ series }: LeftSidebarArticleSeriesProps) {
 
   const resolvedThemeName = series?.profile?.themeName ?? "";

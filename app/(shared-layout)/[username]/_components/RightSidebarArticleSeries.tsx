@@ -7,7 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { processHeadings } from "../../insights/[blogTitleId]/_utils/headingUtils";
 import Link from "next/link";
-import { ChevronRight, List } from "lucide-react";
+import { ChartNoAxesColumn, ChevronRight, List, Package } from "lucide-react";
 import { FunctionReturnType } from "convex/server";
 
 interface RightSidebarArticleSeriesProps {
@@ -27,6 +27,32 @@ const parseRawHeadingsFromMarkdown = (markdown: string = "") => {
 
   return processHeadings(rawHeadings);
 };
+
+export function formatReadTime(totalMinutes: number): string {
+  if (!totalMinutes || totalMinutes <= 0) return "0 Minute Total Read Time";
+
+  if (totalMinutes < 60) {
+    return `${totalMinutes} Minute Read Time`;
+  }
+
+  const hours = Math.floor(totalMinutes / 60);
+  const remainingMinutes = totalMinutes % 60;
+
+  if (hours < 24) {
+    if (remainingMinutes === 0) {
+      return `${hours} Hour Total Read Time`;
+    }
+    return `${hours} Hour ${remainingMinutes} Minute Total Read Time`;
+  }
+
+  const days = Math.floor(hours / 24);
+  const remainingHours = hours % 24;
+
+  if (remainingHours === 0) {
+    return `${days} Day Total Read Time`;
+  }
+  return `${days} Day ${remainingHours} Hour Total Read Time`;
+}
 
 export function RightSidebarArticleSeries({ series }: RightSidebarArticleSeriesProps) {
 
@@ -75,6 +101,49 @@ export function RightSidebarArticleSeries({ series }: RightSidebarArticleSeriesP
                   <h3 className="text-sm font-bold text-foreground leading-snug break-words max-w-full">
                     {series.title}
                   </h3>
+
+                  <div className="flex flex-col gap-5 pb-6 max-w-full overflow-hidden">
+                    <div className="flex border-b py-2 border-zinc-200/60 dark:border-zinc-800 overflow-hidden max-w-full items-center gap-1.5 text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                      <ChartNoAxesColumn className="w-3.5 h-3.5" />
+                      <span>Metrics</span>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <div className="flex flex-col gap-0.5 max-w-full overflow-hidden">
+                        <span className="font-medium text-xs text-foreground leading-snug block break-words max-w-full">
+                          • {series.articlesCount} Articles
+                        </span>
+                      </div>
+                      <div className="flex flex-col gap-0.5 max-w-full overflow-hidden">
+                        <span className="font-medium text-xs text-foreground leading-snug block break-words max-w-full">
+                          • {formatReadTime(series.totalReadTime)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-5 pb-6 max-w-full overflow-hidden">
+                    <div className="flex border-b py-2 border-zinc-200/60 dark:border-zinc-800 overflow-hidden max-w-full items-center gap-1.5 text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                      <Package className="w-3.5 h-3.5" />
+                      <span>What's Included</span>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <div className="flex flex-col gap-0.5 max-w-full overflow-hidden">
+                        <span className="font-medium text-xs text-foreground leading-snug block break-words max-w-full">
+                          • Full Lifetime Access
+                        </span>
+                      </div>
+                      <div className="flex flex-col gap-0.5 max-w-full overflow-hidden">
+                        <span className="font-medium text-xs text-foreground leading-snug block break-words max-w-full">
+                          • Free Periodic Updates
+                        </span>
+                      </div>
+                      <div className="flex flex-col gap-0.5 max-w-full overflow-hidden">
+                        <span className="font-medium text-xs text-foreground leading-snug block break-words max-w-full">
+                          • One-time Payment
+                        </span>
+                      </div>
+                    </div>
+                  </div>
 
                   {hasAnyTopics &&
                     <div className="flex flex-col gap-5 pb-6 max-w-full overflow-hidden">

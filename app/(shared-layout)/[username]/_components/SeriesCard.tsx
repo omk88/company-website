@@ -9,7 +9,8 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { formatReadTime, getCurrencySymbol } from "./LeftSidebarArticleSeries";
+import { getCurrencySymbol } from "./LeftSidebarArticleSeries";
+import { formatReadTime } from "./RightSidebarArticleSeries";
 
 type Series = Doc<"series"> & {
   imageUrl?: string | null;
@@ -167,12 +168,6 @@ export default function SeriesCard({ series, isCompact = false }: ProfileArticle
               </div>
             }
             <div className="flex flex-row gap-1.5">
-              <div className="flex items-center ml-auto">
-                <Badge variant={"outline"} className="gap-1.5 py-1 px-2.5 text-zinc-600 dark:text-zinc-300">
-                  <Clock className="w-3.5 h-3.5" />
-                  <span>{formatReadTime(totalReadTime)}</span>
-                </Badge>
-              </div>
               <div className="flex items-center ml-auto">
                 <Badge variant={"outline"} className="gap-1.5 py-1 px-2.5 text-zinc-600 dark:text-zinc-300">
                   <Library className="w-3.5 h-3.5" />
