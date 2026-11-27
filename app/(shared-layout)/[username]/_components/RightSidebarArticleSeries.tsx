@@ -32,7 +32,7 @@ export function formatReadTime(totalMinutes: number): string {
   if (!totalMinutes || totalMinutes <= 0) return "0 Minute Total Read Time";
 
   if (totalMinutes < 60) {
-    return `${totalMinutes} Minute Read Time`;
+    return `${totalMinutes} Minute Total Read Time`;
   }
 
   const hours = Math.floor(totalMinutes / 60);

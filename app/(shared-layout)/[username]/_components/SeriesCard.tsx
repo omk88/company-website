@@ -132,7 +132,7 @@ export default function SeriesCard({ series, isCompact = false }: ProfileArticle
           <div className="font-roboto flex items-center justify-between text-xs uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
               <div className="flex items-center gap-1">
                   <ProfileHoverCard authorUsername={username} displayName={displayName}>
-                      <span className="cursor-pointer">{displayName}</span>
+                    <span className="cursor-pointer">{displayName}</span>
                   </ProfileHoverCard>
                   
                   <span>&middot;</span>
@@ -152,7 +152,7 @@ export default function SeriesCard({ series, isCompact = false }: ProfileArticle
         </Link>
          
           <div className="flex font-sans font-semibold items-center justify-between text-sm tracking-tight select-none w-full mt-auto">
-            {series.price && series.currency && (series.price === 0) &&
+            {series.price && series.currency && (series.price !== 0) &&
               <div className="flex items-center">
                 <Badge variant={"outline"} className="py-1 px-2.5 text-green-600 dark:text-green-300">
                   <span>{getCurrencySymbol(series.currency)}{series.price}</span>
