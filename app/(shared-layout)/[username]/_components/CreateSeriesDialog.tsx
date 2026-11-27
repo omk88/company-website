@@ -182,7 +182,7 @@ export function CreateSeriesDialog({
       const newSeriesId = await createSeries({
         title: title.trim(),
         slug,
-        description: description.trim() || undefined,
+        description: description.trim(),
         coverImage: coverImageStorageId,
         coverImagePng: coverImagePngStorageId,
       });
