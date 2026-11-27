@@ -225,9 +225,8 @@ const schema = defineSchema({
     coverImagePng: v.optional(v.string()),
     authorId: v.string(),
     isCourse: v.boolean(),
-    price: v.optional(v.number()),
-    currency: v.optional(v.string()),
-    isFree: v.optional(v.boolean())
+    price: v.number(),
+    currency: v.string(),
   })
     .index("by_authorId", ["authorId"])
     .index("by_slug", ["slug"])

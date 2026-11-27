@@ -76,10 +76,6 @@ export default async function ArticleSeriesPage({ params }: ArticleSeriesPagePro
     const { slug, username } = await params;
     const series = await getSeriesData(slug);
 
-    const hasPurchaseBar = Boolean(
-        series?.isCourse && !series.isFree && series.price && series.price > 0
-    );
-
     const baseUrl = process.env.NODE_ENV === "development"
         ? "http://localhost:3000"
         : (process.env.NEXT_PUBLIC_SITE_URL || "https://www.taqtiq.tech");
@@ -93,7 +89,7 @@ export default async function ArticleSeriesPage({ params }: ArticleSeriesPagePro
     };
 
     return (
-        <div className={`min-h-screen w-full ${hasPurchaseBar ? "pb-24" : ""}`}>
+        <div className={"min-h-screen w-full"}>
             {series && (
                 <script
                     type="application/ld+json"
@@ -122,7 +118,7 @@ export default async function ArticleSeriesPage({ params }: ArticleSeriesPagePro
                 </div>
             </SidebarProvider>
 
-            {hasPurchaseBar && <PurchaseSeriesBar series={series} />}
+            <PurchaseSeriesBar series={series} />
         </div>
     );
 }

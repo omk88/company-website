@@ -3,7 +3,6 @@
 import { useCurrentUser } from "@/app/ConvexClientProvider";
 import { Button } from "@/components/ui/button";
 import { api } from "@/convex/_generated/api";
-import { cn } from "cn";
 import { useAction } from "convex/react";
 import { FunctionReturnType } from "convex/server";
 import { ArrowRight, Loader2 } from "lucide-react";
@@ -21,7 +20,7 @@ export function PurchaseSeriesBar({ series }: PurchaseSeriesBarProps) {
     
     const currentUser = useCurrentUser();
 
-    const isOwnProfile = Boolean( currentUser?.userId &&
+    const isOwnSeries = Boolean( currentUser?.userId &&
         series?.profile?.userId &&
         currentUser.userId === series?.profile.userId
     );
@@ -59,7 +58,7 @@ export function PurchaseSeriesBar({ series }: PurchaseSeriesBarProps) {
         <div className="fixed bottom-0 h-16 w-full border-t bg-background">
             {series && 
                 <div className="flex flex-row p-4 items-center">
-                    {isOwnProfile && (
+                    {isOwnSeries && (
                         <Button
                             type="button"
                             size="sm"
@@ -72,7 +71,7 @@ export function PurchaseSeriesBar({ series }: PurchaseSeriesBarProps) {
                         </Button>
                     )}
 
-                    {!isOwnProfile && series.isCourse && (
+                    {!isOwnSeries && series.isCourse && (
                         <div className="ml-auto flex items-center gap-3">
                             <span className="text-lg font-semibold tabular-nums">
                                 {getCurrencySymbol(series?.currency || "")}{series?.price}

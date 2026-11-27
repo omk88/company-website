@@ -152,7 +152,7 @@ export default function SeriesCard({ series, isCompact = false }: ProfileArticle
         </Link>
          
           <div className="flex font-sans font-semibold items-center justify-between text-sm tracking-tight select-none w-full mt-auto">
-            {series.price && series.currency && !series.isFree &&
+            {series.price && series.currency && (series.price === 0) &&
               <div className="flex items-center">
                 <Badge variant={"outline"} className="py-1 px-2.5 text-green-600 dark:text-green-300">
                   <span>{getCurrencySymbol(series.currency)}{series.price}</span>
@@ -160,7 +160,7 @@ export default function SeriesCard({ series, isCompact = false }: ProfileArticle
               </div>
             }
           
-            {!series.price && !series.currency && series.isFree &&
+            {!series.price && !series.currency && (series.price === 0) &&
               <div className="flex items-center">
                 <Badge variant={"outline"} className="py-1 px-2.5 text-green-600 dark:text-green-300">
                   <span>Free</span>

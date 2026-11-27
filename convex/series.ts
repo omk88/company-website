@@ -38,7 +38,6 @@ export const updateSeriesWithItems = mutation({
     isCourse: v.optional(v.boolean()),
     price: v.optional(v.number()),
     currency: v.optional(v.string()),
-    isFree: v.optional(v.boolean()),
     articleIds: v.array(v.id("blogs")),
   },
   handler: async (ctx, args) => {
@@ -61,7 +60,6 @@ export const updateSeriesWithItems = mutation({
       isCourse: args.isCourse,
       price: args.price,
       currency: args.currency,
-      isFree: args.isFree,
     });
 
     const existingItems = await ctx.db
@@ -248,9 +246,8 @@ export const createSeriesWithItems = mutation({
     coverImage: v.string(),
     coverImagePng: v.optional(v.string()),
     isCourse: v.boolean(),
-    price: v.optional(v.number()),
-    currency: v.optional(v.string()),
-    isFree: v.optional(v.boolean()),
+    price: v.number(),
+    currency: v.string(),
     articleIds: v.array(v.id("blogs")),
   },
   handler: async (ctx, args) => {
@@ -268,7 +265,6 @@ export const createSeriesWithItems = mutation({
       isCourse: args.isCourse,
       price: args.price,
       currency: args.currency,
-      isFree: args.isFree,
       authorId: userId,
     });
 
@@ -281,47 +277,6 @@ export const createSeriesWithItems = mutation({
     }
 
     return args.slug;
-  },
-});
-
-export const createSeries = mutation({
-  args: {
-    title: v.string(),
-    slug: v.string(),
-    description: v.string(),
-    coverImage: v.string(),
-    coverImagePng: v.optional(v.string()),
-  },
-  handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new Error("Unauthenticated: You must be logged in to create a series.");
-    }
-
-    const userId = identity.subject;
-
-    const existingSeries = await ctx.db
-      .query("series")
-      .withIndex("by_author_and_slug", (q) => 
-        q.eq("authorId", userId).eq("slug", args.slug)
-      )
-      .first();
-
-    if (existingSeries) {
-      throw new Error("You already have a series with this title. Please choose a different title.");
-    }
-
-    const seriesId = await ctx.db.insert("series", {
-      title: args.title,
-      slug: args.slug,
-      description: args.description,
-      coverImage: args.coverImage,
-      coverImagePng: args.coverImagePng,
-      isCourse: false,
-      authorId: userId,
-    });
-
-    return seriesId;
   },
 });
 

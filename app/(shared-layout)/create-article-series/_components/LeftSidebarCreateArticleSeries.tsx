@@ -1,26 +1,26 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useMutation, useQuery } from "convex/react";
+import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
-import { 
-  Sidebar, 
-  SidebarContent, 
-  SidebarGroup, 
-  SidebarFooter 
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarFooter,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Clock, ImagePlus, Loader2, X } from "lucide-react";
@@ -45,31 +45,51 @@ const CURRENCIES = [
   { code: "aud", label: "AUD ($)" },
 ];
 
-export function LeftSidebarCreateArticleSeries({ isEditing, seriesId, existingData }: LeftSidebarProps) {
+export function LeftSidebarCreateArticleSeries({
+  isEditing,
+  seriesId,
+  existingData,
+}: LeftSidebarProps) {
   const router = useRouter();
   const currentUser = useCurrentUser();
-  const authorName = currentUser?.profile?.displayName || currentUser?.profile?.username || "User";
-  const profilePic = currentUser?.profile?.profilePicUrl || currentUser?.profile?.defaultProfilePic;
+  const authorName =
+    currentUser?.profile?.displayName ||
+    currentUser?.profile?.username ||
+    "User";
+  const profilePic =
+    currentUser?.profile?.profilePicUrl ||
+    currentUser?.profile?.defaultProfilePic;
 
-  const { stagedBlogs, seriesTitle, description, setSeriesTitle, setDescription } = useSeriesStore();
+  const {
+    stagedBlogs,
+    seriesTitle,
+    description,
+    setSeriesTitle,
+    setDescription,
+  } = useSeriesStore();
 
   const stagedBlogIds = stagedBlogs.map((b) => b._id);
-  const totalReadMinutes = stagedBlogs.reduce((acc, blog) => acc + (blog.readTime || 0), 0);
+  const totalReadMinutes = stagedBlogs.reduce(
+    (acc, blog) => acc + (blog.readTime || 0),
+    0
+  );
 
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-  const initialIsCourse = existingData?.isCourse;
-  const initialIsFree = existingData?.isFree ?? (initialIsCourse && (!existingData?.price || existingData.price <= 0));
+  const initialIsCourse = Boolean(existingData?.isCourse);
+  const existingPrice =
+    typeof existingData?.price === "number" ? existingData.price : 0;
+  const initialIsFreeCourse = initialIsCourse && existingPrice === 0;
 
   const [isCourse, setIsCourse] = useState<boolean>(initialIsCourse);
-  const [isFreeCourse, setIsFreeCourse] = useState<boolean>(Boolean(initialIsFree));
+  const [isFreeCourse, setIsFreeCourse] = useState<boolean>(initialIsFreeCourse);
   const [price, setPrice] = useState<string>(
-    !initialIsFree && existingData?.price && existingData.price > 0
-      ? String(existingData.price)
-      : ""
+    initialIsCourse ? String(existingPrice) : ""
   );
-  const [currency, setCurrency] = useState<string>(existingData?.currency || "usd");
+  const [currency, setCurrency] = useState<string>(
+    existingData?.currency || "usd"
+  );
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -82,8 +102,13 @@ export function LeftSidebarCreateArticleSeries({ isEditing, seriesId, existingDa
 
   const handleCourseToggle = (checked: boolean) => {
     setIsCourse(checked);
+    setError(null);
     if (!checked) {
       setIsFreeCourse(false);
+      setPrice("");
+    } else if (price === "" || parseFloat(price) === 0) {
+      setIsFreeCourse(true);
+      setPrice("0");
     }
   };
 
@@ -91,7 +116,22 @@ export function LeftSidebarCreateArticleSeries({ isEditing, seriesId, existingDa
     setIsFreeCourse(checked);
     setError(null);
     if (checked) {
+      setPrice("0");
+    } else if (price === "0") {
       setPrice("");
+    }
+  };
+
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setPrice(val);
+    setError(null);
+
+    const parsed = parseFloat(val);
+    if (!Number.isNaN(parsed) && parsed > 0) {
+      setIsFreeCourse(false);
+    } else if (val === "0" || parsed === 0) {
+      setIsFreeCourse(true);
     }
   };
 
@@ -109,72 +149,114 @@ export function LeftSidebarCreateArticleSeries({ isEditing, seriesId, existingDa
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  function formatReadTime(totalMinutes: number): string {
-    if (!totalMinutes || totalMinutes <= 0) return "0 min read";
-    if (totalMinutes < 60) return `${totalMinutes} min read`;
-
-    const hours = Math.floor(totalMinutes / 60);
-    const remainingMinutes = totalMinutes % 60;
-
-    if (hours < 24) {
-      if (remainingMinutes === 0) return `${hours} hr read`;
-      return `${hours} hr ${remainingMinutes} min read`;
-    }
-
-    const days = Math.floor(hours / 24);
-    const remainingHours = hours % 24;
-    if (remainingHours === 0) return `${days} day read`;
-    return `${days} day ${remainingHours} hr read`;
-  }
-
   const convertImageToPngFile = async (file: File): Promise<File> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        try {
-          const fileContent = event.target?.result as string;
-          let processedContent = fileContent;
-          let svgWidth = 1200;
-          let svgHeight = 630;
+    const isSvg =
+      file.type === "image/svg+xml" || file.name.toLowerCase().endsWith(".svg");
 
-          if (file.type === "image/svg+xml" || file.name.endsWith(".svg")) {
-            const viewBoxMatch = processedContent.match(/viewBox\s*=\s*["']([\d\s.-]+)["']/i);
-            if (viewBoxMatch) {
-              const parts = viewBoxMatch[1].trim().split(/[\s,]+/);
-              if (parts.length === 4) {
-                svgWidth = parseFloat(parts[2]) || 1200;
-                svgHeight = parseFloat(parts[3]) || 630;
-              }
-            }
-            if (!processedContent.includes('fill="#ffffff"') && !processedContent.includes('fill="white"')) {
-              processedContent = processedContent.replace(/(<svg[^>]*>)/i, `$1<rect width="${svgWidth}" height="${svgHeight}" fill="#ffffff"/>`);
-            }
+    // For standard raster images (JPG, PNG, WebP, etc.), load directly via object URL
+    if (!isSvg) {
+      return new Promise((resolve, reject) => {
+        const objectUrl = URL.createObjectURL(file);
+        const img = new window.Image();
+
+        img.onload = () => {
+          URL.revokeObjectURL(objectUrl);
+          const canvas = document.createElement("canvas");
+          canvas.width = img.naturalWidth || 1200;
+          canvas.height = img.naturalHeight || 630;
+
+          const ctx = canvas.getContext("2d");
+          if (!ctx) {
+            reject(new Error("Canvas context failed"));
+            return;
           }
 
-          const dataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(processedContent)}`;
-          const img = new window.Image();
-          img.crossOrigin = "anonymous";
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-          img.onload = () => {
-            const canvas = document.createElement("canvas");
-            canvas.width = svgWidth;
-            canvas.height = svgHeight;
-            const ctx = canvas.getContext("2d");
-            if (!ctx) return reject(new Error("Canvas context failed"));
-            ctx.fillStyle = "#ffffff";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            canvas.toBlob((blob) => {
-              if (!blob) return reject(new Error("Blob conversion failed"));
-              resolve(new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".png", { type: "image/png" }));
-            }, "image/png");
-          };
-          img.src = dataUrl;
-        } catch (err) {
-          reject(err);
+          canvas.toBlob((blob) => {
+            if (!blob) {
+              reject(new Error("Blob conversion failed"));
+              return;
+            }
+            const baseName = file.name.replace(/\.[^/.]+$/, "");
+            resolve(new File([blob], `${baseName}.png`, { type: "image/png" }));
+          }, "image/png");
+        };
+
+        img.onerror = () => {
+          URL.revokeObjectURL(objectUrl);
+          reject(new Error("Failed to load image for PNG conversion."));
+        };
+
+        img.src = objectUrl;
+      });
+    }
+
+    // For SVGs, read as text and rasterize
+    const svgText = await file.text();
+    let processedContent = svgText;
+    let svgWidth = 1200;
+    let svgHeight = 630;
+
+    const viewBoxMatch = processedContent.match(
+      /viewBox\s*=\s*["']([\d\s.-]+)["']/i
+    );
+    if (viewBoxMatch) {
+      const parts = viewBoxMatch[1].trim().split(/[\s,]+/);
+      if (parts.length === 4) {
+        svgWidth = parseFloat(parts[2]) || 1200;
+        svgHeight = parseFloat(parts[3]) || 630;
+      }
+    }
+
+    if (
+      !processedContent.includes('fill="#ffffff"') &&
+      !processedContent.includes('fill="white"')
+    ) {
+      processedContent = processedContent.replace(
+        /(<svg[^>]*>)/i,
+        `$1<rect width="${svgWidth}" height="${svgHeight}" fill="#ffffff"/>`
+      );
+    }
+
+    return new Promise((resolve, reject) => {
+      const dataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(
+        processedContent
+      )}`;
+      const img = new window.Image();
+
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = svgWidth;
+        canvas.height = svgHeight;
+
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          reject(new Error("Canvas context failed"));
+          return;
         }
+
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        canvas.toBlob((blob) => {
+          if (!blob) {
+            reject(new Error("Blob conversion failed"));
+            return;
+          }
+          const baseName = file.name.replace(/\.[^/.]+$/, "");
+          resolve(new File([blob], `${baseName}.png`, { type: "image/png" }));
+        }, "image/png");
       };
-      reader.readAsText(file);
+
+      img.onerror = () => {
+        reject(new Error("Failed to render SVG image."));
+      };
+
+      img.src = dataUrl;
     });
   };
 
@@ -182,10 +264,16 @@ export function LeftSidebarCreateArticleSeries({ isEditing, seriesId, existingDa
     e.preventDefault();
     if (!seriesTitle.trim()) return;
 
-    const numericPrice = price ? parseFloat(price) : NaN;
+    const numericPrice = price.trim() !== "" ? parseFloat(price) : NaN;
 
-    if (isCourse && !isFreeCourse && (Number.isNaN(numericPrice) || numericPrice <= 0)) {
-      setError("Please provide a valid price for a paid course, or mark it as free.");
+    if (
+      isCourse &&
+      !isFreeCourse &&
+      (Number.isNaN(numericPrice) || numericPrice <= 0)
+    ) {
+      setError(
+        "Please provide a valid price greater than 0 for a paid course, or mark it as free."
+      );
       return;
     }
 
@@ -194,40 +282,50 @@ export function LeftSidebarCreateArticleSeries({ isEditing, seriesId, existingDa
 
     try {
       let coverImageStorageId: string | undefined = existingData?.coverImage;
-      let coverImagePngStorageId: string | undefined = existingData?.coverImagePng;
+      let coverImagePngStorageId: string | undefined =
+        existingData?.coverImagePng;
 
       if (selectedImage) {
         const postUrl1 = await generateUploadUrl();
-        const res1 = await fetch(postUrl1, { method: "POST", headers: { "Content-Type": selectedImage.type }, body: selectedImage });
+        const res1 = await fetch(postUrl1, {
+          method: "POST",
+          headers: { "Content-Type": selectedImage.type },
+          body: selectedImage,
+        });
         if (!res1.ok) throw new Error("Failed to upload cover image.");
         coverImageStorageId = (await res1.json()).storageId;
 
         const pngFile = await convertImageToPngFile(selectedImage);
         const postUrl2 = await generateUploadUrl();
-        const res2 = await fetch(postUrl2, { method: "POST", headers: { "Content-Type": "image/png" }, body: pngFile });
+        const res2 = await fetch(postUrl2, {
+          method: "POST",
+          headers: { "Content-Type": "image/png" },
+          body: pngFile,
+        });
         if (!res2.ok) throw new Error("Failed to upload PNG cover image.");
         coverImagePngStorageId = (await res2.json()).storageId;
       }
 
-      const slug = seriesTitle.toLowerCase().trim().replace(/[^\w\s-]/g, "").replace(/[\s_-]+/g, "-");
-      const parsedPrice =
-        isCourse && !isFreeCourse && !Number.isNaN(numericPrice) && numericPrice > 0
-          ? numericPrice
-          : undefined;
+      const slug = seriesTitle
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, "")
+        .replace(/[\s_-]+/g, "-");
+
+      const finalPrice = !isCourse ? 0 : isFreeCourse ? 0 : numericPrice;
 
       if (isEditing && seriesId) {
         await updateSeriesWithItems({
           seriesId,
           title: seriesTitle.trim(),
           slug,
-          description: description.trim() || undefined,
+          description: description.trim(),
           coverImage: coverImageStorageId,
           coverImagePng: coverImagePngStorageId,
           articleIds: stagedBlogIds,
           isCourse,
-          isFree: isCourse ? isFreeCourse : false,
-          price: parsedPrice,
-          currency: isCourse && !isFreeCourse ? currency : undefined,
+          price: finalPrice,
+          currency,
         });
         router.push(`${currentUser?.username}/series/${slug}`);
       } else {
@@ -239,9 +337,8 @@ export function LeftSidebarCreateArticleSeries({ isEditing, seriesId, existingDa
           coverImagePng: coverImagePngStorageId,
           articleIds: stagedBlogIds,
           isCourse,
-          isFree: isCourse ? isFreeCourse : false,
-          price: parsedPrice,
-          currency: isCourse && !isFreeCourse ? currency : undefined,
+          price: finalPrice,
+          currency,
         });
         router.push(`${currentUser?.username}/series/${newSlug}`);
       }
@@ -264,18 +361,32 @@ export function LeftSidebarCreateArticleSeries({ isEditing, seriesId, existingDa
   }, []);
 
   return (
-    <Sidebar className="flex flex-col !top-16 !z-40 border-r" bgClass="bg-background/95" collapsible="icon">
+    <Sidebar
+      className="flex flex-col !top-16 !z-40 border-r"
+      bgClass="bg-background/95"
+      collapsible="icon"
+    >
       <SidebarContent className="!p-0 w-full">
-        <ScrollArea dir="rtl" className="h-[calc(100vh-4rem)] w-full [&>div>div]:!block">
+        <ScrollArea
+          dir="rtl"
+          className="h-[calc(100vh-4rem)] w-full [&>div>div]:!block"
+        >
           <div dir="ltr" className="text-left">
             <SidebarGroup className="pt-3 !px-2 w-full">
-              <form onSubmit={handleSubmit} className="flex flex-col gap-3 w-full pb-6">
+              <form
+                onSubmit={handleSubmit}
+                className="flex flex-col gap-3 w-full pb-6"
+              >
                 <div className="relative p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 flex flex-col gap-3">
-                  
                   <div className="relative w-full h-48 overflow-hidden rounded-lg">
                     {imagePreview ? (
                       <div className="relative w-full h-full rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800">
-                        <Image src={imagePreview} alt="Cover preview" fill className="object-cover" />
+                        <Image
+                          src={imagePreview}
+                          alt="Cover preview"
+                          fill
+                          className="object-cover"
+                        />
                         <Button
                           type="button"
                           variant="ghost"
@@ -288,45 +399,96 @@ export function LeftSidebarCreateArticleSeries({ isEditing, seriesId, existingDa
                         </Button>
                       </div>
                     ) : (
-                      <div onClick={() => fileInputRef.current?.click()} className="w-full h-full border-2 border-dashed border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 rounded-lg p-4 flex flex-col items-center justify-center gap-1.5 cursor-pointer bg-background/50 text-center">
+                      <div
+                        onClick={() => fileInputRef.current?.click()}
+                        className="w-full h-full border-2 border-dashed border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 rounded-lg p-4 flex flex-col items-center justify-center gap-1.5 cursor-pointer bg-background/50 text-center"
+                      >
                         <ImagePlus className="h-8 w-8 text-zinc-400" />
-                        <p className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Click to upload cover image</p>
+                        <p className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                          Click to upload cover image
+                        </p>
                       </div>
                     )}
-                    <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageChange} disabled={isSubmitting} />
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleImageChange}
+                      disabled={isSubmitting}
+                    />
                   </div>
 
                   <div className="flex flex-row gap-2 items-center">
                     {profilePic && (
                       <div className="h-6 w-6 border border-border rounded-full overflow-hidden bg-muted shrink-0">
-                        <img src={profilePic} alt="profile" className="h-full w-full object-cover" />
+                        <img
+                          src={profilePic}
+                          alt="profile"
+                          className="h-full w-full object-cover"
+                        />
                       </div>
                     )}
-                    <ProfileHoverCard displayName={currentUser?.profile?.displayName} authorUsername={currentUser?.profile?.username || ""}>
-                      <span className="text-sm truncate leading-tight cursor-pointer">{authorName}</span>
+                    <ProfileHoverCard
+                      displayName={currentUser?.profile?.displayName}
+                      authorUsername={currentUser?.profile?.username || ""}
+                    >
+                      <span className="text-sm truncate leading-tight cursor-pointer">
+                        {authorName}
+                      </span>
                     </ProfileHoverCard>
-                    <span className="capitalize font-semibold text-xs text-zinc-400 ml-auto">{currentDate}</span>
+                    <span className="capitalize font-semibold text-xs text-zinc-400 ml-auto">
+                      {currentDate}
+                    </span>
                   </div>
 
                   <div className="flex flex-col gap-3">
                     <div className="grid gap-1.5">
-                      <Label htmlFor="title" className="text-xs font-semibold">Title</Label>
-                      <Input id="title" placeholder="Next.js 16 Masterclass" value={seriesTitle} onChange={(e) => setSeriesTitle(e.target.value)} disabled={isSubmitting} required />
+                      <Label htmlFor="title" className="text-xs font-semibold">
+                        Title
+                      </Label>
+                      <Input
+                        id="title"
+                        placeholder="Next.js 16 Masterclass"
+                        value={seriesTitle}
+                        onChange={(e) => setSeriesTitle(e.target.value)}
+                        disabled={isSubmitting}
+                        required
+                      />
                     </div>
                     <div className="grid gap-1.5">
-                      <Label htmlFor="description" className="text-xs font-semibold">Description (Optional)</Label>
-                      <Textarea id="description" placeholder="What will readers learn?" value={description} onChange={(e) => setDescription(e.target.value)} disabled={isSubmitting} rows={3} className="resize-none" />
+                      <Label
+                        htmlFor="description"
+                        className="text-xs font-semibold"
+                      >
+                        Description
+                      </Label>
+                      <Textarea
+                        id="description"
+                        placeholder="What will readers learn?"
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        disabled={isSubmitting}
+                        rows={3}
+                        className="resize-none"
+                      />
                     </div>
                   </div>
 
                   <div className="flex items-center space-x-2 pt-1">
                     <Checkbox
+                      className="cursor-pointer"
                       id="isCourseToggle"
                       checked={isCourse}
-                      onCheckedChange={(checked) => handleCourseToggle(checked === true)}
+                      onCheckedChange={(checked) =>
+                        handleCourseToggle(checked === true)
+                      }
                       disabled={isSubmitting}
                     />
-                    <Label htmlFor="isCourseToggle" className="text-xs font-semibold cursor-pointer">
+                    <Label
+                      htmlFor="isCourseToggle"
+                      className="text-xs font-semibold cursor-pointer"
+                    >
                       Mark as Course
                     </Label>
                   </div>
@@ -335,12 +497,18 @@ export function LeftSidebarCreateArticleSeries({ isEditing, seriesId, existingDa
                     <div className="flex flex-col gap-3 p-3 rounded-lg bg-background/80 border border-border animate-in fade-in-50 duration-200">
                       <div className="flex items-center space-x-2">
                         <Checkbox
+                          className="cursor-pointer"
                           id="isFreeCourseToggle"
                           checked={isFreeCourse}
-                          onCheckedChange={(checked) => handleFreeCourseToggle(checked === true)}
+                          onCheckedChange={(checked) =>
+                            handleFreeCourseToggle(checked === true)
+                          }
                           disabled={isSubmitting}
                         />
-                        <Label htmlFor="isFreeCourseToggle" className="text-xs font-semibold cursor-pointer">
+                        <Label
+                          htmlFor="isFreeCourseToggle"
+                          className="text-xs font-semibold cursor-pointer"
+                        >
                           Free Course
                         </Label>
                       </div>
@@ -349,7 +517,12 @@ export function LeftSidebarCreateArticleSeries({ isEditing, seriesId, existingDa
                         <>
                           <div className="grid grid-cols-3 gap-2">
                             <div className="col-span-2 grid gap-1.5">
-                              <Label htmlFor="price" className="text-xs font-semibold">Price</Label>
+                              <Label
+                                htmlFor="price"
+                                className="text-xs font-semibold"
+                              >
+                                Price
+                              </Label>
                               <Input
                                 id="price"
                                 type="number"
@@ -357,20 +530,36 @@ export function LeftSidebarCreateArticleSeries({ isEditing, seriesId, existingDa
                                 min="0.01"
                                 placeholder="29.99"
                                 value={price}
-                                onChange={(e) => setPrice(e.target.value)}
+                                onChange={handlePriceChange}
                                 disabled={isSubmitting}
                                 required={isCourse && !isFreeCourse}
                               />
                             </div>
                             <div className="grid gap-1.5">
-                              <Label htmlFor="currency" className="text-xs font-semibold">Currency</Label>
-                              <Select value={currency} onValueChange={setCurrency} disabled={isSubmitting}>
-                                <SelectTrigger id="currency" className="h-9 cursor-pointer">
+                              <Label
+                                htmlFor="currency"
+                                className="text-xs font-semibold"
+                              >
+                                Currency
+                              </Label>
+                              <Select
+                                value={currency}
+                                onValueChange={setCurrency}
+                                disabled={isSubmitting}
+                              >
+                                <SelectTrigger
+                                  id="currency"
+                                  className="h-9 cursor-pointer"
+                                >
                                   <SelectValue placeholder="Currency" />
                                 </SelectTrigger>
                                 <SelectContent>
                                   {CURRENCIES.map((c) => (
-                                    <SelectItem key={c.code} value={c.code} className="cursor-pointer">
+                                    <SelectItem
+                                      key={c.code}
+                                      value={c.code}
+                                      className="cursor-pointer"
+                                    >
                                       {c.code.toUpperCase()}
                                     </SelectItem>
                                   ))}
@@ -379,31 +568,34 @@ export function LeftSidebarCreateArticleSeries({ isEditing, seriesId, existingDa
                             </div>
                           </div>
                           <p className="text-[11px] text-muted-foreground">
-                            Users will be prompted to purchase via Stripe before accessing this course content.
+                            Users will be prompted to purchase via Stripe before
+                            accessing this course content.
                           </p>
                         </>
                       ) : (
                         <p className="text-[11px] text-muted-foreground">
-                          Students can enroll in this course for free without Stripe checkout.
+                          Price will be set to 0. Students can enroll for free
+                          without Stripe checkout.
                         </p>
                       )}
                     </div>
                   )}
 
-                  <div className="flex items-center">
-                    <Badge variant={"outline"} className="gap-1.5 py-1 px-2.5 text-zinc-600 dark:text-zinc-300">
-                      <Clock className="w-3.5 h-3.5 text-zinc-400" />
-                      <span>{formatReadTime(totalReadMinutes)}</span>
-                    </Badge>
-                  </div>
+                  {error && (
+                    <p className="text-xs text-red-500 mt-1">{error}</p>
+                  )}
 
-                  {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
-
-                  <Button type="submit" size={"sm"} disabled={isSubmitting || !seriesTitle.trim()} className="cursor-pointer rounded-xl w-fit mt-2">
-                    {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  <Button
+                    type="submit"
+                    size={"sm"}
+                    disabled={isSubmitting || !seriesTitle.trim()}
+                    className="cursor-pointer rounded-xl w-fit mt-2"
+                  >
+                    {isSubmitting && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
                     {isEditing ? "Save Changes" : "Create Series"}
                   </Button>
-
                 </div>
               </form>
             </SidebarGroup>
