@@ -31,7 +31,7 @@ export default function SeriesCard({ series, isCompact = false }: ProfileArticle
   const pathname = usePathname();
   const router = useRouter();
   const [isButtonHovered, setIsButtonHovered] = useState(false);
-  
+
   const imageUrl = series.imageUrl;
   const articleCount = series.articleCount || 0;
   const targetArticleId = series.firstArticleId;
@@ -67,9 +67,9 @@ export default function SeriesCard({ series, isCompact = false }: ProfileArticle
             <h3 className="leading-tight text-lg md:text-sm font-bold tracking-tight line-clamp-1 text-foreground group-hover:text-blue-600 flex-1 min-w-0">
               {series.title}
             </h3>
-            
+
             <span className="shrink-0 text-xs font-medium text-zinc-500 dark:text-zinc-400 bg-zinc-200/60 dark:bg-zinc-800 px-2 py-0.5 rounded-full">
-              {articleCount} {articleCount === 1 ? 'article' : 'articles'}
+              {articleCount} {articleCount === 1 ? "article" : "articles"}
             </span>
           </div>
 
@@ -84,9 +84,9 @@ export default function SeriesCard({ series, isCompact = false }: ProfileArticle
               </time>
             </div>
 
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               asChild
               className="shrink-0 h-7 text-xs rounded-lg gap-1.5 px-3 shadow-none cursor-pointer self-center z-10"
               onMouseEnter={() => setIsButtonHovered(true)}
@@ -108,37 +108,36 @@ export default function SeriesCard({ series, isCompact = false }: ProfileArticle
 
   return (
     <div className="group flex flex-col md:flex-row h-auto md:h-[190px] border border-border/50 rounded-none transition-colors duration-100 hover:bg-muted bg-background/95">
-      
-      <Link 
+      <Link
         href={`/${username}/series/${series.slug}`}
         className="relative aspect-video md:aspect-auto w-full md:w-2/5 md:h-full overflow-hidden bg-muted border-b md:border-b-0 md:border-r border-border/50 shrink-0 block"
       >
-        {imageUrl && 
-            <div className="relative w-full aspect-[16/9] bg-zinc-100 dark:bg-zinc-800">
-                <Image
-                    unoptimized
-                    src={imageUrl} 
-                    alt={series.title}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                />
-            </div>
-        }
+        {imageUrl && (
+          <div className="relative w-full aspect-[16/9] bg-zinc-100 dark:bg-zinc-800">
+            <Image
+              unoptimized
+              src={imageUrl}
+              alt={series.title}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            />
+          </div>
+        )}
       </Link>
 
       <div className="flex flex-col flex-1 justify-start p-4 min-w-0">
         <div className="min-w-0">
           <div className="font-roboto flex items-center justify-between text-xs uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-              <div className="flex items-center gap-1">
-                  <ProfileHoverCard authorUsername={username} displayName={displayName}>
-                    <span className="cursor-pointer">{displayName}</span>
-                  </ProfileHoverCard>
-                  
-                  <span>&middot;</span>
-                  
-                  <span>{formatSmartDate(series._creationTime, false)}</span>
-              </div>
+            <div className="flex items-center gap-1">
+              <ProfileHoverCard authorUsername={username} displayName={displayName}>
+                <span className="cursor-pointer">{displayName}</span>
+              </ProfileHoverCard>
+
+              <span>&middot;</span>
+
+              <span>{formatSmartDate(series._creationTime, false)}</span>
+            </div>
           </div>
         </div>
 
@@ -150,34 +149,36 @@ export default function SeriesCard({ series, isCompact = false }: ProfileArticle
             {series.description}
           </p>
         </Link>
-         
-          <div className="flex font-sans font-semibold items-center justify-between text-sm tracking-tight select-none w-full mt-auto">
-            {series.price && series.currency && (series.price !== 0) &&
-              <div className="flex items-center">
-                <Badge variant={"outline"} className="py-1 px-2.5 text-green-600 dark:text-green-300">
-                  <span>{getCurrencySymbol(series.currency)}{series.price}</span>
-                </Badge>
-              </div>
-            }
-          
-            {!series.price && !series.currency && (series.price === 0) &&
-              <div className="flex items-center">
-                <Badge variant={"outline"} className="py-1 px-2.5 text-green-600 dark:text-green-300">
-                  <span>Free</span>
-                </Badge>
-              </div>
-            }
-            <div className="flex flex-row gap-1.5">
-              <div className="flex items-center ml-auto">
-                <Badge variant={"outline"} className="gap-1.5 py-1 px-2.5 text-zinc-600 dark:text-zinc-300">
-                  <Library className="w-3.5 h-3.5" />
-                  <span>
-                    {series.articleCount} {series.articleCount === 1 ? "Article" : "Articles"}
-                  </span>
-                </Badge>
-              </div>
+
+        <div className="flex font-sans font-semibold items-center justify-between text-sm tracking-tight select-none w-full mt-auto">
+          {series.price && series.price > 0 ? (
+            <div className="flex items-center">
+              <Badge variant="outline" className="py-1 px-2.5 text-green-600 dark:text-green-300">
+                <span>
+                  {series.currency ? getCurrencySymbol(series.currency) : ""}
+                  {series.price}
+                </span>
+              </Badge>
+            </div>
+          ) : (
+            <div className="flex items-center">
+              <Badge variant="outline" className="py-1 px-2.5 text-green-600 dark:text-green-300">
+                <span>Free</span>
+              </Badge>
+            </div>
+          )}
+
+          <div className="flex flex-row gap-1.5">
+            <div className="flex items-center ml-auto">
+              <Badge variant="outline" className="gap-1.5 py-1 px-2.5 text-zinc-600 dark:text-zinc-300">
+                <Library className="w-3.5 h-3.5" />
+                <span>
+                  {series.articleCount} {series.articleCount === 1 ? "Article" : "Articles"}
+                </span>
+              </Badge>
             </div>
           </div>
+        </div>
       </div>
     </div>
   );
