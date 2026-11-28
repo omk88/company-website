@@ -43,7 +43,7 @@ export const listForFeed = query({
           tags: post.tags,
           createdAt: post.createdAt,
           imageUrl: post.imageUrl,
-          audioUrl: post.audioUrl,
+          audioUrl: isPaid ? undefined : post.audioUrl,
           postType: post.postType,
           isPaid,
         };
