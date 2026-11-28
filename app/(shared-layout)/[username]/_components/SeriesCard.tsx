@@ -4,13 +4,12 @@ import { formatSmartDate, ProfileHoverCard } from "@/components/web/ProfileHover
 import { Doc } from "@/convex/_generated/dataModel";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { BookOpenText, Clock, Library } from "lucide-react";
+import { BookOpenText, Library } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { getCurrencySymbol } from "./LeftSidebarArticleSeries";
-import { formatReadTime } from "./RightSidebarArticleSeries";
 
 type Series = Doc<"series"> & {
   imageUrl?: string | null;
