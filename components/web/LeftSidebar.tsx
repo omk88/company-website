@@ -1,11 +1,10 @@
 import { Separator } from "../ui/separator";
-import { Sidebar, SidebarContent, SidebarGroup, SidebarFooter, SidebarMenuButton } from "../ui/sidebar";
+import { Sidebar, SidebarContent, SidebarGroup, SidebarFooter, SidebarMenuButton, SidebarMenuItem } from "../ui/sidebar";
 import { SidebarSearch } from "./SidebarSearch";
 import { SidebarSort } from "./SidebarSort";
 import { SidebarTags } from "./SidebarTags";
 import { SidebarNav } from "./SidebarNav";
-import { Gavel } from "lucide-react";
-import Link from "next/link";
+import { Rss } from "lucide-react";
 
 export async function LeftSidebar() {
 
@@ -53,6 +52,19 @@ export async function LeftSidebar() {
               <div className="w-full min-w-0">
                 <SidebarTags fullWidth={true} />
               </div>
+        
+              <SidebarMenuItem>
+                <a href="/feed.xml">
+                  <SidebarMenuButton
+                    className={`
+                      group !cursor-pointer justify-start px-2.5 py-1.5 rounded-lg text-lg md:text-sm transition-colors text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/60 font-medium"
+                    `}
+                  >
+                    <Rss className="h-4 w-4 shrink-0 stroke-[2.5] transition-colors" />
+                    <span className="font-medium">RSS Feed</span>
+                  </SidebarMenuButton>
+                </a>
+              </SidebarMenuItem>
             </div>
           </SidebarGroup>
         </SidebarContent>

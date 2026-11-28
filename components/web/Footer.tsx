@@ -48,6 +48,7 @@ export default function Footer() {
             <h3 className="font-semibold text-foreground">Support</h3>
             <ul className="flex flex-col gap-2">
               <li><Link href="/contact" className="hover:text-foreground transition-colors">Contact Us</Link></li>
+              <li><a href="/feed.xml" className="hover:text-foreground transition-colors">RSS Feed</a></li>
             </ul>
           </div>
 
