@@ -63,7 +63,7 @@ export function SeriesItems({ slug, preloadedData }: SeriesItemsProps) {
   }, [canLoadMore, loadMore]);
 
   return (
-    <div className="w-full p-2 pb-16">
+    <div className="w-full p-2 pb-24">
       <div className="w-full mx-auto">
         {isInitialLoading ? (
           <ul className="flex flex-col gap-4">
