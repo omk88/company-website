@@ -32,12 +32,19 @@ const jetBrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
 });
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.taqtiq.tech";
+
 export const metadata: Metadata = {
   title: {
     default: "TaQtiQ | Software that pushes boundaries.",
     template: "%s | TaQtiQ",
   },
-  description: "Description",
+  alternates: {
+    types: {
+      "application/rss+xml": `${SITE_URL}/feed.xml`,
+    },
+  },
+  description: "TaQtiQ is a London-based software development firm. We focus on driving progress within the technology sector with our innovative approach to problem solving.",
 };
 
 export default function RootLayout({

@@ -30,6 +30,7 @@ import type * as notifications from "../notifications.js";
 import type * as postImageCleanup from "../postImageCleanup.js";
 import type * as profiles from "../profiles.js";
 import type * as purchases from "../purchases.js";
+import type * as rss from "../rss.js";
 import type * as scoreAlgorithm from "../scoreAlgorithm.js";
 import type * as series from "../series.js";
 import type * as settings from "../settings.js";
@@ -67,6 +68,7 @@ declare const fullApi: ApiFromModules<{
   postImageCleanup: typeof postImageCleanup;
   profiles: typeof profiles;
   purchases: typeof purchases;
+  rss: typeof rss;
   scoreAlgorithm: typeof scoreAlgorithm;
   series: typeof series;
   settings: typeof settings;
