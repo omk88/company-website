@@ -4,8 +4,6 @@ import { api } from "@/convex/_generated/api";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://yourdomain.com";
 
-export const revalidate = 3600;
-
 export async function GET() {
   const posts = await fetchQuery(api.rss.listForFeed, {});
 
