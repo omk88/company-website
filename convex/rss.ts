@@ -18,18 +18,36 @@ export const listForFeed = query({
 
     const posts = await baseQuery.take(50);
 
-    return posts.map((post) => ({
-      _id: post._id,
-      blogTitleId: post.blogTitleId,
-      title: post.title,
-      subtitle: post.subtitle,
-      content: post.content,
-      author: post.displayName ?? post.author,
-      tags: post.tags,
-      createdAt: post.createdAt,
-      imageUrl: post.imageUrl,
-      audioUrl: post.audioUrl,
-      postType: post.postType,
-    }));
+    return await Promise.all(
+      posts.map(async (post) => {
+        const memberships = await ctx.db
+          .query("seriesItems")
+          .withIndex("by_article", (q) => q.eq("articleId", post._id))
+          .collect();
+
+        const seriesDocs = await Promise.all(
+          memberships.map((item) => ctx.db.get(item.seriesId))
+        );
+
+        const isPaid = seriesDocs.some(
+          (series) => series !== null && series.price > 0
+        );
+
+        return {
+          _id: post._id,
+          blogTitleId: post.blogTitleId,
+          title: post.title,
+          subtitle: post.subtitle,
+          content: isPaid ? undefined : post.content,
+          author: post.displayName ?? post.author,
+          tags: post.tags,
+          createdAt: post.createdAt,
+          imageUrl: post.imageUrl,
+          audioUrl: post.audioUrl,
+          postType: post.postType,
+          isPaid,
+        };
+      })
+    );
   },
 });
